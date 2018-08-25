@@ -13,13 +13,14 @@ class DSGraphicsLayout():
     plots = list()
     referencePlot = None
 
-    def __init__(self):
-        self.plotLayoutWidget = pg.GraphicsLayoutWidget()
+    def __init__(self, dockWidget):
+        self.dockWidget = dockWidget
+        self.plotLayoutWidget = DSGraphicsLayoutWidget(self)
         self.plotLayoutWidget.setBackground(self.sequenceBGColor)
 
-    def addPlot(self, name):
+    def addPlot(self, name, comp):
         self.plotLayoutWidget.nextRow()
-        plot = DSPlotItem(self, name)
+        plot = DSPlotItem(self, name, comp)
         self.plots.append(plot)
 
         if(len(self.plots) == 1):
@@ -29,58 +30,120 @@ class DSGraphicsLayout():
 
         return plot
 
-class DSPlotItem():
+    def clearPlots(self):
+        self.plots.clear()
+        self.plotLayoutWidget.clear()
 
-    def __init__(self, plotLayout, name):
+class DSGraphicsLayoutWidget(pg.GraphicsLayoutWidget):
+
+    def __init__(self, parent):
+        super().__init__()
+        self.parent = parent
+
+    def findPlotByMousePos(self, pos):
+        plotsInRange = []
+        for plot in self.parent.plots:
+            # Okay - so there is a glitch in pyqtgraph that adjustes the offset for other widgets in the scene by offsetting the bounding QRect
+            # into the plot area (it seems to do this TWICE). Because the sequencer browser is causing this - we are adjusting the QRect collision
+            # area to account for this. It's not pretty but it works.
+            sequenceNavigatorWidth = self.parent.dockWidget.sequenceNavigator.width()
+            adjViewGeometry = plot.plotItem.getViewBox().screenGeometry().adjusted(-sequenceNavigatorWidth, 0, sequenceNavigatorWidth, 0)
+            if(adjViewGeometry.contains(pos)):
+                plotsInRange.append(plot)
+        return plotsInRange
+
+    def mouseDoubleClickEvent(self, event):
+        if(event.buttons() == Qt.LeftButton):
+            super().mouseDoubleClickEvent(event)
+            event.accept()
+        else:
+            super().mouseDoubleClickEvent(event)
+        selectedPlots = self.findPlotByMousePos(event.globalPos())
+        if (len(selectedPlots) > 0):
+            selectedPlots[0].component.onSequencerDoubleClick(event.globalPos())
+
+    def mousePressEvent(self, event):
+        
+        if(event.buttons() == Qt.RightButton):
+            event.accept()
+            selectedPlots = self.findPlotByMousePos(event.globalPos())
+            if (len(selectedPlots) > 0):
+                selectedPlots[0].component.onSequencerDoubleClick(event.globalPos())
+        else:
+            super().mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        if(event.button() == 2):
+            event.accept()
+        else:
+            super().mouseReleaseEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if(event.buttons() & Qt.RightButton):
+            event.accept()
+        else:
+            super().mouseMoveEvent(event)
+
+class DSPlotItem():
+    plotPaddingPercent = 1
+
+    def __init__(self, plotLayout, name, comp):
+        self.component = comp
         self.plotLayout = plotLayout
         self.plotItem = plotLayout.plotLayoutWidget.addPlot()
         self.name = name
         self.LODs = []
         self.data = []
         self.pen = []
-        self.xMax = 0
-        self.xMin = 0
-        self.numPoints = 0
-        self.LODing = True
     
-    def plot(self, data):
-        self.xMax = data.size #np.max(data)
-        self.xMin = 0 #np.min(data)
-        self.numPoints = data.size
-        self.data = data
+    def plot(self, showXAxis, xMinIn, xMaxIn):
+        data = self.component.plotSequencer()
+        data2 = self.formatData(data, xMinIn, xMaxIn)
+        self.data = data2
 
-        self.plotItem.plot(y=data, pen = self.plotLayout.sequencePLT1Color)
-        self.plotItem.setLimits(xMin=0, xMax=data.size)
+        yDelta = self.data[:,1].max() - self.data[:,1].min()
+        yPadding = yDelta*self.plotPaddingPercent/100
+
+        self.plotItem.plot(x=self.data[:,0], y=self.data[:,1], pen = self.plotLayout.sequencePLT1Color)
+        self.plotItem.setLimits(xMin=xMinIn, xMax=xMaxIn, yMin=self.data[:,1].min()-yPadding, yMax=self.data[:,1].max()+yPadding)
         self.plotItem.setMouseEnabled(x=True, y=False)
-        self.plotItem.showAxis('bottom', False)
+        self.plotItem.setLabels(bottom='Time (s)', left='voltage')
+        if(showXAxis):
+            self.plotItem.showAxis('bottom', True)
+            self.plotItem.showLabel('bottom', True)
+        else:
+            self.plotItem.showAxis('bottom', False)
+            self.plotItem.showLabel('bottom', False)
         self.plotItem.setLabel('left', self.name)
         self.plotItem.setDownsampling(ds=True, auto=True, mode='peak')
-        self.plotItem.setClipToView(True)
+        #self.plotItem.setClipToView(True)
         axis = self.plotItem.getAxis('bottom')
-        #self.plotItem.sigXRangeChanged.connect(lambda: self.checkLOD(axis.range))
         
-    def checkLOD(self, range):
-        xRange = self.xMax-self.xMin
-        xRangeView = range[1]-range[0]
-        xRangeRatio = xRangeView/xRange
-        xPoints = self.numPoints*xRangeRatio
-        print([xRangeRatio, '||', xPoints, '||'])
+    def formatData(self, data, xMin, xMax):
+        if(data[:,0].min() > xMin):
+            minStump = [xMin, data[data[:,0].argmin(), 1]]
+            data = np.vstack((minStump, data))
+        if(data[:,0].max() < xMax):
+            maxStump = [xMax, data[data[:,0].argmax(), 1]]
+            data = np.vstack((data, maxStump))
+
+        return data
 
     def report(self):
-        #self.plotItem.setLabel('left', random.choice("abcde"))
-
-        print("SHIT")
+        pass
 
     def calcLODs(self):
         pass
 
-
 class sequencerDockWidget(QDockWidget):
     ITEM_GUID = Qt.UserRole
+    plots = []
+    plotPaddingPercent = 1
 
     def __init__(self, mainWindow):
         super().__init__('Sequencer')
         self.mainWindow = mainWindow
+        self.instrumentManager = mainWindow.workspace.DSInstrumentManager
         self.hide()
         self.resize(1000, 800)
         self.fileSystem = DSEditorFSModel()
@@ -97,7 +160,7 @@ class sequencerDockWidget(QDockWidget):
         self.initActions()
         self.initToolbar()
 
-        self.sequenceView = DSGraphicsLayout()
+        self.sequenceView = DSGraphicsLayout(self)
         #self.sequenceView = pg.GraphicsLayoutWidget()
         self.initSequenceView()
         
@@ -116,22 +179,56 @@ class sequencerDockWidget(QDockWidget):
 
     def initSequenceView(self):
         pg.setConfigOptions(antialias=True)
+        self.updatePlotList()
 
-        size = 1000000
-        p1 = self.sequenceView.addPlot("Name 1")
-        p1.plot(np.random.normal(size=size))
+    def isPlotListDirty(self):
+        return True
+        # This function is a placeholder for future optimizations - for stopping redraw on EVERY param change when
+        # not necessary.
 
-        p2 = self.sequenceView.addPlot("Name 2")
-        p2.plot(np.random.normal(size=size))
+    def updatePlotList(self):
+        if(self.isPlotListDirty()):
+            self.sequenceView.clearPlots()
+            if(self.instrumentManager.currentInstrument is not None):
+                for component in self.instrumentManager.currentInstrument.components:
+                    if(component.compSettings['showSequencer'] is True):
+                        plotHolder = self.sequenceView.addPlot(component.compSettings['name'], component)
+                        if(component.valid is True):
+                            pass
+                            #plotHolder.plotItem.getViewBox().setBackgroundColor(None)
+                        else:
+                            plotHolder.plotItem.getViewBox().setBackgroundColor(QColor(255,0,0,alpha=100))
+                        self.plots.append(plotHolder)
 
-        p3 = self.sequenceView.addPlot("Name 3")
-        p3.plot(np.random.normal(size=size))
+            self.redrawSequence()
 
-        p4 = self.sequenceView.addPlot("Name 4")
-        p4.plot(np.random.normal(size=size))
+    def getSequenceXRange(self):
+        globalxMax = 0
+        globalxMin = 1
+        for plotTemp in self.plots:
+            data = plotTemp.component.plotSequencer()
+            xMax = data[:, 0].max()
+            if(xMax > globalxMax):
+                globalxMax = xMax
+            xMin = data[:, 0].min()
+            if(xMin < globalxMin):
+                globalxMin = xMin
+
+        return globalxMin, globalxMax
 
     def redrawSequence(self):
-        npoints = 100000
+        xMin, xMax = self.getSequenceXRange()
+        distance = xMax-xMin
+        xMin = xMin - (self.plotPaddingPercent*distance/100)
+        xMax = xMax + (self.plotPaddingPercent*distance/100)
+
+        plotCounter = len(self.plots)
+        for plotTemp in self.plots:
+            plotCounter = plotCounter - 1
+            if(plotCounter == 0):
+                plotTemp.plot(True, xMin, xMax)
+            else:
+                plotTemp.plot(False, xMin, xMax)
 
     def initToolbar(self):
         self.toolbar.addAction(self.newAction)
@@ -230,9 +327,6 @@ class sequencerDockWidget(QDockWidget):
         self.saveAsAction.setEnabled(True)
         self.saveAllAction.setEnabled(True)
 
-
-
-
 class DSNewFileDialog(QDialog):
     def __init__(self):
         super().__init__()
@@ -259,8 +353,6 @@ class DSNewFileDialog(QDialog):
         result = dialog.exec_()
         return (result == QDialog.Accepted)
 
-
-
 class DSEditorFSModel(QFileSystemModel):
     def __init__(self):
         super().__init__()
@@ -271,8 +363,6 @@ class DSEditorFSModel(QFileSystemModel):
             return "Sequences"
         else:
             return super(QFileSystemModel, self).headerData(section, orientation, role)
-
-
 
 class DSTreeView(QTreeView):
     def __init__(self, parent, model):

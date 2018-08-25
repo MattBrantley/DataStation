@@ -43,8 +43,17 @@ class iView(pg.GraphicsWindow):
         result = self.mainWindow.instrumentManager.addCompToInstrument(index)
 
         if result is not None:
-            m = iViewComponent(self.mainWindow, index, result, width=1, height=1, pos=(dropX, dropY))
+            m = iViewComponent(self.mainWindow, result, self, width=1, height=1, pos=(dropX, dropY))
             self.view.addItem(m)
+            result.registeriViewComponent(m)
+
+    def addComp(self, comp, x, y, r):
+        m = iViewComponent(self.mainWindow, comp, self, width=1, height=1, pos=(x, y), angle=r)
+        self.view.addItem(m)
+        comp.registeriViewComponent(m)
+
+    def clearComps(self):
+        self.view.clear()
 
 class ParamObj:
     # Just a helper for tracking parameters and responding to changes
@@ -81,7 +90,6 @@ class iViewGraphic(pg.GraphicsObject, ParamObj):
         self.pxm = QPixmap(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'User Components\img\\' + src))
         self.surfaces = [iViewGraphicBound(self.pxm.width(), self.pxm.height())]
         
-
         if pen is None:
             self.pen = pg.mkPen((220,220,255,200), width=1, cosmetic=True)
         else:
@@ -146,14 +154,15 @@ class iViewObject(pg.GraphicsObject, ParamObj):
     index = 0
     instrComp = None
 
-    def __init__(self, gitem, **params):
+    def __init__(self, gitem, iView, **params):
         ParamObj.__init__(self)
         pg.GraphicsObject.__init__(self) #, [0,0], [1,1])
 
         self.gitem = gitem
+        self.iView = iView
         gitem.setParentItem(self)
         
-        self.roi = pg.ROI([0,0], [1,1])
+        self.roi = pg.ROI([0,0], [1,1], removable=True)
         self.roi.pen = pg.mkPen((0,0,255,0), width=0, cosmetic=True)
         handle = self.roi.addRotateHandle([1, 1], [0.5, 0.5])
         handle.pen = pg.mkPen('r')
@@ -172,8 +181,14 @@ class iViewObject(pg.GraphicsObject, ParamObj):
         self.roi.sigRegionChanged.connect(self.roiChanged)
         self.roi.sigClicked.connect(self.clicked)
         self.roi.setAcceptedMouseButtons(QtCore.Qt.LeftButton)
+        self.roi.sigRemoveRequested.connect(self.removed)
         self.setParams(**defaults)
     
+    def removed(self):
+        if(self.instrComp is not None):
+            self.instrComp.ROIRemove(QCursor.pos())
+            self.iView.view.removeItem(self)
+
     def clicked(self):
         if(self.instrComp is not None):
             self.instrComp.onLeftClick(QCursor.pos())
@@ -204,6 +219,7 @@ class iViewObject(pg.GraphicsObject, ParamObj):
             self.roi.setSize([br.width(), br.height()])
         finally:
             self.roi.sigRegionChanged.connect(self.roiChanged)
+
         self.sigStateChanged.emit()
 
     def roiChanged(self, *args):
@@ -222,16 +238,25 @@ class iViewObject(pg.GraphicsObject, ParamObj):
         pass
 
 class iViewComponent(iViewObject):
-    def __init__(self, mainWindow, index, instrComp, **params):
+    def __init__(self, mainWindow, instrComp, iView, **params):
         defaults = {
             'width': 1,
             'height': 1,
             'angle' : 180
         }
         self.mainWindow = mainWindow
-        self.indexComp = index
         self.instrComp = instrComp
+        self.iView = iView
         defaults.update(params)
-        src = self.mainWindow.instrumentManager.componentsAvailable[index].layoutGraphicSrc
+        src = instrComp.compSettings['layoutGraphicSrc']
+
         self.gitem = iViewGraphic(src, brush=(100,100,100,255), **defaults)
-        iViewObject.__init__(self, self.gitem, **defaults)
+        iViewObject.__init__(self, self.gitem, iView, **defaults)
+
+    def onSave(self):
+        iViewSaveData = dict()
+        iViewSaveData['x'] = self.gitem.pos().x()
+        iViewSaveData['y'] = self.gitem.pos().y()
+        iViewSaveData['r'] = self.roi.angle()
+
+        return iViewSaveData

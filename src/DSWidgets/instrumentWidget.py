@@ -1,9 +1,12 @@
 from PyQt5.Qt import *
+from PyQt5.QtCore import *
 import pyqtgraph as pg # This library gives a bunch of FutureWarnings that are unpleasant! Fix for this is in the main .py file header.
 import os
 from shutil import copyfileobj
 import numpy as np
 import random
+from Constants import DSConstants as DSConstants
+from PyQt5.QtGui import QInputDialog, QMessageBox
 from .iView import iView
 
 class instrumentWidget(QDockWidget):
@@ -16,7 +19,8 @@ class instrumentWidget(QDockWidget):
         self.hide()
         self.resize(1000, 800)
         self.fileSystem = DSEditorFSModel()
-        self.fsIndex = self.fileSystem.setRootPath(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))  #This is a placeholder - will need updating.
+        self.rootPath = os.path.abspath(os.path.join(os.path.join(os.path.dirname(os.path.dirname(__file__)), os.path.pardir), 'User Instruments'))
+        self.fsIndex = self.fileSystem.setRootPath(self.rootPath)
 
         self.toolbar = QToolBar()
         
@@ -40,7 +44,7 @@ class instrumentWidget(QDockWidget):
         self.instrumentContainer.addWidget(self.instrumentView)
 
         self.instrumentContainer.setStretchFactor(1, 3)
-        self.setWidget(self.mainContainer)
+        self.setWidget(self.mainContainer) 
         self.mainContainer.setCentralWidget(self.instrumentContainer)
         self.updateToolbarState()
         
@@ -65,29 +69,61 @@ class instrumentWidget(QDockWidget):
         self.instrumentNavigator.hideColumn(2)
         self.instrumentNavigator.hideColumn(3)
 
+    def new(self):
+        self.mainWindow.postLog('Creating new instrument', DSConstants.LOG_PRIORITY_HIGH)
+        fname, ok = QInputDialog.getText(self.mainWindow, "Virtual Instrument Name", "Virtual Instrument Name")
+        if(ok):
+            self.instrumentManager.newInstrument(fname)
+        else:
+            return
+
     def save(self):
-        print("save")
-        #curWidget = self.codeEditorTabs.currentWidget()
-        #curWidget.file.save()
+        savePath = None
+        item = self.instrumentNavigator.selectionModel().selectedIndexes()
+        if(len(item) > 0):
+            savePath = self.instrumentNavigator.model.filePath(item[0])
+        else:
+            savePath = self.rootPath
+
+        if(self.instrumentManager.currentInstrument.name == 'Default Instrument'):
+            self.saveAsInstrument(savePath)
+        else:
+            self.saveInstrument(savePath)
 
     def saveAs(self):
-        print("save as")
-        '''
-        curWidget = self.codeEditorTabs.currentWidget()
-        if(curWidget):
-            text, ok = QInputDialog.getText(self, 'Save As..', 'Filename:', QLineEdit.Normal, curWidget.fileName)
-            if(ok):
-                if(os.path.isfile(os.path.dirname(curWidget.filePath) + '/' + text)):
-                    ans = QMessageBox.question(self, 'Save File..', 'A file with this name already exists. Do you want to overwrite it?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-                    if(ans == QMessageBox.Yes):
-                        curWidget.file.save(os.path.dirname(curWidget.filePath) + '/' + text)
-                else:
-                    curWidget.file.save(os.path.dirname(curWidget.filePath) + '/' + text)
-        '''
+        savePath = None
+        item = self.instrumentNavigator.selectionModel().selectedIndexes()
+        if(len(item) > 0):
+            savePath = self.instrumentNavigator.model.filePath(item[0])
+        else:
+            savePath = self.rootPath
+        self.saveAsInstrument(savePath)
 
-    def new(self):
-        result = DSNewFileDialog.newFile()
-        print(result)
+    def saveAsInstrument(self, savePath):
+        fname, ok = QInputDialog.getText(self.mainWindow, "Virtual Instrument Name", "Virtual Instrument Name")
+        savePath = os.path.join(savePath, fname + '.dsinstrument')
+        if(ok):
+            self.instrumentManager.currentInstrument.name = fname
+        else:
+            return
+
+        url = self.instrumentManager.currentInstrument.url
+        if(os.path.exists(savePath)):
+            reply = QMessageBox.question(self.mainWindow, 'File Warning!', 'File exists - overwrite?', QMessageBox.Yes, QMessageBox.No)
+            if(reply == QMessageBox.No):
+                return
+        self.instrumentManager.saveInstrument(url)
+
+    def saveInstrument(self, savePath):
+        if(self.instrumentManager.currentInstrument.name == 'Default Instrument'):
+            fname, ok = QInputDialog.getText(self.mainWindow, "Virtual Instrument Name", "Virtual Instrument Name")
+            if(ok):
+                self.instrumentManager.currentInstrument.name = fname
+            else:
+                return
+
+        url = self.instrumentManager.currentInstrument.url
+        self.instrumentManager.saveInstrument(url)
 
     def initActions(self):
         self.newAction = QAction('New', self)
@@ -141,7 +177,7 @@ class instrumentWidget(QDockWidget):
             self.openInstrument(filePath)
 
     def openInstrument(self, filePath):
-        print("opening path")
+        self.instrumentManager.loadInstrument(filePath)
 
     def updateToolbarState(self):
         self.saveAction.setEnabled(True)
@@ -165,7 +201,10 @@ class componentsList(QListWidget):
         mimeData.setText("compDrag")
         data = QByteArray()
         stream = QDataStream(data, QIODevice.WriteOnly)
-        stream.writeQString(self.itemAt(e.pos()).text())
+        if(self.itemAt(e.pos()) is not None):
+            stream.writeQString(self.itemAt(e.pos()).text())
+        else:
+            return
         data2 = QByteArray()
         stream2 = QDataStream(data2, QIODevice.WriteOnly)
         stream2.writeInt(self.selectedIndexes()[0].row())
@@ -227,6 +266,7 @@ class DSEditorFSModel(QFileSystemModel):
     def __init__(self):
         super().__init__()
         self.setReadOnly(False)
+        self.setNameFilters({'*.dsinstrument'})
 
     def headerData(self, section, orientation, role):
         if section == 0 and role == Qt.DisplayRole:
@@ -242,23 +282,71 @@ class DSTreeView(QTreeView):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.rightClick)
 
+    def mousePressEvent(self, event):
+        self.clearSelection()
+        event.accept()
+        QTreeView.mousePressEvent(self, event)
+
     def rightClick(self, point):
         idx = self.mapToGlobal(point)
 
         item = self.selectionModel().selectedIndexes()
-        if(os.path.isdir(self.model.filePath(item[0]))):        #Don't show menu on folders
-            return
+        if(len(item) > 0):
+            if(os.path.isdir(self.model.filePath(item[0]))):        #Show different menu on folders
+                newInstrumentAction = QAction('New Instrument', self)
+                newInstrumentAction.triggered.connect(lambda: self.newInstrumentAction(self.model.filePath(item[0])))
 
-        deleteAction = QAction('Delete', self)
-        deleteAction.triggered.connect(lambda: self.delete(self.model.filePath(item[0])))
+                newFolderAction = QAction('New Folder', self)
+                newFolderAction.triggered.connect(lambda: self.newFolderAction(self.model.filePath(item[0])))
+                
+                menu = QMenu(self)
+                menu.addAction(newInstrumentAction)
+                menu.addAction(newFolderAction)
+                menu.exec(idx)
+            else:                                                   #Show this menu for non-folder items
+                openInstrumentAction = QAction('Open', self)
+                openInstrumentAction.triggered.connect(lambda: self.openInstrumentAction(self.model.filePath(item[0])))
 
-        duplicateAction = QAction('Duplicate', self)
-        duplicateAction.triggered.connect(lambda: self.duplicate(self.model.filePath(item[0])))
+                newInstrumentAction = QAction('New Instrument', self)
+                newInstrumentAction.triggered.connect(lambda: self.newInstrumentAction(self.model.filePath(item[0])))
 
-        menu = QMenu(self)
-        menu.addAction(deleteAction)
-        menu.addAction(duplicateAction)
-        menu.exec(idx)
+                newFolderAction = QAction('New Folder', self)
+                newFolderAction.triggered.connect(lambda: self.newFolderAction(self.model.filePath(item[0])))
+                
+                deleteAction = QAction('Delete', self)
+                deleteAction.triggered.connect(lambda: self.delete(self.model.filePath(item[0])))
+
+                duplicateAction = QAction('Duplicate', self)
+                duplicateAction.triggered.connect(lambda: self.duplicate(self.model.filePath(item[0])))
+
+                menu = QMenu(self)
+                menu.addAction(openInstrumentAction)
+                menu.addSeparator()
+                menu.addAction(newInstrumentAction)
+                menu.addAction(newFolderAction)
+                menu.addAction(deleteAction)
+                menu.addAction(duplicateAction)
+                menu.exec(idx)
+        else:                                                       #Show this menu for non-items
+            newInstrumentAction = QAction('New Instrument', self)
+            newInstrumentAction.triggered.connect(lambda: self.newInstrumentAction(self.parent.rootPath))
+
+            newFolderAction = QAction('New Folder', self)
+            newFolderAction.triggered.connect(lambda: self.newFolderAction(self.parent.rootPath))
+            
+            menu = QMenu(self)
+            menu.addAction(newInstrumentAction)
+            menu.addAction(newFolderAction)
+            menu.exec(idx)
+
+    def openInstrumentAction(self, item):
+        self.parent.openInstrument(item)
+
+    def newInstrumentAction(self, item):
+        print(item)
+
+    def newFolderAction(self, item):
+        print(item)
 
     def delete(self, item):
         os.remove(item)

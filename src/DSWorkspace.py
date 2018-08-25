@@ -13,6 +13,7 @@ from PyQt5.QtGui import *
 from UserScriptsController import userScriptsController
 from UserScript import *
 from InstrumentManager import InstrumentManager
+from HardwareManager import HardwareManager
 from Constants import DSConstants as DSConstants
 
 class databaseCommManager():
@@ -43,10 +44,10 @@ class databaseCommManager():
             conn.close()
             data = {'GUID': GUID, 'Type': 'Data', 'Name': dataSet.name, 'Units': DSUnits.arbitrary().baseQuantity}
 
-
 class DSWorkspace():
     workspaceURL = ''
     directoryURL = os.path.dirname(os.path.realpath(__file__))
+    userProfile = {}
     settingsURL = 'settings.json'
     userScripts = None
     ITEM_GUID = Qt.UserRole
@@ -62,7 +63,13 @@ class DSWorkspace():
         self.buildUserScripts()
         self.initDatabaseCommManager()
         self.initInstrumentManager()
+        self.initHardwareManager()
         
+    def initHardwareManager(self):
+        filtersURL = os.path.join(str(Path(self.directoryURL).parent), 'User Filters')
+        driversURL = os.path.join(str(Path(self.directoryURL).parent), 'Hardware Drivers')
+        self.DSHardwareManager = HardwareManager(self, filtersURL, driversURL)
+
     def initInstrumentManager(self):
         componentsURL = os.path.join(str(Path(self.directoryURL).parent), 'User Components')
         instrumentsURL = os.path.join(str(Path(self.directoryURL).parent), 'User Instruments')
@@ -92,7 +99,7 @@ class DSWorkspace():
     def updateSettings(self):
         self.mainWindow.postLog('Updating Settings File... ', DSConstants.LOG_PRIORITY_HIGH)
         with open(self.settingsURL, 'w') as file:
-            json.dump(self.settings, file)
+            json.dump(self.settings, file, sort_keys=True, indent=4)
         self.mainWindow.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     def generateDefaultSettingsFile(self):
@@ -106,6 +113,7 @@ class DSWorkspace():
     def setLoadedWorkspace(self, URL):
         self.workspaceURL = URL
         self.directoryURL = os.path.dirname(URL)
+        self.settings['workspaceURL'] = URL
 
         self.mainWindow.workspaceTreeDockWidget.setWindowTitle(os.path.basename(URL))
         self.mainWindow.updateState(DSConstants.MW_STATE_WORKSPACE_LOADED)
@@ -188,9 +196,22 @@ class DSWorkspace():
 
         self.saveWSToSql()
 
-    def loadWSFromSql(self):
-        dataURL = os.path.join(str(Path(self.directoryURL).parent), 'User Data')
-        fname = QFileDialog.getOpenFileName(self.mainWindow, 'Open File', dataURL, filter='*.db')
+    def loadPreviousWS(self):
+        if('workspaceURL' in self.settings):
+            if(isinstance(self.settings['workspaceURL'], str) is True):
+                if(os.path.isfile(self.settings['workspaceURL']) is True):
+                    self.loadWSFromSql(self.settings['workspaceURL'])
+            else:
+                self.settings['workspaceURL'] = None
+
+    def loadWSFromSql(self, url=None):
+        if(url is False):
+            dataURL = os.path.join(str(Path(self.directoryURL).parent), 'User Data')
+            fname = QFileDialog.getOpenFileName(self.mainWindow, 'Open File', dataURL, filter='*.db')
+        else:
+            fname = list()
+            fname.append(url)
+
         if fname[0]:
             self.setLoadedWorkspace(fname[0])
             conn = sqlite3.connect(fname[0])

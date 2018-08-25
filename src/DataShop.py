@@ -16,6 +16,10 @@ from UserScript import *
 from Constants import DSConstants as DSConstants
 # NOTES FOR FUTURE INSTALLS
 # pyqtgraph has an import warning that is solved by running "conda install h5py==2.8.0"
+# nidaqmx - pip install 
+# proctitle - pip install setproctitle -- NOT USED?
+# pyserial - pip install pyserial
+
 
 import DSUnits, DSPrefix
 from DSWorkspace import DSWorkspace
@@ -29,6 +33,8 @@ from DSWidgets.sequencerWidget import sequencerDockWidget
 from DSWidgets.instrumentWidget import instrumentWidget
 from DSWidgets.processWidget import processWidget
 from DSWidgets.loginWidget import loginDockWidget
+from DSWidgets.hardwareWidget import hardwareWidget
+from DSWidgets.controlWidget import controlWidget
 
 sys._excepthook = sys.excepthook
 
@@ -45,35 +51,70 @@ class mainWindow(QMainWindow):
     def __init__(self, app):
         super().__init__()
         self.app = app
+        self.DSC = DSConstants()
 
         # All used widgets need to be registered here - they autopopulate into the menu.
         # Also, ensure the widget is imported in the import statements above.
         # Generate a widget instance in initUI()
         self.setGeometry(300, 300, 640, 480)
-        self.setWindowTitle('DataShop (Alpha) - Loading...')
+        self.setWindowTitle('DataStation (Alpha) - Loading...')
 
         self.logDockWidget = logDockWidget(self)
+        self.logDockWidget.setObjectName('logDockWidget')
         self.addDockWidget(Qt.BottomDockWidgetArea, self.logDockWidget)
         self.show()
         app.processEvents()
 
         self.processWidget = processWidget(self)
+        self.processWidget.setObjectName('processWidget')
         self.workspace = DSWorkspace(self)
 
+        self.controlWidget = controlWidget(self)
+        self.controlWidget.setObjectName('controlWidget')
+
         self.workspaceTreeDockWidget = workspaceTreeDockWidget(self)
+        self.workspaceTreeDockWidget.setObjectName('workspaceTreeDockWidget')
         self.settingsDockWidget = settingsDockWidget(self)
+        self.settingsDockWidget .setObjectName('settingsDockWidget')
         self.inspectorDockWidget = inspectorDockWidget(self)
+        self.inspectorDockWidget.setObjectName('inspectorDockWidget')
         self.editorWidget = editorWidget(self)
+        self.editorWidget.setObjectName('editorWidget')
         self.sequencerDockWidget = sequencerDockWidget(self)
+        self.sequencerDockWidget.setObjectName('sequencerDockWidget')
         self.instrumentWidget = instrumentWidget(self, self.workspace.DSInstrumentManager)
+        self.instrumentWidget.setObjectName('instrumentWidget')
         self.workspace.DSInstrumentManager.instrumentWidget = self.instrumentWidget #HOTFIX - Order of Execution Issue... NOT PRETTY
+        self.newsWidget = newsWidget(self)
+        self.newsWidget.setObjectName('newsWidget')
+        self.hardwareWidget = hardwareWidget(self, self.workspace.DSInstrumentManager, self.workspace.DSHardwareManager)
+        self.hardwareWidget.setObjectName('hardwareWidget')
 
         self.workspace.workspaceTreeWidget = self.workspaceTreeDockWidget.workspaceTreeWidget
+        self.workspace.workspaceTreeWidget.setObjectName('workspaceTreeWidget')
+
+        self.controlWidget.registerManagers(self.instrumentWidget.instrumentManager, self.hardwareWidget.hardwareManager)
 
         self.initActions()
+        self.workspace.DSHardwareManager.loadHardwareState()
         self.loginWindow = loginDockWidget(self)
+        self.loginWindow.setObjectName('loginWindow')
+        self.postLog('Waiting on User Profile selection..', DSConstants.LOG_PRIORITY_HIGH)
+        self.loginWindow.runModal() #Open the login window and then waits until it finishes and calls the finishInitWithUser function
+
+    def finishInitWithUser(self, userData):
+        self.postLog('User Profile Selected: ' + userData['First Name'] + ' ' + userData['Last Name'], DSConstants.LOG_PRIORITY_HIGH)
+        self.workspace.userProfile = userData
         self.initUI()
+        self.restoreWindowStates()
+        self.workspace.loadPreviousWS()
+        self.loadPreviousInstrument()
         self.postLog('Data Station Finished Loading!', DSConstants.LOG_PRIORITY_HIGH)
+
+    def loadPreviousInstrument(self):
+        if('instrumentURL' in self.workspace.userProfile):
+            if(self.workspace.userProfile['instrumentURL'] is not None):
+                self.instrumentWidget.instrumentManager.loadInstrument(self.workspace.userProfile['instrumentURL'])
 
     def updateState(self, state):
         if(state == DSConstants.MW_STATE_NO_WORKSPACE):
@@ -143,13 +184,13 @@ class mainWindow(QMainWindow):
         self.initToolbar()
         self.updateState(DSConstants.MW_STATE_NO_WORKSPACE)
         
-        self.newsWidget = newsWidget(self)
-        self.setCentralWidget(self.newsWidget)
         self.statusBar()
 
-        self.addDockWidget(Qt.LeftDockWidgetArea, self.workspaceTreeDockWidget)
+        self.addDockWidget(Qt.TopDockWidgetArea, self.workspaceTreeDockWidget)
 
-        self.addDockWidget(Qt.RightDockWidgetArea, self.processWidget)
+        self.addDockWidget(Qt.TopDockWidgetArea, self.newsWidget)
+
+        self.addDockWidget(Qt.TopDockWidgetArea, self.processWidget)
 
         self.addDockWidget(Qt.BottomDockWidgetArea, self.settingsDockWidget)
         self.settingsDockWidget.setFloating(True)
@@ -166,6 +207,12 @@ class mainWindow(QMainWindow):
         self.addDockWidget(Qt.BottomDockWidgetArea, self.instrumentWidget)
         self.instrumentWidget.setFloating(True)
 
+        self.addDockWidget(Qt.BottomDockWidgetArea, self.hardwareWidget)
+        self.hardwareWidget.setFloating(True)
+
+        self.addDockWidget(Qt.BottomDockWidgetArea, self.controlWidget)
+        self.controlWidget.setFloating(True)
+
         self.AnimatedDocks = True
         self.setDockNestingEnabled(True)
 
@@ -173,11 +220,34 @@ class mainWindow(QMainWindow):
         self.setWindowTitle('DataShop (Alpha)')
         self.show()
 
-    def postLog(self, text, level, **kwargs):
+    def postLog(self, key, level, **kwargs):
+        useKey = kwargs.get('textKey', False)
+        if(useKey):
+            text = self.DSC.getLogText(key)
+        else:
+            text = key
+
         if(self.logDetail >= level):
             self.logDockWidget.postLog(text, **kwargs)
             print(text)
             app.processEvents()
+
+    def updateWindowStates(self):
+        windowStates = self.saveState()
+        self.workspace.userProfile['windowStates'] = json.dumps(bytes(windowStates.toHex()).decode('ascii'))
+        windowGeometry = self.saveGeometry()
+        self.workspace.userProfile['windowGeometry'] = json.dumps(bytes(windowGeometry.toHex()).decode('ascii'))
+
+    def restoreWindowStates(self):
+        if('windowGeometry' in self.workspace.userProfile):
+            tempGeometry = QByteArray.fromHex(bytes(json.loads(self.workspace.userProfile['windowGeometry']), 'ascii'))
+            self.restoreGeometry(tempGeometry)
+        if('windowStates' in self.workspace.userProfile):
+            tempState = QByteArray.fromHex(bytes(json.loads(self.workspace.userProfile['windowStates']), 'ascii'))
+            self.restoreState(tempState)
+
+        #These can be restored to show but shouldn't be.
+        self.hardwareWidget.filterStackWidget.hide()
 
     def populateViewWindowMenu(self):
         windows = self.findChildren(QDockWidget)
@@ -219,6 +289,7 @@ class mainWindow(QMainWindow):
 
     def initToolbar(self):
         self.toolbar = self.addToolBar('Toolbar')
+        self.toolbar.setObjectName('toolbar')
         self.toolbar.addAction(self.newAction)
         self.toolbar.addAction(self.saveAction)
         self.toolbar.addAction(self.openAction)
@@ -229,11 +300,28 @@ class mainWindow(QMainWindow):
         self.toolbar.addSeparator()
         self.toolbar.addAction(self.exitAction)
 
+    def softExit(self):
+        self.postLog('Shutting down Datastation!', DSConstants.LOG_PRIORITY_HIGH)
+        self.workspace.DSHardwareManager.saveHardwareState()
+        self.updateUserProfile()
+        self.workspace.updateSettings()
+
+    def updateUserProfile(self):
+        self.updateWindowStates()
+        self.loginWindow.updateUserProfile()
+
+    def signalClose(self):
+        self.close()
+
+    def closeEvent(self, event):
+        self.softExit()
+        event.accept()
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     mW = mainWindow(app)
     try:
         sys.exit(app.exec_())
     except:
-        mW.postLog("Exiting!", DSConstants.LOG_PRIORITY_HIGH)
+        mW.postLog("Datastation successfully closed!", DSConstants.LOG_PRIORITY_HIGH)
 
