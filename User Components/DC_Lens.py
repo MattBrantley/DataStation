@@ -2,7 +2,7 @@
 """
 A simple DC Lens.
 """
-from Component import Component
+from Component import *
 from PyQt5.Qt import *
 from PyQt5.QtGui import *
 import os, random
@@ -30,11 +30,12 @@ class User_Component(Component):
         self.configWidget.setWidget(self.containerWidget)
         self.addDCSocket(self.compSettings['name'])
         self.checkValidity()
-        self.data = self.randData()
+        #self.data = self.randData()
 
-        self.addSequencerEventType('Step')
-        self.addSequencerEventType('Ramp')
-        self.addSequencerEventType('Pulse')
+        self.addSequencerEventType(stepEvent())
+        self.addSequencerEventType(pulseEvent())
+        self.addSequencerEventType(pulseTrainEvent())
+        self.addSequencerEventType(linearRampEvent())
 
     def onRun(self):
         dataPacket = DCWaveformPacket(self.data)
@@ -79,8 +80,57 @@ class User_Component(Component):
             newData = np.vstack((newData, data))
         return newData
 
-    def plotSequencer(self):
-        return self.data
+    def plotSequencer(self, events):
+        data = None
+        lastEventVoltage = 0
+        for event in events:
+            newEventData = None
+
+            if(isinstance(event['type'], stepEvent) is True):
+                newEventData = np.array([[event['time'], lastEventVoltage],
+                [event['time']+0.000001, event['settings']['Voltage']]])
+
+                lastEventVoltage = event['settings']['Voltage']
+                #print(newEventData)
+
+            if(isinstance(event['type'], pulseEvent) is True):
+                newEventData = np.array([[event['time'], lastEventVoltage],
+                [event['time'], event['settings']['Voltage']],
+                [event['time']+event['settings']['Duration'], event['settings']['Voltage']],
+                [event['time']+event['settings']['Duration'], lastEventVoltage]])
+
+                lastEventVoltage = lastEventVoltage            
+                
+            if(isinstance(event['type'], pulseTrainEvent) is True):
+                newEventData = None
+                for n in range(0, event['settings']['Count']):
+                    offset = n*event['settings']['offDuration'] + n*event['settings']['onDuration']
+                    newEventStep = np.array([[event['time']+offset, lastEventVoltage],
+                    [event['time']+offset, event['settings']['Voltage']],
+                    [event['time']+event['settings']['onDuration']+offset, event['settings']['Voltage']],
+                    [event['time']+event['settings']['onDuration']+offset, lastEventVoltage]])
+                    if(newEventData is None):
+                        newEventData = newEventStep
+                    else:
+                        newEventData = np.vstack((newEventData, newEventStep))
+
+                lastEventVoltage = lastEventVoltage
+
+            if(isinstance(event['type'], linearRampEvent) is True):
+                duration = event['settings']['Duration']
+
+                newEventData = np.array([[event['time'], lastEventVoltage],
+                [event['time']+duration, event['settings']['Voltage']]])
+
+                lastEventVoltage = event['settings']['Voltage']
+
+            if(newEventData is not None):
+                if(data is None):
+                    data = newEventData
+                else:
+                    data = np.vstack((data, newEventData))
+        #print(data)
+        return data
 
     def saveWidgetValues(self):
         self.compSettings['showSequencer'] = self.showSequenceBox.isChecked()
@@ -98,6 +148,63 @@ class User_Component(Component):
             self.valid = True
             self.maxVBox.setStyleSheet("QDoubleSpinBox {background-color: white;}")
             self.minVBox.setStyleSheet("QDoubleSpinBox {background-color: white;}")
+
+class stepEvent(sequencerEventType):
+    def __init__(self):
+        super().__init__()
+        self.name = 'Step'
+
+    def genParameters(self):
+        paramList = list()
+        paramList.append(eventParameterDouble('Voltage'))
+        return paramList
+
+    def getLength(self, params):
+        return 0.001
+
+class pulseEvent(sequencerEventType):
+    def __init__(self):
+        super().__init__()
+        self.name = 'Pulse'
+
+    def genParameters(self):
+        paramList = list()
+        paramList.append(eventParameterDouble('Voltage'))
+        paramList.append(eventParameterDouble('Duration', allowZero=False, allowNegative=False))
+        return paramList
+
+    def getLength(self, params):
+        return params[1].value()
+
+class linearRampEvent(sequencerEventType):
+    def __init__(self):
+        super().__init__()
+        self.name = 'Linear Ramp'
+
+    def genParameters(self):
+        paramList = list()
+        paramList.append(eventParameterDouble('Voltage'))
+        paramList.append(eventParameterDouble('Duration', allowZero=False))
+        return paramList
+
+    def getLength(self, params):
+        return params[1].value()
+
+class pulseTrainEvent(sequencerEventType):
+    def __init__(self):
+        super().__init__()
+        self.name = 'Pulse Train'
+
+    def genParameters(self):
+        paramList = list()
+        paramList.append(eventParameterDouble('Voltage'))
+        paramList.append(eventParameterInt('Count', allowZero=False, allowNegative=False))
+        paramList.append(eventParameterDouble('onDuration', allowZero=False, allowNegative=False))
+        paramList.append(eventParameterDouble('offDuration', allowZero=False, allowNegative=False))
+        return paramList
+
+    def getLength(self, params):
+        return params[1].value()*params[2].value() + (params[1].value()-1)*params[3].value()
 
 class DC_LensEvent():
     def __init__(self, time, eventType, data):

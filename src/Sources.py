@@ -161,6 +161,8 @@ class DCSource(Source):
         return readyCheckPacket('DC Source', DSConstants.READY_CHECK_READY)
             
     def packetInSourceRange(self, packetIn):
+        if(packetIn.waveformData is None):
+            return True
         yAxis = packetIn.waveformData[:,1]
         if(yAxis.max() > self.vMax):
             return False

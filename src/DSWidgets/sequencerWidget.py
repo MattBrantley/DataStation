@@ -89,6 +89,7 @@ class DSPlotItem():
 
     def __init__(self, plotLayout, name, comp):
         self.component = comp
+        self.component.registerPlotItem(self)
         self.plotLayout = plotLayout
         self.plotItem = plotLayout.plotLayoutWidget.addPlot()
         self.name = name
@@ -96,16 +97,53 @@ class DSPlotItem():
         self.data = []
         self.pen = []
     
+    def updatePlot(self):
+        data = self.component.parentPlotSequencer()
+        self.xMin, self.xMax = self.component.instrumentManager.mainWindow.sequencerDockWidget.getSequenceXRange()
+        if(data is not None):
+            self.plotItem.clear()
+            #print(data.ndim)
+            #print(data)
+            #if(data.ndim >= 2):
+            #    xMin = data[:, 0].min()
+            #    xMax = data[:, 0].max()
+            #    xMin, xMax = self.component.instrumentManager.mainWindow.sequencerDockWidget.xRangeUpdate(xMin, xMax)
+            #else:
+            if(data.ndim < 2):
+                startHub = np.array([-900000, data[1]])
+                endHub = np.array([900000, data[1]])
+                data = np.vstack((startHub, data))
+                data = np.vstack((data, endHub))
+                self.data = data
+                xMin = 0
+                xMax = 1
+                
+            data = self.formatData(data, self.xMin, self.xMax)
+            self.data = data
+
+            yDelta = self.data[:,1].max() - self.data[:,1].min()
+            yPadding = yDelta*self.plotPaddingPercent/100
+
+            self.plotItem.clear()
+            self.plotItem.plot(x=self.data[:,0], y=self.data[:,1], pen = self.plotLayout.sequencePLT1Color)
+
+            #self.plotItem.setLimits(xMin=self.xMin, xMax=self.xMax, yMin=self.data[:,1].min()-yPadding, yMax=self.data[:,1].max()+yPadding)
+            self.plotItem.autoRange()
+            self.component.instrumentManager.mainWindow.sequencerDockWidget.redrawSequence()
+
     def plot(self, showXAxis, xMinIn, xMaxIn):
-        data = self.component.plotSequencer()
-        data2 = self.formatData(data, xMinIn, xMaxIn)
-        self.data = data2
+        data = self.component.parentPlotSequencer()
+        if(data is not None):
+            data2 = self.formatData(data, xMinIn, xMaxIn)
+            self.data = data2
 
-        yDelta = self.data[:,1].max() - self.data[:,1].min()
-        yPadding = yDelta*self.plotPaddingPercent/100
+            yDelta = self.data[:,1].max() - self.data[:,1].min()
+            yPadding = yDelta*self.plotPaddingPercent/100
 
-        self.plotItem.plot(x=self.data[:,0], y=self.data[:,1], pen = self.plotLayout.sequencePLT1Color)
-        self.plotItem.setLimits(xMin=xMinIn, xMax=xMaxIn, yMin=self.data[:,1].min()-yPadding, yMax=self.data[:,1].max()+yPadding)
+            self.plotItem.clear()
+            self.plotItem.plot(x=self.data[:,0], y=self.data[:,1], pen = self.plotLayout.sequencePLT1Color)
+            self.plotItem.setLimits(xMin=xMinIn, xMax=xMaxIn, yMin=self.data[:,1].min()-yPadding, yMax=self.data[:,1].max()+yPadding)
+
         self.plotItem.setMouseEnabled(x=True, y=False)
         self.plotItem.setLabels(bottom='Time (s)', left='voltage')
         if(showXAxis):
@@ -120,13 +158,18 @@ class DSPlotItem():
         axis = self.plotItem.getAxis('bottom')
         
     def formatData(self, data, xMin, xMax):
+        #print('START')
+        #print(data)
         if(data[:,0].min() > xMin):
-            minStump = [xMin, data[data[:,0].argmin(), 1]]
+            #minStump = [xMin, data[data[:,0].argmin(), 1]]
+            minStump = [xMin, data[0, 1]]
             data = np.vstack((minStump, data))
         if(data[:,0].max() < xMax):
-            maxStump = [xMax, data[data[:,0].argmax(), 1]]
+            #maxStump = [xMax, data[data[:,0].argmax(), 1]]
+            maxStump = [xMax, data[-1, 1]]
             data = np.vstack((data, maxStump))
-
+        #print('RESULT')
+        #print(data)
         return data
 
     def report(self):
@@ -147,7 +190,10 @@ class sequencerDockWidget(QDockWidget):
         self.hide()
         self.resize(1000, 800)
         self.fileSystem = DSEditorFSModel()
-        self.fsIndex = self.fileSystem.setRootPath(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))  #This is a placeholder - will need updating.
+        self.fsIndex = self.fileSystem.setRootPath(os.path.abspath(os.path.join(os.path.join(os.path.dirname(os.path.dirname(__file__)), os.path.pardir), 'sequences')))  #This is a placeholder - will need updating.
+
+        self.xMin = 0
+        self.xMax = 1
 
         self.toolbar = QToolBar()
         
@@ -202,39 +248,57 @@ class sequencerDockWidget(QDockWidget):
 
             self.redrawSequence()
 
+    def xRangeUpdate(self, xMinTest, xMaxTest):
+        if(xMinTest < self.xMin):
+            xMinOut = xMinTest
+            self.xMin = xMinOut
+        else:
+            xMinOut = self.xMin
+
+        if(xMaxTest > self.xMax):
+            xMaxOut = xMaxTest
+            self.xMax = xMaxOut
+        else:
+            xMaxOut = self.xMax
+
+        return self.padSequenceXRange(xMinOut, xMaxOut)
+
     def getSequenceXRange(self):
         globalxMax = 0
         globalxMin = 1
         for plotTemp in self.plots:
-            data = plotTemp.component.plotSequencer()
-            xMax = data[:, 0].max()
-            if(xMax > globalxMax):
-                globalxMax = xMax
-            xMin = data[:, 0].min()
-            if(xMin < globalxMin):
-                globalxMin = xMin
+            data = plotTemp.component.parentPlotSequencer()
+            if(data is not None):
+                xMax = data[:, 0].max()
+                if(xMax > globalxMax):
+                    globalxMax = xMax
+                xMin = data[:, 0].min()
+                if(xMin < globalxMin):
+                    globalxMin = xMin
 
         return globalxMin, globalxMax
 
-    def redrawSequence(self):
-        xMin, xMax = self.getSequenceXRange()
+    def padSequenceXRange(self, xMin, xMax):
         distance = xMax-xMin
-        xMin = xMin - (self.plotPaddingPercent*distance/100)
-        xMax = xMax + (self.plotPaddingPercent*distance/100)
+        xMinOut = xMin - (self.plotPaddingPercent*distance/100)
+        xMaxOut = xMax + (self.plotPaddingPercent*distance/100)
+        return xMinOut, xMaxOut
 
+    def redrawSequence(self):
+        self.xMin, self.xMax = self.getSequenceXRange()
+        xMinPad, xMaxPad = self.padSequenceXRange(self.xMin, self.xMax) 
         plotCounter = len(self.plots)
         for plotTemp in self.plots:
             plotCounter = plotCounter - 1
             if(plotCounter == 0):
-                plotTemp.plot(True, xMin, xMax)
+                plotTemp.plot(True, self.xMin, self.xMax)
             else:
-                plotTemp.plot(False, xMin, xMax)
+                plotTemp.plot(False, self.xMin, self.xMax)
 
     def initToolbar(self):
         self.toolbar.addAction(self.newAction)
         self.toolbar.addAction(self.saveAction)
         self.toolbar.addAction(self.saveAsAction)
-        self.toolbar.addAction(self.saveAllAction)
         
         self.toolbar.addSeparator()
 
@@ -252,9 +316,7 @@ class sequencerDockWidget(QDockWidget):
         self.sequenceNavigator.hideColumn(3)
 
     def save(self):
-        print("save")
-        #curWidget = self.codeEditorTabs.currentWidget()
-        #curWidget.file.save()
+        self.sequenceNavigator.saveSequence()
 
     def saveAs(self):
         print("save as")
@@ -270,11 +332,6 @@ class sequencerDockWidget(QDockWidget):
                 else:
                     curWidget.file.save(os.path.dirname(curWidget.filePath) + '/' + text)
         '''
-
-    def saveAll(self):
-        print("save all")
-        #for n in range(0, self.codeEditorTabs.count()):
-        #    self.codeEditorTabs.widget(n).file.save()
 
     def new(self):
         result = DSNewFileDialog.newFile()
@@ -293,11 +350,6 @@ class sequencerDockWidget(QDockWidget):
         self.saveAsAction = QAction('Save As', self)
         self.saveAsAction.setStatusTip('Save As')
         self.saveAsAction.triggered.connect(self.saveAs)
-
-        self.saveAllAction = QAction('&Save All', self)
-        self.saveAllAction.setShortcut('Ctrl+S')
-        self.saveAllAction.setStatusTip('Save All')
-        self.saveAllAction.triggered.connect(self.saveAll)
 
         self.toggleTree = QToolButton(self)
         self.toggleTree.setIcon(QIcon(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'icons3\css.png')))
@@ -371,6 +423,9 @@ class DSTreeView(QTreeView):
         self.model = model
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.rightClick)
+
+    def saveSequence(self, sequenceData):
+        print('saving')
 
     def rightClick(self, point):
         idx = self.mapToGlobal(point)

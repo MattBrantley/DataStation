@@ -95,6 +95,7 @@ class mainWindow(QMainWindow):
 
         self.controlWidget.registerManagers(self.instrumentWidget.instrumentManager, self.hardwareWidget.hardwareManager)
 
+
         self.initActions()
         self.workspace.DSHardwareManager.loadHardwareState()
         self.loginWindow = loginDockWidget(self)
