@@ -1,0 +1,28 @@
+{
+    "instrument": "Test_copy",
+    "saveData": [
+        {
+            "compID": "DCLens_MRB",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Duration": 1.0,
+                        "Voltage": 1.0
+                    },
+                    "time": 1.001,
+                    "type": "Linear Ramp"
+                }
+            ],
+            "name": "Unnamed DC Lens",
+            "type": "DC Lens",
+            "uuid": "cca3d53b-669f-422a-9d41-cd9ec428e2bb"
+        }
+    ]
+}

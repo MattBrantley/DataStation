@@ -1,0 +1,185 @@
+{
+    "instrument": "ESI-FT-ICR",
+    "saveData": [
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Count": 5,
+                        "Voltage": 1.0,
+                        "offDuration": 0.1,
+                        "onDuration": 0.1
+                    },
+                    "time": 1.001,
+                    "type": "Pulse Train"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Duration": 1.0,
+                        "Voltage": 1.0
+                    },
+                    "time": 0.0,
+                    "type": "Linear Ramp"
+                }
+            ],
+            "name": "Q1/Q2 Lens",
+            "type": "Circular Lens",
+            "uuid": "a7dc6306-5af2-4dc3-805e-5f49ea67bd95"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Count": 5,
+                        "Voltage": 1.0,
+                        "offDuration": 0.1,
+                        "onDuration": 0.1
+                    },
+                    "time": 1.001,
+                    "type": "Pulse Train"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Duration": 1.0,
+                        "Voltage": 1.0
+                    },
+                    "time": 0.0,
+                    "type": "Linear Ramp"
+                }
+            ],
+            "name": "Q1/Q2 Lens",
+            "type": "Circular Lens",
+            "uuid": "a7dc6306-5af2-4dc3-805e-5f49ea67bd95"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Duration": 1.0,
+                        "Voltage": 1.0
+                    },
+                    "time": 0.0,
+                    "type": "Linear Ramp"
+                }
+            ],
+            "name": "Q1/Q2 Lens",
+            "type": "Circular Lens",
+            "uuid": "a7dc6306-5af2-4dc3-805e-5f49ea67bd95"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Count": 5,
+                        "Voltage": 1.0,
+                        "offDuration": 0.1,
+                        "onDuration": 0.1
+                    },
+                    "time": 1.001,
+                    "type": "Pulse Train"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Duration": 1.0,
+                        "Voltage": 1.0
+                    },
+                    "time": 0.0,
+                    "type": "Linear Ramp"
+                }
+            ],
+            "name": "Q1/Q2 Lens",
+            "type": "Circular Lens",
+            "uuid": "a7dc6306-5af2-4dc3-805e-5f49ea67bd95"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Count": 5,
+                        "Voltage": 1.0,
+                        "offDuration": 0.1,
+                        "onDuration": 0.1
+                    },
+                    "time": 1.001,
+                    "type": "Pulse Train"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Duration": 1.0,
+                        "Voltage": 1.0
+                    },
+                    "time": 0.0,
+                    "type": "Linear Ramp"
+                }
+            ],
+            "name": "Q1/Q2 Lens",
+            "type": "Circular Lens",
+            "uuid": "a7dc6306-5af2-4dc3-805e-5f49ea67bd95"
+        }
+    ]
+}

@@ -74,12 +74,13 @@ class Hardware_Object():
 
         return savePacket
 
-    def onLoad(self, loadPacket):
+    def onLoadParent(self, loadPacket):
         self.hardwareSettings = {**self.hardwareSettings, **loadPacket['hardwareSettings']}
         if('sourceList' in loadPacket):
             self.sourceListData = loadPacket['sourceList']
             self.loadSourceListData()
-        self.afterLoad(loadPacket)
+        self.onLoad(loadPacket)
+        self.onInitialize()
 
     def loadSourceListData(self):
         if(self.sourceListData is not None):
@@ -89,7 +90,10 @@ class Hardware_Object():
                     if(source is not None):
                         source.onLoad(loadPacket)
 
-    def afterLoad(self, loadPacket):
+    def onInitialize(self):
+        pass
+
+    def onLoad(self, loadPacket):
         pass
 
     def clearSourceList(self):
@@ -143,20 +147,16 @@ class Hardware_Object():
         self.onProgramParent()
 
     def onProgramParent(self):
-        self.getProgramData()
         self.onProgram()
 
-    def getProgramData(self):
+    def getEvents(self):
         programDataList = list()
         for source in self.sourceList:
             result = source.getProgramData()
             if(result is not None):
                 programDataList.append(result)
 
-        self.parseProgramData(programDataList)
-
-    def parseProgramData(self, programDataList):
-        pass
+        return programDataList
 
     def onProgram(self):
         pass
@@ -176,10 +176,10 @@ class hardwareWorker():
                             'ping': Queue()
                         }
 
-        self.outQueues['command'].put(hwm(action='init'))
-        self.outQueues['command'].put(hwm(action='config'))
-        self.outQueues['command'].put(hwm(action='program'))
-        self.outQueues['command'].put(hwm(action='arm'))
+        #self.outQueues['command'].put(hwm(action='init'))
+        #self.outQueues['command'].put(hwm(action='config'))
+        #self.outQueues['command'].put(hwm(action='program'))
+        #self.outQueues['command'].put(hwm(action='arm'))
 
         self.initProcess()
         #self.pingTimer = QTimer()

@@ -136,6 +136,9 @@ class Source():
             if(self.programData is not None):
                 return self.programData
 
+    def reprogram(self):
+        self.hardware.program()
+
 class DCSource(Source):
     def __init__(self, hardware, name, vMin, vMax, prec, physConID):
         super().__init__(hardware)

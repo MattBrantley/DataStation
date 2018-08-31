@@ -1,4 +1,4 @@
-import os, sys, imp, time
+import os, sys, imp, time, inspect
 from Instrument import *
 from Constants import DSConstants as DSConstants
 import json as json
@@ -41,20 +41,27 @@ class InstrumentManager():
         else:
             return
 
+        #if (py_mod != None):
+        #    if hasattr(py_mod, expected_class):  # verify that Component is a class in this file
+        #        loaded = True
+        #        class_temp = getattr(py_mod, expected_class)(filepath)
+        #        if isinstance(class_temp, Component):  # verify that Component inherits the correct class
+        #            class_inst = class_temp
+
         if (py_mod != None):
-            if hasattr(py_mod, expected_class):  # verify that Component is a class in this file
-                loaded = True
-                class_temp = getattr(py_mod, expected_class)(filepath)
-                if isinstance(class_temp, Component):  # verify that Component inherits the correct class
+            if(hasattr(py_mod, mod_name) is True):
+                class_temp = getattr(py_mod, mod_name)(filepath)
+                if issubclass(type(class_temp), Component):
                     class_inst = class_temp
+                    loaded = True
 
         if(loaded):
+            class_inst.instrumentManager = self
+            class_inst.setupWidgets()
             self.mainWindow.postLog('  (Success!)', DSConstants.LOG_PRIORITY_MED, newline=False)
         else:
             self.mainWindow.postLog(' (Failed!)', DSConstants.LOG_PRIORITY_MED, newline=False)
 
-        class_inst.instrumentManager = self
-        class_inst.setupWidgets()
         return class_inst
 
     def getAvailableComponents(self):
@@ -79,22 +86,31 @@ class InstrumentManager():
     def saveInstrument(self, url):
         if(self.currentInstrument is not None):
             self.mainWindow.postLog('VI_Save', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
+            self.currentInstrument.name, ext = os.path.splitext(os.path.basename(url))
             saveData = self.currentInstrument.saveInstrument()
             self.writeInstrumentToFile(saveData, url)
             self.mainWindow.postLog(' ...Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
         else:
             self.mainWindow.postLog('VI_Save_No_VI', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
+            
+        self.instrumentWidget.updateTitle()
         
     def readyCheck(self):
         subs = list()
         if(self.currentInstrument is not None):
             subs.append(self.currentInstrument.readyCheck())
+        else:
+            return readyCheckPacket('Instrument Manager', DSConstants.READY_CHECK_ERROR, msg='No Instrument Loaded!')
 
         return readyCheckPacket('Instrument Manager', DSConstants.READY_CHECK_READY, subs=subs)
 
     def loadInstrument(self, url):
         self.mainWindow.postLog('Loading User Instrument (' + url + ')... ', DSConstants.LOG_PRIORITY_HIGH)
+        if(os.path.exists(url) is False):
+            self.mainWindow.postLog('Path (' + url + ') does not exist! Aborting! ', DSConstants.LOG_PRIORITY_HIGH)
+            return
+
         with open(url, 'r') as file:
             try:
                 instrumentData = json.load(file)
@@ -108,6 +124,8 @@ class InstrumentManager():
         self.workspace.userProfile['instrumentURL'] = self.currentInstrument.url
         self.mainWindow.sequencerDockWidget.updatePlotList()
         self.mainWindow.hardwareWidget.drawScene()
+
+        self.instrumentWidget.updateTitle()
 
     def processInstrumentData(self, instrumentData, url):
         self.tempInstrument = Instrument(self)
@@ -124,7 +142,7 @@ class InstrumentManager():
                     modelComp = self.findCompModelByIdentifier(comp['compIdentifier'])
                     if(modelComp is None):
                         self.mainWindow.postLog('Instrument contains component (' + comp['compType'] + ':' + comp['compIdentifier'] + ') that is not in the available component modules. Ignoring this component!', DSConstants.LOG_PRIORITY_MED)
-                        return
+                        break
                     else:
                         result = self.tempInstrument.addComponent(modelComp)
                         if('compSettings' in comp):

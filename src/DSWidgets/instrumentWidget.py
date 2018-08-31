@@ -8,12 +8,13 @@ import random
 from Constants import DSConstants as DSConstants
 from PyQt5.QtGui import QInputDialog, QMessageBox
 from .iView import iView
+from shutil import copyfile
 
 class instrumentWidget(QDockWidget):
     ITEM_GUID = Qt.UserRole
 
     def __init__(self, mainWindow, instrManager):
-        super().__init__('Instrument View')
+        super().__init__('Instrument View (None)')
         self.instrumentManager = instrManager
         self.mainWindow = mainWindow
         self.hide()
@@ -76,6 +77,13 @@ class instrumentWidget(QDockWidget):
             self.instrumentManager.newInstrument(fname)
         else:
             return
+        self.updateTitle()
+
+    def updateTitle(self):
+        if(self.instrumentManager.currentInstrument is not None):
+            self.setWindowTitle('Instrument View (' + self.instrumentManager.currentInstrument.name + ')')
+        else:
+            self.setWindowTitle('Instrument View (None)')
 
     def save(self):
         savePath = None
@@ -107,12 +115,12 @@ class instrumentWidget(QDockWidget):
         else:
             return
 
-        url = self.instrumentManager.currentInstrument.url
+        #url = self.instrumentManager.currentInstrument.url
         if(os.path.exists(savePath)):
             reply = QMessageBox.question(self.mainWindow, 'File Warning!', 'File exists - overwrite?', QMessageBox.Yes, QMessageBox.No)
             if(reply == QMessageBox.No):
                 return
-        self.instrumentManager.saveInstrument(url)
+        self.instrumentManager.saveInstrument(savePath)
 
     def saveInstrument(self, savePath):
         if(self.instrumentManager.currentInstrument.name == 'Default Instrument'):
@@ -178,6 +186,7 @@ class instrumentWidget(QDockWidget):
 
     def openInstrument(self, filePath):
         self.instrumentManager.loadInstrument(filePath)
+        self.updateTitle()
 
     def updateToolbarState(self):
         self.saveAction.setEnabled(True)
@@ -325,7 +334,7 @@ class DSTreeView(QTreeView):
                 menu.addAction(newInstrumentAction)
                 menu.addAction(newFolderAction)
                 menu.addAction(deleteAction)
-                menu.addAction(duplicateAction)
+                #menu.addAction(duplicateAction)
                 menu.exec(idx)
         else:                                                       #Show this menu for non-items
             newInstrumentAction = QAction('New Instrument', self)

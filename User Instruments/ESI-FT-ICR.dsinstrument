@@ -1,0 +1,259 @@
+{
+    "compList": [
+        {
+            "compIdentifier": "circLens_mrb",
+            "compSettings": {
+                "granularity": 0.0001,
+                "layoutGraphicSrc": "lens.png",
+                "name": "Source/Q1 Lens",
+                "showSequencer": true,
+                "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383",
+                "vMax": 10.0,
+                "vMin": 0.0
+            },
+            "compType": "Circular Lens",
+            "iViewSettings": {
+                "r": 180,
+                "x": -1839.0,
+                "y": 1290.0
+            },
+            "sockets": [
+                {
+                    "filterInputPathNo": 1,
+                    "filterInputSource": "a38801e9-317b-482f-8b3b-ce931ae5df16",
+                    "name": "Source/Q1 Lens",
+                    "prec": 0.1,
+                    "uuid": "9a907a48-13c5-4c12-8f7f-3388842045b6",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ]
+        },
+        {
+            "compIdentifier": "quad_mrb",
+            "compSettings": {
+                "layoutGraphicSrc": "Quad_Short.png",
+                "name": "",
+                "showSequencer": false,
+                "uuid": "880d901b-5b4e-4f6d-9217-02004ce86933"
+            },
+            "compType": "Quadrupole",
+            "iViewSettings": {
+                "r": 180,
+                "x": -1261.0,
+                "y": 1128.0
+            },
+            "sockets": []
+        },
+        {
+            "compIdentifier": "circLens_mrb",
+            "compSettings": {
+                "granularity": 0.0001,
+                "layoutGraphicSrc": "lens.png",
+                "name": "Q1/Q2 Lens",
+                "showSequencer": true,
+                "uuid": "a7dc6306-5af2-4dc3-805e-5f49ea67bd95",
+                "vMax": 10.0,
+                "vMin": 0.0
+            },
+            "compType": "Circular Lens",
+            "iViewSettings": {
+                "r": 180,
+                "x": -1076.0,
+                "y": 1299.0
+            },
+            "sockets": [
+                {
+                    "filterInputPathNo": 1,
+                    "filterInputSource": "21ea9f56-d55b-4ba8-9aa9-b37d263743e2",
+                    "name": "Q1/Q2 Lens",
+                    "prec": 0.1,
+                    "uuid": "f20e9b69-d14e-4b2c-bb84-90397728c667",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ]
+        },
+        {
+            "compIdentifier": "circLens_mrb",
+            "compSettings": {
+                "granularity": 0.0001,
+                "layoutGraphicSrc": "Penning_Trap.png",
+                "name": "Trapping Plates",
+                "showSequencer": true,
+                "uuid": "4587cff2-8a90-4eb3-bfc0-afee23d16c04",
+                "vMax": 10.0,
+                "vMin": 0.0
+            },
+            "compType": "Circular Lens",
+            "iViewSettings": {
+                "r": 180,
+                "x": 1746.0,
+                "y": 1164.0
+            },
+            "sockets": [
+                {
+                    "filterInputPathNo": 1,
+                    "filterInputSource": "0615c661-af40-4c9f-af50-e162f5c83266",
+                    "name": "Trapping Plates",
+                    "prec": 0.1,
+                    "uuid": "d2303aa8-6c52-47cf-a7fb-ac359b44023c",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ]
+        },
+        {
+            "compIdentifier": "excPlates_mrb",
+            "compSettings": {
+                "layoutGraphicSrc": "Excitation_Plates.png",
+                "name": "",
+                "showSequencer": false,
+                "uuid": "cfb53529-bc5d-4dea-b58c-b54c2840ef47"
+            },
+            "compType": "Excitation Plates",
+            "iViewSettings": {
+                "r": 180,
+                "x": 1295.0,
+                "y": 1162.0
+            },
+            "sockets": []
+        },
+        {
+            "compIdentifier": "detecPlates_mrb",
+            "compSettings": {
+                "layoutGraphicSrc": "Detection_Plates.png",
+                "name": "",
+                "showSequencer": false,
+                "uuid": "c87ef966-521a-4ae7-b9a1-a0d175d55500"
+            },
+            "compType": "Detection Plates",
+            "iViewSettings": {
+                "r": 180,
+                "x": 1297.0,
+                "y": 1053.0
+            },
+            "sockets": []
+        },
+        {
+            "compIdentifier": "quad_mrb",
+            "compSettings": {
+                "layoutGraphicSrc": "Quad_Short.png",
+                "name": "",
+                "showSequencer": false,
+                "uuid": "12ea2079-82b8-4285-b4f8-389fa626ad62"
+            },
+            "compType": "Quadrupole",
+            "iViewSettings": {
+                "r": 180,
+                "x": -506.0,
+                "y": 1118.0
+            },
+            "sockets": []
+        },
+        {
+            "compIdentifier": "circLens_mrb",
+            "compSettings": {
+                "granularity": 0.0001,
+                "layoutGraphicSrc": "lens.png",
+                "name": "Q2/Q3 Lens",
+                "showSequencer": true,
+                "uuid": "915d4536-c10e-445a-8828-a3fbd5d0d7f0",
+                "vMax": 10.0,
+                "vMin": 0.0
+            },
+            "compType": "Circular Lens",
+            "iViewSettings": {
+                "r": 180,
+                "x": -334.0,
+                "y": 1297.0
+            },
+            "sockets": [
+                {
+                    "filterInputPathNo": 1,
+                    "filterInputSource": "4ccb111c-aae4-4ae2-8145-4741a027b752",
+                    "name": "Q2/Q3 Lens",
+                    "prec": 0.1,
+                    "uuid": "6575bcc7-9638-447a-b88d-c2364534e720",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ]
+        },
+        {
+            "compIdentifier": "quad_mrb",
+            "compSettings": {
+                "layoutGraphicSrc": "Quad_Short.png",
+                "name": "",
+                "showSequencer": false,
+                "uuid": "9f5fed9a-d452-4ff3-943b-08adacdfb06b"
+            },
+            "compType": "Quadrupole",
+            "iViewSettings": {
+                "r": 180,
+                "x": 231.0,
+                "y": 1112.0
+            },
+            "sockets": []
+        },
+        {
+            "compIdentifier": "circLens_mrb",
+            "compSettings": {
+                "granularity": 0.0001,
+                "layoutGraphicSrc": "lens.png",
+                "name": "Quad Trap",
+                "showSequencer": true,
+                "uuid": "ff7373f1-b9d9-47b6-aa72-f61c4c87619d",
+                "vMax": 10.0,
+                "vMin": 0.0
+            },
+            "compType": "Circular Lens",
+            "iViewSettings": {
+                "r": 180,
+                "x": 388.0,
+                "y": 1300.0
+            },
+            "sockets": [
+                {
+                    "filterInputPathNo": 1,
+                    "filterInputSource": "2cb32cde-3a0e-4d9b-ba07-da7f11b5ce8f",
+                    "name": "Quad Trap",
+                    "prec": 0.1,
+                    "uuid": "062c7f01-5717-405a-8ec2-a51acf7c0e13",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ]
+        },
+        {
+            "compIdentifier": "circLens_mrb",
+            "compSettings": {
+                "granularity": 0.0001,
+                "layoutGraphicSrc": "lens.png",
+                "name": "Fil Trap",
+                "showSequencer": true,
+                "uuid": "038e342d-6f02-4c2e-a234-d11afc426b27",
+                "vMax": 10.0,
+                "vMin": 0.0
+            },
+            "compType": "Circular Lens",
+            "iViewSettings": {
+                "r": 180,
+                "x": 1898.0,
+                "y": 1311.0
+            },
+            "sockets": [
+                {
+                    "filterInputPathNo": 1,
+                    "filterInputSource": "435c78d4-244f-42d9-8db1-bf4d311d1915",
+                    "name": "Fil Trap",
+                    "prec": 0.1,
+                    "uuid": "96eee4e2-14db-4d04-b34b-45fcabe97961",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ]
+        }
+    ],
+    "name": "ESI-FT-ICR"
+}

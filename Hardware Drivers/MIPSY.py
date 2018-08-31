@@ -129,7 +129,8 @@ class Hardware_Driver(Hardware_Object):
             print(self.waveformToClockCount(programData.waveformData))
 
     def onProgram(self):
-        print('I would program now')
+        pass
+        #print('I would program now')
 
     def onRun(self):
         self.program()
@@ -144,7 +145,7 @@ class Hardware_Driver(Hardware_Object):
         return waveOut
 
     def getClockCountAtTimePoint(self, time):
-        #time is in s
+        #time is in seconds (s)
         freq = int(self.hardwareSettings['tableClockSpeed'])
         return float(int(freq*time))
 

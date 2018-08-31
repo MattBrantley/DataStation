@@ -193,7 +193,7 @@ class HardwareManager():
                     if(hardwareModel is not None):
                         hardwareObj = self.mainWindow.hardwareWidget.hardwareWidget.addHardware(hardwareModel)
                         if('hardwareSettings' in state):
-                            hardwareObj.onLoad(state)
+                            hardwareObj.onLoadParent(state)
                     else:
                         self.mainWindow.postLog('Hardware Component State Found (Identifier: ' + state['hardwareIdentifier'] + ') But No Drivers Are Present For This Identifier! Partial Hardware State Import Continuing...', DSConstants.LOG_PRIORITY_HIGH)
                         

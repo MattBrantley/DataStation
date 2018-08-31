@@ -33,7 +33,8 @@ class Socket():
             if(self.instrumentManager is not None):
                 self.instrumentManager.socketUnattached(self)
                 
-        self.loadPacket['filterInputSource'] = None
+        if(self.loadPacket is not None):
+            self.loadPacket['filterInputSource'] = None
 
     def walkPathsForDraw(self, curColumn, view, branchRoot):
         tempColumn, filterObject = view.addFilterObject(self, branchRoot, curColumn)
@@ -91,7 +92,6 @@ class Socket():
     def onDataToSources(self, packet):
         if(self.filterInputSource is None or self.filterInputPathNo is None):
             return readyCheckPacket('Socket', DSConstants.READY_CHECK_ERROR, msg='Socket not attached!')
-
 
         subs = list()
         subs.append(self.filterInputSource.procReverseParent(self.filterInputPathNo, packet))

@@ -10,13 +10,13 @@ import numpy as np
 from decimal import Decimal
 from Sockets import *
 
-class User_Component(Component):
-    componentType = 'DC Lens'
-    componentIdentifier = 'DCLens_MRB'
+class DC_Electrode(Component):
+    componentType = 'DC Electrode'
+    componentIdentifier = 'DCElec_MRB'
     componentVersion = '1.0'
     componentCreator = 'Matthew R. Brantley'
     componentVersionDate = '7/13/2018'
-    iconGraphicSrc = 'Lens.png' #Not adjustable like layoutGraphicSrc
+    iconGraphicSrc = 'default.png' #Not adjustable like layoutGraphicSrc
     valid = False
 
     def onCreation(self):
@@ -24,13 +24,14 @@ class User_Component(Component):
         self.compSettings['layoutGraphicSrc'] = self.iconGraphicSrc
         self.compSettings['vMin'] = 0.0
         self.compSettings['vMax'] = 10.0
+        self.compSettings['granularity'] = 0.0001
         self.compSettings['showSequencer'] = True 
         self.sequenceEvents = list()
         self.containerWidget = self.configWidgetContent()
         self.configWidget.setWidget(self.containerWidget)
-        self.addDCSocket(self.compSettings['name'])
+        self.socket = self.addDCSocket(self.compSettings['name'])
         self.checkValidity()
-        #self.data = self.randData()
+        self.data = None
 
         self.addSequencerEventType(stepEvent())
         self.addSequencerEventType(pulseEvent())
@@ -41,6 +42,12 @@ class User_Component(Component):
         dataPacket = DCWaveformPacket(self.data)
         self.setPathDataPacket(1, dataPacket)
         return True
+
+    def updateConfigContent(self):
+        self.showSequenceBox.setChecked(self.compSettings['showSequencer'])
+        self.nameBox.setText(self.compSettings['name'])
+        self.minVBox.setValue(self.compSettings['vMin'])
+        self.maxVBox.setValue(self.compSettings['vMax'])
 
     def configWidgetContent(self):
         self.container = QWidget()
@@ -70,34 +77,23 @@ class User_Component(Component):
         self.container.setLayout(self.fbox)
         return self.container
 
-    def randData(self):
-        count = random.randint(1,100)
-        var = random.randint(-5,10)
-        newData = np.array([var-1,var])
-        for i in range(count):
-            data = np.array([var, random.randint(1,10)])
-            var = var + 1
-            newData = np.vstack((newData, data))
-        return newData
-
-    def plotSequencer(self, events):
-        data = None
+    def parseSequenceEvents(self, events):
+        self.data = None
         lastEventVoltage = 0
         for event in events:
             newEventData = None
 
             if(isinstance(event['type'], stepEvent) is True):
                 newEventData = np.array([[event['time'], lastEventVoltage],
-                [event['time']+0.000001, event['settings']['Voltage']]])
+                [event['time']+self.compSettings['granularity'], event['settings']['Voltage']]])
 
                 lastEventVoltage = event['settings']['Voltage']
-                #print(newEventData)
 
             if(isinstance(event['type'], pulseEvent) is True):
                 newEventData = np.array([[event['time'], lastEventVoltage],
-                [event['time'], event['settings']['Voltage']],
+                [event['time']+self.compSettings['granularity'], event['settings']['Voltage']],
                 [event['time']+event['settings']['Duration'], event['settings']['Voltage']],
-                [event['time']+event['settings']['Duration'], lastEventVoltage]])
+                [event['time']+event['settings']['Duration']+self.compSettings['granularity'], lastEventVoltage]])
 
                 lastEventVoltage = lastEventVoltage            
                 
@@ -106,9 +102,9 @@ class User_Component(Component):
                 for n in range(0, event['settings']['Count']):
                     offset = n*event['settings']['offDuration'] + n*event['settings']['onDuration']
                     newEventStep = np.array([[event['time']+offset, lastEventVoltage],
-                    [event['time']+offset, event['settings']['Voltage']],
+                    [event['time']+offset+self.compSettings['granularity'], event['settings']['Voltage']],
                     [event['time']+event['settings']['onDuration']+offset, event['settings']['Voltage']],
-                    [event['time']+event['settings']['onDuration']+offset, lastEventVoltage]])
+                    [event['time']+event['settings']['onDuration']+offset+self.compSettings['granularity'], lastEventVoltage]])
                     if(newEventData is None):
                         newEventData = newEventStep
                     else:
@@ -125,18 +121,22 @@ class User_Component(Component):
                 lastEventVoltage = event['settings']['Voltage']
 
             if(newEventData is not None):
-                if(data is None):
-                    data = newEventData
+                if(self.data is None):
+                    self.data = newEventData
                 else:
-                    data = np.vstack((data, newEventData))
+                    self.data = np.vstack((self.data, newEventData))
         #print(data)
-        return data
+        return self.data
+
+    def plotSequencer(self, events):
+        return self.parseSequenceEvents(events)
 
     def saveWidgetValues(self):
         self.compSettings['showSequencer'] = self.showSequenceBox.isChecked()
         self.compSettings['name'] = self.nameBox.text()
         self.compSettings['vMin'] = self.minVBox.value()
         self.compSettings['vMax'] = self.maxVBox.value()
+        self.socket.name = self.compSettings['name']
         self.checkValidity()
 
     def checkValidity(self):
@@ -206,8 +206,12 @@ class pulseTrainEvent(sequencerEventType):
     def getLength(self, params):
         return params[1].value()*params[2].value() + (params[1].value()-1)*params[3].value()
 
-class DC_LensEvent():
-    def __init__(self, time, eventType, data):
-        self.time = time
-        self.eventType = eventType
-        self.data = data
+#def randData(self):
+#    count = random.randint(1,100)
+#    var = random.randint(-5,10)
+#    newData = np.array([var-1,var])
+#    for i in range(count):
+#        data = np.array([var, random.randint(1,10)])
+#        var = var + 1
+#        newData = np.vstack((newData, data))
+#    return newData

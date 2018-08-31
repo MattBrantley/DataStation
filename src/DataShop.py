@@ -110,12 +110,18 @@ class mainWindow(QMainWindow):
         self.restoreWindowStates()
         self.workspace.loadPreviousWS()
         self.loadPreviousInstrument()
+        self.loadPreviousSequence()
         self.postLog('Data Station Finished Loading!', DSConstants.LOG_PRIORITY_HIGH)
 
     def loadPreviousInstrument(self):
         if('instrumentURL' in self.workspace.userProfile):
             if(self.workspace.userProfile['instrumentURL'] is not None):
                 self.instrumentWidget.instrumentManager.loadInstrument(self.workspace.userProfile['instrumentURL'])
+
+    def loadPreviousSequence(self):
+        if('sequenceURL' in self.workspace.userProfile):
+            if(self.workspace.userProfile['sequenceURL'] is not None):
+                self.sequencerDockWidget.openSequence(self.workspace.userProfile['sequenceURL'])
 
     def updateState(self, state):
         if(state == DSConstants.MW_STATE_NO_WORKSPACE):

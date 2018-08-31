@@ -1,0 +1,60 @@
+{
+    "instrument": "Test_copy",
+    "saveData": [
+        {
+            "compID": "DCLens_MRB",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0101,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Duration": 0.001,
+                        "Voltage": 1.0
+                    },
+                    "time": 1.1111,
+                    "type": "Linear Ramp"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.2222,
+                    "type": "Step"
+                }
+            ],
+            "name": "Unnamed DC Lens",
+            "type": "DC Lens",
+            "uuid": "cca3d53b-669f-422a-9d41-cd9ec428e2bb"
+        },
+        {
+            "compID": "DCLens_MRB",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Count": 12,
+                        "Voltage": 1.0,
+                        "offDuration": 0.05,
+                        "onDuration": 0.1
+                    },
+                    "time": 1.001,
+                    "type": "Pulse Train"
+                }
+            ],
+            "name": "Unnamed DC Lens",
+            "type": "DC Lens",
+            "uuid": "5d72905e-b777-4730-9362-f3930f3acf08"
+        }
+    ]
+}

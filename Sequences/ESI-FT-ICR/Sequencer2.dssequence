@@ -1,0 +1,1658 @@
+{
+    "instrument": "ESI-FT-ICR",
+    "saveData": [
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 2.002,
+                    "type": "Step"
+                }
+            ],
+            "name": "Source/Q1 Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        }
+    ]
+}

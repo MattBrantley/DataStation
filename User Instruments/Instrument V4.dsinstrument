@@ -1,0 +1,61 @@
+{
+    "compList": [
+        {
+            "compIdentifier": "DCLens_MRB",
+            "compSettings": {
+                "layoutGraphicSrc": "Lens.png",
+                "name": "Unnamed DC Lens",
+                "showSequencer": true,
+                "uuid": "cefa4221-15f7-42d6-8358-3d14351e9267",
+                "vMax": 10.0,
+                "vMin": 0.0
+            },
+            "compType": "DC Lens",
+            "iViewSettings": {
+                "r": 180,
+                "x": -2594.413272898897,
+                "y": 1474.2740286298567
+            },
+            "sockets": [
+                {
+                    "filterInputPathNo": null,
+                    "filterInputSource": null,
+                    "name": "Unnamed DC Lens",
+                    "prec": 0.1,
+                    "uuid": "3b61174a-81df-4321-bb12-2895922b9a0c",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ]
+        },
+        {
+            "compIdentifier": "DCLens_MRB",
+            "compSettings": {
+                "layoutGraphicSrc": "Lens.png",
+                "name": "Unnamed DC Lens",
+                "showSequencer": true,
+                "uuid": "ec956d05-7474-4b11-abe8-bd0f9647b219",
+                "vMax": 10.0,
+                "vMin": 0.0
+            },
+            "compType": "DC Lens",
+            "iViewSettings": {
+                "r": 180,
+                "x": -1775.2112228902515,
+                "y": 1253.087934560327
+            },
+            "sockets": [
+                {
+                    "filterInputPathNo": null,
+                    "filterInputSource": null,
+                    "name": "Unnamed DC Lens",
+                    "prec": 0.1,
+                    "uuid": "e203a3f1-2de1-4b99-94b7-e6760504feb9",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ]
+        }
+    ],
+    "name": "Instrument V4"
+}

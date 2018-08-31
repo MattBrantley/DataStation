@@ -1,6 +1,6 @@
 from PyQt5.Qt import *
 from PyQt5.QtGui import QStandardItemModel
-import os, random
+import os, random, uuid
 from Constants import DSConstants as DSConstants
 from Sockets import *
 import numpy as np
@@ -8,6 +8,7 @@ from decimal import Decimal
 from DSWidgets.controlWidget import readyCheckPacket
 
 class Component():
+    indexMe = True
     componentType = 'Default Component'
     componentIdentifier = 'DefComp'
     componentVersion = '1.0'
@@ -23,6 +24,7 @@ class Component():
         self.compSettings['name'] = ''
         self.compSettings['layoutGraphicSrc'] = self.iconGraphicSrc
         self.compSettings['showSequencer'] = False
+        self.compSettings['uuid'] = str(uuid.uuid4())
         self.instrumentManager = instrumentManager
         self.name = kwargs.get('name', self.componentType)
         self.socketList = list()
@@ -32,17 +34,30 @@ class Component():
         self.sequencerEventTypes = list()
         self.data = None
         self.plotItem = None
+        self.sequencerDrawState = False
 
     def registerPlotItem(self, plotItem):
         self.plotItem = plotItem
 
     def updatePlot(self):
+        if(self.compSettings['showSequencer'] is not self.sequencerDrawState):
+            self.sequencerDrawState = self.compSettings['showSequencer']
+            self.redrawSequence()
+
         if(self.plotItem is not None):
             self.plotItem.updatePlot()
+        self.reprogramSourceTargets()
+
+    def reprogramSourceTargets(self):
+        for socket in self.socketList:
+            source = socket.getAttachedSource()
+            if(source is not None):
+                source.reprogram()
 
     def addDCSocket(self, name):
         socket = DCSocket(self, name, 0, 10, 0.1)
         self.socketList.append(socket)
+        return socket
 
     def registeriViewComponent(self, component):
         self.iViewComponent = component
@@ -53,6 +68,7 @@ class Component():
 
         self.sequencerEditWidget.move(eventPos + QPoint(2, 2))
         if(self.sequencerEditWidget.isHidden()):
+            self.sequencerEditWidget.updateTitle()
             self.sequencerEditWidget.show()
         else:
             self.sequencerEditWidget.hide()
@@ -72,7 +88,10 @@ class Component():
         return savePacket
 
     def loadCompSettings(self, compSettings):
-        self.compSettings = compSettings
+        for key, value in compSettings.items():
+            self.compSettings[key] = value
+
+        #self.compSettings = compSettings
 
     def saveSockets(self):
         sockets = list()
@@ -104,13 +123,13 @@ class Component():
     def onCreationFinishedParent(self):
         #Walks through all appropriate objects and adds the update call.
         for widget in self.configWidget.findChildren(QLineEdit):
-            widget.textChanged.connect(self.redrawSequence)
+            widget.textChanged.connect(self.updatePlot)
 
         for widget in self.configWidget.findChildren(QCheckBox):
-            widget.stateChanged.connect(self.redrawSequence)
+            widget.stateChanged.connect(self.updatePlot)
 
         for widget in self.configWidget.findChildren(QDoubleSpinBox):
-            widget.valueChanged.connect(self.redrawSequence)
+            widget.valueChanged.connect(self.updatePlot)
 
     def onRemovalParent(self):
         self.instrumentManager.mainWindow.postLog('Removing Instrument Component: ' + self.componentType, DSConstants.LOG_PRIORITY_MED)
@@ -122,9 +141,13 @@ class Component():
     def hideConfigWindow(self):
         self.configWidget.hide()
 
+    def updateConfigContent(self):
+        pass
+
     def onLeftClick(self, eventPos):
         self.configWidget.move(eventPos + QPoint(2, 2))
         if(self.configWidget.isHidden()):
+            self.updateConfigContent()
             self.configWidget.show()
         else:
             self.configWidget.hide()
@@ -163,6 +186,9 @@ class Component():
             index = 0
             for socket in self.socketList:
                 if(self.pathDataPackets[index] is not None):
+                    #if(self.pathDataPackets[index].waveformData is None):
+                    #    subs.append(readyCheckPacket('User Component', DSConstants.READY_CHECK_ERROR, msg='User Component onRun() populated and empty packet (no waveformData!)' + str(index+1) + '!'))
+                    #else:
                     subs.append(socket.onDataToSourcesParent(self.pathDataPackets[index]))
                 else:
                     subs.append(readyCheckPacket('User Component', DSConstants.READY_CHECK_ERROR, msg='User Component onRun() Did Not Populate pathDataPackets for Path #' + str(index+1) + '!'))
@@ -182,11 +208,25 @@ class Component():
     def addSequencerEventType(self, sequencerEventType):
         self.sequencerEventTypes.append(sequencerEventType)
 
+    def loadSequenceData(self, events):
+        if(self.sequencerEditWidget is None): #Generates this widget the first time it is made.
+            self.sequencerEditWidget = sequenceEditWidget(self)
+
+        for event in events:
+            self.sequencerEditWidget.addEvent(event)
+            #print(event)
+        self.sequencerEditWidget.checkEventOverlaps()
+        #print(events)
+
+    def clearEvents(self):
+        if(self.sequencerEditWidget is not None):
+            self.sequencerEditWidget.clearEvents()
+
 class sequenceEditWidget(QDockWidget):
     doNotAutoPopulate = True
 
     def __init__(self, compParent):
-        super().__init__('Sequencer: ' + compParent.name, parent=compParent.mainWindow.sequencerDockWidget)
+        super().__init__('Sequencer: ' + compParent.compSettings['name'], parent=compParent.mainWindow.sequencerDockWidget)
         self.compParent = compParent
         self.sequencerWidget = self.compParent.instrumentManager.mainWindow.sequencerDockWidget
         self.setFeatures(QDockWidget.DockWidgetClosable)
@@ -203,6 +243,53 @@ class sequenceEditWidget(QDockWidget):
 
         self.setWidget(self.mainWidget)
 
+    def updateTitle(self):
+        self.setWindowTitle('Sequence: ' + self.compParent.compSettings['name'])
+
+    def clearEvents(self):
+        #self.table.clear()
+        for row in range(0, self.table.rowCount()):
+            self.table.removeRow(0)
+
+    def addEvent(self, eventData):
+        newRow = self.newEvent()
+        index = self.table.cellWidget(newRow, 1).findText(eventData['type'])
+        if(index != -1):
+            self.table.cellWidget(newRow, 0).setValue(eventData['time'])
+            self.table.cellWidget(newRow, 1).setCurrentIndex(index)
+            settingsWidgets = self.table.cellWidget(newRow, 2).stackWidgetDicts[index]
+            for setting, value in eventData['settings'].items():
+                if(setting in settingsWidgets):
+                    settingsWidgets[setting].setValue(value)
+                else:
+                    self.compParent.instrumentManager.mainWindow.postLog('Event of type (' + eventData['type'] + ') does not have a (' + setting + ') setting type!!!', DSConstants.LOG_PRIORITY_HIGH)
+        else:
+            self.table.removeRow(newRow)
+            self.compParent.instrumentManager.mainWindow.postLog('Event has unknown type (' + eventData['type'] + ') for object type (' + self.compParent.componentType + ')!!', DSConstants.LOG_PRIORITY_HIGH)
+        
+    def newEvent(self):
+        rowCount = self.table.rowCount()
+        self.table.insertRow(rowCount)
+        if(rowCount > 0):
+            s,e = self.getEventStartEnd(rowCount-1)
+            time = e + 1
+        else:
+            time = 0
+        timeWidget = timeInputEdit(rowCount, time=time)
+        timeWidget.timeChanged.connect(self.sortEvent)
+        timeWidget.timeChanged.connect(self.checkEventOverlaps)
+        self.table.setCellWidget(rowCount, 0, timeWidget)
+        typeWidget = eventTypeComboBox(self.sequencerEventTypes)
+        settingsWidget = eventSettingsEdit(self.sequencerEventTypes, rowCount)
+        settingsWidget.parameterChanged.connect(self.checkEventOverlaps)
+        typeWidget.currentIndexChanged.connect(settingsWidget.redraw)
+        typeWidget.currentIndexChanged.connect(self.checkEventOverlaps)
+
+        self.table.setCellWidget(rowCount, 1, typeWidget)
+        self.table.setCellWidget(rowCount, 2, settingsWidget)
+        
+        return rowCount
+
     def getEvents(self):
         eventListOut = list()
         for row in range(0, self.table.rowCount()):
@@ -210,6 +297,20 @@ class sequenceEditWidget(QDockWidget):
                 item = dict()
                 item['time'] = self.table.cellWidget(row, 0).value()
                 item['type'] = self.table.cellWidget(row, 1).value()
+                item['settings'] = dict()
+                for setting in self.table.cellWidget(row, 2).value():
+                    item['settings'][setting.name] = setting.value()
+                eventListOut.append(item)
+        #print(eventListOut)
+        return eventListOut
+
+    def getEventsSerializable(self):
+        eventListOut = list()
+        for row in range(0, self.table.rowCount()):
+            if(self.table.cellWidget(row, 0).valid is True):
+                item = dict()
+                item['time'] = self.table.cellWidget(row, 0).value()
+                item['type'] = self.table.cellWidget(row, 1).value().name
                 item['settings'] = dict()
                 for setting in self.table.cellWidget(row, 2).value():
                     item['settings'][setting.name] = setting.value()
@@ -254,26 +355,7 @@ class sequenceEditWidget(QDockWidget):
         return self.buttonWidget
 
     def newButtonPressed(self):
-        rowCount = self.table.rowCount()
-        self.table.insertRow(rowCount)
-        if(rowCount > 0):
-            s,e = self.getEventStartEnd(rowCount-1)
-            time = e + 1
-        else:
-            time = 0
-        timeWidget = timeInputEdit(rowCount, time=time)
-        timeWidget.timeChanged.connect(self.sortEvent)
-        timeWidget.timeChanged.connect(self.checkEventOverlaps)
-        self.table.setCellWidget(rowCount, 0, timeWidget)
-        typeWidget = eventTypeComboBox(self.sequencerEventTypes)
-        settingsWidget = eventSettingsEdit(self.sequencerEventTypes, rowCount)
-        settingsWidget.parameterChanged.connect(self.checkEventOverlaps)
-        typeWidget.currentIndexChanged.connect(settingsWidget.redraw)
-        typeWidget.currentIndexChanged.connect(self.checkEventOverlaps)
-
-        self.table.setCellWidget(rowCount, 1, typeWidget)
-        self.table.setCellWidget(rowCount, 2, settingsWidget)
-        #self.table.setVerticalHeaderItem(rowCount, QTableWidgetItem('#' + str(rowCount+1)))
+        self.newEvent()
         self.checkEventOverlaps()
 
     def editButtonPressed(self):
@@ -401,6 +483,9 @@ class timeInputEdit(QLineEdit):
     def value(self):
         return float(self.text())
 
+    def setValue(self, value):
+        self.setText(str(Decimal(value).quantize(self.quant)))
+
     def checkValue(self):
         value = self.text()
         self.setText(str(Decimal(value).quantize(self.quant)))
@@ -415,6 +500,7 @@ class eventSettingsEdit(QWidget):
         self.row = row
         self.index = 0
         self.stackList = list()
+        self.stackWidgetDicts = list()
         self.stack = QStackedLayout()
         self.setLayout(self.stack)
         self.makeSettingsLayouts()
@@ -424,6 +510,7 @@ class eventSettingsEdit(QWidget):
     def makeSettingsLayouts(self):
         for settingsType in self.settingsType:
             settingsList = list()
+            widgetDict = dict()
             widget = settingsStackWidget()
             layout = QHBoxLayout()
             widget.setLayout(layout)
@@ -435,9 +522,11 @@ class eventSettingsEdit(QWidget):
                 layout.addWidget(label)
                 layout.addWidget(param)
                 widget.addParam(param)
+                widgetDict[param.name] = param
                 param.textChanged.connect(self.settingChanged)
             self.stack.addWidget(widget)
             self.stackList.append(settingsList)
+            self.stackWidgetDicts.append(widgetDict)
 
     def value(self):
         return self.stackList[self.index]
@@ -517,6 +606,9 @@ class eventParameterDouble(eventParameter):
         else:
             return float(0.0)
 
+    def setValue(self, value):
+        self.setText(str(Decimal(value).quantize(self.quant)))
+
     def checkValue(self):
         value = self.text()
         if(self.allowZero is False):
@@ -538,12 +630,14 @@ class eventParameterInt(eventParameter):
         self.setText(str(defaultVal))
         self.editingFinished.emit()
 
-
     def value(self):
         if(self.text() != ''):
             return int(self.text())
         else:
             return int(0)
+
+    def setValue(self, value):
+        self.setText(str(value))
 
     def checkValue(self):
         value = self.text()
@@ -559,6 +653,9 @@ class eventParameterString(eventParameter):
         
     def value(self):
         return self.text()
+
+    def setValue(self, value):
+        self.setText(str(value))
 
 class ComponentConfigWidget(QDockWidget):
     doNotAutoPopulate = True

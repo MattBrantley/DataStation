@@ -1,0 +1,30 @@
+{
+    "instrument": "Test_copy",
+    "saveData": [
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Count": 4,
+                        "Voltage": 1.0,
+                        "offDuration": 0.1,
+                        "onDuration": 0.1
+                    },
+                    "time": 1.001,
+                    "type": "Pulse Train"
+                }
+            ],
+            "name": "Unnamed Circular Lens",
+            "type": "Circular Lens",
+            "uuid": "201a6eb2-c25c-4059-af23-4cdaeeebe383"
+        }
+    ]
+}

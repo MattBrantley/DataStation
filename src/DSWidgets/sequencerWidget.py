@@ -1,10 +1,12 @@
 from PyQt5.Qt import *
 import pyqtgraph as pg # This library gives a bunch of FutureWarnings that are unpleasant! Fix for this is in the main .py file header.
 from pyqode.core import api, modes, panels
-import os
+import os, json
 from shutil import copyfileobj
 import numpy as np
 import random
+from shutil import copyfile
+from Constants import DSConstants as DSConstants
 
 class DSGraphicsLayout():
     sequenceBGColor = QColor(255, 255, 255) #Intended to be user-editable at a future date.
@@ -20,7 +22,7 @@ class DSGraphicsLayout():
 
     def addPlot(self, name, comp):
         self.plotLayoutWidget.nextRow()
-        plot = DSPlotItem(self, name, comp)
+        plot = DSPlotItem(self, self.dockWidget, name, comp)
         self.plots.append(plot)
 
         if(len(self.plots) == 1):
@@ -87,8 +89,9 @@ class DSGraphicsLayoutWidget(pg.GraphicsLayoutWidget):
 class DSPlotItem():
     plotPaddingPercent = 1
 
-    def __init__(self, plotLayout, name, comp):
+    def __init__(self, plotLayout, sequencerWidget, name, comp):
         self.component = comp
+        self.sequencerWidget = sequencerWidget
         self.component.registerPlotItem(self)
         self.plotLayout = plotLayout
         self.plotItem = plotLayout.plotLayoutWidget.addPlot()
@@ -102,13 +105,6 @@ class DSPlotItem():
         self.xMin, self.xMax = self.component.instrumentManager.mainWindow.sequencerDockWidget.getSequenceXRange()
         if(data is not None):
             self.plotItem.clear()
-            #print(data.ndim)
-            #print(data)
-            #if(data.ndim >= 2):
-            #    xMin = data[:, 0].min()
-            #    xMax = data[:, 0].max()
-            #    xMin, xMax = self.component.instrumentManager.mainWindow.sequencerDockWidget.xRangeUpdate(xMin, xMax)
-            #else:
             if(data.ndim < 2):
                 startHub = np.array([-900000, data[1]])
                 endHub = np.array([900000, data[1]])
@@ -127,22 +123,38 @@ class DSPlotItem():
             self.plotItem.clear()
             self.plotItem.plot(x=self.data[:,0], y=self.data[:,1], pen = self.plotLayout.sequencePLT1Color)
 
-            #self.plotItem.setLimits(xMin=self.xMin, xMax=self.xMax, yMin=self.data[:,1].min()-yPadding, yMax=self.data[:,1].max()+yPadding)
             self.plotItem.autoRange()
             self.component.instrumentManager.mainWindow.sequencerDockWidget.redrawSequence()
 
     def plot(self, showXAxis, xMinIn, xMaxIn):
         data = self.component.parentPlotSequencer()
+        if(data is None):
+            data = np.array([[0,0], [1,0]])
+
         if(data is not None):
             data2 = self.formatData(data, xMinIn, xMaxIn)
             self.data = data2
 
             yDelta = self.data[:,1].max() - self.data[:,1].min()
+            if(yDelta < 1):
+                yDelta = 1
             yPadding = yDelta*self.plotPaddingPercent/100
+
+            yMin = self.data[:,1].min()
+            if(yMin > 0):
+                yMin = 0 - yPadding
+            else:
+                yMin = yMin - yPadding
+
+            yMax = self.data[:, 1].max()
+            if(yMax < 1):
+                yMax = 1 + yPadding
+            else:
+                yMax = yMax + yPadding
 
             self.plotItem.clear()
             self.plotItem.plot(x=self.data[:,0], y=self.data[:,1], pen = self.plotLayout.sequencePLT1Color)
-            self.plotItem.setLimits(xMin=xMinIn, xMax=xMaxIn, yMin=self.data[:,1].min()-yPadding, yMax=self.data[:,1].max()+yPadding)
+            self.plotItem.setLimits(xMin=xMinIn, xMax=xMaxIn, yMin=yMin, yMax=yMax)
 
         self.plotItem.setMouseEnabled(x=True, y=False)
         self.plotItem.setLabels(bottom='Time (s)', left='voltage')
@@ -184,13 +196,16 @@ class sequencerDockWidget(QDockWidget):
     plotPaddingPercent = 1
 
     def __init__(self, mainWindow):
-        super().__init__('Sequencer')
+        super().__init__('Sequencer (None)')
         self.mainWindow = mainWindow
         self.instrumentManager = mainWindow.workspace.DSInstrumentManager
         self.hide()
         self.resize(1000, 800)
         self.fileSystem = DSEditorFSModel()
-        self.fsIndex = self.fileSystem.setRootPath(os.path.abspath(os.path.join(os.path.join(os.path.dirname(os.path.dirname(__file__)), os.path.pardir), 'sequences')))  #This is a placeholder - will need updating.
+        self.fsRoot = os.path.abspath(os.path.join(os.path.join(os.path.dirname(os.path.dirname(__file__)), os.path.pardir), 'sequences'))
+        self.fsIndex = self.fileSystem.setRootPath(self.fsRoot)  #This is a placeholder - will need updating.
+
+        self.currentSequenceURL = None
 
         self.xMin = 0
         self.xMax = 1
@@ -247,6 +262,8 @@ class sequencerDockWidget(QDockWidget):
                         self.plots.append(plotHolder)
 
             self.redrawSequence()
+        if hasattr(self.instrumentManager.mainWindow, 'hardwareWidget'):
+            self.instrumentManager.mainWindow.hardwareWidget.drawScene()
 
     def xRangeUpdate(self, xMinTest, xMaxTest):
         if(xMinTest < self.xMin):
@@ -315,23 +332,70 @@ class sequencerDockWidget(QDockWidget):
         self.sequenceNavigator.hideColumn(2)
         self.sequenceNavigator.hideColumn(3)
 
+    def getSaveData(self):
+        saveDataPacket = dict()
+        saveDataPacket['instrument'] = self.instrumentManager.currentInstrument.name
+
+        saveData = list()
+        count = 1
+        for plot in self.plots:
+            if(plot.component.sequencerEditWidget is not None):
+                packetItem = dict()
+                packetItem['name'] = plot.component.compSettings['name']
+                packetItem['type'] = plot.component.componentType
+                packetItem['compID'] = plot.component.componentIdentifier
+                packetItem['uuid'] = plot.component.compSettings['uuid']
+                packetItem['events'] = plot.component.sequencerEditWidget.getEventsSerializable()
+                saveData.append(packetItem)
+            print(count)
+            count = count + 1
+
+        saveDataPacket['saveData'] = saveData
+        return saveDataPacket
+
     def save(self):
-        self.sequenceNavigator.saveSequence()
+        if(self.currentSequenceURL is None):
+            self.saveAs()
+            return
+
+        fileName = os.path.basename(self.currentSequenceURL)
+        if(os.path.exists(os.path.join(self.fsRoot, self.instrumentManager.currentInstrument.name)) is False):
+            os.mkdir(os.path.join(self.fsRoot, self.instrumentManager.currentInstrument.name))
+        saveURL = os.path.join(os.path.join(self.fsRoot, self.instrumentManager.currentInstrument.name), fileName)
+
+        #saveURL = self.currentSequenceURL
+        saveData = self.getSaveData()
+        self.mainWindow.postLog('Saving Sequence (' + saveURL + ')... ', DSConstants.LOG_PRIORITY_HIGH)
+        if(os.path.exists(saveURL)):
+            os.remove(saveURL)
+        with open(saveURL, 'w') as file:
+            json.dump(saveData, file, sort_keys=True, indent=4)
+        self.mainWindow.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     def saveAs(self):
-        print("save as")
-        '''
-        curWidget = self.codeEditorTabs.currentWidget()
-        if(curWidget):
-            text, ok = QInputDialog.getText(self, 'Save As..', 'Filename:', QLineEdit.Normal, curWidget.fileName)
-            if(ok):
-                if(os.path.isfile(os.path.dirname(curWidget.filePath) + '/' + text)):
-                    ans = QMessageBox.question(self, 'Save File..', 'A file with this name already exists. Do you want to overwrite it?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-                    if(ans == QMessageBox.Yes):
-                        curWidget.file.save(os.path.dirname(curWidget.filePath) + '/' + text)
-                else:
-                    curWidget.file.save(os.path.dirname(curWidget.filePath) + '/' + text)
-        '''
+        fname, ok = QInputDialog.getText(self.mainWindow, "Sequence Name", "Sequence Name")
+        if(os.path.exists(os.path.join(self.fsRoot, self.instrumentManager.currentInstrument.name)) is False):
+            os.mkdir(os.path.join(self.fsRoot, self.instrumentManager.currentInstrument.name))
+        saveURL = os.path.join(os.path.join(self.fsRoot, self.instrumentManager.currentInstrument.name), fname + '.dssequence')
+        if(ok):
+            pass
+            #self.instrumentManager.currentInstrument.name = fname
+        else:
+            return
+
+        if(os.path.exists(saveURL)):
+            reply = QMessageBox.question(self.mainWindow, 'File Warning!', 'File exists - overwrite?', QMessageBox.Yes, QMessageBox.No)
+            if(reply == QMessageBox.No):
+                return
+
+        saveData = self.getSaveData()
+        self.mainWindow.postLog('Saving Sequence (' + saveURL + ')... ', DSConstants.LOG_PRIORITY_HIGH)
+        if(os.path.exists(saveURL)):
+            os.remove(saveURL)
+        with open(saveURL, 'w') as file:
+            json.dump(saveData, file, sort_keys=True, indent=4)
+        self.currentSequenceURL = saveURL
+        self.mainWindow.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     def new(self):
         result = DSNewFileDialog.newFile()
@@ -372,12 +436,63 @@ class sequencerDockWidget(QDockWidget):
             self.openSequence(filePath)
 
     def openSequence(self, filePath):
-        print("opening path")
+        if(self.instrumentManager.currentInstrument is None):
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("No instrument is loaded - cannot load sequence!")
+            msg.setWindowTitle("Sequence/Instrument Compatibability Error")
+            msg.setStandardButtons(QMessageBox.Ok)
+
+            retval = msg.exec_()
+            return
+
+        self.mainWindow.postLog('Loading Sequence (' + filePath + ')... ', DSConstants.LOG_PRIORITY_HIGH)
+        if(os.path.isfile(filePath) is True):
+            with open(filePath, 'r') as file:
+                try:
+                    sequenceData = json.load(file)
+                    if(self.processSequenceData(sequenceData) is False):
+                        self.mainWindow.postLog('Sequence at (' + filePath + ') not loaded - aborting! ', DSConstants.LOG_PRIORITY_HIGH)
+                    else:
+                        self.currentSequenceURL = filePath
+                except ValueError as e:
+                    self.mainWindow.postLog('Corrupted sequence at (' + filePath + ') - aborting! ', DSConstants.LOG_PRIORITY_HIGH)
+                    return
+        if(self.currentSequenceURL is not None):
+            self.setWindowTitle('Sequencer (' + os.path.basename(self.currentSequenceURL) + ')')
+        else:
+            self.setWindowTitle('Sequencer (None)')
+        self.mainWindow.workspace.userProfile['sequenceURL'] = filePath
+        self.mainWindow.postLog('Finished Loading Sequence!', DSConstants.LOG_PRIORITY_HIGH)
+
+    def processSequenceData(self, data):
+        instrument = data['instrument']
+        self.instrumentManager.currentInstrument.clearSequenceEvents()
+        if(instrument != self.instrumentManager.currentInstrument.name):
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setText("The sequence is for a different instrument (" + instrument + ") than what is currently loaded (" + self.instrumentManager.currentInstrument.name + "). It is unlikely this sequence will load.. Continue?")
+            msg.setWindowTitle("Sequence/Instrument Compatibability Warning")
+            msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+
+            retval = msg.exec_()
+            if(retval == QMessageBox.No):
+                return False
+
+        dataSet = data['saveData']
+        for datum in dataSet:
+            comp = self.instrumentManager.currentInstrument.getComponentByUUID(datum['uuid'])
+            if(comp is None):
+                self.mainWindow.postLog('Sequence data for comp with uuid (' + datum['uuid'] + ') cannot be assigned! Possibly from different instrument.', DSConstants.LOG_PRIORITY_HIGH)
+            else:
+                comp.loadSequenceData(datum['events'])
+        
+        self.redrawSequence()
+        return True
 
     def updateToolbarState(self):
         self.saveAction.setEnabled(True)
         self.saveAsAction.setEnabled(True)
-        self.saveAllAction.setEnabled(True)
 
 class DSNewFileDialog(QDialog):
     def __init__(self):
@@ -424,15 +539,15 @@ class DSTreeView(QTreeView):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.rightClick)
 
-    def saveSequence(self, sequenceData):
-        print('saving')
-
     def rightClick(self, point):
         idx = self.mapToGlobal(point)
 
         item = self.selectionModel().selectedIndexes()
         if(os.path.isdir(self.model.filePath(item[0]))):        #Don't show menu on folders
             return
+
+        openAction = QAction('Open', self)
+        openAction.triggered.connect(lambda: self.open(self.model.filePath(item[0])))
 
         deleteAction = QAction('Delete', self)
         deleteAction.triggered.connect(lambda: self.delete(self.model.filePath(item[0])))
@@ -441,9 +556,13 @@ class DSTreeView(QTreeView):
         duplicateAction.triggered.connect(lambda: self.duplicate(self.model.filePath(item[0])))
 
         menu = QMenu(self)
+        menu.addAction(openAction)
         menu.addAction(deleteAction)
         menu.addAction(duplicateAction)
         menu.exec(idx)
+
+    def open(self, item):
+        self.parent.openSequence(item)
 
     def delete(self, item):
         os.remove(item)
@@ -454,5 +573,5 @@ class DSTreeView(QTreeView):
         while(os.path.isfile(tempPath)):
             tempNum = tempNum + 1
             tempPath = os.path.splitext(item)[0] + '_copy' + str(tempNum) + os.path.splitext(item)[1]
-
+        
         copyfile(item, tempPath)

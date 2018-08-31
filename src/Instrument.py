@@ -14,6 +14,8 @@ class Instrument():
 
     def readyCheck(self):
         subs = list()
+        if(len(self.components) == 0):
+            return readyCheckPacket('Active Instrument', DSConstants.READY_CHECK_ERROR, msg='Instrument has no components!')
         for component in self.components:
             subs.append(component.readyCheck())
 
@@ -28,6 +30,13 @@ class Instrument():
         newComp.onCreationFinishedParent()
         self.components.append(newComp)
         return newComp
+
+    def getComponentByUUID(self, uuid):
+        for comp in self.components:
+            if('uuid' in comp.compSettings):
+                if(comp.compSettings['uuid'] == uuid):
+                    return comp
+        return None
 
     def removeComponent(self, comp):
         comp.onRemovalParent()
@@ -56,3 +65,7 @@ class Instrument():
     def reattachSockets(self):
         for socket in self.getSockets():
             socket.onLink()
+
+    def clearSequenceEvents(self):
+        for comp in self.components:
+            comp.clearEvents()

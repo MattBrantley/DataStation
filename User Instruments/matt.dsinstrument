@@ -1,1 +1,0 @@
-{"name": "matt", "compList": [{"compSettings": {"name": "Unnamed DC Lens", "layoutGraphicSrc": "Lens.png", "showSequencer": true, "vMin": 0.0, "vMax": 10.0}, "compType": "DC Lens", "compIdentifier": "DCLens_MRB", "iViewSettings": {"x": -199.28415539065907, "y": 1512.2772277227723, "r": 180}, "sockets": [

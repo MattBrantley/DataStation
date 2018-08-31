@@ -1,0 +1,71 @@
+{
+    "instrument": "Instrument V4",
+    "saveData": [
+        {
+            "compID": "DCLens_MRB",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "stepEvent"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "stepEvent"
+                }
+            ],
+            "name": "Unnamed DC Lens",
+            "type": "DC Lens",
+            "uuid": "cefa4221-15f7-42d6-8358-3d14351e9267"
+        },
+        {
+            "compID": "DCLens_MRB",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "stepEvent"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "stepEvent"
+                }
+            ],
+            "name": "Unnamed DC Lens",
+            "type": "DC Lens",
+            "uuid": "cefa4221-15f7-42d6-8358-3d14351e9267"
+        },
+        {
+            "compID": "DCLens_MRB",
+            "events": [
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "stepEvent"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 1.001,
+                    "type": "stepEvent"
+                }
+            ],
+            "name": "Unnamed DC Lens",
+            "type": "DC Lens",
+            "uuid": "ec956d05-7474-4b11-abe8-bd0f9647b219"
+        }
+    ]
+}
