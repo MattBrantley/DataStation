@@ -195,6 +195,13 @@ class sequencerDockWidget(QDockWidget):
     plots = []
     plotPaddingPercent = 1
 
+##### HELPER FUNCTIONS #####
+    def isPlotListDirty(self):
+        return True
+        # This function is a placeholder for future optimizations - for stopping redraw on EVERY param change when
+        # not necessary.
+
+##### GUI FUNCTIONS #####
     def __init__(self, mainWindow):
         super().__init__('Sequencer (None)')
         self.mainWindow = mainWindow
@@ -235,17 +242,9 @@ class sequencerDockWidget(QDockWidget):
 
         self.redrawSequence()
 
-    def prepareLODs(self, data):
-        pass
-
     def initSequenceView(self):
         pg.setConfigOptions(antialias=True)
         self.updatePlotList()
-
-    def isPlotListDirty(self):
-        return True
-        # This function is a placeholder for future optimizations - for stopping redraw on EVERY param change when
-        # not necessary.
 
     def updatePlotList(self):
         if(self.isPlotListDirty()):
@@ -347,7 +346,6 @@ class sequencerDockWidget(QDockWidget):
                 packetItem['uuid'] = plot.component.compSettings['uuid']
                 packetItem['events'] = plot.component.sequencerEditWidget.getEventsSerializable()
                 saveData.append(packetItem)
-            print(count)
             count = count + 1
 
         saveDataPacket['saveData'] = saveData

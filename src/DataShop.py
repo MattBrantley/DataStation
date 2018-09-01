@@ -53,6 +53,15 @@ class mainWindow(QMainWindow):
         self.app = app
         self.DSC = DSConstants()
 
+        self.initLoading()
+        self.initActions()
+        self.workspace.DSHardwareManager.loadHardwareState()
+        self.loginWindow = loginDockWidget(self)
+        self.loginWindow.setObjectName('loginWindow')
+        self.postLog('Waiting on User Profile selection..', DSConstants.LOG_PRIORITY_HIGH)
+        self.loginWindow.runModal() #Open the login window and then waits until it finishes and calls the finishInitWithUser function
+
+    def initLoading(self):
         # All used widgets need to be registered here - they autopopulate into the menu.
         # Also, ensure the widget is imported in the import statements above.
         # Generate a widget instance in initUI()
@@ -64,7 +73,6 @@ class mainWindow(QMainWindow):
         self.addDockWidget(Qt.BottomDockWidgetArea, self.logDockWidget)
         self.show()
         app.processEvents()
-
         self.processWidget = processWidget(self)
         self.processWidget.setObjectName('processWidget')
         self.workspace = DSWorkspace(self)
@@ -95,13 +103,6 @@ class mainWindow(QMainWindow):
 
         self.controlWidget.registerManagers(self.instrumentWidget.instrumentManager, self.hardwareWidget.hardwareManager)
 
-
-        self.initActions()
-        self.workspace.DSHardwareManager.loadHardwareState()
-        self.loginWindow = loginDockWidget(self)
-        self.loginWindow.setObjectName('loginWindow')
-        self.postLog('Waiting on User Profile selection..', DSConstants.LOG_PRIORITY_HIGH)
-        self.loginWindow.runModal() #Open the login window and then waits until it finishes and calls the finishInitWithUser function
 
     def finishInitWithUser(self, userData):
         self.postLog('User Profile Selected: ' + userData['First Name'] + ' ' + userData['Last Name'], DSConstants.LOG_PRIORITY_HIGH)
@@ -224,7 +225,7 @@ class mainWindow(QMainWindow):
         self.setDockNestingEnabled(True)
 
         self.setGeometry(300, 300, 1280, 720)
-        self.setWindowTitle('DataShop (Alpha)')
+        self.setWindowTitle('DataStation (Alpha)')
         self.show()
 
     def postLog(self, key, level, **kwargs):
