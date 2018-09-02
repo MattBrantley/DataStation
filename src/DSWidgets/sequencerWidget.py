@@ -99,10 +99,12 @@ class DSPlotItem():
         self.LODs = []
         self.data = []
         self.pen = []
+
+        self.component.Events_Modified.connect(self.updatePlot)
     
     def updatePlot(self):
         data = self.component.parentPlotSequencer()
-        self.xMin, self.xMax = self.component.instrumentManager.mainWindow.sequencerDockWidget.getSequenceXRange()
+        self.xMin, self.xMax = self.component.instrumentManager.mW.sequencerDockWidget.getSequenceXRange()
         if(data is not None):
             self.plotItem.clear()
             if(data.ndim < 2):
@@ -124,7 +126,7 @@ class DSPlotItem():
             self.plotItem.plot(x=self.data[:,0], y=self.data[:,1], pen = self.plotLayout.sequencePLT1Color)
 
             self.plotItem.autoRange()
-            self.component.instrumentManager.mainWindow.sequencerDockWidget.redrawSequence()
+            self.component.instrumentManager.mW.sequencerDockWidget.redrawSequence()
 
     def plot(self, showXAxis, xMinIn, xMaxIn):
         data = self.component.parentPlotSequencer()
@@ -202,10 +204,10 @@ class sequencerDockWidget(QDockWidget):
         # not necessary.
 
 ##### GUI FUNCTIONS #####
-    def __init__(self, mainWindow):
+    def __init__(self, mW):
         super().__init__('Sequencer (None)')
-        self.mainWindow = mainWindow
-        self.instrumentManager = mainWindow.workspace.DSInstrumentManager
+        self.mW = mW
+        self.instrumentManager = mW.workspace.DSInstrumentManager
         self.hide()
         self.resize(1000, 800)
         self.fileSystem = DSEditorFSModel()
@@ -229,7 +231,6 @@ class sequencerDockWidget(QDockWidget):
         self.initToolbar()
 
         self.sequenceView = DSGraphicsLayout(self)
-        #self.sequenceView = pg.GraphicsLayoutWidget()
         self.initSequenceView()
         
         self.sequencerContainer.addWidget(self.sequenceNavigator)
@@ -239,6 +240,8 @@ class sequencerDockWidget(QDockWidget):
         self.setWidget(self.mainContainer)
         self.mainContainer.setCentralWidget(self.sequencerContainer)
         self.updateToolbarState()
+
+        self.instrumentManager.Instrument_Modified.connect(self.redrawSequence)
 
         self.redrawSequence()
 
@@ -261,8 +264,8 @@ class sequencerDockWidget(QDockWidget):
                         self.plots.append(plotHolder)
 
             self.redrawSequence()
-        if hasattr(self.instrumentManager.mainWindow, 'hardwareWidget'):
-            self.instrumentManager.mainWindow.hardwareWidget.drawScene()
+        if hasattr(self.instrumentManager.mW, 'hardwareWidget'):
+            self.instrumentManager.mW.hardwareWidget.drawScene()
 
     def xRangeUpdate(self, xMinTest, xMaxTest):
         if(xMinTest < self.xMin):
@@ -363,15 +366,15 @@ class sequencerDockWidget(QDockWidget):
 
         #saveURL = self.currentSequenceURL
         saveData = self.getSaveData()
-        self.mainWindow.postLog('Saving Sequence (' + saveURL + ')... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.mW.postLog('Saving Sequence (' + saveURL + ')... ', DSConstants.LOG_PRIORITY_HIGH)
         if(os.path.exists(saveURL)):
             os.remove(saveURL)
         with open(saveURL, 'w') as file:
             json.dump(saveData, file, sort_keys=True, indent=4)
-        self.mainWindow.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     def saveAs(self):
-        fname, ok = QInputDialog.getText(self.mainWindow, "Sequence Name", "Sequence Name")
+        fname, ok = QInputDialog.getText(self.mW, "Sequence Name", "Sequence Name")
         if(os.path.exists(os.path.join(self.fsRoot, self.instrumentManager.currentInstrument.name)) is False):
             os.mkdir(os.path.join(self.fsRoot, self.instrumentManager.currentInstrument.name))
         saveURL = os.path.join(os.path.join(self.fsRoot, self.instrumentManager.currentInstrument.name), fname + '.dssequence')
@@ -382,18 +385,18 @@ class sequencerDockWidget(QDockWidget):
             return
 
         if(os.path.exists(saveURL)):
-            reply = QMessageBox.question(self.mainWindow, 'File Warning!', 'File exists - overwrite?', QMessageBox.Yes, QMessageBox.No)
+            reply = QMessageBox.question(self.mW, 'File Warning!', 'File exists - overwrite?', QMessageBox.Yes, QMessageBox.No)
             if(reply == QMessageBox.No):
                 return
 
         saveData = self.getSaveData()
-        self.mainWindow.postLog('Saving Sequence (' + saveURL + ')... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.mW.postLog('Saving Sequence (' + saveURL + ')... ', DSConstants.LOG_PRIORITY_HIGH)
         if(os.path.exists(saveURL)):
             os.remove(saveURL)
         with open(saveURL, 'w') as file:
             json.dump(saveData, file, sort_keys=True, indent=4)
         self.currentSequenceURL = saveURL
-        self.mainWindow.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     def new(self):
         result = DSNewFileDialog.newFile()
@@ -444,24 +447,24 @@ class sequencerDockWidget(QDockWidget):
             retval = msg.exec_()
             return
 
-        self.mainWindow.postLog('Loading Sequence (' + filePath + ')... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.mW.postLog('Loading Sequence (' + filePath + ')... ', DSConstants.LOG_PRIORITY_HIGH)
         if(os.path.isfile(filePath) is True):
             with open(filePath, 'r') as file:
                 try:
                     sequenceData = json.load(file)
                     if(self.processSequenceData(sequenceData) is False):
-                        self.mainWindow.postLog('Sequence at (' + filePath + ') not loaded - aborting! ', DSConstants.LOG_PRIORITY_HIGH)
+                        self.mW.postLog('Sequence at (' + filePath + ') not loaded - aborting! ', DSConstants.LOG_PRIORITY_HIGH)
                     else:
                         self.currentSequenceURL = filePath
                 except ValueError as e:
-                    self.mainWindow.postLog('Corrupted sequence at (' + filePath + ') - aborting! ', DSConstants.LOG_PRIORITY_HIGH)
+                    self.mW.postLog('Corrupted sequence at (' + filePath + ') - aborting! ', DSConstants.LOG_PRIORITY_HIGH)
                     return
         if(self.currentSequenceURL is not None):
             self.setWindowTitle('Sequencer (' + os.path.basename(self.currentSequenceURL) + ')')
         else:
             self.setWindowTitle('Sequencer (None)')
-        self.mainWindow.workspace.userProfile['sequenceURL'] = filePath
-        self.mainWindow.postLog('Finished Loading Sequence!', DSConstants.LOG_PRIORITY_HIGH)
+        self.mW.workspace.userProfile['sequenceURL'] = filePath
+        self.mW.postLog('Finished Loading Sequence!', DSConstants.LOG_PRIORITY_HIGH)
 
     def processSequenceData(self, data):
         instrument = data['instrument']
@@ -481,7 +484,7 @@ class sequencerDockWidget(QDockWidget):
         for datum in dataSet:
             comp = self.instrumentManager.currentInstrument.getComponentByUUID(datum['uuid'])
             if(comp is None):
-                self.mainWindow.postLog('Sequence data for comp with uuid (' + datum['uuid'] + ') cannot be assigned! Possibly from different instrument.', DSConstants.LOG_PRIORITY_HIGH)
+                self.mW.postLog('Sequence data for comp with uuid (' + datum['uuid'] + ') cannot be assigned! Possibly from different instrument.', DSConstants.LOG_PRIORITY_HIGH)
             else:
                 comp.loadSequenceData(datum['events'])
         

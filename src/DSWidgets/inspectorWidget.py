@@ -3,7 +3,7 @@ from PyQt5.Qt import *
 class inspectorDockWidget(QDockWidget):
     ITEM_GUID = Qt.UserRole
 
-    def __init__(self, mainWindow):
+    def __init__(self, mW):
         super().__init__('Inspector')
         self.inspectorContainer = QWidget()
         self.inspectorLayout = QVBoxLayout()
@@ -13,7 +13,7 @@ class inspectorDockWidget(QDockWidget):
         self.inspectorContainer.setLayout(self.inspectorLayout)
         self.setWidget(self.inspectorContainer)
 
-        self.mainWindow = mainWindow
+        self.mW = mW
 
     def drawInspectorWidget(self, selectedItem):
         while self.inspectorLayout.count():
@@ -22,7 +22,7 @@ class inspectorDockWidget(QDockWidget):
                 child.widget().deleteLater()
 
         GUID = selectedItem.data(0, self.ITEM_GUID)
-        DataSet = self.mainWindow.workspace.getScriptIODataFromSQLByGUID(GUID)
+        DataSet = self.mW.workspace.getScriptIODataFromSQLByGUID(GUID)
 
 
         self.inspectorLayout.addWidget(QLabel('Name: ' + DataSet.name))

@@ -2,10 +2,15 @@ from Component import *
 from copy import deepcopy
 from DSWidgets.controlWidget import readyCheckPacket
 
-class Instrument():
+class Instrument(QObject):
+    Instrument_Modified = pyqtSignal(object)
+    Component_Modified = pyqtSignal(object)
+    Events_Modified = pyqtSignal(object)
+
     name = ''
 
     def __init__(self, instrumentManager):
+        super().__init__()
         self.instrumentManager = instrumentManager
         self.name = "Default Instrument"
         self.url = None
@@ -23,12 +28,16 @@ class Instrument():
 
     def addComponent(self, comp):
         newComp = type(comp)(self)
+        newComp.Component_Modified.connect(self.Component_Modified)
+        newComp.Events_Modified.connect(self.Events_Modified)
         newComp.instrumentManager = self.instrumentManager
         newComp.setupWidgets()
         newComp.name = 'Unnamed Component'
         newComp.onCreationParent()
         newComp.onCreationFinishedParent()
         self.components.append(newComp)
+        print('Instrument_Modified.emit()')
+        self.Instrument_Modified.emit(self)
         return newComp
 
     def getComponentByUUID(self, uuid):
@@ -41,8 +50,10 @@ class Instrument():
     def removeComponent(self, comp):
         comp.onRemovalParent()
         self.components.remove(comp)
-        self.instrumentManager.mainWindow.sequencerDockWidget.updatePlotList()
-        self.instrumentManager.mainWindow.hardwareWidget.drawScene()
+        self.instrumentManager.mW.sequencerDockWidget.updatePlotList()
+        self.instrumentManager.mW.hardwareWidget.drawScene()
+        print('Instrument_Modified.emit()')
+        self.Instrument_Modified.emit(self)
 
     def getSockets(self):
         self.fullSocketList.clear()

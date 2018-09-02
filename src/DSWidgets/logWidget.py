@@ -4,14 +4,14 @@ import time
 class logDockWidget(QDockWidget):
     ITEM_GUID = Qt.UserRole
 
-    def __init__(self, mainWindow):
+    def __init__(self, mW):
         super().__init__('Log')
         self.logTextEdit = QPlainTextEdit()
         self.resize(600, 200)
 
         #self.hide()
         self.setWidget(self.logTextEdit)
-        self.mainWindow = mainWindow
+        self.mW = mW
         self.logTextEdit.setReadOnly(True)
 
         font = QFont()

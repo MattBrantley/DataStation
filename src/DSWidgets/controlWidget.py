@@ -7,9 +7,9 @@ from Constants import DSConstants as DSConstants
 from pathlib import Path
 
 class controlWidget(QDockWidget):
-    def __init__(self, mainWindow):
+    def __init__(self, mW):
         super().__init__("Instrument Control")
-        self.mainWindow = mainWindow
+        self.mW = mW
         self.instrumentManager = None
         self.hardwareManager = None
         self.readyCheckMessages = list()
@@ -36,6 +36,10 @@ class controlWidget(QDockWidget):
     def registerManagers(self, instrumentManager, hardwareManager):
         self.instrumentManager = instrumentManager
         self.hardwareManager = hardwareManager
+
+        self.instrumentManager.Instrument_Modified.connect(self.readyChecks)
+        self.instrumentManager.Events_Modified.connect(self.readyChecks)
+        self.hardwareManager.Hardware_Modified.connect(self.readyChecks)
 
     def initButtons(self):
         dir = os.path.dirname(os.path.dirname(__file__))

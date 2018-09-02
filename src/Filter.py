@@ -13,7 +13,7 @@ class Filter():
     filterVersionDate = '8/13/2018'
     iconGraphicSrc = 'default.png'
     numPaths = 1
-    mainWindow = None
+    mW = None
     valid = False
 
     FILTER_FORWARD = 100
@@ -94,7 +94,7 @@ class Filter():
         return None
 
     def onCreationParent(self):
-        self.hardwareManager.mainWindow.postLog('Added Filter: ' + self.filterType, DSConstants.LOG_PRIORITY_MED)
+        self.hardwareManager.mW.postLog('Added Filter: ' + self.filterType, DSConstants.LOG_PRIORITY_MED)
         self.paths.clear()
         for i in range(0, self.numPaths):
             self.paths.append(None)
@@ -211,7 +211,7 @@ class Filter():
         if(self.filterInputSource is not None):
             return self.filterInputSource.getSource()
         else:
-            self.hardwareManager.mainWindow.postLog('ERROR: Filter called during getSource that has no root parent!', DSConstants.LOG_PRIORITY_HIGHT)
+            self.hardwareManager.mW.postLog('ERROR: Filter called during getSource that has no root parent!', DSConstants.LOG_PRIORITY_HIGHT)
             return None
 
     def followPath(self, pathNumber):

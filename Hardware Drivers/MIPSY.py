@@ -1,4 +1,4 @@
-from Hardware_Driver import Hardware_Object, hardwareWorker, hwm
+from Hardware_Object import Hardware_Object, hardwareWorker, hwm
 from PyQt5.Qt import *
 from Sources import *
 import os, traceback, sys, glob, serial, re

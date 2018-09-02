@@ -138,6 +138,7 @@ class DC_Electrode(Component):
         self.compSettings['vMax'] = self.maxVBox.value()
         self.socket.name = self.compSettings['name']
         self.checkValidity()
+        self.Component_Modified.emit(self)
 
     def checkValidity(self):
         if(self.compSettings['vMax'] <= self.compSettings['vMin']):

@@ -97,7 +97,7 @@ class workerObj():
             self.loadDefaultSettings()
 
     def drawSettingWindow(self):
-        self.dialogBox = QDialog(self.workspace.mainWindow)
+        self.dialogBox = QDialog(self.workspace.mW)
         self.dialogBox.setModal(False)
         self.dialogBox.setMinimumWidth(300)
         self.dialogBox.setWindowTitle(self.script.name)

@@ -24,12 +24,12 @@ class settingsDefaultImporterListWidget(QWidget):
         return self.comboBox.currentText()
 
 class settingsDockWidget(QDockWidget):
-    def __init__(self, mainWindow):
+    def __init__(self, mW):
         super().__init__("Settings")
         self.settingsContainer = QWidget()
         self.settingsLayout = QVBoxLayout()
         self.settingsWidget = QTabWidget()
-        self.mainWindow = mainWindow
+        self.mW = mW
 
         self.settingsApplyButton = QPushButton('Apply')
         self.settingsApplyButton.clicked.connect(self.getNewSettings)
@@ -55,8 +55,8 @@ class settingsDockWidget(QDockWidget):
         container.setLayout(layout)
 
         self.importSettingsWidgetList = []
-        for ext, importers in sorted(self.mainWindow.workspace.userScripts.registeredImportersList.items()):
-            defaultItem = settingsDefaultImporterListWidget(ext, importers, self.mainWindow.workspace.settings['Default Importers'][ext])
+        for ext, importers in sorted(self.mW.workspace.userScripts.registeredImportersList.items()):
+            defaultItem = settingsDefaultImporterListWidget(ext, importers, self.mW.workspace.settings['Default Importers'][ext])
             self.importSettingsWidgetList.append(defaultItem)
             layout.addWidget(defaultItem)
 
@@ -64,5 +64,5 @@ class settingsDockWidget(QDockWidget):
 
     def getNewSettings(self):
         for defaultItem in self.importSettingsWidgetList:
-            self.mainWindow.workspace.settings['Default Importers'][defaultItem.ext.upper()] = defaultItem.getNameOfSelected()
-        self.mainWindow.workspace.updateSettings()
+            self.mW.workspace.settings['Default Importers'][defaultItem.ext.upper()] = defaultItem.getNameOfSelected()
+        self.mW.workspace.updateSettings()

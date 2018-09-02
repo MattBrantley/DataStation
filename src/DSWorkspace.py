@@ -55,15 +55,17 @@ class DSWorkspace():
     ITEM_NAME = Qt.UserRole+2
     ITEM_UNITS = Qt.UserRole+3
 
-    def __init__(self, mainWindow):
+    def __init__(self, mW):
         super().__init__()
-        self.mainWindow = mainWindow
+        self.mW = mW
         self.readSettings()
-        self.workspaceTreeWidget = None #Will be loaded in by mainWindow
+        self.workspaceTreeWidget = None #Will be loaded in by mW
         self.buildUserScripts()
         self.initDatabaseCommManager()
         self.initInstrumentManager()
         self.initHardwareManager()
+
+        self.mW.DataStation_Closing.connect(self.updateSettings)
         
     def initHardwareManager(self):
         filtersURL = os.path.join(str(Path(self.directoryURL).parent), 'User Filters')
@@ -79,28 +81,28 @@ class DSWorkspace():
         self.DBCommMgr = databaseCommManager(self)
 
     def readSettings(self):
-        self.mainWindow.postLog('Loading Settings... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.mW.postLog('Loading Settings... ', DSConstants.LOG_PRIORITY_HIGH)
         if(os.path.isfile(self.settingsURL)):
             with open(self.settingsURL, 'r+') as inFile:
                 try:
                     self.settings = json.load(inFile)
                     inFile.close()
-                    self.mainWindow.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+                    self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
                 except ValueError:
-                    self.mainWindow.postLog('Settings File is Corrupt!!! Making New One..', DSConstants.LOG_PRIORITY_HIGH)
+                    self.mW.postLog('Settings File is Corrupt!!! Making New One..', DSConstants.LOG_PRIORITY_HIGH)
                     inFile.close()
                     self.settings = self.generateDefaultSettingsFile()
                     self.updateSettings()
         else:
-            self.mainWindow.postLog('Settings File Not Found! Making New One..', DSConstants.LOG_PRIORITY_HIGH)
+            self.mW.postLog('Settings File Not Found! Making New One..', DSConstants.LOG_PRIORITY_HIGH)
             self.settings = self.generateDefaultSettingsFile()
             self.updateSettings()
 
     def updateSettings(self):
-        self.mainWindow.postLog('Updating Settings File... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.mW.postLog('Updating Settings File... ', DSConstants.LOG_PRIORITY_HIGH)
         with open(self.settingsURL, 'w') as file:
             json.dump(self.settings, file, sort_keys=True, indent=4)
-        self.mainWindow.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     def generateDefaultSettingsFile(self):
         data = {'Default Importers': {}}
@@ -115,11 +117,11 @@ class DSWorkspace():
         self.directoryURL = os.path.dirname(URL)
         self.settings['workspaceURL'] = URL
 
-        self.mainWindow.workspaceTreeDockWidget.setWindowTitle(os.path.basename(URL))
-        self.mainWindow.updateState(DSConstants.MW_STATE_WORKSPACE_LOADED)
+        self.mW.workspaceTreeDockWidget.setWindowTitle(os.path.basename(URL))
+        self.mW.updateState(DSConstants.MW_STATE_WORKSPACE_LOADED)
 
     def newWorkspace(self):
-        fname = QFileDialog.getSaveFileName(self.mainWindow, 'Save File', self.directoryURL, filter='*.db')
+        fname = QFileDialog.getSaveFileName(self.mW, 'Save File', self.directoryURL, filter='*.db')
         if fname[0]:
             self.workspaceTreeWidget.clear()
             xmlString = tostring(self.workspaceTreeWidget.toXML(), encoding="unicode")
@@ -133,7 +135,7 @@ class DSWorkspace():
             conn.close()
 
     def saveWSToNewSql(self):
-        fname = QFileDialog.getSaveFileName(self.mainWindow, 'Save File', self.directoryURL)
+        fname = QFileDialog.getSaveFileName(self.mW, 'Save File', self.directoryURL)
         if fname[0]:
             self.setLoadedWorkspace(fname[0])
             self.saveWSToSql()
@@ -207,7 +209,7 @@ class DSWorkspace():
     def loadWSFromSql(self, url=None):
         if(url is False):
             dataURL = os.path.join(str(Path(self.directoryURL).parent), 'User Data')
-            fname = QFileDialog.getOpenFileName(self.mainWindow, 'Open File', dataURL, filter='*.db')
+            fname = QFileDialog.getOpenFileName(self.mW, 'Open File', dataURL, filter='*.db')
         else:
             fname = list()
             fname.append(url)
@@ -229,7 +231,7 @@ class DSWorkspace():
         return str
 
     def importData(self):
-        fname = QFileDialog.getOpenFileNames(self.mainWindow, 'Open File', self.workspaceURL, filter=self.userScripts.genImportDialogFilter())
+        fname = QFileDialog.getOpenFileNames(self.mW, 'Open File', self.workspaceURL, filter=self.userScripts.genImportDialogFilter())
         for fileURL in fname[0]:
             fileName, fileExtension = os.path.splitext(fileURL)
             self.userScripts.runDefaultImporter(fileURL, fileExtension)
@@ -275,7 +277,7 @@ class DSWorkspace():
             return None
 
     def surfacePlotItem(self, selectedItem):
-        dockWidget = QDockWidget(selectedItem.text(0), self.mainWindow)
+        dockWidget = QDockWidget(selectedItem.text(0), self.mW)
         multiWidget = QWidget()
         layout = QGridLayout()
         pltFigure = plt.figure()
@@ -286,7 +288,7 @@ class DSWorkspace():
         multiWidget.setLayout(layout)
         dockWidget.setWidget(multiWidget)
         dockWidget.setAttribute(Qt.WA_DeleteOnClose)
-        self.mainWindow.addDockWidget(Qt.RightDockWidgetArea, dockWidget)
+        self.mW.addDockWidget(Qt.RightDockWidgetArea, dockWidget)
         dockWidget.setFloating(True)
         GUID = selectedItem.data(0, self.ITEM_GUID)
         dataSet = self.getScriptIODataFromSQLByGUID(GUID)
@@ -323,7 +325,7 @@ class DSWorkspace():
             dockWidget.close()
 
     def linePlotItem(self, selectedItem):
-        dockWidget = QDockWidget(selectedItem.text(0), self.mainWindow)
+        dockWidget = QDockWidget(selectedItem.text(0), self.mW)
         multiWidget = QWidget()
         layout = QGridLayout()
         pltFigure = plt.figure()
@@ -334,7 +336,7 @@ class DSWorkspace():
         multiWidget.setLayout(layout)
         dockWidget.setWidget(multiWidget)
         dockWidget.setAttribute(Qt.WA_DeleteOnClose)
-        self.mainWindow.addDockWidget(Qt.RightDockWidgetArea, dockWidget)
+        self.mW.addDockWidget(Qt.RightDockWidgetArea, dockWidget)
         dockWidget.setFloating(True)
         GUID = selectedItem.data(0, self.ITEM_GUID)
         dataSet = self.getScriptIODataFromSQLByGUID(GUID)

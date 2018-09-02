@@ -8,23 +8,23 @@ from WorkerObjects import *
 from Constants import DSConstants as DSConstants
 
 class scriptProcessManager():
-    numWorkers = 4
+    numWorkers = 1
     activeWorkers = []
     managers = []
     tickLength = 50 # Time between worker update cycles (This can slow down dramatically if the main thread lags)
 
     def __init__(self, workspace):
-        self.processWidget = workspace.mainWindow.processWidget
+        self.processWidget = workspace.mW.processWidget
         self.workspace = workspace
-        self.mainWindow = self.workspace.mainWindow
+        self.mW = self.workspace.mW
         self.queueUpdateTimer = QTimer()
         self.initTimer()
 
-        self.mainWindow.postLog('Building I/O Managers... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.mW.postLog('Building I/O Managers... ', DSConstants.LOG_PRIORITY_HIGH)
         for i in range (0, self.numWorkers):
             self.managers.append(procCommManager())
             self.managers[i].clear()
-        self.mainWindow.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     def getAvailManager(self):
         for mgr in self.managers:
@@ -151,7 +151,7 @@ class userScriptsController():
             print('No import function for extension: ' + ext)
 
     def runImporter(self, importer):
-        fname = QFileDialog.getOpenFileNames(self.parent.mainWindow, 'Open File', self.parent.workspaceURL, filter=importer.genFilter())
+        fname = QFileDialog.getOpenFileNames(self.parent.mW, 'Open File', self.parent.workspaceURL, filter=importer.genFilter())
         for fileURL in fname[0]:
             fileName, fileExtension = os.path.splitext(fileURL)
             self.doImport(fileURL, fileExtension, importer)

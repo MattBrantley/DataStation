@@ -7,10 +7,10 @@ from pathlib import Path
 import time
 
 class loginDockWidget(QDockWidget):
-    def __init__(self, mainWindow):
+    def __init__(self, mW):
         super().__init__("Select User Profile")
         self.userProfiles = []
-        self.mainWindow = mainWindow
+        self.mW = mW
         self.profilePathFolder = os.path.join(str(Path(os.path.dirname(os.path.realpath(__file__))).parent.parent), 'User Profiles')
 
         self.setWindowFlags(self.windowFlags() & QtCore.Qt.CustomizeWindowHint)
@@ -24,7 +24,7 @@ class loginDockWidget(QDockWidget):
         self.newButton = QPushButton("New")
         self.editButton = QPushButton("Edit")
         self.acceptButton = QPushButton("Accept")
-        self.mainWindow = mainWindow
+        self.mW = mW
 
         self.loginLayout.addWidget(self.userList)
         self.buttonLayout.addWidget(self.newButton)
@@ -58,7 +58,7 @@ class loginDockWidget(QDockWidget):
 
     def finishModal(self):
         self.hide()
-        self.mainWindow.finishInitWithUser(self.userProfiles[self.userList.currentRow()])
+        self.mW.finishInitWithUser(self.userProfiles[self.userList.currentRow()])
 
     def showNewUserPopup(self):
         self.newUserPopup.loadSettings(None)
@@ -67,7 +67,7 @@ class loginDockWidget(QDockWidget):
         self.newUserPopup.loadSettings(self.userProfiles[self.userList.currentRow()])
 
     def populateUserProfiles(self):
-        self.mainWindow.postLog('Loading User Profiles... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.mW.postLog('Loading User Profiles... ', DSConstants.LOG_PRIORITY_HIGH)
         self.userList.clear()
         self.userProfiles = []
 
@@ -80,7 +80,7 @@ class loginDockWidget(QDockWidget):
                     self.userList.addItem(userProfile['Last Name'] + ', ' + userProfile['First Name'])
 
         self.profileSelectionChanged(-1)
-        self.mainWindow.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=True)
+        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=True)
     
     def loadUserProfile(self, url): # 'First Name' and 'Last Name' are the only required fields.
         with open(url, 'r') as file:
@@ -91,7 +91,7 @@ class loginDockWidget(QDockWidget):
                         profileData['url'] = url
                         return profileData
             except ValueError as e:
-                self.mainWindow.postLog('Corrupted user profile at (' + url + ')!! ', DSConstants.LOG_PRIORITY_MED)
+                self.mW.postLog('Corrupted user profile at (' + url + ')!! ', DSConstants.LOG_PRIORITY_MED)
 
         return None
 
@@ -108,18 +108,18 @@ class loginDockWidget(QDockWidget):
             self.editButton.setEnabled(False)
 
     def closeEvent(self, event):
-        self.mainWindow.postLog('No User Profile selected...', DSConstants.LOG_PRIORITY_HIGH)
-        self.mainWindow.signalClose()
+        self.mW.postLog('No User Profile selected...', DSConstants.LOG_PRIORITY_HIGH)
+        self.mW.signalClose()
         event.accept()
 
     def updateUserProfile(self):
-        if(any(self.mainWindow.workspace.userProfile) and ('url' in self.mainWindow.workspace.userProfile)):
-            self.mainWindow.postLog('Updating User Profile... (' + self.mainWindow.workspace.userProfile['url'] + ').. ', DSConstants.LOG_PRIORITY_HIGH)        
-            with open(self.mainWindow.workspace.userProfile['url'], 'w') as file:
-                json.dump(self.mainWindow.workspace.userProfile, file)
+        if(any(self.mW.workspace.userProfile) and ('url' in self.mW.workspace.userProfile)):
+            self.mW.postLog('Updating User Profile... (' + self.mW.workspace.userProfile['url'] + ').. ', DSConstants.LOG_PRIORITY_HIGH)        
+            with open(self.mW.workspace.userProfile['url'], 'w') as file:
+                json.dump(self.mW.workspace.userProfile, file)
                 time.sleep(1) #NOT ELEGANT - NEED CROSS PLATFORM SOLUTION
         else:
-            self.mainWindow.postLog('Error Updating User Profile or No Profile Loaded.', DSConstants.LOG_PRIORITY_HIGH)        
+            self.mW.postLog('Error Updating User Profile or No Profile Loaded.', DSConstants.LOG_PRIORITY_HIGH)        
 
 class newProfileDockWidget(QDockWidget):
     def __init__(self, loginWindow, profileData):
@@ -200,7 +200,7 @@ class newProfileDockWidget(QDockWidget):
         while(os.path.isfile(savePathAppend)):
             savePathAppend = savePath + str(num) + '.dsprofile'
             num = num + 1
-        self.loginWindow.mainWindow.postLog('Writing User Profile... (' + savePathAppend + ').. ', DSConstants.LOG_PRIORITY_HIGH)
+        self.loginWindow.mW.postLog('Writing User Profile... (' + savePathAppend + ').. ', DSConstants.LOG_PRIORITY_HIGH)
         if(self.profileData is None):
             with open(savePathAppend, 'w') as file:
                 json.dump(userProfile, file)
@@ -209,7 +209,7 @@ class newProfileDockWidget(QDockWidget):
                 os.remove(self.profileData['url'])
             with open(savePathAppend, 'w') as file:
                 json.dump(userProfile, file)
-        self.loginWindow.mainWindow.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+        self.loginWindow.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
         self.loginWindow.populateUserProfiles()
         self.hide()

@@ -4,20 +4,32 @@ from Constants import DSConstants as DSConstants
 import json as json
 from DSWidgets.controlWidget import readyCheckPacket
 
-class InstrumentManager():
+class InstrumentManager(QObject):
+    Instrument_Modified = pyqtSignal(object)
+    Instrument_Unloaded = pyqtSignal()
+    Instrument_Loaded = pyqtSignal(object)
+    Component_Modified = pyqtSignal(object)
+    Events_Modified = pyqtSignal(object)
+
     instrumentsURL = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'User Instruments')
     componentsURL = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'User Components')
     instrumentWidget = None
 
     def __init__(self, workspace, instrumentsURL, componentsURL):
+        super().__init__()
         self.workspace = workspace
-        self.mainWindow = self.workspace.mainWindow
+        self.mW = self.workspace.mW
         self.currentInstrument = None
         self.componentsAvailable = list()
         self.loadComponents()
 
+        self.mW.DataStation_Closing.connect(self.unsavedChangesCheck)
+
+    def unsavedChangesCheck(self):
+        print('UNSAVED CHANGES TO INSTRUMENT')
+
     def loadComponents(self):
-        self.mainWindow.postLog('Loading User Components... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.mW.postLog('Loading User Components... ', DSConstants.LOG_PRIORITY_HIGH)
 
         for root, dirs, files in os.walk(self.componentsURL):
             for name in files:
@@ -26,7 +38,7 @@ class InstrumentManager():
                 if (compHolder != None):
                     self.componentsAvailable.append(compHolder)
 
-        self.mainWindow.postLog('Finished Loading User Components!', DSConstants.LOG_PRIORITY_HIGH)
+        self.mW.postLog('Finished Loading User Components!', DSConstants.LOG_PRIORITY_HIGH)
 
     def loadComponentFromFile(self, filepath):
         class_inst = None
@@ -36,7 +48,7 @@ class InstrumentManager():
         loaded = False
 
         if file_ext.lower() == '.py':
-            self.mainWindow.postLog('   Found Component Script: ' + filepath, DSConstants.LOG_PRIORITY_MED)
+            self.mW.postLog('   Found Component Script: ' + filepath, DSConstants.LOG_PRIORITY_MED)
             py_mod = imp.load_source(mod_name, filepath)
         else:
             return
@@ -58,9 +70,9 @@ class InstrumentManager():
         if(loaded):
             class_inst.instrumentManager = self
             class_inst.setupWidgets()
-            self.mainWindow.postLog('  (Success!)', DSConstants.LOG_PRIORITY_MED, newline=False)
+            self.mW.postLog('  (Success!)', DSConstants.LOG_PRIORITY_MED, newline=False)
         else:
-            self.mainWindow.postLog(' (Failed!)', DSConstants.LOG_PRIORITY_MED, newline=False)
+            self.mW.postLog(' (Failed!)', DSConstants.LOG_PRIORITY_MED, newline=False)
 
         return class_inst
 
@@ -69,30 +81,39 @@ class InstrumentManager():
 
     def newInstrument(self, name):
         self.currentInstrument = Instrument(self)
+        self.currentInstrument.Instrument_Modified.connect(self.Instrument_Modified)
+        self.currentInstrument.Component_Modified.connect(self.Component_Modified)
+        self.currentInstrument.Events_Modified.connect(self.Events_Modified)
         self.currentInstrument.name = name
-        self.mainWindow.instrumentWidget.instrumentView.clearComps()
+        print('Instrument_Modified.emit()')
+        self.Instrument_Modified.emit()
+        print('Instrument_Unloaded.emit()')
+        self.Instrument_Unloaded.emit()
 
     def addCompToInstrument(self, dropIndex):
         if (self.currentInstrument is None):
-            self.mainWindow.postLog('No instrument is loaded - creating new one! ', DSConstants.LOG_PRIORITY_HIGH)
+            self.mW.postLog('No instrument is loaded - creating new one! ', DSConstants.LOG_PRIORITY_HIGH)
             self.currentInstrument = Instrument(self)
+            self.currentInstrument.Instrument_Modified.connect(self.Instrument_Modified)
+            self.currentInstrument.Component_Modified.connect(self.Component_Modified)
+            self.currentInstrument.Events_Modified.connect(self.Events_Modified)
 
         comp = self.componentsAvailable[dropIndex]
         result = self.currentInstrument.addComponent(comp)
-        self.mainWindow.sequencerDockWidget.updatePlotList()
-        self.mainWindow.hardwareWidget.drawScene()
+        self.mW.sequencerDockWidget.updatePlotList()
+        self.mW.hardwareWidget.drawScene()
         return result
 
     def saveInstrument(self, url):
         if(self.currentInstrument is not None):
-            self.mainWindow.postLog('VI_Save', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
+            self.mW.postLog('VI_Save', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
             self.currentInstrument.name, ext = os.path.splitext(os.path.basename(url))
             saveData = self.currentInstrument.saveInstrument()
             self.writeInstrumentToFile(saveData, url)
-            self.mainWindow.postLog(' ...Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+            self.mW.postLog(' ...Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
         else:
-            self.mainWindow.postLog('VI_Save_No_VI', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
+            self.mW.postLog('VI_Save_No_VI', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
             
         self.instrumentWidget.updateTitle()
         
@@ -106,33 +127,38 @@ class InstrumentManager():
         return readyCheckPacket('Instrument Manager', DSConstants.READY_CHECK_READY, subs=subs)
 
     def loadInstrument(self, url):
-        self.mainWindow.postLog('Loading User Instrument (' + url + ')... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.mW.postLog('Loading User Instrument (' + url + ')... ', DSConstants.LOG_PRIORITY_HIGH)
         if(os.path.exists(url) is False):
-            self.mainWindow.postLog('Path (' + url + ') does not exist! Aborting! ', DSConstants.LOG_PRIORITY_HIGH)
+            self.mW.postLog('Path (' + url + ') does not exist! Aborting! ', DSConstants.LOG_PRIORITY_HIGH)
             return
 
         with open(url, 'r') as file:
             try:
-                instrumentData = json.load(file)
+                instrumentData = json.load(file)        
+                print('Instrument_Unloaded.emit()')
+                self.Instrument_Unloaded.emit()
                 if(isinstance(instrumentData, dict)):
                     if(self.processInstrumentData(instrumentData, url) is False):
-                        self.mainWindow.postLog('Corrupted instrument at (' + url + ') - aborting! ', DSConstants.LOG_PRIORITY_MED)
+                        self.mW.postLog('Corrupted instrument at (' + url + ') - aborting! ', DSConstants.LOG_PRIORITY_MED)
             except ValueError as e:
-                self.mainWindow.postLog('Corrupted instrument at (' + url + ') - aborting! ', DSConstants.LOG_PRIORITY_MED)
+                self.mW.postLog('Corrupted instrument at (' + url + ') - aborting! ', DSConstants.LOG_PRIORITY_MED)
                 return
-        self.mainWindow.postLog('Finished Loading User Instrument!', DSConstants.LOG_PRIORITY_HIGH)
+        self.mW.postLog('Finished Loading User Instrument!', DSConstants.LOG_PRIORITY_HIGH)
         self.workspace.userProfile['instrumentURL'] = self.currentInstrument.url
-        self.mainWindow.sequencerDockWidget.updatePlotList()
-        self.mainWindow.hardwareWidget.drawScene()
+        self.mW.sequencerDockWidget.updatePlotList()
+        self.mW.hardwareWidget.drawScene()
 
         self.instrumentWidget.updateTitle()
+
+        print('Instrument_Loaded.emit()')
+        self.Instrument_Loaded.emit(self.currentInstrument)
 
     def processInstrumentData(self, instrumentData, url):
         self.tempInstrument = Instrument(self)
         self.tempInstrument.url = url
         if('name' in instrumentData):
             self.tempInstrument.name = instrumentData['name']
-            self.mainWindow.instrumentWidget.instrumentView.clearComps()
+            self.mW.instrumentWidget.instrumentView.clearComps()
         else:
             return False
 
@@ -141,7 +167,7 @@ class InstrumentManager():
                 if(('compIdentifier' in comp) and ('compType' in comp)):
                     modelComp = self.findCompModelByIdentifier(comp['compIdentifier'])
                     if(modelComp is None):
-                        self.mainWindow.postLog('Instrument contains component (' + comp['compType'] + ':' + comp['compIdentifier'] + ') that is not in the available component modules. Ignoring this component!', DSConstants.LOG_PRIORITY_MED)
+                        self.mW.postLog('Instrument contains component (' + comp['compType'] + ':' + comp['compIdentifier'] + ') that is not in the available component modules. Ignoring this component!', DSConstants.LOG_PRIORITY_MED)
                         break
                     else:
                         result = self.tempInstrument.addComponent(modelComp)
@@ -152,10 +178,13 @@ class InstrumentManager():
                                 result.loadSockets(comp['sockets'])
                         if('iViewSettings' in comp):
                             ivs = comp['iViewSettings']
-                            self.mainWindow.instrumentWidget.instrumentView.addComp(result, ivs['x'], ivs['y'], ivs['r'])
+                            self.mW.instrumentWidget.instrumentView.addComp(result, ivs['x'], ivs['y'], ivs['r'])
                             
         self.clearCurrentInstrument()
         self.currentInstrument = self.tempInstrument
+        self.currentInstrument.Instrument_Modified.connect(self.Instrument_Modified)
+        self.currentInstrument.Component_Modified.connect(self.Component_Modified)
+        self.currentInstrument.Events_Modified.connect(self.Events_Modified)
         self.currentInstrument.reattachSockets()
 
     def reattachSockets(self):
@@ -189,4 +218,4 @@ class InstrumentManager():
             json.dump(saveData, file, sort_keys=True, indent=4)
 
     def socketUnattached(self, socket):
-        self.mainWindow.hardwareWidget.iScene.connectPlugsAndSockets()
+        self.mW.hardwareWidget.iScene.connectPlugsAndSockets()

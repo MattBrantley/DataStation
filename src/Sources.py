@@ -105,8 +105,8 @@ class Source():
                 drivingSocketCount = drivingSocketCount + 1
 
         if(drivingSocketCount > 1):
-            #self.hardware.hardwareManager.workspace.mainWindow.postLog('READY CHECK FAILED: Socket has more than one driving source!', DSConstants.LOG_PRIORITY_HIGH)
-            #self.hardware.hardwareManager.workspace.mainWindow.controlWidget.addReadyCheckMessage('READY CHECK FAILED: Active Socket Has No Source!')
+            #self.hardware.hardwareManager.workspace.mW.postLog('READY CHECK FAILED: Socket has more than one driving source!', DSConstants.LOG_PRIORITY_HIGH)
+            #self.hardware.hardwareManager.workspace.mW.controlWidget.addReadyCheckMessage('READY CHECK FAILED: Active Socket Has No Source!')
             return readyCheckPacket('Socket', DSConstants.READY_CHECK_ERROR, msg='Source Has More Than One Driving Socket!')
 
         return readyCheckPacket('Socket', DSConstants.READY_CHECK_READY)

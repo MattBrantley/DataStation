@@ -10,9 +10,9 @@ class hardwareWidget(QDockWidget):
     socketList = list()
     plugList = list()
 
-    def __init__(self, mainWindow, instrumentManager, hardwareManager):
+    def __init__(self, mW, instrumentManager, hardwareManager):
         super().__init__('Hardware')
-        self.mainWindow = mainWindow
+        self.mW = mW
         self.instrumentManager = instrumentManager
         self.hardwareManager = hardwareManager
 
@@ -29,9 +29,9 @@ class hardwareWidget(QDockWidget):
 
         self.hardwareWidget = hardwareListWidget(self, self.hardwareManager)
 
-        self.filterStackWidget = filterStackWidget(self, self.mainWindow)
+        self.filterStackWidget = filterStackWidget(self, self.mW)
         self.filterStackWidget.setObjectName('filterStackWidget')
-        self.mainWindow.addDockWidget(Qt.BottomDockWidgetArea, self.filterStackWidget)
+        self.mW.addDockWidget(Qt.BottomDockWidgetArea, self.filterStackWidget)
         self.filterStackWidget.hide()
         self.filterStackWidget.setFloating(True)
 
@@ -49,6 +49,10 @@ class hardwareWidget(QDockWidget):
         self.tabWidget.addTab(self.driversWidget, "Hardware Drivers")
         self.mainContainer.setCentralWidget(self.tabWidget)
         self.setWidget(self.mainContainer)
+        self.hardwareManager.Hardware_Modified.connect(self.drawScene)
+        self.instrumentManager.Instrument_Unloaded.connect(self.drawScene)
+        self.instrumentManager.Instrument_Loaded.connect(self.drawScene)
+        self.instrumentManager.Instrument_Modified.connect(self.drawScene)
 
         self.drawScene()
 
@@ -360,7 +364,7 @@ class iScene(QGraphicsScene):
         return len(self.widget.socketList)*self.cellHeight + self.marginTop
 
     def connectPlugsAndSockets(self):
-        self.widget.mainWindow.controlWidget.configChanged()
+        self.widget.mW.controlWidget.configChanged()
         self.clearItems()
 
         for socket in self.widget.socketList:

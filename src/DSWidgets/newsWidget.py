@@ -5,7 +5,7 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView
 class newsWidget(QDockWidget):
     ITEM_GUID = Qt.UserRole
 
-    def __init__(self, mainWindow):
+    def __init__(self, mW):
         super().__init__('News')
         #self.setFeatures(self.features() & ~QDockWidget.DockWidgetClosable & ~QDockWidget.DockWidgetMovable & ~QDockWidget.DockWidgetFloatable & ~QDockWidget.DockWidgetVerticalTitleBar)
         self.browser = QWebEngineView()

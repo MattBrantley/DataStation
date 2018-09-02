@@ -20,7 +20,7 @@
             "sockets": [
                 {
                     "filterInputPathNo": 1,
-                    "filterInputSource": "a38801e9-317b-482f-8b3b-ce931ae5df16",
+                    "filterInputSource": "d7acbe8b-9675-439a-91a5-edfe3ebc5ba1",
                     "name": "Source/Q1 Lens",
                     "prec": 0.1,
                     "uuid": "9a907a48-13c5-4c12-8f7f-3388842045b6",
@@ -65,7 +65,7 @@
             "sockets": [
                 {
                     "filterInputPathNo": 1,
-                    "filterInputSource": "21ea9f56-d55b-4ba8-9aa9-b37d263743e2",
+                    "filterInputSource": "99f31e95-0437-45bb-89b1-2c7bca7351b4",
                     "name": "Q1/Q2 Lens",
                     "prec": 0.1,
                     "uuid": "f20e9b69-d14e-4b2c-bb84-90397728c667",
@@ -94,7 +94,7 @@
             "sockets": [
                 {
                     "filterInputPathNo": 1,
-                    "filterInputSource": "0615c661-af40-4c9f-af50-e162f5c83266",
+                    "filterInputSource": "bb09a082-473c-47f6-a844-a8224a779995",
                     "name": "Trapping Plates",
                     "prec": 0.1,
                     "uuid": "d2303aa8-6c52-47cf-a7fb-ac359b44023c",
@@ -171,7 +171,7 @@
             "sockets": [
                 {
                     "filterInputPathNo": 1,
-                    "filterInputSource": "4ccb111c-aae4-4ae2-8145-4741a027b752",
+                    "filterInputSource": "0d15ffb4-75e6-4858-a17f-4dc825501486",
                     "name": "Q2/Q3 Lens",
                     "prec": 0.1,
                     "uuid": "6575bcc7-9638-447a-b88d-c2364534e720",
@@ -216,7 +216,7 @@
             "sockets": [
                 {
                     "filterInputPathNo": 1,
-                    "filterInputSource": "2cb32cde-3a0e-4d9b-ba07-da7f11b5ce8f",
+                    "filterInputSource": "cf447fb1-967c-4393-935a-2034864663d4",
                     "name": "Quad Trap",
                     "prec": 0.1,
                     "uuid": "062c7f01-5717-405a-8ec2-a51acf7c0e13",
@@ -245,7 +245,7 @@
             "sockets": [
                 {
                     "filterInputPathNo": 1,
-                    "filterInputSource": "435c78d4-244f-42d9-8db1-bf4d311d1915",
+                    "filterInputSource": "b77f2a46-0f02-4f67-84e3-a471180b9e71",
                     "name": "Fil Trap",
                     "prec": 0.1,
                     "uuid": "96eee4e2-14db-4d04-b34b-45fcabe97961",

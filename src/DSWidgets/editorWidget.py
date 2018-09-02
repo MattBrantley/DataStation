@@ -6,9 +6,9 @@ from shutil import copyfile
 class editorWidget(QDockWidget):
     ITEM_GUID = Qt.UserRole
 
-    def __init__(self, mainWindow):
+    def __init__(self, mW):
         super().__init__('Code Editor')
-        self.mainWindow = mainWindow
+        self.mW = mW
         self.hide()
         self.resize(1000, 800)
 

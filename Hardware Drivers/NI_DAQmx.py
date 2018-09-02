@@ -1,4 +1,4 @@
-from Hardware_Driver import Hardware_Object, hardwareWorker, hwm
+from Hardware_Object import Hardware_Object, hardwareWorker, hwm
 from PyQt5.Qt import *
 from Sources import *
 import os, traceback, math
@@ -45,6 +45,9 @@ class Hardware_Driver(Hardware_Object):
                 source = DCSource(self, '['+self.hardwareSettings['deviceName']+'] '+chan.name, -10, 10, 0.1, chan.name)
                 self.addSource(source)
             self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
+        else:
+            print('Config_Modified.emit()')
+            self.Config_Modified.emit(self)
 
     def parseProgramData(self):
         eventData = self.getEvents()
@@ -52,7 +55,11 @@ class Hardware_Driver(Hardware_Object):
         if(len(eventData) != 0):
             channelList = list()
             timingBounds = self.getTimingBounds(eventData)
-            granularity = round(self.getGranularity(eventData), int(math.log10(self.maxRate)))
+            gran = self.getGranularity(eventData)
+            if(gran is not None):
+                granularity = round(self.getGranularity(eventData), int(math.log10(self.maxRate)))
+            else:
+                return None
             freq = 1/granularity
             #print('STARTINGGGGGG')
             #print(timingBounds)

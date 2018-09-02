@@ -5,7 +5,7 @@ from PyQt5.QtGui import QIcon, QFont
 class processWidget(QDockWidget):
     ITEM_GUID = Qt.UserRole
 
-    def __init__(self, mainWindow):
+    def __init__(self, mW):
         super().__init__('Log')
         
         self.setFeatures(QDockWidget.DockWidgetFloatable | QDockWidget.DockWidgetMovable)
@@ -26,7 +26,7 @@ class processWidget(QDockWidget):
         selectedRow = self.processList.currentRow()
         itemWorker = selectedItem.data(Qt.UserRole)
 
-        warningAction = QAction(QIcon(os.path.join(os.path.dirname(__file__), 'icons4\multiply-1')), 'Kill Job', self.workspace.mainWindow)
+        warningAction = QAction(QIcon(os.path.join(os.path.dirname(__file__), 'icons4\multiply-1')), 'Kill Job', self.workspace.mW)
         warningAction.setStatusTip('Kill the selected job. (Note: No data will be returned)')
         warningAction.triggered.connect(lambda: self.abortJob(itemWorker))
         warningAction.setEnabled(True)

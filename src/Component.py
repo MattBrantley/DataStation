@@ -7,7 +7,10 @@ import numpy as np
 from decimal import Decimal
 from DSWidgets.controlWidget import readyCheckPacket
 
-class Component():
+class Component(QObject):
+    Component_Modified = pyqtSignal(object)
+    Events_Modified = pyqtSignal(object)
+
     indexMe = True
     componentType = 'Default Component'
     componentIdentifier = 'DefComp'
@@ -15,10 +18,11 @@ class Component():
     componentCreator = 'Matthew R. Brantley'
     componentVersionDate = '7/13/2018'
     iconGraphicSrc = 'default.png' # Not adjustable like layoutGraphicSrc is.
-    mainWindow = None
+    mW = None
     valid = False
 
     def __init__(self, instrumentManager, **kwargs):
+        super().__init__()
         self.allowOverlappingEvents = False
         self.compSettings = {}
         self.compSettings['name'] = ''
@@ -35,6 +39,18 @@ class Component():
         self.data = None
         self.plotItem = None
         self.sequencerDrawState = False
+
+    ##### EVENTS #####
+    def addSequencerEventType(self, sequencerEventType):
+        self.sequencerEventTypes.append(sequencerEventType)
+
+    def clearEvents(self):
+        if(self.sequencerEditWidget is not None):
+            self.sequencerEditWidget.clearEvents()
+
+    ##### CONFIG #####
+
+    ##### OTHER #####
 
     def registerPlotItem(self, plotItem):
         self.plotItem = plotItem
@@ -65,6 +81,7 @@ class Component():
     def onSequencerDoubleClick(self, eventPos):
         if(self.sequencerEditWidget is None): #Generates this widget the first time it is made.
             self.sequencerEditWidget = sequenceEditWidget(self)
+            self.sequencerEditWidget.Events_Modified.connect(self.Events_Modified)
 
         self.sequencerEditWidget.move(eventPos + QPoint(2, 2))
         if(self.sequencerEditWidget.isHidden()):
@@ -74,8 +91,8 @@ class Component():
             self.sequencerEditWidget.hide()
 
     def redrawSequence(self):
-        self.instrumentManager.mainWindow.sequencerDockWidget.updatePlotList()
-        self.instrumentManager.mainWindow.hardwareWidget.drawScene()
+        self.instrumentManager.mW.sequencerDockWidget.updatePlotList()
+        self.instrumentManager.mW.hardwareWidget.drawScene()
 
     def onSaveParent(self):
         savePacket = dict()
@@ -109,12 +126,12 @@ class Component():
         return self.compSettings[key]
 
     def setupWidgets(self):
-        self.mainWindow = self.instrumentManager.mainWindow
+        self.mW = self.instrumentManager.mW
         self.configWidget = ComponentConfigWidget(self)
         self.sequenceEditWidget = ComponentSequenceEditWidget(self)
 
     def onCreationParent(self):
-        self.instrumentManager.mainWindow.postLog('Added New Component to Instrument: ' + self.componentType, DSConstants.LOG_PRIORITY_MED)
+        self.instrumentManager.mW.postLog('Added New Component to Instrument: ' + self.componentType, DSConstants.LOG_PRIORITY_MED)
         self.onCreation()
 
     def onCreation(self):
@@ -132,7 +149,7 @@ class Component():
             widget.valueChanged.connect(self.updatePlot)
 
     def onRemovalParent(self):
-        self.instrumentManager.mainWindow.postLog('Removing Instrument Component: ' + self.componentType, DSConstants.LOG_PRIORITY_MED)
+        self.instrumentManager.mW.postLog('Removing Instrument Component: ' + self.componentType, DSConstants.LOG_PRIORITY_MED)
         self.onRemoval()
 
     def onRemoval(self):
@@ -205,12 +222,10 @@ class Component():
     def onRun(self):
         return readyCheckPacket('Component', DSConstants.READY_CHECK_ERROR, msg='User Component Does Not Override onRun()!')
 
-    def addSequencerEventType(self, sequencerEventType):
-        self.sequencerEventTypes.append(sequencerEventType)
-
     def loadSequenceData(self, events):
         if(self.sequencerEditWidget is None): #Generates this widget the first time it is made.
             self.sequencerEditWidget = sequenceEditWidget(self)
+            self.sequencerEditWidget.Events_Modified.connect(self.Events_Modified)
 
         for event in events:
             self.sequencerEditWidget.addEvent(event)
@@ -218,17 +233,19 @@ class Component():
         self.sequencerEditWidget.checkEventOverlaps()
         #print(events)
 
-    def clearEvents(self):
-        if(self.sequencerEditWidget is not None):
-            self.sequencerEditWidget.clearEvents()
+        print('Events_Modified.emit()')
+        self.Events_Modified.emit(self)
 
 class sequenceEditWidget(QDockWidget):
     doNotAutoPopulate = True
 
+    Events_Modified = pyqtSignal(object)
+
+
     def __init__(self, compParent):
-        super().__init__('Sequencer: ' + compParent.compSettings['name'], parent=compParent.mainWindow.sequencerDockWidget)
+        super().__init__('Sequencer: ' + compParent.compSettings['name'], parent=compParent.mW.sequencerDockWidget)
         self.compParent = compParent
-        self.sequencerWidget = self.compParent.instrumentManager.mainWindow.sequencerDockWidget
+        self.sequencerWidget = self.compParent.instrumentManager.mW.sequencerDockWidget
         self.setFeatures(QDockWidget.DockWidgetClosable)
         self.setMinimumSize(QSize(500,450))
         self.setFloating(True)
@@ -240,7 +257,6 @@ class sequenceEditWidget(QDockWidget):
 
         self.layout.addWidget(self.initTableWidget())
         self.layout.addWidget(self.initButtonsWidget())
-
         self.setWidget(self.mainWidget)
 
     def updateTitle(self):
@@ -250,6 +266,9 @@ class sequenceEditWidget(QDockWidget):
         #self.table.clear()
         for row in range(0, self.table.rowCount()):
             self.table.removeRow(0)
+
+        print('Events_Modified.emit()')
+        self.Events_Modified.emit(self)
 
     def addEvent(self, eventData):
         newRow = self.newEvent()
@@ -262,11 +281,14 @@ class sequenceEditWidget(QDockWidget):
                 if(setting in settingsWidgets):
                     settingsWidgets[setting].setValue(value)
                 else:
-                    self.compParent.instrumentManager.mainWindow.postLog('Event of type (' + eventData['type'] + ') does not have a (' + setting + ') setting type!!!', DSConstants.LOG_PRIORITY_HIGH)
+                    self.compParent.instrumentManager.mW.postLog('Event of type (' + eventData['type'] + ') does not have a (' + setting + ') setting type!!!', DSConstants.LOG_PRIORITY_HIGH)
         else:
             self.table.removeRow(newRow)
-            self.compParent.instrumentManager.mainWindow.postLog('Event has unknown type (' + eventData['type'] + ') for object type (' + self.compParent.componentType + ')!!', DSConstants.LOG_PRIORITY_HIGH)
+            self.compParent.instrumentManager.mW.postLog('Event has unknown type (' + eventData['type'] + ') for object type (' + self.compParent.componentType + ')!!', DSConstants.LOG_PRIORITY_HIGH)
         
+        print('Events_Modified.emit()')  ### THIS IS PROBABLY HAPPENING TWICE - addEvent calls newEvent
+        self.Events_Modified.emit(self)
+
     def newEvent(self):
         rowCount = self.table.rowCount()
         self.table.insertRow(rowCount)
@@ -288,6 +310,9 @@ class sequenceEditWidget(QDockWidget):
         self.table.setCellWidget(rowCount, 1, typeWidget)
         self.table.setCellWidget(rowCount, 2, settingsWidget)
         
+        print('Events_Modified.emit()') ### THIS IS PROBABLY HAPPENING TWICE - addEvent calls newEvent
+        self.Events_Modified.emit(self)
+
         return rowCount
 
     def getEvents(self):

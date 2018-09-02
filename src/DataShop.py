@@ -20,6 +20,10 @@ from Constants import DSConstants as DSConstants
 # proctitle - pip install setproctitle -- NOT USED?
 # pyserial - pip install pyserial
 
+def warn(*args, **kwargs):
+    pass
+import warnings
+warnings.warn = warn
 
 import DSUnits, DSPrefix
 from DSWorkspace import DSWorkspace
@@ -47,6 +51,8 @@ sys.excepthook = default_exception_hook
 
 class mainWindow(QMainWindow):
     logDetail = DSConstants.LOG_PRIORITY_MED
+    DataStation_Loaded = pyqtSignal()
+    DataStation_Closing = pyqtSignal()
 
     def __init__(self, app):
         super().__init__()
@@ -60,6 +66,8 @@ class mainWindow(QMainWindow):
         self.loginWindow.setObjectName('loginWindow')
         self.postLog('Waiting on User Profile selection..', DSConstants.LOG_PRIORITY_HIGH)
         self.loginWindow.runModal() #Open the login window and then waits until it finishes and calls the finishInitWithUser function
+
+        self.DataStation_Closing.connect(self.updateUserProfile)
 
     def initLoading(self):
         # All used widgets need to be registered here - they autopopulate into the menu.
@@ -103,7 +111,6 @@ class mainWindow(QMainWindow):
 
         self.controlWidget.registerManagers(self.instrumentWidget.instrumentManager, self.hardwareWidget.hardwareManager)
 
-
     def finishInitWithUser(self, userData):
         self.postLog('User Profile Selected: ' + userData['First Name'] + ' ' + userData['Last Name'], DSConstants.LOG_PRIORITY_HIGH)
         self.workspace.userProfile = userData
@@ -112,6 +119,8 @@ class mainWindow(QMainWindow):
         self.workspace.loadPreviousWS()
         self.loadPreviousInstrument()
         self.loadPreviousSequence()
+        print('DataStation_Loaded.emit()')
+        self.DataStation_Loaded.emit()
         self.postLog('Data Station Finished Loading!', DSConstants.LOG_PRIORITY_HIGH)
 
     def loadPreviousInstrument(self):
@@ -310,9 +319,11 @@ class mainWindow(QMainWindow):
 
     def softExit(self):
         self.postLog('Shutting down Datastation!', DSConstants.LOG_PRIORITY_HIGH)
-        self.workspace.DSHardwareManager.saveHardwareState()
-        self.updateUserProfile()
-        self.workspace.updateSettings()
+        print('DataStation_Closing.emit()')
+        self.DataStation_Closing.emit()
+        #self.workspace.DSHardwareManager.saveHardwareState()
+        #self.updateUserProfile()
+        #self.workspace.updateSettings()
 
     def updateUserProfile(self):
         self.updateWindowStates()

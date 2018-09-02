@@ -101,7 +101,7 @@ class Socket():
         if(self.loadPacket is not None):
             if('filterInputSource' in self.loadPacket):
                 if(self.loadPacket['filterInputSource'] is not None):
-                    targetFilter = self.instrumentManager.mainWindow.hardwareWidget.hardwareManager.objFromUUID(self.loadPacket['filterInputSource'])
+                    targetFilter = self.instrumentManager.mW.hardwareWidget.hardwareManager.objFromUUID(self.loadPacket['filterInputSource'])
                     if(targetFilter is None): #Contigency incase objFromUUID fails
                         self.filterInputPathNo = None
                         self.filterInputSource = None
@@ -110,7 +110,7 @@ class Socket():
                         self.filterInputSource = targetFilter.reattachSocket(self, self.filterInputPathNo)
                         if(self.filterInputSource is None): #This happens if you try to attach to a filter/source on a path that is already occupied
                             self.filterInputPathNo = None
-                            self.instrumentManager.mainWindow.postLog('SOCKET ATTACHEMENT ERROR: ' + self.name + '(' + type(self).__name__ + ') Trying To Attach To Filter/Source Path That Is Occupied!!' , DSConstants.LOG_PRIORITY_MED)
+                            self.instrumentManager.mW.postLog('SOCKET ATTACHEMENT ERROR: ' + self.name + '(' + type(self).__name__ + ') Trying To Attach To Filter/Source Path That Is Occupied!!' , DSConstants.LOG_PRIORITY_MED)
                             self.callRemove()
                 else:
                     self.filterInputPathNo = None

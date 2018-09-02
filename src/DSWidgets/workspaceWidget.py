@@ -7,12 +7,12 @@ from UserScript import *
 
 class workspaceTreeDockWidget(QDockWidget):
 
-    def __init__(self, mainWindow):
+    def __init__(self, mW):
         super().__init__('No Workspace Loaded')
-        self.mainWindow = mainWindow
+        self.mW = mW
         self.setFeatures(QDockWidget.DockWidgetFloatable | QDockWidget.DockWidgetMovable)
 
-        self.workspaceTreeWidget = WorkspaceTreeWidget(mainWindow)
+        self.workspaceTreeWidget = WorkspaceTreeWidget(mW)
         self.setWidget(self.workspaceTreeWidget)
 
 class WorkspaceTreeWidget(QTreeWidget):
@@ -21,10 +21,10 @@ class WorkspaceTreeWidget(QTreeWidget):
     ITEM_NAME = Qt.UserRole+2
     ITEM_UNITS = Qt.UserRole+3
 
-    def __init__(self, mainWindow):
+    def __init__(self, mW):
         super().__init__()
-        self.mainWindow = mainWindow
-        self.workspace = mainWindow.workspace
+        self.mW = mW
+        self.workspace = mW.workspace
         self.setDragEnabled(True)
         self.setHeaderHidden(True)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -35,7 +35,7 @@ class WorkspaceTreeWidget(QTreeWidget):
     def selectionChangedFunc(self):
         if(len(self.selectedItems()) > 0):
             if(self.selectedItems()[0].data(0, self.ITEM_TYPE) == 'Data'):
-                self.workspace.mainWindow.inspectorDockWidget.drawInspectorWidget(self.selectedItems()[0])
+                self.workspace.mW.inspectorDockWidget.drawInspectorWidget(self.selectedItems()[0])
 
     def dragEnterEvent(self, event):
         if(event.mimeData().hasUrls()):
@@ -128,7 +128,7 @@ class WorkspaceTreeWidget(QTreeWidget):
         self.workspace.deleteDSFromSql(selectedItem)
 
     def renameItem(self, selectedItem):
-        text, ok = QInputDialog.getText(self.mainWindow, 'Rename Item', 'Enter New Name', text=selectedItem.text(0))
+        text, ok = QInputDialog.getText(self.mW, 'Rename Item', 'Enter New Name', text=selectedItem.text(0))
         if(ok):
             selectedItem.setText(0, self.workspace.cleanStringName(text))
             selectedItem.setData(0, self.ITEM_NAME, text)
@@ -161,19 +161,19 @@ class WorkspaceTreeWidget(QTreeWidget):
         return []
 
     def initContextActions(self, selectedItem):
-        self.renameAction = QAction(QIcon('icons\\analytics-1.png'), 'Rename Item', self.mainWindow)
+        self.renameAction = QAction(QIcon('icons\\analytics-1.png'), 'Rename Item', self.mW)
         self.renameAction.setStatusTip('Rename this Item')
         self.renameAction.triggered.connect(lambda: self.renameItem(selectedItem))
 
-        self.deleteAction = QAction(QIcon('icons\\transfer-1.png'),'Delete Item', self.mainWindow)
+        self.deleteAction = QAction(QIcon('icons\\transfer-1.png'),'Delete Item', self.mW)
         self.deleteAction.setStatusTip('Delete this Item from Memory')
         self.deleteAction.triggered.connect(lambda: self.deleteItem(selectedItem))
 
-        self.linePlotAction = QAction(QIcon('icons\\analytics-4.png'),'Line Plot', self.mainWindow)
+        self.linePlotAction = QAction(QIcon('icons\\analytics-4.png'),'Line Plot', self.mW)
         self.linePlotAction.setStatusTip('Generate a line plot of this DataSet')
         self.linePlotAction.triggered.connect(lambda: self.workspace.linePlotItem(selectedItem))
 
-        self.surfacePlotAction = QAction(QIcon('icons\\analytics-4.png'),'Surface Plot', self.mainWindow)
+        self.surfacePlotAction = QAction(QIcon('icons\\analytics-4.png'),'Surface Plot', self.mW)
         self.surfacePlotAction.setStatusTip('Generate a surface plot of this DataSet')
         self.surfacePlotAction.triggered.connect(lambda: self.workspace.surfacePlotItem(selectedItem))
 
@@ -196,10 +196,10 @@ class WorkspaceTreeWidget(QTreeWidget):
             self.contextMenu.addAction(self.linePlotAction)
             self.contextMenu.addAction(self.surfacePlotAction)
             self.contextMenu.addSeparator()
-            self.workspace.userScripts.populateActionMenu(self.contextMenu.addMenu('Operations'), UserOperation, self.mainWindow, selectedItem)
+            self.workspace.userScripts.populateActionMenu(self.contextMenu.addMenu('Operations'), UserOperation, self.mW, selectedItem)
 
     def initDefaultContextMenu(self):
-        warningAction = QAction('Nothing selected!', self.mainWindow)
+        warningAction = QAction('Nothing selected!', self.mW)
         warningAction.setStatusTip('Nothing has been selected!')
         warningAction.setEnabled(False)
 

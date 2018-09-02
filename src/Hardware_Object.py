@@ -9,7 +9,9 @@ from DSWidgets.controlWidget import readyCheckPacket
 # This is so that pickle can pull the correct class
 sys.path.append(str(os.path.dirname(os.path.dirname(__file__))) + '\\Hardware Drivers\\')
 
-class Hardware_Object():
+class Hardware_Object(QObject):
+    Config_Modified = pyqtSignal(object)
+
     hardwareType = 'Default Hardware Object'
     hardwareIdentifier = 'DefHardObj'
     hardwareVersion = '1.0'
@@ -17,6 +19,7 @@ class Hardware_Object():
     hardwareVersionDate = '8/18/2018'
 
     def __init__(self, hardwareManager, modelObject=False, **kwargs):
+        super().__init__()
         self.sourceListWidget = QListWidget()
         self.hardwareSettings = {}
         self.hardwareSettings['name'] = ''
@@ -109,7 +112,8 @@ class Hardware_Object():
             self.loadSourceListData()
             self.updateSourceListWidget()
             self.hardwareManager.workspace.DSInstrumentManager.reattachSockets()
-            self.hardwareManager.mainWindow.hardwareWidget.drawScene()
+            print('Config_Modified.emit()')
+            self.Config_Modified.emit(self)
 
     def forceNoUpdatesOnSourceAdd(self, toggle): #Improves speed to use this when adding many sockets at once
         self.forceNoUpdatesOnSourceAddToggle = toggle
@@ -117,7 +121,8 @@ class Hardware_Object():
             self.loadSourceListData()
             self.updateSourceListWidget()
             self.hardwareManager.workspace.DSInstrumentManager.reattachSockets()
-            self.hardwareManager.mainWindow.hardwareWidget.drawScene()
+            print('Config_Modified.emit()')
+            self.Config_Modified.emit(self)
 
     def updateSourceListWidget(self):
         self.sourceListWidget.clear()

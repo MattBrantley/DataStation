@@ -10,12 +10,12 @@ from Sockets import Socket
 class filterStackWidget(QDockWidget):
     doNotAutoPopulate = True
 
-    def __init__(self, parent, mainWindow):
+    def __init__(self, parent, mW):
         super().__init__('Filter Stack Editor', parent=parent)
         self.hardwareManager = parent.hardwareManager
         self.instrumentManager = parent.instrumentManager 
         self.parent = parent
-        self.mainWindow = mainWindow
+        self.mW = mW
         self.hide()
         self.setAllowedAreas(Qt.NoDockWidgetArea)
         #self.setFeatures(QDockWidget.DockWidgetClosable)
@@ -246,7 +246,7 @@ class filterWidgetObject():
         self.sourceObject.attachSocket(pathNo, socket.socket)
         socket.socket.onAttach(self.sourceObject)
         self.view.drawScene(self.view.rootSource)
-        self.view.parent.mainWindow.hardwareWidget.iScene.connectPlugsAndSockets()
+        self.view.parent.mW.hardwareWidget.iScene.connectPlugsAndSockets()
 
     def arrowPressed(self, pathNo, pos):
         menu = QMenu()
@@ -328,7 +328,7 @@ class socketSelectionWidget(QWidgetAction):
         self.menu.close()
 
     def populateBox(self):
-        for socket in self.parent.view.parent.mainWindow.instrumentWidget.instrumentManager.currentInstrument.getSockets():
+        for socket in self.parent.view.parent.mW.instrumentWidget.instrumentManager.currentInstrument.getSockets():
             item = socketSelectionItem(socket.name, socket)
             self.pSpinBox.addItem(item)
 
