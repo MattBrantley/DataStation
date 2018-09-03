@@ -2,8 +2,8 @@ import os, sys, imp, multiprocessing
 from PyQt5.QtCore import Qt, QVariant, QTimer, QSize
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QFont
-from UserScript import *
-from UserScriptsController import *
+from Managers.WorkspaceManager.UserScript import *
+from Managers.WorkspaceManager.UserScriptsController import *
 
 class jobWidget(QWidget):
     WORKER_DATA = Qt.UserRole

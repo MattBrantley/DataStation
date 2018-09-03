@@ -24,7 +24,7 @@ class WorkspaceTreeWidget(QTreeWidget):
     def __init__(self, mW):
         super().__init__()
         self.mW = mW
-        self.workspace = mW.workspace
+        self.workspaceManager = mW.workspaceManager
         self.setDragEnabled(True)
         self.setHeaderHidden(True)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -35,7 +35,7 @@ class WorkspaceTreeWidget(QTreeWidget):
     def selectionChangedFunc(self):
         if(len(self.selectedItems()) > 0):
             if(self.selectedItems()[0].data(0, self.ITEM_TYPE) == 'Data'):
-                self.workspace.mW.inspectorDockWidget.drawInspectorWidget(self.selectedItems()[0])
+                self.mW.inspectorDockWidget.drawInspectorWidget(self.selectedItems()[0])
 
     def dragEnterEvent(self, event):
         if(event.mimeData().hasUrls()):
@@ -52,7 +52,7 @@ class WorkspaceTreeWidget(QTreeWidget):
     def dropEvent(self, event):
         for url in event.mimeData().urls():
             if(url.isValid):
-                self.workspace.importDataByURL(url.toLocalFile())
+                self.workspaceManager.importDataByURL(url.toLocalFile())
 
     def getItemLevel(self, item):
         level = 0
@@ -132,8 +132,8 @@ class WorkspaceTreeWidget(QTreeWidget):
         if(ok):
             selectedItem.setText(0, self.workspace.cleanStringName(text))
             selectedItem.setData(0, self.ITEM_NAME, text)
-            self.workspace.renameDSInSql(selectedItem)
-            self.workspace.saveWSToSql()
+            self.workspaceManager.renameDSInSql(selectedItem)
+            self.workspaceManager.saveWSToSql()
 
     def treeWidgetItemByGUID(self, GUID):
         iterator = QTreeWidgetItemIterator(self)
@@ -171,11 +171,11 @@ class WorkspaceTreeWidget(QTreeWidget):
 
         self.linePlotAction = QAction(QIcon('icons\\analytics-4.png'),'Line Plot', self.mW)
         self.linePlotAction.setStatusTip('Generate a line plot of this DataSet')
-        self.linePlotAction.triggered.connect(lambda: self.workspace.linePlotItem(selectedItem))
+        self.linePlotAction.triggered.connect(lambda: self.workspaceManager.linePlotItem(selectedItem))
 
         self.surfacePlotAction = QAction(QIcon('icons\\analytics-4.png'),'Surface Plot', self.mW)
         self.surfacePlotAction.setStatusTip('Generate a surface plot of this DataSet')
-        self.surfacePlotAction.triggered.connect(lambda: self.workspace.surfacePlotItem(selectedItem))
+        self.surfacePlotAction.triggered.connect(lambda: self.workspaceManager.surfacePlotItem(selectedItem))
 
     def initContextMenu(self):
         selectedItem = self.currentItem()
@@ -184,7 +184,7 @@ class WorkspaceTreeWidget(QTreeWidget):
         self.contextMenu = QMenu()
 
         #Universal Workspace Context Menu Actions
-        if(self.workspace.userScripts.processManager.processWidget.processList.count() is not 0):
+        if(self.workspaceManager.userScripts.processManager.processWidget.processList.count() is not 0):
             self.renameAction.setEnabled(False)
             self.deleteAction.setEnabled(False)
         self.contextMenu.addAction(self.renameAction)
@@ -196,7 +196,7 @@ class WorkspaceTreeWidget(QTreeWidget):
             self.contextMenu.addAction(self.linePlotAction)
             self.contextMenu.addAction(self.surfacePlotAction)
             self.contextMenu.addSeparator()
-            self.workspace.userScripts.populateActionMenu(self.contextMenu.addMenu('Operations'), UserOperation, self.mW, selectedItem)
+            self.workspaceManager.userScripts.populateActionMenu(self.contextMenu.addMenu('Operations'), UserOperation, self.mW, selectedItem)
 
     def initDefaultContextMenu(self):
         warningAction = QAction('Nothing selected!', self.mW)

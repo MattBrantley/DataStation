@@ -1,5 +1,5 @@
 import os, sys, imp, time, inspect
-from Instrument import *
+from Managers.InstrumentManager.Instrument import *
 from Constants import DSConstants as DSConstants
 import json as json
 from DSWidgets.controlWidget import readyCheckPacket
@@ -11,14 +11,13 @@ class InstrumentManager(QObject):
     Component_Modified = pyqtSignal(object)
     Events_Modified = pyqtSignal(object)
 
-    instrumentsURL = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'User Instruments')
-    componentsURL = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'User Components')
     instrumentWidget = None
 
-    def __init__(self, workspace, instrumentsURL, componentsURL):
+    def __init__(self, mW):
         super().__init__()
-        self.workspace = workspace
-        self.mW = self.workspace.mW
+        self.mW = mW
+        self.instrumentDir = os.path.join(self.mW.rootDir, 'User Instruments')
+        self.componentsDir = os.path.join(self.mW.rootDir, 'User Components')
         self.currentInstrument = None
         self.componentsAvailable = list()
         self.loadComponents()
@@ -31,7 +30,7 @@ class InstrumentManager(QObject):
     def loadComponents(self):
         self.mW.postLog('Loading User Components... ', DSConstants.LOG_PRIORITY_HIGH)
 
-        for root, dirs, files in os.walk(self.componentsURL):
+        for root, dirs, files in os.walk(self.componentsDir):
             for name in files:
                 url = os.path.join(root, name)
                 compHolder = self.loadComponentFromFile(url)
@@ -144,7 +143,7 @@ class InstrumentManager(QObject):
                 self.mW.postLog('Corrupted instrument at (' + url + ') - aborting! ', DSConstants.LOG_PRIORITY_MED)
                 return
         self.mW.postLog('Finished Loading User Instrument!', DSConstants.LOG_PRIORITY_HIGH)
-        self.workspace.userProfile['instrumentURL'] = self.currentInstrument.url
+        self.mW.workspaceManager.userProfile['instrumentURL'] = self.currentInstrument.url
         self.mW.sequencerDockWidget.updatePlotList()
         self.mW.hardwareWidget.drawScene()
 
@@ -206,7 +205,7 @@ class InstrumentManager(QObject):
 
     def writeInstrumentToFile(self, saveData, url):
         if(url is None):
-            instrumentSaveURL = os.path.join(self.instrumentsURL, self.currentInstrument.name + '.dsinstrument')
+            instrumentSaveURL = os.path.join(self.instrumentDir, self.currentInstrument.name + '.dsinstrument')
         else:
             instrumentSaveURL = url
 

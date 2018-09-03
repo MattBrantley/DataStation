@@ -111,7 +111,7 @@ class Hardware_Object(QObject):
         if(self.forceNoUpdatesOnSourceAddToggle is False):
             self.loadSourceListData()
             self.updateSourceListWidget()
-            self.hardwareManager.workspace.DSInstrumentManager.reattachSockets()
+            self.hardwareManager.mW.instrumentManager.reattachSockets()
             print('Config_Modified.emit()')
             self.Config_Modified.emit(self)
 
@@ -120,7 +120,7 @@ class Hardware_Object(QObject):
         if(toggle is False): #Turning it off calls these update functions - necessary
             self.loadSourceListData()
             self.updateSourceListWidget()
-            self.hardwareManager.workspace.DSInstrumentManager.reattachSockets()
+            self.hardwareManager.mW.instrumentManager.reattachSockets()
             print('Config_Modified.emit()')
             self.Config_Modified.emit(self)
 

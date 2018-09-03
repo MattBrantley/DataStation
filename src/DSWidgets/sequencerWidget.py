@@ -207,7 +207,7 @@ class sequencerDockWidget(QDockWidget):
     def __init__(self, mW):
         super().__init__('Sequencer (None)')
         self.mW = mW
-        self.instrumentManager = mW.workspace.DSInstrumentManager
+        self.instrumentManager = mW.instrumentManager
         self.hide()
         self.resize(1000, 800)
         self.fileSystem = DSEditorFSModel()
@@ -463,7 +463,7 @@ class sequencerDockWidget(QDockWidget):
             self.setWindowTitle('Sequencer (' + os.path.basename(self.currentSequenceURL) + ')')
         else:
             self.setWindowTitle('Sequencer (None)')
-        self.mW.workspace.userProfile['sequenceURL'] = filePath
+        self.mW.workspaceManager.userProfile['sequenceURL'] = filePath
         self.mW.postLog('Finished Loading Sequence!', DSConstants.LOG_PRIORITY_HIGH)
 
     def processSequenceData(self, data):

@@ -3,8 +3,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from time import sleep
-from UserScriptSettingsObjects import *
-import DSUnits, DSPrefix
+from Managers.WorkspaceManager.UserScriptSettingsObjects import *
+from Managers.WorkspaceManager import DSUnits, DSPrefix
 
 class ScriptIOAxis():
 

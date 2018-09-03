@@ -1,4 +1,4 @@
-from Component import Component
+from src.Managers.InstrumentManager.Component import Component
 import os, uuid
 
 class Excitation_Plates(Component):

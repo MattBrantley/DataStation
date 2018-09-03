@@ -10,10 +10,10 @@ import multiprocessing
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from UserScriptsController import userScriptsController
-from UserScript import *
-from InstrumentManager import InstrumentManager
-from HardwareManager import HardwareManager
+from Managers.WorkspaceManager.UserScriptsController import userScriptsController
+from Managers.WorkspaceManager.UserScript import *
+from Managers.InstrumentManager.InstrumentManager import InstrumentManager
+from Managers.HardwareManager.HardwareManager import HardwareManager
 from Constants import DSConstants as DSConstants
 
 class databaseCommManager():
@@ -44,12 +44,11 @@ class databaseCommManager():
             conn.close()
             data = {'GUID': GUID, 'Type': 'Data', 'Name': dataSet.name, 'Units': DSUnits.arbitrary().baseQuantity}
 
-class DSWorkspace():
+class WorkspaceManager():
     workspaceURL = ''
-    directoryURL = os.path.dirname(os.path.realpath(__file__))
     userProfile = {}
     settingsURL = 'settings.json'
-    userScripts = None
+    userScriptController = None
     ITEM_GUID = Qt.UserRole
     ITEM_TYPE = Qt.UserRole+1
     ITEM_NAME = Qt.UserRole+2
@@ -58,24 +57,29 @@ class DSWorkspace():
     def __init__(self, mW):
         super().__init__()
         self.mW = mW
+        self.filtersDir = os.path.join(self.mW.rootDir, 'User Filters')
+        self.scriptsDir = os.path.join(self.mW.rootDir, 'User Scripts')
+        self.userDataDir = os.path.join(self.mW.rootDir, 'User Data')
+        self.hardwareDriversDir = os.path.join(self.mW.rootDir, 'Hardware Drivers')
         self.readSettings()
         self.workspaceTreeWidget = None #Will be loaded in by mW
-        self.buildUserScripts()
+        self.initUserScriptController()
         self.initDatabaseCommManager()
         self.initInstrumentManager()
         self.initHardwareManager()
 
         self.mW.DataStation_Closing.connect(self.updateSettings)
+
+    def connectWidgets(self):
+        self.userScriptController.connectWidgets()
         
     def initHardwareManager(self):
-        filtersURL = os.path.join(str(Path(self.directoryURL).parent), 'User Filters')
-        driversURL = os.path.join(str(Path(self.directoryURL).parent), 'Hardware Drivers')
-        self.DSHardwareManager = HardwareManager(self, filtersURL, driversURL)
+        pass
+        #self.DSHardwareManager = HardwareManager(self)
 
     def initInstrumentManager(self):
-        componentsURL = os.path.join(str(Path(self.directoryURL).parent), 'User Components')
-        instrumentsURL = os.path.join(str(Path(self.directoryURL).parent), 'User Instruments')
-        self.DSInstrumentManager = InstrumentManager(self, instrumentsURL, componentsURL)
+        pass
+        #self.DSInstrumentManager = InstrumentManager(self)
 
     def initDatabaseCommManager(self):
         self.DBCommMgr = databaseCommManager(self)
@@ -108,20 +112,18 @@ class DSWorkspace():
         data = {'Default Importers': {}}
         return data
 
-    def buildUserScripts(self):
-        scriptsURL = os.path.join(str(Path(self.directoryURL).parent), 'User Scripts')
-        self.userScripts = userScriptsController(scriptsURL, self)
+    def initUserScriptController(self):
+        self.userScriptController = userScriptsController(self.scriptsDir, self)
 
     def setLoadedWorkspace(self, URL):
         self.workspaceURL = URL
-        self.directoryURL = os.path.dirname(URL)
         self.settings['workspaceURL'] = URL
 
         self.mW.workspaceTreeDockWidget.setWindowTitle(os.path.basename(URL))
         self.mW.updateState(DSConstants.MW_STATE_WORKSPACE_LOADED)
 
     def newWorkspace(self):
-        fname = QFileDialog.getSaveFileName(self.mW, 'Save File', self.directoryURL, filter='*.db')
+        fname = QFileDialog.getSaveFileName(self.mW, 'Save File', self.userDataDir, filter='*.db')
         if fname[0]:
             self.workspaceTreeWidget.clear()
             xmlString = tostring(self.workspaceTreeWidget.toXML(), encoding="unicode")
@@ -135,7 +137,7 @@ class DSWorkspace():
             conn.close()
 
     def saveWSToNewSql(self):
-        fname = QFileDialog.getSaveFileName(self.mW, 'Save File', self.directoryURL)
+        fname = QFileDialog.getSaveFileName(self.mW, 'Save File', self.userDataDir)
         if fname[0]:
             self.setLoadedWorkspace(fname[0])
             self.saveWSToSql()
@@ -208,8 +210,7 @@ class DSWorkspace():
 
     def loadWSFromSql(self, url=None):
         if(url is False):
-            dataURL = os.path.join(str(Path(self.directoryURL).parent), 'User Data')
-            fname = QFileDialog.getOpenFileName(self.mW, 'Open File', dataURL, filter='*.db')
+            fname = QFileDialog.getOpenFileName(self.mW, 'Open File', self.userDataDir, filter='*.db')
         else:
             fname = list()
             fname.append(url)
@@ -234,11 +235,11 @@ class DSWorkspace():
         fname = QFileDialog.getOpenFileNames(self.mW, 'Open File', self.workspaceURL, filter=self.userScripts.genImportDialogFilter())
         for fileURL in fname[0]:
             fileName, fileExtension = os.path.splitext(fileURL)
-            self.userScripts.runDefaultImporter(fileURL, fileExtension)
+            self.userScriptController.runDefaultImporter(fileURL, fileExtension)
 
     def importDataByURL(self, fileURL):
         fileName, fileExtension = os.path.splitext(fileURL)
-        self.userScripts.runDefaultImporter(fileURL, fileExtension)
+        self.userScriptController.runDefaultImporter(fileURL, fileExtension)
 
     def getScriptIODataFromSQLByGUID(self, GUID):
         conn = sqlite3.connect(self.workspaceURL)

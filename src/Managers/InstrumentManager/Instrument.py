@@ -1,4 +1,4 @@
-from Component import *
+from Managers.InstrumentManager.Component import *
 from copy import deepcopy
 from DSWidgets.controlWidget import readyCheckPacket
 

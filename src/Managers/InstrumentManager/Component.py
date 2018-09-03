@@ -2,7 +2,7 @@ from PyQt5.Qt import *
 from PyQt5.QtGui import QStandardItemModel
 import os, random, uuid
 from Constants import DSConstants as DSConstants
-from Sockets import *
+from Manager.InstrumentManager.Sockets import *
 import numpy as np
 from decimal import Decimal
 from DSWidgets.controlWidget import readyCheckPacket

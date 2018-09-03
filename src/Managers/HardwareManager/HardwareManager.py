@@ -18,21 +18,20 @@ class HardwareManager(QObject):
     driversAvailable = list()
     hardwareLoaded = list()
 
-    def __init__(self, workspace, filterURL, driverURL):
+    def __init__(self, mW):
         super().__init__()
-        self.workspace = workspace
-        self.mW = self.workspace.mW
-        self.filterURL = filterURL
-        self.driverURL = driverURL
+        self.mW = mW
+        self.filtersDir = os.path.join(self.mW.rootDir, 'User Filters')
+        self.hardwareDriverDir = os.path.join(self.mW.rootDir, 'Hardware Drivers')
         self.loadFilters()
         self.loadHardwareDrivers()
 
-        self.workspace.mW.DataStation_Closing.connect(self.saveHardwareState)
+        self.mW.DataStation_Closing.connect(self.saveHardwareState)
 
     def loadHardwareDrivers(self):
         self.mW.postLog('Loading Hardware Drivers... ', DSConstants.LOG_PRIORITY_HIGH)
 
-        for root, dirs, files in os.walk(self.driverURL):
+        for root, dirs, files in os.walk(self.hardwareDriverDir):
             for name in files:
                 url = os.path.join(root, name)
                 driverHolder = self.loadDriverFromFile(url)
@@ -72,7 +71,7 @@ class HardwareManager(QObject):
     def loadFilters(self):
         self.mW.postLog('Loading User Filters... ', DSConstants.LOG_PRIORITY_HIGH)
 
-        for root, dirs, files in os.walk(self.filterURL):
+        for root, dirs, files in os.walk(self.filtersDir):
             for name in files:
                 url = os.path.join(root, name)
                 filterHolder = self.loadFilterFromFile(url)
@@ -142,7 +141,7 @@ class HardwareManager(QObject):
                 self.filterList.append(newFilter)
                 return newFilter
             else:
-                self.workspace.mW.postLog('Attempting To Restore Filter With Identifier (' + data['filterIdentifier'] + ') But Could Not Find Matching User_Filter... ', DSConstants.LOG_PRIORITY_HIGH)
+                self.mW.postLog('Attempting To Restore Filter With Identifier (' + data['filterIdentifier'] + ') But Could Not Find Matching User_Filter... ', DSConstants.LOG_PRIORITY_HIGH)
         return None
 
     def objFromUUID(self, uuid):
@@ -187,10 +186,10 @@ class HardwareManager(QObject):
         return None
 
     def loadHardwareState(self):
-        self.workspace.mW.postLog('Restoring Hardware State... ', DSConstants.LOG_PRIORITY_HIGH)
-        if('hardwareState' in self.workspace.settings):
-            tempHardwareSettings = self.workspace.settings['hardwareState']
-            self.workspace.settings['hardwareState'] = None
+        self.mW.postLog('Restoring Hardware State... ', DSConstants.LOG_PRIORITY_HIGH)
+        if('hardwareState' in self.mW.workspaceManager.settings):
+            tempHardwareSettings = self.mW.workspaceManager.settings['hardwareState']
+            self.mW.workspaceManager.settings['hardwareState'] = None
             if(self.processHardwareData(tempHardwareSettings) is True):
                 self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
             else:
@@ -219,14 +218,14 @@ class HardwareManager(QObject):
             return False
 
     def saveHardwareState(self):
-        self.workspace.mW.postLog('Recording Hardware State... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.mW.postLog('Recording Hardware State... ', DSConstants.LOG_PRIORITY_HIGH)
         savePacket = dict()
         savePacket['hardwareStates'] = list()
 
         for hardware in self.hardwareLoaded:
             savePacket['hardwareStates'].append(hardware.onSave())
 
-        self.workspace.settings['hardwareState'] = savePacket
+        self.mW.workspaceManager.settings['hardwareState'] = savePacket
 
         self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 

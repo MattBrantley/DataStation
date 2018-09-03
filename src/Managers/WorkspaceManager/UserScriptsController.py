@@ -3,8 +3,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'Use
 from PyQt5.QtCore import Qt, QVariant, QTimer, QSize
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QFont
-from UserScript import *
-from WorkerObjects import *
+from Managers.WorkspaceManager.UserScript import *
+from Managers.WorkspaceManager.WorkerObjects import *
 from Constants import DSConstants as DSConstants
 
 class scriptProcessManager():
@@ -14,17 +14,20 @@ class scriptProcessManager():
     tickLength = 50 # Time between worker update cycles (This can slow down dramatically if the main thread lags)
 
     def __init__(self, workspace):
-        self.processWidget = workspace.mW.processWidget
+        #self.processWidget = workspace.mW.processWidget
         self.workspace = workspace
         self.mW = self.workspace.mW
         self.queueUpdateTimer = QTimer()
-        self.initTimer()
 
         self.mW.postLog('Building I/O Managers... ', DSConstants.LOG_PRIORITY_HIGH)
         for i in range (0, self.numWorkers):
             self.managers.append(procCommManager())
             self.managers[i].clear()
         self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+
+    def connectWidgets(self):
+        self.processWidget = self.mW.processWidget
+        self.initTimer()
 
     def getAvailManager(self):
         for mgr in self.managers:
@@ -35,7 +38,7 @@ class scriptProcessManager():
         self.processWidget.addProcessToWidget(job)
 
     def initTimer(self):
-        self.queueUpdateTimer.timeout.connect(lambda: self.updateQueueWorkers())
+        self.queueUpdateTimer.timeout.connect(self.updateQueueWorkers)
         self.queueUpdateTimer.start(self.tickLength)
 
     def addJobToQueue(self, worker):
@@ -121,6 +124,9 @@ class userScriptsController():
         self.parent = parent
         self.getUserScripts()
         self.processManager = scriptProcessManager(parent)
+
+    def connectWidgets(self):
+        self.processManager.connectWidgets()
 
     def getUserScripts(self):
         self.scripts['Display'] = self.getUserScriptsByType(UserDisplay)

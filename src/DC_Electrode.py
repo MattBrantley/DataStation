@@ -2,7 +2,7 @@
 """
 A simple DC Lens.
 """
-from Component import *
+from Managers.InstrumentManager.Component import *
 from PyQt5.Qt import *
 from PyQt5.QtGui import *
 import os, random
