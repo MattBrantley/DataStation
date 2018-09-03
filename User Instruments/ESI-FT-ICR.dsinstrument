@@ -18,15 +18,7 @@
                 "y": 1290.0
             },
             "sockets": [
-                {
-                    "filterInputPathNo": 1,
-                    "filterInputSource": "d7acbe8b-9675-439a-91a5-edfe3ebc5ba1",
-                    "name": "Source/Q1 Lens",
-                    "prec": 0.1,
-                    "uuid": "9a907a48-13c5-4c12-8f7f-3388842045b6",
-                    "vMax": 10,
-                    "vMin": 0
-                }
+                null
             ]
         },
         {
@@ -63,15 +55,7 @@
                 "y": 1299.0
             },
             "sockets": [
-                {
-                    "filterInputPathNo": 1,
-                    "filterInputSource": "99f31e95-0437-45bb-89b1-2c7bca7351b4",
-                    "name": "Q1/Q2 Lens",
-                    "prec": 0.1,
-                    "uuid": "f20e9b69-d14e-4b2c-bb84-90397728c667",
-                    "vMax": 10,
-                    "vMin": 0
-                }
+                null
             ]
         },
         {
@@ -92,15 +76,7 @@
                 "y": 1164.0
             },
             "sockets": [
-                {
-                    "filterInputPathNo": 1,
-                    "filterInputSource": "bb09a082-473c-47f6-a844-a8224a779995",
-                    "name": "Trapping Plates",
-                    "prec": 0.1,
-                    "uuid": "d2303aa8-6c52-47cf-a7fb-ac359b44023c",
-                    "vMax": 10,
-                    "vMin": 0
-                }
+                null
             ]
         },
         {
@@ -116,22 +92,6 @@
                 "r": 180,
                 "x": 1295.0,
                 "y": 1162.0
-            },
-            "sockets": []
-        },
-        {
-            "compIdentifier": "detecPlates_mrb",
-            "compSettings": {
-                "layoutGraphicSrc": "Detection_Plates.png",
-                "name": "",
-                "showSequencer": false,
-                "uuid": "c87ef966-521a-4ae7-b9a1-a0d175d55500"
-            },
-            "compType": "Detection Plates",
-            "iViewSettings": {
-                "r": 180,
-                "x": 1297.0,
-                "y": 1053.0
             },
             "sockets": []
         },
@@ -169,15 +129,7 @@
                 "y": 1297.0
             },
             "sockets": [
-                {
-                    "filterInputPathNo": 1,
-                    "filterInputSource": "0d15ffb4-75e6-4858-a17f-4dc825501486",
-                    "name": "Q2/Q3 Lens",
-                    "prec": 0.1,
-                    "uuid": "6575bcc7-9638-447a-b88d-c2364534e720",
-                    "vMax": 10,
-                    "vMin": 0
-                }
+                null
             ]
         },
         {
@@ -214,15 +166,7 @@
                 "y": 1300.0
             },
             "sockets": [
-                {
-                    "filterInputPathNo": 1,
-                    "filterInputSource": "cf447fb1-967c-4393-935a-2034864663d4",
-                    "name": "Quad Trap",
-                    "prec": 0.1,
-                    "uuid": "062c7f01-5717-405a-8ec2-a51acf7c0e13",
-                    "vMax": 10,
-                    "vMin": 0
-                }
+                null
             ]
         },
         {
@@ -243,15 +187,25 @@
                 "y": 1311.0
             },
             "sockets": [
-                {
-                    "filterInputPathNo": 1,
-                    "filterInputSource": "b77f2a46-0f02-4f67-84e3-a471180b9e71",
-                    "name": "Fil Trap",
-                    "prec": 0.1,
-                    "uuid": "96eee4e2-14db-4d04-b34b-45fcabe97961",
-                    "vMax": 10,
-                    "vMin": 0
-                }
+                null
+            ]
+        },
+        {
+            "compIdentifier": "detecPlates_mrb",
+            "compSettings": {
+                "layoutGraphicSrc": "Detection_Plates.png",
+                "name": "Unnamed Detection Plates",
+                "showSequencer": true,
+                "uuid": "64cd7763-0086-4fb8-82cb-6f3c78259eb6"
+            },
+            "compType": "Detection Plates",
+            "iViewSettings": {
+                "r": 180,
+                "x": 1294.0,
+                "y": 1037.0
+            },
+            "sockets": [
+                null
             ]
         }
     ],

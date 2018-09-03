@@ -3,7 +3,7 @@
 Returns the fast Fourier Transform of a 1-D matrix.
 """
 
-from UserScript import *
+from Managers.WorkspaceManager.UserScript import *
 import numpy as np
 
 

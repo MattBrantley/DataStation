@@ -4,7 +4,7 @@ Takes a 2-dimensional matrix and normalizes it against the greatest value
 point. Defaults to normalizing matrix to 1.
 """
 
-from UserScript import *
+from Managers.WorkspaceManager.UserScript import *
 import numpy as np
 
 

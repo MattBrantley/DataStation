@@ -2,7 +2,7 @@ from PyQt5.Qt import *
 from PyQt5.QtGui import QStandardItemModel
 import os, random, uuid
 from Constants import DSConstants as DSConstants
-from Manager.InstrumentManager.Sockets import *
+from Managers.InstrumentManager.Sockets import *
 import numpy as np
 from decimal import Decimal
 from DSWidgets.controlWidget import readyCheckPacket
@@ -21,7 +21,7 @@ class Component(QObject):
     mW = None
     valid = False
 
-    def __init__(self, instrumentManager, **kwargs):
+    def __init__(self, mW, **kwargs):
         super().__init__()
         self.allowOverlappingEvents = False
         self.compSettings = {}
@@ -29,7 +29,7 @@ class Component(QObject):
         self.compSettings['layoutGraphicSrc'] = self.iconGraphicSrc
         self.compSettings['showSequencer'] = False
         self.compSettings['uuid'] = str(uuid.uuid4())
-        self.instrumentManager = instrumentManager
+        self.mW = mW
         self.name = kwargs.get('name', self.componentType)
         self.socketList = list()
         self.pathDataPackets = list()
@@ -39,6 +39,19 @@ class Component(QObject):
         self.data = None
         self.plotItem = None
         self.sequencerDrawState = False
+        self.doProgramming = True
+
+        self.mW.instrumentManager.Sequence_Loading.connect(self.sequenceLoading)
+        self.mW.instrumentManager.Sequence_Loaded.connect(self.sequenceLoaded)
+
+        self.Component_Modified.connect(self.reprogramSourceTargets)
+        self.Events_Modified.connect(self.reprogramSourceTargets)
+
+    def sequenceLoading(self):
+        self.doProgramming = False
+    
+    def sequenceLoaded(self):
+        self.doProgramming = True
 
     ##### EVENTS #####
     def addSequencerEventType(self, sequencerEventType):
@@ -62,16 +75,21 @@ class Component(QObject):
 
         if(self.plotItem is not None):
             self.plotItem.updatePlot()
-        self.reprogramSourceTargets()
 
     def reprogramSourceTargets(self):
-        for socket in self.socketList:
-            source = socket.getAttachedSource()
-            if(source is not None):
-                source.reprogram()
+        if(self.doProgramming is True):
+            for socket in self.socketList:
+                source = socket.getAttachedSource()
+                if(source is not None):
+                    source.reprogram()
 
-    def addDCSocket(self, name):
-        socket = DCSocket(self, name, 0, 10, 0.1)
+    def addAOSocket(self, name):
+        socket = AOSocket(self, name, 0, 10, 0.1)
+        self.socketList.append(socket)
+        return socket
+
+    def addAISocket(self, name):
+        socket = AISocket(self, name, 0, 10, 0.1)
         self.socketList.append(socket)
         return socket
 
@@ -241,13 +259,12 @@ class sequenceEditWidget(QDockWidget):
 
     Events_Modified = pyqtSignal(object)
 
-
     def __init__(self, compParent):
         super().__init__('Sequencer: ' + compParent.compSettings['name'], parent=compParent.mW.sequencerDockWidget)
         self.compParent = compParent
         self.sequencerWidget = self.compParent.instrumentManager.mW.sequencerDockWidget
         self.setFeatures(QDockWidget.DockWidgetClosable)
-        self.setMinimumSize(QSize(500,450))
+        self.setMinimumSize(QSize(750,450))
         self.setFloating(True)
         self.hide()
         self.mainWidget = QWidget()
@@ -298,14 +315,19 @@ class sequenceEditWidget(QDockWidget):
         else:
             time = 0
         timeWidget = timeInputEdit(rowCount, time=time)
-        timeWidget.timeChanged.connect(self.sortEvent)
-        timeWidget.timeChanged.connect(self.checkEventOverlaps)
+        timeWidget.Time_Changed.connect(self.sortEvent)
+        timeWidget.Time_Changed.connect(self.checkEventOverlaps)
+        timeWidget.Time_Changed.connect(self.eventsModified)
+
         self.table.setCellWidget(rowCount, 0, timeWidget)
         typeWidget = eventTypeComboBox(self.sequencerEventTypes)
         settingsWidget = eventSettingsEdit(self.sequencerEventTypes, rowCount)
         settingsWidget.parameterChanged.connect(self.checkEventOverlaps)
+        settingsWidget.parameterChanged.connect(self.eventsModified)
+
         typeWidget.currentIndexChanged.connect(settingsWidget.redraw)
         typeWidget.currentIndexChanged.connect(self.checkEventOverlaps)
+        typeWidget.currentIndexChanged.connect(self.eventsModified)
 
         self.table.setCellWidget(rowCount, 1, typeWidget)
         self.table.setCellWidget(rowCount, 2, settingsWidget)
@@ -314,6 +336,9 @@ class sequenceEditWidget(QDockWidget):
         self.Events_Modified.emit(self)
 
         return rowCount
+
+    def eventsModified(self):
+        self.Events_Modified.emit(self)
 
     def getEvents(self):
         eventListOut = list()
@@ -326,32 +351,29 @@ class sequenceEditWidget(QDockWidget):
                 for setting in self.table.cellWidget(row, 2).value():
                     item['settings'][setting.name] = setting.value()
                 eventListOut.append(item)
-        #print(eventListOut)
         return eventListOut
 
     def getEventsSerializable(self):
         eventListOut = list()
         for row in range(0, self.table.rowCount()):
-            if(self.table.cellWidget(row, 0).valid is True):
-                item = dict()
-                item['time'] = self.table.cellWidget(row, 0).value()
-                item['type'] = self.table.cellWidget(row, 1).value().name
-                item['settings'] = dict()
-                for setting in self.table.cellWidget(row, 2).value():
-                    item['settings'][setting.name] = setting.value()
-                eventListOut.append(item)
-        #print(eventListOut)
+            item = dict()
+            item['time'] = self.table.cellWidget(row, 0).value()
+            item['type'] = self.table.cellWidget(row, 1).value().name
+            item['settings'] = dict()
+            for setting in self.table.cellWidget(row, 2).value():
+                item['settings'][setting.name] = setting.value()
+            eventListOut.append(item)
         return eventListOut
 
     def initTableWidget(self):
         self.table = QTableWidget(0,3)
         self.table.setHorizontalHeaderLabels(['Time (s)', 'Type', 'Settings'])
         self.table.setColumnWidth(0, 50)
-        self.table.setColumnWidth(1, 90)
-        self.table.setColumnWidth(2, 300)
+        self.table.setColumnWidth(1, 130)
+        self.table.setColumnWidth(2, 500)
         #self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
-        #self.table.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.table.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table.itemSelectionChanged.connect(self.tableSelectionChanged)
 
         #self.model = QStandardItemModel(1, 3, self)
@@ -381,7 +403,6 @@ class sequenceEditWidget(QDockWidget):
 
     def newButtonPressed(self):
         self.newEvent()
-        self.checkEventOverlaps()
 
     def editButtonPressed(self):
         pass
@@ -390,6 +411,7 @@ class sequenceEditWidget(QDockWidget):
         rows = self.getTableSelectedRows()
         for row in rows:
             self.table.removeRow(row)
+        self.Events_Modified.emit(self)
 
     def getTableSelectedRows(self):
         indexes = self.table.selectedIndexes()
@@ -485,19 +507,30 @@ class sequenceEditWidget(QDockWidget):
             self.table.cellWidget(row, 2).row = row
 
 class timeInputEdit(QLineEdit):
-    timeChanged = pyqtSignal(int)
+    Time_Changed = pyqtSignal(int)
 
     def __init__(self, row, decimalPlaces=4, time=0):
         super().__init__()
         self.row = row
         self.valid = True
+        self.dirty = False
         self.setText(str(time))
         self.setValidator(QDoubleValidator())
         self.quant = Decimal(10) ** -decimalPlaces
         self.setStyleSheet("QLineEdit { qproperty-frame: false }")
         
         self.editingFinished.connect(self.checkValue)
-        self.editingFinished.emit()
+        self.textEdited.connect(self.textHasChanged)
+        self.dirty = False
+        self.Time_Changed.emit(self.row)
+
+    def textHasChanged(self, value):
+        self.dirty = True
+
+    def isTextDirty(self):
+        if(self.dirty is True):
+            self.Time_Changed.emit()
+        self.dirty = False
 
     def setBackground(self, color):
         p = self.palette()
@@ -514,7 +547,9 @@ class timeInputEdit(QLineEdit):
     def checkValue(self):
         value = self.text()
         self.setText(str(Decimal(value).quantize(self.quant)))
-        self.timeChanged.emit(self.row)
+        if(self.dirty is True):
+            self.Time_Changed.emit(self.row)
+        self.dirty = False
 
 class eventSettingsEdit(QWidget):
     parameterChanged = pyqtSignal(int)
@@ -548,7 +583,7 @@ class eventSettingsEdit(QWidget):
                 layout.addWidget(param)
                 widget.addParam(param)
                 widgetDict[param.name] = param
-                param.textChanged.connect(self.settingChanged)
+                param.Value_Modified.connect(self.settingChanged)
             self.stack.addWidget(widget)
             self.stackList.append(settingsList)
             self.stackWidgetDicts.append(widgetDict)
@@ -556,7 +591,7 @@ class eventSettingsEdit(QWidget):
     def value(self):
         return self.stackList[self.index]
 
-    def settingChanged(self, value):
+    def settingChanged(self):
         self.parameterChanged.emit(self.row)
 
     def setBackground(self, color):
@@ -606,9 +641,22 @@ class sequencerEventType():
         return 0
 
 class eventParameter(QLineEdit):
+    Value_Modified = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.name = ''
+        self.editingFinished.connect(self.isTextDirty)
+        self.textEdited.connect(self.textHasChanged)
+        self.dirty = False
+
+    def textHasChanged(self, value):
+        self.dirty = True
+
+    def isTextDirty(self):
+        if(self.dirty is True):
+            self.Value_Modified.emit()
+        self.dirty = False
 
 class eventParameterDouble(eventParameter):
     def __init__(self, name, defaultVal=0, decimalPlaces=4, allowZero=True, allowNegative=True, **kwargs):
@@ -624,6 +672,7 @@ class eventParameterDouble(eventParameter):
 
         self.setText(str(defaultVal))
         self.editingFinished.emit()
+        self.dirty = False
 
     def value(self):
         if(self.text() != '' and self.text() != '-' and self.text() != '.'):
@@ -654,6 +703,7 @@ class eventParameterInt(eventParameter):
 
         self.setText(str(defaultVal))
         self.editingFinished.emit()
+        self.dirty = False
 
     def value(self):
         if(self.text() != ''):
@@ -675,6 +725,7 @@ class eventParameterString(eventParameter):
     def __init__(self, name, **kwargs):
         super().__init__()
         self.name = name
+        self.dirty = False
         
     def value(self):
         return self.text()

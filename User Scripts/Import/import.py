@@ -1,5 +1,5 @@
-from UserScript import *
-import DSUnits, DSPrefix
+from Managers.WorkspaceManager.UserScript import *
+from Managers.WorkspaceManager import DSUnits, DSPrefix
 
 class ds_user_script(UserImport):
     name = 'CSV Importer 2D'

@@ -12,6 +12,7 @@ class Instrument(QObject):
     def __init__(self, instrumentManager):
         super().__init__()
         self.instrumentManager = instrumentManager
+        self.mW = self.instrumentManager.mW
         self.name = "Default Instrument"
         self.url = None
         self.components = list()
@@ -27,7 +28,7 @@ class Instrument(QObject):
         return readyCheckPacket('Active Instrument', DSConstants.READY_CHECK_READY, subs=subs)
 
     def addComponent(self, comp):
-        newComp = type(comp)(self)
+        newComp = type(comp)(self.mW)
         newComp.Component_Modified.connect(self.Component_Modified)
         newComp.Events_Modified.connect(self.Events_Modified)
         newComp.instrumentManager = self.instrumentManager

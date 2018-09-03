@@ -8,7 +8,7 @@ from PyQt5.QtGui import *
 import os, random
 import numpy as np
 from decimal import Decimal
-from Sockets import *
+from Managers.InstrumentManager.Sockets import *
 
 class DC_Electrode(Component):
     componentType = 'DC Electrode'
@@ -26,20 +26,19 @@ class DC_Electrode(Component):
         self.compSettings['vMax'] = 10.0
         self.compSettings['granularity'] = 0.0001
         self.compSettings['showSequencer'] = True 
-        self.sequenceEvents = list()
         self.containerWidget = self.configWidgetContent()
         self.configWidget.setWidget(self.containerWidget)
-        self.socket = self.addDCSocket(self.compSettings['name'])
+        self.socket = self.addAOSocket(self.compSettings['name'])
         self.checkValidity()
         self.data = None
 
-        self.addSequencerEventType(stepEvent())
+        self.addSequencerEventType(stepEvent(self.compSettings['granularity']))
         self.addSequencerEventType(pulseEvent())
         self.addSequencerEventType(pulseTrainEvent())
         self.addSequencerEventType(linearRampEvent())
 
     def onRun(self):
-        dataPacket = DCWaveformPacket(self.data)
+        dataPacket = waveformPacket(self.data)
         self.setPathDataPacket(1, dataPacket)
         return True
 
@@ -151,9 +150,10 @@ class DC_Electrode(Component):
             self.minVBox.setStyleSheet("QDoubleSpinBox {background-color: white;}")
 
 class stepEvent(sequencerEventType):
-    def __init__(self):
+    def __init__(self, gran):
         super().__init__()
         self.name = 'Step'
+        self.gran = gran
 
     def genParameters(self):
         paramList = list()
@@ -161,7 +161,7 @@ class stepEvent(sequencerEventType):
         return paramList
 
     def getLength(self, params):
-        return 0.001
+        return self.gran
 
 class pulseEvent(sequencerEventType):
     def __init__(self):

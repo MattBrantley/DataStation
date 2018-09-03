@@ -1,6 +1,6 @@
-from Hardware_Object import Hardware_Object, hardwareWorker, hwm
+from Managers.HardwareManager.Hardware_Object import Hardware_Object, hardwareWorker, hwm
 from PyQt5.Qt import *
-from Sources import *
+from Managers.HardwareManager.Sources import *
 import os, traceback, math
 import numpy as np
 import nidaqmx.system
@@ -42,7 +42,7 @@ class Hardware_Driver(Hardware_Object):
             device = nidaqmx.system.Device(self.hardwareSettings['deviceName'])
             self.forceNoUpdatesOnSourceAdd(True) #FOR SPEED!
             for chan in device.ao_physical_chans:
-                source = DCSource(self, '['+self.hardwareSettings['deviceName']+'] '+chan.name, -10, 10, 0.1, chan.name)
+                source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] '+chan.name, -10, 10, 0.1, chan.name)
                 self.addSource(source)
             self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
         else:
@@ -61,12 +61,7 @@ class Hardware_Driver(Hardware_Object):
             else:
                 return None
             freq = 1/granularity
-            #print('STARTINGGGGGG')
-            #print(timingBounds)
-            #print(granularity)
             xAxis = np.arange(timingBounds['min'], timingBounds['max'] + granularity, granularity)
-            #print(xAxis)
-            #print(xAxis.shape)
             yAxisData = None
             for dataPacket in eventData:
                 if(dataPacket.waveformData is None):
@@ -77,12 +72,8 @@ class Hardware_Driver(Hardware_Object):
                     yAxisData = yAxis
                 else:
                     yAxisData = np.vstack((yAxisData, yAxis))
-                #xAxis = np.hstack((xAxis, yAxis))
-                #print(dataPacket.physicalConnectorID)
-                #print(dataPacket.waveformData)
             if(yAxisData is not None):
                 yAxisData = np.transpose(yAxisData)
-                #print(yAxisData.shape)
             
             dataOut = dict()
             dataOut['channelList'] = channelList
@@ -162,12 +153,10 @@ class Hardware_Driver(Hardware_Object):
 
     def onProgram(self):
         programmingData = self.parseProgramData()
-        print(programmingData)
         if(programmingData is not None):
             self.hardwareWorker.outQueues['command'].put(hwm(action='program'))
 
     def onRun(self):
-        #self.onProgram()
         self.hardwareWorker.outQueues['command'].put(hwm(action='run'))
 
 class NI_DAQmHardwareWorker(hardwareWorker):

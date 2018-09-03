@@ -2,8 +2,8 @@
 """
 A simple DC Amplifier.
 """
-from Filter import Filter
-from Sockets import *
+from Managers.InstrumentManager.Filter import Filter
+from Managers.InstrumentManager.Sockets import *
 from PyQt5.Qt import *
 from PyQt5.QtGui import *
 import numpy as np

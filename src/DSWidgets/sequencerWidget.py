@@ -12,11 +12,11 @@ class DSGraphicsLayout():
     sequenceBGColor = QColor(255, 255, 255) #Intended to be user-editable at a future date.
     sequencePLT1Color = QColor(0, 0, 0) #Intended to be user-editable at a future date. This is the programming plot
     sequencePLT2Color = QColor(255, 0, 0) #Intended to be user-editable at a future date. This is the readback plot
-    plots = list()
-    referencePlot = None
 
     def __init__(self, dockWidget):
         self.dockWidget = dockWidget
+        self.plots = list()
+        self.referencePlot = None
         self.plotLayoutWidget = DSGraphicsLayoutWidget(self)
         self.plotLayoutWidget.setBackground(self.sequenceBGColor)
 
@@ -193,6 +193,8 @@ class DSPlotItem():
         pass
 
 class sequencerDockWidget(QDockWidget):
+    Sequencer_New = pyqtSignal
+
     ITEM_GUID = Qt.UserRole
     plots = []
     plotPaddingPercent = 1
@@ -211,10 +213,10 @@ class sequencerDockWidget(QDockWidget):
         self.hide()
         self.resize(1000, 800)
         self.fileSystem = DSEditorFSModel()
-        self.fsRoot = os.path.abspath(os.path.join(os.path.join(os.path.dirname(os.path.dirname(__file__)), os.path.pardir), 'sequences'))
+        self.fsRoot = self.mW.instrumentManager.sequencesDir
+        self.fsRoot = os.path.join(self.mW.rootDir, 'sequences')
+        #self.fsRoot = os.path.abspath(os.path.join(os.path.join(os.path.dirname(os.path.dirname(__file__)), os.path.pardir), 'sequences'))
         self.fsIndex = self.fileSystem.setRootPath(self.fsRoot)  #This is a placeholder - will need updating.
-
-        self.currentSequenceURL = None
 
         self.xMin = 0
         self.xMax = 1
@@ -242,7 +244,17 @@ class sequencerDockWidget(QDockWidget):
         self.updateToolbarState()
 
         self.instrumentManager.Instrument_Modified.connect(self.redrawSequence)
+        self.instrumentManager.Sequence_Loaded.connect(self.sequenceLoaded)
+        self.instrumentManager.Sequence_Unloaded.connect(self.sequenceUnloaded)
 
+        self.redrawSequence()
+
+    def sequenceLoaded(self):
+        self.setWindowTitle('Sequencer (' + os.path.basename(self.instrumentManager.currentSequenceURL) + ')')
+        self.redrawSequence()
+
+    def sequenceUnloaded(self):
+        self.setWindowTitle('Sequencer (None)')
         self.redrawSequence()
 
     def initSequenceView(self):
@@ -252,8 +264,10 @@ class sequencerDockWidget(QDockWidget):
     def updatePlotList(self):
         if(self.isPlotListDirty()):
             self.sequenceView.clearPlots()
+            self.plots.clear()
             if(self.instrumentManager.currentInstrument is not None):
                 for component in self.instrumentManager.currentInstrument.components:
+                    print(type(component))
                     if(component.compSettings['showSequencer'] is True):
                         plotHolder = self.sequenceView.addPlot(component.compSettings['name'], component)
                         if(component.valid is True):
@@ -334,87 +348,19 @@ class sequencerDockWidget(QDockWidget):
         self.sequenceNavigator.hideColumn(2)
         self.sequenceNavigator.hideColumn(3)
 
-    def getSaveData(self):
-        saveDataPacket = dict()
-        saveDataPacket['instrument'] = self.instrumentManager.currentInstrument.name
-
-        saveData = list()
-        count = 1
-        for plot in self.plots:
-            if(plot.component.sequencerEditWidget is not None):
-                packetItem = dict()
-                packetItem['name'] = plot.component.compSettings['name']
-                packetItem['type'] = plot.component.componentType
-                packetItem['compID'] = plot.component.componentIdentifier
-                packetItem['uuid'] = plot.component.compSettings['uuid']
-                packetItem['events'] = plot.component.sequencerEditWidget.getEventsSerializable()
-                saveData.append(packetItem)
-            count = count + 1
-
-        saveDataPacket['saveData'] = saveData
-        return saveDataPacket
-
-    def save(self):
-        if(self.currentSequenceURL is None):
-            self.saveAs()
-            return
-
-        fileName = os.path.basename(self.currentSequenceURL)
-        if(os.path.exists(os.path.join(self.fsRoot, self.instrumentManager.currentInstrument.name)) is False):
-            os.mkdir(os.path.join(self.fsRoot, self.instrumentManager.currentInstrument.name))
-        saveURL = os.path.join(os.path.join(self.fsRoot, self.instrumentManager.currentInstrument.name), fileName)
-
-        #saveURL = self.currentSequenceURL
-        saveData = self.getSaveData()
-        self.mW.postLog('Saving Sequence (' + saveURL + ')... ', DSConstants.LOG_PRIORITY_HIGH)
-        if(os.path.exists(saveURL)):
-            os.remove(saveURL)
-        with open(saveURL, 'w') as file:
-            json.dump(saveData, file, sort_keys=True, indent=4)
-        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
-
-    def saveAs(self):
-        fname, ok = QInputDialog.getText(self.mW, "Sequence Name", "Sequence Name")
-        if(os.path.exists(os.path.join(self.fsRoot, self.instrumentManager.currentInstrument.name)) is False):
-            os.mkdir(os.path.join(self.fsRoot, self.instrumentManager.currentInstrument.name))
-        saveURL = os.path.join(os.path.join(self.fsRoot, self.instrumentManager.currentInstrument.name), fname + '.dssequence')
-        if(ok):
-            pass
-            #self.instrumentManager.currentInstrument.name = fname
-        else:
-            return
-
-        if(os.path.exists(saveURL)):
-            reply = QMessageBox.question(self.mW, 'File Warning!', 'File exists - overwrite?', QMessageBox.Yes, QMessageBox.No)
-            if(reply == QMessageBox.No):
-                return
-
-        saveData = self.getSaveData()
-        self.mW.postLog('Saving Sequence (' + saveURL + ')... ', DSConstants.LOG_PRIORITY_HIGH)
-        if(os.path.exists(saveURL)):
-            os.remove(saveURL)
-        with open(saveURL, 'w') as file:
-            json.dump(saveData, file, sort_keys=True, indent=4)
-        self.currentSequenceURL = saveURL
-        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
-
-    def new(self):
-        result = DSNewFileDialog.newFile()
-        print(result)
-
     def initActions(self):
         self.newAction = QAction('New', self)
         self.newAction.setShortcut('Ctrl+N')
         self.newAction.setStatusTip('New')
-        self.newAction.triggered.connect(self.new)
+        self.newAction.triggered.connect(self.instrumentManager.newSequence)
 
         self.saveAction = QAction('Save', self)
         self.saveAction.setStatusTip('Save')
-        self.saveAction.triggered.connect(self.save)
+        self.saveAction.triggered.connect(self.instrumentManager.saveSequence)
 
         self.saveAsAction = QAction('Save As', self)
         self.saveAsAction.setStatusTip('Save As')
-        self.saveAsAction.triggered.connect(self.saveAs)
+        self.saveAsAction.triggered.connect(self.instrumentManager.saveSequenceAs)
 
         self.toggleTree = QToolButton(self)
         self.toggleTree.setIcon(QIcon(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'icons3\css.png')))
@@ -437,59 +383,7 @@ class sequencerDockWidget(QDockWidget):
             self.openSequence(filePath)
 
     def openSequence(self, filePath):
-        if(self.instrumentManager.currentInstrument is None):
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Critical)
-            msg.setText("No instrument is loaded - cannot load sequence!")
-            msg.setWindowTitle("Sequence/Instrument Compatibability Error")
-            msg.setStandardButtons(QMessageBox.Ok)
-
-            retval = msg.exec_()
-            return
-
-        self.mW.postLog('Loading Sequence (' + filePath + ')... ', DSConstants.LOG_PRIORITY_HIGH)
-        if(os.path.isfile(filePath) is True):
-            with open(filePath, 'r') as file:
-                try:
-                    sequenceData = json.load(file)
-                    if(self.processSequenceData(sequenceData) is False):
-                        self.mW.postLog('Sequence at (' + filePath + ') not loaded - aborting! ', DSConstants.LOG_PRIORITY_HIGH)
-                    else:
-                        self.currentSequenceURL = filePath
-                except ValueError as e:
-                    self.mW.postLog('Corrupted sequence at (' + filePath + ') - aborting! ', DSConstants.LOG_PRIORITY_HIGH)
-                    return
-        if(self.currentSequenceURL is not None):
-            self.setWindowTitle('Sequencer (' + os.path.basename(self.currentSequenceURL) + ')')
-        else:
-            self.setWindowTitle('Sequencer (None)')
-        self.mW.workspaceManager.userProfile['sequenceURL'] = filePath
-        self.mW.postLog('Finished Loading Sequence!', DSConstants.LOG_PRIORITY_HIGH)
-
-    def processSequenceData(self, data):
-        instrument = data['instrument']
-        self.instrumentManager.currentInstrument.clearSequenceEvents()
-        if(instrument != self.instrumentManager.currentInstrument.name):
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Warning)
-            msg.setText("The sequence is for a different instrument (" + instrument + ") than what is currently loaded (" + self.instrumentManager.currentInstrument.name + "). It is unlikely this sequence will load.. Continue?")
-            msg.setWindowTitle("Sequence/Instrument Compatibability Warning")
-            msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-
-            retval = msg.exec_()
-            if(retval == QMessageBox.No):
-                return False
-
-        dataSet = data['saveData']
-        for datum in dataSet:
-            comp = self.instrumentManager.currentInstrument.getComponentByUUID(datum['uuid'])
-            if(comp is None):
-                self.mW.postLog('Sequence data for comp with uuid (' + datum['uuid'] + ') cannot be assigned! Possibly from different instrument.', DSConstants.LOG_PRIORITY_HIGH)
-            else:
-                comp.loadSequenceData(datum['events'])
-        
-        self.redrawSequence()
-        return True
+        self.instrumentManager.openSequence(filePath)
 
     def updateToolbarState(self):
         self.saveAction.setEnabled(True)

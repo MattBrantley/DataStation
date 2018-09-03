@@ -3,7 +3,7 @@
 Takes a 2-dimensional matrix of size [m, n] and returns a cropped Matrix.
 """
 
-from UserScript import *
+from Managers.WorkspaceManager.UserScript import *
 import numpy as np
 
 class ds_user_script(UserOperation):

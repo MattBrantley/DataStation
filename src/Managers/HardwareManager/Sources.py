@@ -3,7 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import os, sys, imp, math
 from Constants import DSConstants as DSConstants
-from Sockets import *
+from Managers.InstrumentManager.Sockets import *
 import uuid
 from DSWidgets.controlWidget import readyCheckPacket
 import numpy as np
@@ -139,7 +139,7 @@ class Source():
     def reprogram(self):
         self.hardware.program()
 
-class DCSource(Source):
+class AISource(Source):
     def __init__(self, hardware, name, vMin, vMax, prec, physConID):
         super().__init__(hardware)
         self.hardware = hardware
@@ -153,15 +153,64 @@ class DCSource(Source):
         self.physicalConnectorID = physConID
 
     def parsePacket(self, packetIn):
-        if(isinstance(packetIn, DCWaveformPacket) is False):
-            return readyCheckPacket('DC Source', DSConstants.READY_CHECK_ERROR, msg='DC Source Recieved Unknown Packet Type!')
+        if(isinstance(packetIn, waveformPacket) is False):
+            return readyCheckPacket('Analog Input Source', DSConstants.READY_CHECK_ERROR, msg='Analog Input Source Recieved Unknown Packet Type!')
         
         if(self.packetInSourceRange(packetIn) is False):
-            return readyCheckPacket('DC Source', DSConstants.READY_CHECK_ERROR, msg='DC Waveform Out Of Range!')
+            return readyCheckPacket('Analog Input Source', DSConstants.READY_CHECK_ERROR, msg='Analog Input Source Waveform Out Of Range!')
 
         self.programData = packetIn
         self.programData.physicalConnectorID = self.physicalConnectorID
-        return readyCheckPacket('DC Source', DSConstants.READY_CHECK_READY)
+        return readyCheckPacket('Analog Input Source', DSConstants.READY_CHECK_READY)
+
+    def onSave(self):
+        savePacket = dict()
+        savePacket['name'] = self.name
+        savePacket['uuid'] = self.uuid
+        savePacket['vMin'] = self.vMin
+        savePacket['vMax'] = self.vMax
+        savePacket['prec'] = self.prec
+        savePacket['physConID'] = self.physicalConnectorID
+        savePacket['paths'] = self.savePaths()
+
+        return savePacket
+
+    def onLoad(self, loadPacket):
+        self.loadPacket = loadPacket
+        if('uuid' in loadPacket):
+            self.uuid = loadPacket['uuid']
+        if('physConID' in loadPacket):
+            self.physicalConnectorID = loadPacket['physConID']
+
+        if('paths' in loadPacket):
+            for path in loadPacket['paths']:
+                if('pathNo' in path and 'data' in path):
+                    if(path['data'] is not None and path['pathNo'] is not None):
+                        self.paths[path['pathNo']-1] = self.hardware.hardwareManager.loadFilterFromData(self, path['data'], path['pathNo'])
+
+class AOSource(Source):
+    def __init__(self, hardware, name, vMin, vMax, prec, physConID):
+        super().__init__(hardware)
+        self.hardware = hardware
+        self.name = name
+        self.vMin = vMin
+        self.vMax = vMax
+        self.prec = prec
+        self.paths.clear()
+        self.paths.append(None)
+        self.loadPacket = None
+        self.physicalConnectorID = physConID
+
+    def parsePacket(self, packetIn):
+        if(isinstance(packetIn, waveformPacket) is False):
+            return readyCheckPacket('Analog Output Source', DSConstants.READY_CHECK_ERROR, msg='Analog Output Source Recieved Unknown Packet Type!')
+        
+        if(self.packetInSourceRange(packetIn) is False):
+            return readyCheckPacket('Analog Output Source', DSConstants.READY_CHECK_ERROR, msg='Analog Output Source Waveform Out Of Range!')
+
+        self.programData = packetIn
+        self.programData.physicalConnectorID = self.physicalConnectorID
+        return readyCheckPacket('Analog Output Source', DSConstants.READY_CHECK_READY)
             
     def packetInSourceRange(self, packetIn):
         if(packetIn.waveformData is None):

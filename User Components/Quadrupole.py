@@ -2,7 +2,7 @@
 """
 A quadrupole ion guide
 """
-from Component import Component
+from Managers.InstrumentManager.Component import Component
 import os, uuid
 
 class Quadrupole(Component):

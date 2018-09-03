@@ -5,7 +5,7 @@ starting components of 1D arrays m). Returns the classical least squares
 solution matrix of size [i, n].
 """
 
-from UserScript import *
+from Managers.WorkspaceManager.UserScript import *
 import numpy as np
 #import vuvdeconvolution as vuv
 

@@ -2,15 +2,16 @@ from PyQt5.Qt import *
 import os, uuid, time, sys
 from multiprocessing import Process, Queue, Pipe
 from Constants import DSConstants as DSConstants
-from Sources import *
+from Managers.HardwareManager.Sources import *
 import numpy as np
 from DSWidgets.controlWidget import readyCheckPacket
 
 # This is so that pickle can pull the correct class
-sys.path.append(str(os.path.dirname(os.path.dirname(__file__))) + '\\Hardware Drivers\\')
+sys.path.append(str(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))) + '\\Hardware Drivers\\')
 
 class Hardware_Object(QObject):
     Config_Modified = pyqtSignal(object)
+    Reprogrammed = pyqtSignal(object)
 
     hardwareType = 'Default Hardware Object'
     hardwareIdentifier = 'DefHardObj'
@@ -153,6 +154,11 @@ class Hardware_Object(QObject):
 
     def onProgramParent(self):
         self.onProgram()
+        import traceback
+        traceback.print_stack()
+        #print(programmingData)
+        print('Reprogrammed.emit(self)')
+        self.Reprogrammed.emit(self)
 
     def getEvents(self):
         programDataList = list()

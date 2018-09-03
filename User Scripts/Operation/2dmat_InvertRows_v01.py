@@ -4,7 +4,7 @@ Takes a 2-dimensional matrix of size [m, n] and returns a matrix with the
 row orders inverted.
 """
 
-from UserScript import *
+from Managers.WorkspaceManager.UserScript import *
 import numpy as np
 
 

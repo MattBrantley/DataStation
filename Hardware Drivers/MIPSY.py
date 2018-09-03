@@ -1,6 +1,6 @@
-from Hardware_Object import Hardware_Object, hardwareWorker, hwm
+from Managers.HardwareManager.Hardware_Object import Hardware_Object, hardwareWorker, hwm
 from PyQt5.Qt import *
-from Sources import *
+from Managers.HardwareManager.Sources import *
 import os, traceback, sys, glob, serial, re
 import numpy as np
 import nidaqmx.system
@@ -110,7 +110,7 @@ class Hardware_Driver(Hardware_Object):
                     minTemp = self.MIPSYResponseToFloat(ser.readline())
                     ser.write(b'GDCMAX,' + chOut.encode('ascii') + b'\r\n')
                     maxTemp = self.MIPSYResponseToFloat(ser.readline())
-                    source = DCSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, minTemp, maxTemp, 0.1, chOut)
+                    source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, minTemp, maxTemp, 0.1, chOut)
                     self.addSource(source)
 
                 self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!

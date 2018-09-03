@@ -3,7 +3,7 @@
 Takes a 2-dimensional matrix of size [m, n] and deconvolutes it.
 """
 
-from UserScript import *
+from Managers.WorkspaceManager.UserScript import *
 import numpy as np
 #import vuvdeconvolution as vuv
 import tkinter

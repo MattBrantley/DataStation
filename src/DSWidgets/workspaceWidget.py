@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from xml.dom.minidom import *
 from xml.etree.ElementTree import *
-from UserScript import *
+from Managers.WorkspaceManager.UserScript import *
 
 class workspaceTreeDockWidget(QDockWidget):
 

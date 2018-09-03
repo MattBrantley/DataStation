@@ -9,7 +9,7 @@ Returns a matrices of size [m, i] of the suspected components
 along the m axis.
 """
 
-from UserScript import *
+from Managers.WorkspaceManager.UserScript import *
 import numpy as np
 #import vuvdeconvolution as vuv
 

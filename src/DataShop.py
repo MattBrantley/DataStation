@@ -22,6 +22,11 @@ from Constants import DSConstants as DSConstants
 # proctitle - pip install setproctitle -- NOT USED?
 # pyserial - pip install pyserial
 
+
+
+        #import traceback
+        #traceback.print_stack()
+
 def warn(*args, **kwargs):
     pass
 import warnings
@@ -56,6 +61,7 @@ class mainWindow(QMainWindow):
     logDetail = DSConstants.LOG_PRIORITY_MED
     DataStation_Loaded = pyqtSignal()
     DataStation_Closing = pyqtSignal()
+    DataStation_Closing_Final = pyqtSignal()
 
     def __init__(self, app):
         super().__init__()
@@ -90,6 +96,7 @@ class mainWindow(QMainWindow):
     def initManagers(self):
         self.workspaceManager = WorkspaceManager(self)
         self.instrumentManager = InstrumentManager(self)
+        self.instrumentManager.loadComponents()
         self.hardwareManager = HardwareManager(self)
         #self.DSInstrumentManager = InstrumentManager(self)
 
@@ -338,6 +345,7 @@ class mainWindow(QMainWindow):
         self.postLog('Shutting down Datastation!', DSConstants.LOG_PRIORITY_HIGH)
         print('DataStation_Closing.emit()')
         self.DataStation_Closing.emit()
+        self.DataStation_Closing_Final.emit()
 
     def updateUserProfile(self):
         self.updateWindowStates()

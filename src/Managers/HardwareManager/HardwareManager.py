@@ -1,10 +1,10 @@
 import os, sys, imp
-from Instrument import *
+from Managers.InstrumentManager.Instrument import *
+from Managers.InstrumentManager.Filter import Filter
+from Managers.InstrumentManager.Sockets import *
+from Managers.HardwareManager.Hardware_Object import Hardware_Object
+from Managers.HardwareManager.Sources import *
 from Constants import DSConstants as DSConstants
-from Filter import Filter
-from Hardware_Object import Hardware_Object
-from Sources import *
-from Sockets import *
 import json as json
 from DSWidgets.controlWidget import readyCheckPacket
 
@@ -200,7 +200,7 @@ class HardwareManager(QObject):
             self.mW.postLog('No Hardware State Found - Aborting!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     def processHardwareData(self, hardwareData):
-        if('hardwareStates' in hardwareData):
+        if(hardwareData is not None and 'hardwareStates' in hardwareData):
             for state in hardwareData['hardwareStates']:
                 if(('hardwareIdentifier') in state):
                     hardwareModel = self.findHardwareModelByIdentifier(state['hardwareIdentifier'])

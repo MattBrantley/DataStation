@@ -3,9 +3,9 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import os, sys, imp, math, copy
 from Constants import DSConstants as DSConstants
-from Filter import Filter
-from Sources import Source
-from Sockets import Socket
+from Managers.InstrumentManager.Filter import Filter
+from Managers.InstrumentManager.Sockets import Socket
+from Managers.HardwareManager.Sources import Source
 
 class filterStackWidget(QDockWidget):
     doNotAutoPopulate = True

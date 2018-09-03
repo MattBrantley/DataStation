@@ -68,7 +68,7 @@ class WorkspaceManager():
         self.initInstrumentManager()
         self.initHardwareManager()
 
-        self.mW.DataStation_Closing.connect(self.updateSettings)
+        self.mW.DataStation_Closing_Final.connect(self.updateSettings)
 
     def connectWidgets(self):
         self.userScriptController.connectWidgets()

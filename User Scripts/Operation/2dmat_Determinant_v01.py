@@ -3,7 +3,7 @@
 Takes a 2-dimensional, square matrix [m, m] and returns the determinant.
 """
 
-from UserScript import *
+from Managers.WorkspaceManager.UserScript import *
 import numpy as np
 
 

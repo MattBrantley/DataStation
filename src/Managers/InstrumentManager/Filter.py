@@ -2,7 +2,7 @@ from PyQt5.Qt import *
 import os, uuid
 from Constants import DSConstants as DSConstants
 import numpy as np
-from Sockets import *
+from Managers.InstrumentManager.Sockets import *
 from DSWidgets.controlWidget import readyCheckPacket
 
 class Filter():

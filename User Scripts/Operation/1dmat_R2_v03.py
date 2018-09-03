@@ -3,7 +3,7 @@
 Takes two 1-dimensional matrices, compares them, and returns the R2 value.
 """
 
-from UserScript import *
+from Managers.WorkspaceManager.UserScript import *
 import numpy as np
 #import vectorutils
 

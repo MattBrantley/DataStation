@@ -4,7 +4,7 @@ Takes matrices of the same size and shape and multiplies the individual
 elements.
 """
 
-from UserScript import *
+from Managers.WorkspaceManager.UserScript import *
 import numpy as np
 
 

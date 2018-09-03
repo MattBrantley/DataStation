@@ -1,4 +1,4 @@
-from UserScript import UserDisplay
+from Managers.WorkspaceManager.UserScript import UserDisplay
 
 class ds_user_script(UserDisplay):
     name = 'userDisplay Copy'

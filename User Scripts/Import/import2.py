@@ -1,4 +1,4 @@
-from UserScript import *
+from Managers.WorkspaceManager.UserScript import *
 
 class ds_user_script(UserImport):
     name = 'CSV Importer Fails'

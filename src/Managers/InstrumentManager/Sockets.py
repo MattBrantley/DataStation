@@ -116,17 +116,17 @@ class Socket():
                     self.filterInputPathNo = None
                     self.filterInputSource = None
 
-class DCSocket(Socket):
+class AOSocket(Socket):
     def __init__(self, component, name, vMin, vMax, prec):
         super().__init__(component)
         self.instrumentManager = self.component.instrumentManager
-        self.name = name
+        self.name = name + ' [AO]'
         self.vMin = vMin
         self.vMax = vMax
         self.prec = prec
         self.paths.clear()
 
-    def onSave(self):
+    def onSaveChild(self):
         savePacket = dict()
         savePacket['name'] = self.name
         savePacket['uuid'] = self.uuid
@@ -156,12 +156,51 @@ class DCSocket(Socket):
             if('prec' in loadPacket):
                 self.prec = loadPacket['prec']
 
-class DCWaveformPacket():
+class AISocket(Socket):
+    def __init__(self, component, name, vMin, vMax, prec):
+        super().__init__(component)
+        self.instrumentManager = self.component.instrumentManager
+        self.name = name + ' [AI]'
+        self.vMin = vMin
+        self.vMax = vMax
+        self.prec = prec
+        self.paths.clear()
+
+    def onSaveChild(self):
+        savePacket = dict()
+        savePacket['name'] = self.name
+        savePacket['uuid'] = self.uuid
+        savePacket['vMin'] = self.vMin
+        savePacket['vMax'] = self.vMax
+        savePacket['prec'] = self.prec
+        if(self.filterInputSource is not None):
+            savePacket['filterInputSource'] = self.filterInputSource.uuid
+            savePacket['filterInputPathNo'] = self.filterInputPathNo
+        else:
+            savePacket['filterInputSource'] = None
+            savePacket['filterInputPathNo'] = None
+
+        return savePacket
+
+    def onLoad(self, loadPacket):
+        if(isinstance(loadPacket, dict)):
+            self.loadPacket = loadPacket
+            if('name' in loadPacket):
+                self.name = loadPacket['name']
+            if('uuid' in loadPacket):
+                self.uuid = loadPacket['uuid']
+            if('vMin' in loadPacket):
+                self.vMin = loadPacket['vMin']
+            if('vMax' in loadPacket):
+                self.vMax = loadPacket['vMax']
+            if('prec' in loadPacket):
+                self.prec = loadPacket['prec']
+
+
+class waveformPacket():
     def __init__(self, waveformData):
         self.waveformData = waveformData
         self.physicalConnectorID = ''
 
-class DIOWaveformPacket():
-    def __init__(self, waveformData):
         self.waveformData = waveformData
         self.physicalConnectorID = ''

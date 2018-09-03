@@ -3,7 +3,7 @@
 Takes matrices of the same size and shape and subtracts them.
 """
 
-from UserScript import *
+from Managers.WorkspaceManager.UserScript import *
 import numpy as np
 
 

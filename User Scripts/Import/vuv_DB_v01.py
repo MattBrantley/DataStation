@@ -6,7 +6,7 @@ points, the wavelength points, and the data matrix that corresponds to the
 time points and wavelength points.
 '''
 
-from UserScript import *
+from Managers.WorkspaceManager.UserScript import *
 #import vuvdeconvolution as vuv
 
 class ds_user_script(UserImport):

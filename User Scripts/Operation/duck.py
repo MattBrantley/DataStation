@@ -3,7 +3,7 @@
 Duck.
 """
 
-from UserScript import *
+from Managers.WorkspaceManager.UserScript import *
 import matplotlib.pyplot as quackquack
 import matplotlib as ducker
 import os as quack

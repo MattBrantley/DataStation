@@ -5,7 +5,7 @@ Takes a 2-dimensional matrices of size [m, n] (data) and a i number of
 solution matrices of sizes [i, n] and [i, m].
 """
 
-from UserScript import *
+from Managers.WorkspaceManager.UserScript import *
 import numpy as np
 #import vuvdeconvolution as vuv
 

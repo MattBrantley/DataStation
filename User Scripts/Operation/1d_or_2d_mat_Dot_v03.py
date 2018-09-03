@@ -3,7 +3,7 @@
 Takes matrices of sizes [m,n] and [n,m] and returns the dot product.
 """
 
-from UserScript import *
+from Managers.WorkspaceManager.UserScript import *
 import numpy as np
 
 
