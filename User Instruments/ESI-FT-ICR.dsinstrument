@@ -72,28 +72,12 @@
             "compType": "Circular Lens",
             "iViewSettings": {
                 "r": 180,
-                "x": 1746.0,
+                "x": 1743.0,
                 "y": 1164.0
             },
             "sockets": [
                 null
             ]
-        },
-        {
-            "compIdentifier": "excPlates_mrb",
-            "compSettings": {
-                "layoutGraphicSrc": "Excitation_Plates.png",
-                "name": "",
-                "showSequencer": false,
-                "uuid": "cfb53529-bc5d-4dea-b58c-b54c2840ef47"
-            },
-            "compType": "Excitation Plates",
-            "iViewSettings": {
-                "r": 180,
-                "x": 1295.0,
-                "y": 1162.0
-            },
-            "sockets": []
         },
         {
             "compIdentifier": "quad_mrb",
@@ -191,18 +175,36 @@
             ]
         },
         {
+            "compIdentifier": "excPlates_mrb",
+            "compSettings": {
+                "layoutGraphicSrc": "Excitation_Plates.png",
+                "name": "Unnamed Excitation Plates",
+                "showSequencer": true,
+                "uuid": "e0e20b6d-a46d-4604-aa8b-6b935fda5d6c"
+            },
+            "compType": "Excitation Plates",
+            "iViewSettings": {
+                "r": 180,
+                "x": 1294.0,
+                "y": 1162.0
+            },
+            "sockets": [
+                null
+            ]
+        },
+        {
             "compIdentifier": "detecPlates_mrb",
             "compSettings": {
                 "layoutGraphicSrc": "Detection_Plates.png",
                 "name": "Unnamed Detection Plates",
                 "showSequencer": true,
-                "uuid": "64cd7763-0086-4fb8-82cb-6f3c78259eb6"
+                "uuid": "830b7018-ff0d-4cdc-a307-6cac50961a72"
             },
             "compType": "Detection Plates",
             "iViewSettings": {
                 "r": 180,
-                "x": 1294.0,
-                "y": 1037.0
+                "x": 1299.0,
+                "y": 1043.0
             },
             "sockets": [
                 null

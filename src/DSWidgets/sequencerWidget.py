@@ -167,7 +167,7 @@ class DSPlotItem():
             self.plotItem.showAxis('bottom', False)
             self.plotItem.showLabel('bottom', False)
         self.plotItem.setLabel('left', self.name)
-        self.plotItem.setDownsampling(ds=True, auto=True, mode='peak')
+        self.plotItem.setDownsampling(ds=True, auto=True, mode='peak') #mode='peak' produces strange results with large gaps in data
         #self.plotItem.setClipToView(True)
         axis = self.plotItem.getAxis('bottom')
         
@@ -175,12 +175,18 @@ class DSPlotItem():
         #print('START')
         #print(data)
         if(data[:,0].min() > xMin):
-            #minStump = [xMin, data[data[:,0].argmin(), 1]]
-            minStump = [xMin, data[0, 1]]
+            dataStart = data[:,0].min()
+            gapX = np.arange(xMin, dataStart, 0.001)
+            gapY = np.add(np.zeros(len(gapX)), data[0, 1])
+            minStump = np.vstack((gapX, gapY)).transpose()
+            #minStump = [xMin, data[0, 1]]
             data = np.vstack((minStump, data))
         if(data[:,0].max() < xMax):
-            #maxStump = [xMax, data[data[:,0].argmax(), 1]]
-            maxStump = [xMax, data[-1, 1]]
+            dataEnd = data[:,0].max()
+            gapX = np.arange(dataEnd, xMax, 0.001)
+            gapY = np.add(np.zeros(len(gapX)), data[-1, 1])
+            maxStump = np.vstack((gapX, gapY)).transpose()
+            #maxStump = [xMax, data[-1, 1]]
             data = np.vstack((data, maxStump))
         #print('RESULT')
         #print(data)

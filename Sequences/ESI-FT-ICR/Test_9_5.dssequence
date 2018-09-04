@@ -36,11 +36,71 @@
                     },
                     "time": 0.0,
                     "type": "Linear Ramp"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 4.0,
+                    "type": "Step"
+                },
+                {
+                    "settings": {
+                        "Voltage": 0.0
+                    },
+                    "time": 5.0001,
+                    "type": "Step"
                 }
             ],
             "name": "Q1/Q2 Lens",
             "type": "Circular Lens",
             "uuid": "a7dc6306-5af2-4dc3-805e-5f49ea67bd95"
+        },
+        {
+            "compID": "excPlates_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Amplitude": 50.0,
+                        "Duration": 0.5,
+                        "End": 10000.0,
+                        "Rate": 100000.0,
+                        "Start": 1000.0
+                    },
+                    "time": 0.0,
+                    "type": "Chirp"
+                },
+                {
+                    "settings": {
+                        "Amplitude": 20.0,
+                        "Duration": 0.5,
+                        "End": 10000.0,
+                        "Rate": 100000.0,
+                        "Start": 1000.0
+                    },
+                    "time": 1.5,
+                    "type": "Chirp"
+                }
+            ],
+            "name": "Unnamed Excitation Plates",
+            "type": "Excitation Plates",
+            "uuid": "e0e20b6d-a46d-4604-aa8b-6b935fda5d6c"
+        },
+        {
+            "compID": "detecPlates_mrb",
+            "events": [
+                {
+                    "settings": {
+                        "Duration": 0.5,
+                        "Rate": 10000.0
+                    },
+                    "time": 9.0,
+                    "type": "Timed Collection"
+                }
+            ],
+            "name": "Unnamed Detection Plates",
+            "type": "Detection Plates",
+            "uuid": "830b7018-ff0d-4cdc-a307-6cac50961a72"
         }
     ]
 }
