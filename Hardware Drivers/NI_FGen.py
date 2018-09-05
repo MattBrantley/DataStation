@@ -6,7 +6,6 @@ import numpy as np
 import nidaqmx.system
 import nifgen
 from nifgen import Session
-import pyvisa
 from multiprocessing import Process, Queue, Pipe
 
 class Hardware_Driver(Hardware_Object):
@@ -45,11 +44,11 @@ class Hardware_Driver(Hardware_Object):
 
             self.forceNoUpdatesOnSourceAdd(True) #FOR SPEED!
             print(self.hardwareSettings['deviceName'])
-            with nifgen.Session(self.hardwareSettings['deviceName']) as session:
-                for i in range(0, session.channel_count):
-                    source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] Output '+str(i), -10, 10, 0.1, 'Output '+str(i))
-                    self.addSource(source)
-            self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
+        #    with nifgen.Session(self.hardwareSettings['deviceName']) as session:
+        #        for i in range(0, session.channel_count):
+        #            source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] Output '+str(i), -10, 10, 0.1, 'Output '+str(i))
+        #            self.addSource(source)
+        #    self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
         else:
             print('Config_Modified.emit()')
             self.Config_Modified.emit(self)

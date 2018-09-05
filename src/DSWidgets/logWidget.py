@@ -8,11 +8,13 @@ class logDockWidget(QDockWidget):
         super().__init__('Log')
         self.logTextEdit = QPlainTextEdit()
         self.resize(600, 200)
-
+        #self.setFeatures(QtGui.QDockWidget.DockWidgetFloatable | QtGui.QDockWidget.DockWidgetMovable)
         #self.hide()
         self.setWidget(self.logTextEdit)
         self.mW = mW
         self.logTextEdit.setReadOnly(True)
+        self.logTextEdit.setWordWrapMode(QTextOption.NoWrap)
+        #self.logTextEdit.setCenterOnScroll(True)
 
         font = QFont()
         font.setFamily('Courier')

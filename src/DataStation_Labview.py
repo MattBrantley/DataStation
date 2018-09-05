@@ -1,8 +1,10 @@
 from ctypes import *
+import os
 
 class DataStation_LabviewExtension():
-    def __init__(self):
-        self.DataStation_Labview = cdll.LoadLibrary("inc\DataStation_Labview.dll")
+    def __init__(self, mW):
+        self.mW = mW
+        self.DataStation_Labview = cdll.LoadLibrary(os.path.join(self.mW.rootDir, "inc\DataStation_Labview.dll"))
 
         self.dllGetDeviceCount = self.DataStation_Labview.GetDeviceCount
         self.dllGetDeviceCount.argtypes = [c_char_p]

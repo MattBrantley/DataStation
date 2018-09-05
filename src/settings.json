@@ -1,0 +1,1168 @@
+{
+    "Default Importers": {
+        ".CSV": "CSV Importer 2D",
+        ".DB": "VUV .db Importer",
+        ".SOMETHINGELSE": "CSV Importer 2D",
+        ".THING": "CSV Importer Fails"
+    },
+    "hardwareState": {
+        "hardwareStates": [
+            {
+                "hardwareIdentifier": "MIPSY_MRB",
+                "hardwareSettings": {
+                    "deviceName": "COM14",
+                    "name": "COM14",
+                    "physID": "",
+                    "tableClockIndex": 0,
+                    "uuid": "baaa4f3d-f5f3-408a-a76c-26216da743d0"
+                },
+                "hardwareType": "MIPSY",
+                "sourceList": [
+                    {
+                        "name": "[COM14] COM14/CH1",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "1",
+                        "prec": 0.1,
+                        "uuid": "17009b50-ac16-4730-b736-02404a6071ed",
+                        "vMax": 250.0,
+                        "vMin": -250.0
+                    },
+                    {
+                        "name": "[COM14] COM14/CH2",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "2",
+                        "prec": 0.1,
+                        "uuid": "bdc05256-c3ad-4459-adec-1537be9effa7",
+                        "vMax": 250.0,
+                        "vMin": -250.0
+                    },
+                    {
+                        "name": "[COM14] COM14/CH3",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "3",
+                        "prec": 0.1,
+                        "uuid": "8fb22317-7673-4092-83f7-138fd2fe7214",
+                        "vMax": 250.0,
+                        "vMin": -250.0
+                    },
+                    {
+                        "name": "[COM14] COM14/CH4",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "4",
+                        "prec": 0.1,
+                        "uuid": "051f4b7f-815f-437e-8815-e48992e016f3",
+                        "vMax": 250.0,
+                        "vMin": -250.0
+                    },
+                    {
+                        "name": "[COM14] COM14/CH5",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "5",
+                        "prec": 0.1,
+                        "uuid": "852a2bf8-6ec2-47b9-ad9f-33000b499ea2",
+                        "vMax": 250.0,
+                        "vMin": -250.0
+                    },
+                    {
+                        "name": "[COM14] COM14/CH6",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "6",
+                        "prec": 0.1,
+                        "uuid": "a4005cac-e976-4a18-8997-89aad6c02891",
+                        "vMax": 250.0,
+                        "vMin": -250.0
+                    },
+                    {
+                        "name": "[COM14] COM14/CH7",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "7",
+                        "prec": 0.1,
+                        "uuid": "61bc806c-8cb3-4baf-8413-66d6a77a79b4",
+                        "vMax": 250.0,
+                        "vMin": -250.0
+                    },
+                    {
+                        "name": "[COM14] COM14/CH8",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "8",
+                        "prec": 0.1,
+                        "uuid": "fb533143-f954-4387-9f5a-f9a242efbf9a",
+                        "vMax": 250.0,
+                        "vMin": -250.0
+                    },
+                    {
+                        "name": "[COM14] COM14/CH9",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "9",
+                        "prec": 0.1,
+                        "uuid": "a20016aa-19d7-47f1-9573-910684ca14e2",
+                        "vMax": 50.0,
+                        "vMin": -50.0
+                    },
+                    {
+                        "name": "[COM14] COM14/CH10",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "10",
+                        "prec": 0.1,
+                        "uuid": "04364485-d43e-4959-9cff-8940bd3c704a",
+                        "vMax": 50.0,
+                        "vMin": -50.0
+                    },
+                    {
+                        "name": "[COM14] COM14/CH11",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "11",
+                        "prec": 0.1,
+                        "uuid": "dcdc20b9-4f4a-46a1-a674-a7dcd6343f5c",
+                        "vMax": 50.0,
+                        "vMin": -50.0
+                    },
+                    {
+                        "name": "[COM14] COM14/CH12",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "12",
+                        "prec": 0.1,
+                        "uuid": "c25ec0a5-0bbe-4e88-becf-dac58ad689a7",
+                        "vMax": 50.0,
+                        "vMin": -50.0
+                    },
+                    {
+                        "name": "[COM14] COM14/CH13",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "13",
+                        "prec": 0.1,
+                        "uuid": "ec651836-46bd-45a6-8b57-2171a2bd77cd",
+                        "vMax": 50.0,
+                        "vMin": -50.0
+                    },
+                    {
+                        "name": "[COM14] COM14/CH14",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "14",
+                        "prec": 0.1,
+                        "uuid": "7ee42840-80a3-4530-9836-c2d6ef2d136c",
+                        "vMax": 50.0,
+                        "vMin": -50.0
+                    },
+                    {
+                        "name": "[COM14] COM14/CH15",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "15",
+                        "prec": 0.1,
+                        "uuid": "faf94bb7-bc9b-47bd-bbd0-45a835a761fc",
+                        "vMax": 50.0,
+                        "vMin": -50.0
+                    },
+                    {
+                        "name": "[COM14] COM14/CH16",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "16",
+                        "prec": 0.1,
+                        "uuid": "f1839b1c-feaa-4883-8f45-3c991c0137d1",
+                        "vMax": 50.0,
+                        "vMin": -50.0
+                    }
+                ]
+            },
+            {
+                "hardwareIdentifier": "NI_DAQmx_MRB",
+                "hardwareSettings": {
+                    "deviceName": "AO-DAQ",
+                    "name": "AO-DAQ",
+                    "physID": "",
+                    "uuid": "d8cc9c93-ab87-43de-9dff-34a85fe6c1d7"
+                },
+                "hardwareType": "NI_DAQmx",
+                "sourceList": [
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao0",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao0",
+                        "prec": 0.1,
+                        "uuid": "e61e1e15-49da-499a-979b-dbbe8c786897",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao1",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao1",
+                        "prec": 0.1,
+                        "uuid": "a7d3f33a-5bf4-499e-966f-92ac9e08acaf",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao2",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao2",
+                        "prec": 0.1,
+                        "uuid": "1a559a3b-99d1-439b-9e8b-0650dc1164dd",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao3",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao3",
+                        "prec": 0.1,
+                        "uuid": "0e2925e7-0395-429a-aff6-af45253412ec",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao4",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao4",
+                        "prec": 0.1,
+                        "uuid": "194a465b-d854-42e0-985b-abfea1f10906",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao5",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao5",
+                        "prec": 0.1,
+                        "uuid": "539364df-564b-4290-99f0-6af5dc87ce6c",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao6",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao6",
+                        "prec": 0.1,
+                        "uuid": "00061f6a-ddf8-481a-9b65-02cc66c2fc25",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao7",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao7",
+                        "prec": 0.1,
+                        "uuid": "d1b7ffd2-843e-4a33-80f0-605f7c037ad4",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao8",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao8",
+                        "prec": 0.1,
+                        "uuid": "3eb3201d-b37e-4233-91d8-8ba4b765b5c2",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao9",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao9",
+                        "prec": 0.1,
+                        "uuid": "dfc960b9-7bd9-49c9-b857-eaab243a10f0",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao10",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao10",
+                        "prec": 0.1,
+                        "uuid": "d018aa05-eb56-470f-b3a4-e66d8d0c86ed",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao11",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao11",
+                        "prec": 0.1,
+                        "uuid": "9c9fd7fe-2a8c-40a4-a6ff-ca4825680083",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao12",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao12",
+                        "prec": 0.1,
+                        "uuid": "73965252-96d5-40db-bff0-bb0f40bc8a4c",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao13",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao13",
+                        "prec": 0.1,
+                        "uuid": "3a6d17c8-f4f7-4fd5-8c72-5784f325f8c5",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao14",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao14",
+                        "prec": 0.1,
+                        "uuid": "496cb9b4-4f84-41b5-9120-371702a4be32",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao15",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao15",
+                        "prec": 0.1,
+                        "uuid": "4bfecfae-4a87-4936-8577-d2ce3be022b1",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao16",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao16",
+                        "prec": 0.1,
+                        "uuid": "f3e239c3-d491-4f18-b877-84b3dbd5ad0a",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao17",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao17",
+                        "prec": 0.1,
+                        "uuid": "8bad526b-d0f3-44a1-b32f-91ce0cce3bd3",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao18",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao18",
+                        "prec": 0.1,
+                        "uuid": "8c85c38a-e6ea-4b24-ac1e-a901dd54d87e",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao19",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao19",
+                        "prec": 0.1,
+                        "uuid": "94d17bdf-e484-4a48-9b38-a0e080ff4bb7",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao20",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao20",
+                        "prec": 0.1,
+                        "uuid": "d203c61c-b51b-4eed-8af9-ef9ae849daae",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao21",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao21",
+                        "prec": 0.1,
+                        "uuid": "8e3ce8a6-43e9-4577-bfa2-3f8bb9686877",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao22",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao22",
+                        "prec": 0.1,
+                        "uuid": "3dd9faa4-7541-43c2-99b3-e3cc9bacd77f",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao23",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao23",
+                        "prec": 0.1,
+                        "uuid": "8fb68f74-93d9-48be-8770-4c49d3deb1f9",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao24",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao24",
+                        "prec": 0.1,
+                        "uuid": "14586615-a860-4eb8-adbc-1333a41105fb",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao25",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao25",
+                        "prec": 0.1,
+                        "uuid": "449ec8c2-e443-4243-a480-6c6f7bb7da35",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao26",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao26",
+                        "prec": 0.1,
+                        "uuid": "fc4a0c6b-7016-4263-be59-02c3625a017b",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao27",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao27",
+                        "prec": 0.1,
+                        "uuid": "e154ff3a-a4f4-4242-a310-3779df487695",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao28",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao28",
+                        "prec": 0.1,
+                        "uuid": "07a1807c-058f-4d85-9125-75f2cb788926",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao29",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao29",
+                        "prec": 0.1,
+                        "uuid": "5acb1127-9937-4499-9d5a-9e6467186f51",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao30",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao30",
+                        "prec": 0.1,
+                        "uuid": "4b0e4a81-3db1-4ae0-813a-1f79559ca079",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao31",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao31",
+                        "prec": 0.1,
+                        "uuid": "1cf80201-583f-4d08-83b8-72128a43f0ae",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao32",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao32",
+                        "prec": 0.1,
+                        "uuid": "88e3168d-8cd4-42d3-b91c-252726c24510",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao33",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao33",
+                        "prec": 0.1,
+                        "uuid": "4ebd8a17-2065-404c-86a7-7fbf57a3e37e",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao34",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao34",
+                        "prec": 0.1,
+                        "uuid": "5abee738-394d-4ebc-bbe9-2b339304079a",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao35",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao35",
+                        "prec": 0.1,
+                        "uuid": "837fa281-b576-4731-84fc-6972ad01d30b",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao36",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao36",
+                        "prec": 0.1,
+                        "uuid": "13e96aef-6ccd-46f8-a983-7fdb4dbb2299",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao37",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao37",
+                        "prec": 0.1,
+                        "uuid": "ddc544ca-863a-4a2d-bd5a-c59053f4f37e",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao38",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao38",
+                        "prec": 0.1,
+                        "uuid": "74d92b2e-bfdf-4011-8fc4-bf364c5ef5bf",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao39",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao39",
+                        "prec": 0.1,
+                        "uuid": "f36cea60-9c68-4602-979e-e4f6600f2b61",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao40",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao40",
+                        "prec": 0.1,
+                        "uuid": "244a5c81-2653-4392-b802-502dc444ac57",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao41",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao41",
+                        "prec": 0.1,
+                        "uuid": "c0ad7c4e-cada-4691-9a7a-439e8213554e",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao42",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao42",
+                        "prec": 0.1,
+                        "uuid": "ee56ea77-3f5a-4318-98e5-84b180de15bc",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao43",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao43",
+                        "prec": 0.1,
+                        "uuid": "4ff0d65f-d1a5-4d5d-9d88-2d1397c75ee0",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao44",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao44",
+                        "prec": 0.1,
+                        "uuid": "2904a127-b682-4a1a-862a-7b7cfa0c5d35",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao45",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao45",
+                        "prec": 0.1,
+                        "uuid": "076f9fc0-8ed7-4e8c-9818-21842ce53df1",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao46",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao46",
+                        "prec": 0.1,
+                        "uuid": "1f485068-296b-4583-b1c5-64e5dc4bd753",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao47",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao47",
+                        "prec": 0.1,
+                        "uuid": "944562e0-e6cc-45cf-a355-eefc88cd3b0a",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao48",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao48",
+                        "prec": 0.1,
+                        "uuid": "9e540dd5-9b21-4332-afff-f5e085ff800a",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao49",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao49",
+                        "prec": 0.1,
+                        "uuid": "910b5a58-606d-476c-a0ba-e945aa76d6ce",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao50",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao50",
+                        "prec": 0.1,
+                        "uuid": "e008ed1c-f055-44ae-ba62-bc0ab92ee75f",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao51",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao51",
+                        "prec": 0.1,
+                        "uuid": "4006cbce-d5b8-4d47-b613-b1b78c74eb67",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao52",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao52",
+                        "prec": 0.1,
+                        "uuid": "59f2176f-31fc-42b1-a0f4-4f76bcda7bcd",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao53",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao53",
+                        "prec": 0.1,
+                        "uuid": "c182ed46-4516-4389-bd87-f949b110fcc5",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao54",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao54",
+                        "prec": 0.1,
+                        "uuid": "7b4580df-83ec-4f74-a76c-14fc4dbdeb14",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao55",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao55",
+                        "prec": 0.1,
+                        "uuid": "21125cca-33e2-4715-b8d3-dfdf458e799d",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao56",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao56",
+                        "prec": 0.1,
+                        "uuid": "409ab465-65be-443a-acbf-15d85c47d926",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao57",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao57",
+                        "prec": 0.1,
+                        "uuid": "046bfa5d-ee45-4f4d-9275-5b58b72ee991",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao58",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao58",
+                        "prec": 0.1,
+                        "uuid": "6de690d2-d6e9-4a1f-a576-31f02a6b7caf",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao59",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao59",
+                        "prec": 0.1,
+                        "uuid": "05d67d3d-3ea7-43ac-9522-33595d914e60",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao60",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao60",
+                        "prec": 0.1,
+                        "uuid": "fdc4c651-a13d-4fca-b807-1efc0d63467e",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao61",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao61",
+                        "prec": 0.1,
+                        "uuid": "13f7d005-2ff2-419b-a79b-97c3ce5dbbcd",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao62",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao62",
+                        "prec": 0.1,
+                        "uuid": "38db415a-af76-4377-9a19-234ec0e55c39",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[AO-DAQ] AO-DAQ/ao63",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "AO-DAQ/ao63",
+                        "prec": 0.1,
+                        "uuid": "fa5da9de-8659-4d32-9f6f-9dbd42208b56",
+                        "vMax": 10,
+                        "vMin": -10
+                    }
+                ]
+            },
+            {
+                "hardwareIdentifier": "NI_Scope_MRB",
+                "hardwareSettings": {
+                    "deviceName": "",
+                    "name": "",
+                    "physID": "",
+                    "uuid": "62262726-3dd8-40a4-9bde-94bb6d2c9220"
+                },
+                "hardwareType": "NI_Scope",
+                "sourceList": []
+            }
+        ]
+    }
+}

@@ -28,6 +28,7 @@ class Hardware_Object(QObject):
         self.hardwareSettings['uuid'] = str(uuid.uuid4())
         self.hardwareManager = hardwareManager
         self.sourceList = list()
+        self.managerMessages = list()
         self.onCreationParent()
         self.sourceListData = None
         self.forceNoUpdatesOnSourceAddToggle = False
@@ -108,6 +109,7 @@ class Hardware_Object(QObject):
 
     def addSource(self, source):
         self.sourceList.append(source)
+        self.mgrMsg('Source added: ' + str(type(source)))
 
         if(self.forceNoUpdatesOnSourceAddToggle is False):
             self.loadSourceListData()
@@ -140,8 +142,11 @@ class Hardware_Object(QObject):
                 return source
         return None
 
-    def getWorkerResponses(self):
-        return self.hardwareWorker.updateWorkerResponses()
+    def getMessages(self):
+        messageList = list()
+        messageList = self.managerMessages + self.hardwareWorker.updateWorkerResponses()
+        self.managerMessages.clear()
+        return messageList
 
     def getPingTime(self):
         return self.hardwareWorker.checkPing()
@@ -159,6 +164,10 @@ class Hardware_Object(QObject):
         #print(programmingData)
         print('Reprogrammed.emit(self)')
         self.Reprogrammed.emit(self)
+
+    def mgrMsg(self, text):
+        msg = hwm(msg='[Manager]: ' + text)
+        self.managerMessages.append(msg)
 
     def getEvents(self):
         programDataList = list()

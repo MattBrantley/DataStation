@@ -10,10 +10,9 @@
 		<Property Name="server.vi.callsEnabled" Type="Bool">true</Property>
 		<Property Name="server.vi.propertiesEnabled" Type="Bool">true</Property>
 		<Property Name="specify.custom.address" Type="Bool">false</Property>
-		<Item Name="add.vi" Type="VI" URL="../add.vi"/>
 		<Item Name="getDeviceCount.vi" Type="VI" URL="../getDeviceCount.vi"/>
+		<Item Name="getDeviceParam.vi" Type="VI" URL="../getDeviceParam.vi"/>
 		<Item Name="getFGenDevices.vi" Type="VI" URL="../getFGenDevices.vi"/>
-		<Item Name="getFgenParam.vi" Type="VI" URL="../getFgenParam.vi"/>
 		<Item Name="Dependencies" Type="Dependencies">
 			<Item Name="instr.lib" Type="Folder">
 				<Item Name="niModInst Close Installed Devices Session.vi" Type="VI" URL="/&lt;instrlib&gt;/niModInst/niModInst Close Installed Devices Session.vi"/>
@@ -46,7 +45,7 @@
 				<Property Name="Bld_localDestDirType" Type="Str">relativeToCommon</Property>
 				<Property Name="Bld_modifyLibraryFile" Type="Bool">true</Property>
 				<Property Name="Bld_previewCacheID" Type="Str">{669EDF20-E4B0-4B8E-915B-9F3F7CC9A1DA}</Property>
-				<Property Name="Bld_version.build" Type="Int">9</Property>
+				<Property Name="Bld_version.build" Type="Int">20</Property>
 				<Property Name="Bld_version.major" Type="Int">1</Property>
 				<Property Name="Destination[0].destName" Type="Str">DataStation_Labview.dll</Property>
 				<Property Name="Destination[0].path" Type="Path">../inc/DataStation_Labview.dll</Property>
@@ -63,32 +62,18 @@
 				<Property Name="Source[0].itemID" Type="Str">{07746664-F5A0-4A83-BD1F-551288FE241D}</Property>
 				<Property Name="Source[0].type" Type="Str">Container</Property>
 				<Property Name="Source[1].destinationIndex" Type="Int">0</Property>
-				<Property Name="Source[1].ExportedVI.VIProtoInfo[0]VIProtoDir" Type="Int">1</Property>
-				<Property Name="Source[1].ExportedVI.VIProtoInfo[0]VIProtoInputIdx" Type="Int">-1</Property>
-				<Property Name="Source[1].ExportedVI.VIProtoInfo[0]VIProtoLenInput" Type="Int">-1</Property>
-				<Property Name="Source[1].ExportedVI.VIProtoInfo[0]VIProtoLenOutput" Type="Int">-1</Property>
-				<Property Name="Source[1].ExportedVI.VIProtoInfo[0]VIProtoName" Type="Str">return value</Property>
-				<Property Name="Source[1].ExportedVI.VIProtoInfo[0]VIProtoOutputIdx" Type="Int">-1</Property>
-				<Property Name="Source[1].ExportedVI.VIProtoInfo[0]VIProtoPassBy" Type="Int">0</Property>
-				<Property Name="Source[1].ExportedVI.VIProtoInfo[1]CallingConv" Type="Int">1</Property>
-				<Property Name="Source[1].ExportedVI.VIProtoInfo[1]Name" Type="Str">getFGenDevices</Property>
-				<Property Name="Source[1].ExportedVI.VIProtoInfo[1]VIProtoDir" Type="Int">1</Property>
-				<Property Name="Source[1].ExportedVI.VIProtoInfo[1]VIProtoInputIdx" Type="Int">-1</Property>
-				<Property Name="Source[1].ExportedVI.VIProtoInfo[1]VIProtoLenInput" Type="Int">-1</Property>
-				<Property Name="Source[1].ExportedVI.VIProtoInfo[1]VIProtoLenOutput" Type="Int">-1</Property>
-				<Property Name="Source[1].ExportedVI.VIProtoInfo[1]VIProtoName" Type="Str">Array</Property>
-				<Property Name="Source[1].ExportedVI.VIProtoInfo[1]VIProtoOutputIdx" Type="Int">0</Property>
-				<Property Name="Source[1].ExportedVI.VIProtoInfo[1]VIProtoPassBy" Type="Int">1</Property>
-				<Property Name="Source[1].ExportedVI.VIProtoInfoCPTM" Type="Bin">&amp;1#!!!!!!!=!$E!Q`````Q2/97VF!!!/1$$`````"5VP:'6M!":!-0````].5W6S;7&amp;M)%ZV&lt;7*F=A!-!&amp;!!!Q!!!!%!!A!31%!!!@````]!!Q6"=H*B?1!%!!!!6!$Q!!Q!"!!&amp;!!5!"1!&amp;!!5!"1!&amp;!!5!"1!&amp;!!5$!!"Y!!!*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1!'</Property>
-				<Property Name="Source[1].ExportedVI.VIProtoInfoVIProtoItemCount" Type="Int">2</Property>
-				<Property Name="Source[1].itemID" Type="Ref">/My Computer/getFGenDevices.vi</Property>
+				<Property Name="Source[1].itemID" Type="Ref">/My Computer/getDeviceCount.vi</Property>
 				<Property Name="Source[1].sourceInclusion" Type="Str">TopLevel</Property>
 				<Property Name="Source[1].type" Type="Str">ExportedVI</Property>
 				<Property Name="Source[2].destinationIndex" Type="Int">0</Property>
-				<Property Name="Source[2].itemID" Type="Ref">/My Computer/add.vi</Property>
+				<Property Name="Source[2].itemID" Type="Ref">/My Computer/getDeviceParam.vi</Property>
 				<Property Name="Source[2].sourceInclusion" Type="Str">TopLevel</Property>
 				<Property Name="Source[2].type" Type="Str">ExportedVI</Property>
-				<Property Name="SourceCount" Type="Int">3</Property>
+				<Property Name="Source[3].destinationIndex" Type="Int">0</Property>
+				<Property Name="Source[3].itemID" Type="Ref">/My Computer/getFGenDevices.vi</Property>
+				<Property Name="Source[3].sourceInclusion" Type="Str">TopLevel</Property>
+				<Property Name="Source[3].type" Type="Str">ExportedVI</Property>
+				<Property Name="SourceCount" Type="Int">4</Property>
 				<Property Name="TgtF_companyName" Type="Str">Baylor University</Property>
 				<Property Name="TgtF_fileDescription" Type="Str">DataStation_Labview</Property>
 				<Property Name="TgtF_internalName" Type="Str">DataStation_Labview</Property>

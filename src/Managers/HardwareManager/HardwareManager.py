@@ -34,7 +34,7 @@ class HardwareManager(QObject):
 
     def loadLabviewInterface(self):
         self.mW.postLog('Initializing DataStation Labview Interface... ', DSConstants.LOG_PRIORITY_HIGH)
-        self.lvInterface = DataStation_LabviewExtension()
+        self.lvInterface = DataStation_LabviewExtension(self.mW)
         self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     def getVISAObjectsList(self): #Because for some reason hte VISA drivers from NI don't locate the devices (even though they are seen in Max...)

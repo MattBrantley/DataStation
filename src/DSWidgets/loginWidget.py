@@ -55,6 +55,14 @@ class loginDockWidget(QDockWidget):
 
     def runModal(self):
         self.show()
+        self.center()
+
+    def center(self):
+        frameGm = self.frameGeometry()
+        screen = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
+        centerPoint = QApplication.desktop().screenGeometry(screen).center()
+        frameGm.moveCenter(centerPoint)
+        self.move(frameGm.topLeft())
 
     def finishModal(self):
         self.hide()

@@ -257,11 +257,11 @@ class hardwareListItem(QWidget):
         self.layout.addWidget(self.topPortion)
 
         self.messageUpdateTimer = QTimer()
-        self.messageUpdateTimer.timeout.connect(self.updateDriverMessages)
-        self.messageUpdateTimer.start(100)
+        self.messageUpdateTimer.timeout.connect(self.updateMessages)
+        self.messageUpdateTimer.start(20)
 
-    def updateDriverMessages(self):
-        newMsgs = self.hardwareObj.getWorkerResponses()
+    def updateMessages(self):
+        newMsgs = self.hardwareObj.getMessages()
         for msg in newMsgs:
             self.msgWidget.addItem(time.strftime('[%m/%d/%Y %H:%M:%S] ') + msg.msg)
 

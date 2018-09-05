@@ -8,27 +8,22 @@ from mpl_toolkits.mplot3d import proj3d
 from xml.dom.minidom import *
 from xml.etree.ElementTree import *
 from PyQt5.QtCore import *
-#from PyQt5.QtCore import Qt, QVariant, QTimer, QSize
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-#from PyQt5 import QtWidgets
-#from UserScriptsController import *
-#from UserScript import *
 from Managers.WorkspaceManager import DSUnits, DSPrefix
 from Constants import DSConstants as DSConstants
 # NOTES FOR FUTURE INSTALLS
 # pyqtgraph has an import warning that is solved by running "conda install h5py==2.8.0"
 # nidaqmx - pip install nidaqmx
-# pyVISA - pip install pyvisa 
-# pyVISA-py - pip install pyvisa-py (NOT SURE THIS NEEDED)
 # nifgen - pip install nifgen
 # proctitle - pip install setproctitle -- NOT USED?
 # pyserial - pip install pyserial
 
 
-
-        #import traceback
-        #traceback.print_stack()
+# --- Break glass in case of bug ---
+#import traceback
+#traceback.print_stack()
+# ---                            ---
 
 def warn(*args, **kwargs):
     pass
@@ -50,6 +45,7 @@ from DSWidgets.processWidget import processWidget
 from DSWidgets.loginWidget import loginDockWidget
 from DSWidgets.hardwareWidget import hardwareWidget
 from DSWidgets.controlWidget import controlWidget
+from DSWidgets.logoWidget import logoDockWidget
 
 sys._excepthook = sys.excepthook
 
@@ -73,6 +69,7 @@ class mainWindow(QMainWindow):
         self.srcDir = os.path.dirname(__file__)
         self.rootDir = os.path.dirname(self.srcDir)
 
+        self.loadWindowIcons()
         self.loadingScreenWidgets()
         self.initManagers()
         self.initLoading()
@@ -86,14 +83,40 @@ class mainWindow(QMainWindow):
 
         self.DataStation_Closing.connect(self.updateUserProfile)
 
+    def loadWindowIcons(self):
+        self.app_icon = QIcon()
+        self.app_icon.addFile(os.path.join(self.srcDir, r'DSIcons\DataStation_Small_16.png'), QSize(16,16))
+        self.app_icon.addFile(os.path.join(self.srcDir, r'DSIcons\DataStation_Small_24.png'), QSize(24,24))
+        self.app_icon.addFile(os.path.join(self.srcDir, r'DSIcons\DataStation_Small_32.png'), QSize(32,32))
+        self.app_icon.addFile(os.path.join(self.srcDir, r'DSIcons\DataStation_Small_48.png'), QSize(48,48))
+        self.app_icon.addFile(os.path.join(self.srcDir, r'DSIcons\DataStation_Small_256.png'), QSize(256,256))
+        self.app.setWindowIcon(self.app_icon)
+        self.trayIcon = QSystemTrayIcon(self.app_icon, self)
+        self.trayIcon.show()
+        
+    def center(self):
+        frameGm = self.frameGeometry()
+        screen = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
+        centerPoint = QApplication.desktop().screenGeometry(screen).center()
+        frameGm.moveCenter(centerPoint)
+        self.move(frameGm.topLeft())
+
     def loadingScreenWidgets(self):
-        self.setGeometry(300, 300, 640, 480)
+        #self.setGeometry(300, 300, 640, 480)
         self.setWindowTitle('DataStation (Alpha) - Loading...')
+
+        self.logoDockWidget = logoDockWidget(self)
+        self.logoDockWidget.setObjectName('logoDockWidget')
+        self.addDockWidget(Qt.TopDockWidgetArea, self.logoDockWidget)
+        self.logoDockWidget.setFeatures(QDockWidget.NoDockWidgetFeatures)
 
         self.logDockWidget = logDockWidget(self)
         self.logDockWidget.setObjectName('logDockWidget')
         self.addDockWidget(Qt.BottomDockWidgetArea, self.logDockWidget)
+        self.logDockWidget.setFeatures(QDockWidget.NoDockWidgetFeatures)
+
         self.show()
+        self.center()
         app.processEvents()
 
     def initManagers(self):
@@ -192,31 +215,31 @@ class mainWindow(QMainWindow):
 
     def initActions(self):
 
-        self.exitAction = QAction(QIcon(os.path.join(self.srcDir, 'icons2\minimize.png')), 'Exit', self)
+        self.exitAction = QAction(QIcon(os.path.join(self.srcDir, r'icons2\minimize.png')), 'Exit', self)
         self.exitAction.setShortcut('Ctrl+Q')
         self.exitAction.setStatusTip('Exit Application')
         self.exitAction.triggered.connect(self.close)
 
-        self.newAction = QAction(QIcon(os.path.join(self.srcDir, 'icons2\controller.png')), 'New Workspace', self)
+        self.newAction = QAction(QIcon(os.path.join(self.srcDir, r'icons2\controller.png')), 'New Workspace', self)
         self.newAction.setShortcut('Ctrl+N')
         self.newAction.setStatusTip('Create a New Workspace')
         self.newAction.triggered.connect(self.workspaceManager.newWorkspace)
 
-        self.saveAction = QAction(QIcon(os.path.join(self.srcDir, 'icons2\save.png')), 'Save Workspace As..', self)
+        self.saveAction = QAction(QIcon(os.path.join(self.srcDir, r'icons2\save.png')), 'Save Workspace As..', self)
         self.saveAction.setShortcut('Ctrl+S')
         self.saveAction.setStatusTip('Save Workspace As..')
         self.saveAction.triggered.connect(self.workspaceManager.saveWSToNewSql)
 
-        self.openAction = QAction(QIcon(os.path.join(self.srcDir, 'icons2\\folder.png')), 'Open Workspace', self)
+        self.openAction = QAction(QIcon(os.path.join(self.srcDir, r'icons2\\folder.png')), 'Open Workspace', self)
         self.openAction.setShortcut('Ctrl+O')
         self.openAction.setStatusTip('Open Workspace')
         self.openAction.triggered.connect(self.workspaceManager.loadWSFromSql)
 
-        self.settingsAction = QAction(QIcon(os.path.join(self.srcDir, 'icons2\settings.png')), 'Settings', self)
+        self.settingsAction = QAction(QIcon(os.path.join(self.srcDir, r'icons2\settings.png')), 'Settings', self)
         self.settingsAction.setShortcut('Ctrl+S')
         self.settingsAction.setStatusTip('Adjust Settings')
 
-        self.importAction = QAction(QIcon(os.path.join(self.srcDir, 'icons2\pendrive.png')), 'Import', self)
+        self.importAction = QAction(QIcon(os.path.join(self.srcDir, r'icons2\pendrive.png')), 'Import', self)
         self.importAction.setStatusTip('Import Data')
         self.importAction.triggered.connect(self.workspaceManager.importData)
 
@@ -229,6 +252,9 @@ class mainWindow(QMainWindow):
         self.updateState(DSConstants.MW_STATE_NO_WORKSPACE)
         
         self.statusBar()
+
+        self.logDockWidget.setFeatures(QDockWidget.AllDockWidgetFeatures)
+        self.removeDockWidget(self.logoDockWidget)
 
         self.addDockWidget(Qt.TopDockWidgetArea, self.workspaceTreeDockWidget)
 
