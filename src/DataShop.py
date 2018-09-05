@@ -18,7 +18,10 @@ from Managers.WorkspaceManager import DSUnits, DSPrefix
 from Constants import DSConstants as DSConstants
 # NOTES FOR FUTURE INSTALLS
 # pyqtgraph has an import warning that is solved by running "conda install h5py==2.8.0"
-# nidaqmx - pip install 
+# nidaqmx - pip install nidaqmx
+# pyVISA - pip install pyvisa 
+# pyVISA-py - pip install pyvisa-py (NOT SURE THIS NEEDED)
+# nifgen - pip install nifgen
 # proctitle - pip install setproctitle -- NOT USED?
 # pyserial - pip install pyserial
 

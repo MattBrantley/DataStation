@@ -13,10 +13,98 @@ class Hardware_Driver(Hardware_Object):
     hardwareCreator = 'Matthew R. Brantley'
     hardwareVersionDate = '8/12/2018'
 
-    def onCreation(self):
-        self.hardwareSettings['deviceName'] = ''
-        self.hardwareSettings['tableClockIndex'] = 0
+    ##### SUPPORT FUNCTIONS #####
+
+    def updateTableClockIndex(self, index):
+            self.hardwareSettings['tableClockIndex'] = index
+
+    def updateTableClock(self, rate):
+            self.hardwareSettings['tableClockSpeed'] = int(rate)
+
+    def getPorts(self):
+        """ Lists serial port names
+
+            :raises EnvironmentError:
+                On unsupported or unknown platforms
+            :returns:
+                A list of the serial ports available on the system
+        """
+        if sys.platform.startswith('win'):
+            ports = ['COM%s' % (i + 1) for i in range(256)]
+        elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+            # this excludes your current terminal "/dev/tty"
+            ports = glob.glob('/dev/tty[A-Za-z]*')
+        elif sys.platform.startswith('darwin'):
+            ports = glob.glob('/dev/tty.*')
+        else:
+            raise EnvironmentError('Unsupported platform')
+
+        result = []
+        for port in ports:
+            try:
+                s = serial.Serial(port)
+                s.close()
+                result.append(port)
+            except (OSError, serial.SerialException):
+                pass
+        return result
+
+    def genSources(self):
+        print('GENERATING SOURCES: ' + self.hardwareSettings['deviceName'])
+        self.clearSourceList()
+        if(self.hardwareSettings['deviceName'] != ''):
+            with serial.Serial(self.hardwareSettings['deviceName'], 115200, timeout=1) as ser:
+                ser.write(b'GCHAN,DCB\r\n')
+                response = ser.readline()
+                if(response is not None):
+                    numDCB = self.MIPSYResponseToInt(response)
+                else:
+                    numDCB = 0
+                self.forceNoUpdatesOnSourceAdd(True) #FOR SPEED!
+                for channel in range(numDCB):
+                    chOut = str(channel+1)
+                    nameTemp = self.hardwareSettings['deviceName'] + '/CH' + chOut
+                    ser.write(b'GDCMIN,' + chOut.encode('ascii') + b'\r\n')
+                    minTemp = self.MIPSYResponseToFloat(ser.readline())
+                    ser.write(b'GDCMAX,' + chOut.encode('ascii') + b'\r\n')
+                    maxTemp = self.MIPSYResponseToFloat(ser.readline())
+                    source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, minTemp, maxTemp, 0.1, chOut)
+                    self.addSource(source)
+
+                self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
+
+    def MIPSYResponseToInt(self, bytes):
+        return int(bytes[1:-2].decode("utf-8"))
+
+    def MIPSYResponseToFloat(self, bytes):
+        return float(bytes[1:-2].decode("utf-8"))
+
+    def parseProgramData(self, programDataList):
+        for programData in programDataList:
+            print('NEW PACKET:')
+            print(programData.physicalConnectorID)
+            print(programData.waveformData)
+            print(self.waveformToClockCount(programData.waveformData))
+
+    def waveformToClockCount(self, waveform):
+        waveOut = np.copy(waveform)
+        waveOut[:,0] = np.vectorize(self.getClockCountAtTimePoint)(waveform[:,0])
+        return waveOut
+
+    def getClockCountAtTimePoint(self, time):
+        #time is in seconds (s)
+        freq = int(self.hardwareSettings['tableClockSpeed'])
+        return float(int(freq*time))
+
+    def updateDevice(self, text):
+        self.hardwareSettings['deviceName'] = text
+        self.hardwareSettings['name'] = self.hardwareSettings['deviceName']
         self.genSources()
+
+    ##### REQUIRED FUNCTINONS #####
+
+    def initHardwareWorker(self):
+        self.hardwareWorker = MIPSYHardwareWorker()
 
     def hardwareObjectConfigWidget(self):
         hardwareConfig = QWidget()
@@ -54,79 +142,15 @@ class Hardware_Driver(Hardware_Object):
 
         return hardwareConfig
 
-    def updateTableClockIndex(self, index):
-            self.hardwareSettings['tableClockIndex'] = index
+    def onCreation(self):
+        self.hardwareSettings['deviceName'] = ''
+        self.hardwareSettings['tableClockIndex'] = 0
 
-    def updateTableClock(self, rate):
-            self.hardwareSettings['tableClockSpeed'] = int(rate)
+    def onLoad(self, loadPacket):
+        pass
 
-    def getPorts(self):
-        """ Lists serial port names
-
-            :raises EnvironmentError:
-                On unsupported or unknown platforms
-            :returns:
-                A list of the serial ports available on the system
-        """
-        if sys.platform.startswith('win'):
-            ports = ['COM%s' % (i + 1) for i in range(256)]
-        elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
-            # this excludes your current terminal "/dev/tty"
-            ports = glob.glob('/dev/tty[A-Za-z]*')
-        elif sys.platform.startswith('darwin'):
-            ports = glob.glob('/dev/tty.*')
-        else:
-            raise EnvironmentError('Unsupported platform')
-
-        result = []
-        for port in ports:
-            try:
-                s = serial.Serial(port)
-                s.close()
-                result.append(port)
-            except (OSError, serial.SerialException):
-                pass
-        return result
-
-    def updateDevice(self, text):
-        self.hardwareSettings['deviceName'] = text
-        self.hardwareSettings['name'] = self.hardwareSettings['deviceName']
+    def onInitialize(self):
         self.genSources()
-
-    def afterLoad(self, loadPacket):
-        self.genSources()
-
-    def genSources(self):
-        self.clearSourceList()
-        if(self.hardwareSettings['deviceName'] != ''):
-            with serial.Serial(self.hardwareSettings['deviceName'], 115200, timeout=1) as ser:
-                ser.write(b'GCHAN,DCB\r\n')
-                numDCB = self.MIPSYResponseToInt(ser.readline())
-                self.forceNoUpdatesOnSourceAdd(True) #FOR SPEED!
-                for channel in range(numDCB):
-                    chOut = str(channel+1)
-                    nameTemp = self.hardwareSettings['deviceName'] + '/CH' + chOut
-                    ser.write(b'GDCMIN,' + chOut.encode('ascii') + b'\r\n')
-                    minTemp = self.MIPSYResponseToFloat(ser.readline())
-                    ser.write(b'GDCMAX,' + chOut.encode('ascii') + b'\r\n')
-                    maxTemp = self.MIPSYResponseToFloat(ser.readline())
-                    source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, minTemp, maxTemp, 0.1, chOut)
-                    self.addSource(source)
-
-                self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
-
-    def MIPSYResponseToInt(self, bytes):
-        return int(bytes[1:-2].decode("utf-8"))
-
-    def MIPSYResponseToFloat(self, bytes):
-        return float(bytes[1:-2].decode("utf-8"))
-
-    def parseProgramData(self, programDataList):
-        for programData in programDataList:
-            print('NEW PACKET:')
-            print(programData.physicalConnectorID)
-            print(programData.waveformData)
-            print(self.waveformToClockCount(programData.waveformData))
 
     def onProgram(self):
         pass
@@ -136,18 +160,6 @@ class Hardware_Driver(Hardware_Object):
         self.program()
         self.hardwareWorker.outQueues['command'].put(hwm(action='run'))
 
-    def initHardwareWorker(self):
-        self.hardwareWorker = MIPSYHardwareWorker()
-
-    def waveformToClockCount(self, waveform):
-        waveOut = np.copy(waveform)
-        waveOut[:,0] = np.vectorize(self.getClockCountAtTimePoint)(waveform[:,0])
-        return waveOut
-
-    def getClockCountAtTimePoint(self, time):
-        #time is in seconds (s)
-        freq = int(self.hardwareSettings['tableClockSpeed'])
-        return float(int(freq*time))
 
 class MIPSYHardwareWorker(hardwareWorker):
     def __init__(self):
@@ -162,52 +174,53 @@ class MIPSYHardwareWorker(hardwareWorker):
         queueOut.put(resp)
 
     def onCommand(self, msgIn, queueOut):
+
+        if(msgIn.action == 'readyCheck'):
+            response = 'readyCheck'
+        else:
+            response = 'textUpdate'
+
+        if(self.armed is False and msgIn.action in ('readyCheck', 'run')):
+            queueOut.put(hwm(action=response, msg='Hardware Not Armed', data=False))
+            return
+        if(self.programmed is False and msgIn.action in ('readyCheck', 'run', 'arm')):
+            queueOut.put(hwm(action=response, msg='Hardware Not Programmed', data=False))
+            return
+        if(self.configured is False and msgIn.action in ('readyCheck', 'run', 'arm', 'program')):
+            queueOut.put(hwm(action=response, msg='Hardware Not Configured', data=False))
+            return
+        if(self.configured is False and msgIn.action in ('readyCheck', 'run', 'arm', 'program', 'configure')):
+            queueOut.put(hwm(action=response, msg='Hardware Not Initialized', data=False))
+            return
+        if(msgIn.action == 'readyCheck'):
+            queueOut.put(hwm(action='readyCheck', msg='Hardware Ready!', data=True))
+            return
+
+
+        ##### INITILIAZATION
         if(msgIn.action == 'init'):
             queueOut.put(hwm(action='textUpdate', msg='Initializing..'))
             self.initialized = True
             queueOut.put(hwm(action='textUpdate', msg='Done! Ready for Configuration..'))
 
+        #### CONFIGURING
         if(msgIn.action == 'config'):
             queueOut.put(hwm(action='textUpdate', msg='Configuring..'))
             self.configured = True
             queueOut.put(hwm(action='textUpdate', msg='Done! Ready for Waveform Programming..'))
 
+        ##### PROGRAMMING
         if(msgIn.action == 'program'):
             queueOut.put(hwm(action='textUpdate', msg='Writing Program to Card..'))
             self.programmed = True
             queueOut.put(hwm(action='textUpdate', msg='Done! Ready for Trigger Arming..'))
 
+        ##### ARM
         if(msgIn.action == 'arm'):
             queueOut.put(hwm(action='textUpdate', msg='Writing Program to Card..'))
             self.armed = True
             queueOut.put(hwm(action='textUpdate', msg='Done! DAQ is Armed and Ready!'))
 
-
+        ##### RUN
         if(msgIn.action == 'run'):
-            if(self.initialized is False):
-                queueOut.put(hwm(action='textUpdate', msg='ERROR! Hardware Not Initialized', data=False))
-                return
-            if(self.configured is False):
-                queueOut.put(hwm(action='textUpdate', msg='ERROR! Hardware Not Configured', data=False))
-                return
-            if(self.programmed is False):
-                queueOut.put(hwm(action='textUpdate', msg='ERROR! Hardware Not Programmed', data=False))
-                return
-            if(self.armed is False):
-                queueOut.put(hwm(action='textUpdate', msg='ERROR! Hardware Not Armed', data=False))
-                return
             queueOut.put(hwm(action='textUpdate', msg='Running!', data=False))
-
-        if(msgIn.action == 'readyCheck'):
-            if(self.initialized is False):
-                queueOut.put(hwm(action='readyCheck', msg='Hardware Not Initialized', data=False))
-                return
-            if(self.configured is False):
-                queueOut.put(hwm(action='readyCheck', msg='Hardware Not Configured', data=False))
-                return
-            if(self.programmed is False):
-                queueOut.put(hwm(action='readyCheck', msg='Hardware Not Programmed', data=False))
-                return
-            if(self.armed is False):
-                queueOut.put(hwm(action='readyCheck', msg='Hardware Not Armed', data=False))
-                return

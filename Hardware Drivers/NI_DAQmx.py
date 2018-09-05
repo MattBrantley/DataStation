@@ -113,7 +113,7 @@ class Hardware_Driver(Hardware_Object):
 
     ##### REQUIRED FUNCTIONS #####
     def initHardwareWorker(self):
-        self.hardwareWorker = NI_DAQmHardwareWorker()
+        self.hardwareWorker = NI_DAQmxHardwareWorker()
 
     def hardwareObjectConfigWidget(self):
         hardwareConfig = QWidget()
@@ -159,7 +159,7 @@ class Hardware_Driver(Hardware_Object):
     def onRun(self):
         self.hardwareWorker.outQueues['command'].put(hwm(action='run'))
 
-class NI_DAQmHardwareWorker(hardwareWorker):
+class NI_DAQmxHardwareWorker(hardwareWorker):
     def __init__(self):
         self.initialized = False
         self.configured = False

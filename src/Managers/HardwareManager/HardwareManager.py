@@ -4,8 +4,10 @@ from Managers.InstrumentManager.Filter import Filter
 from Managers.InstrumentManager.Sockets import *
 from Managers.HardwareManager.Hardware_Object import Hardware_Object
 from Managers.HardwareManager.Sources import *
+from DataStation_Labview import DataStation_LabviewExtension
 from Constants import DSConstants as DSConstants
 import json as json
+import pyvisa
 from DSWidgets.controlWidget import readyCheckPacket
 
 class HardwareManager(QObject):
@@ -24,9 +26,32 @@ class HardwareManager(QObject):
         self.filtersDir = os.path.join(self.mW.rootDir, 'User Filters')
         self.hardwareDriverDir = os.path.join(self.mW.rootDir, 'Hardware Drivers')
         self.loadFilters()
+        #self.visaAddresses = self.getVISAObjectsList()
         self.loadHardwareDrivers()
+        self.loadLabviewInterface()
 
         self.mW.DataStation_Closing.connect(self.saveHardwareState)
+
+    def loadLabviewInterface(self):
+        self.mW.postLog('Initializing DataStation Labview Interface... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.lvInterface = DataStation_LabviewExtension()
+        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+
+    def getVISAObjectsList(self): #Because for some reason hte VISA drivers from NI don't locate the devices (even though they are seen in Max...)
+        self.mW.postLog('Detecting VISA compatible hardware... ', DSConstants.LOG_PRIORITY_HIGH)
+        rm = pyvisa.highlevel.ResourceManager()
+        visaAddressList = list()
+        for n in range(0, 25):
+            for m in range(0, 25):
+                try:
+                    name = 'PXI' + str(n) + '::' + str(m) + '::INSTR'
+                    pxm = rm.open_resource(name)
+                    visaAddressList.append(pxm.resource_manufacturer_name)
+                except:
+                    pass
+
+        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+        return visaAddressList
 
     def loadHardwareDrivers(self):
         self.mW.postLog('Loading Hardware Drivers... ', DSConstants.LOG_PRIORITY_HIGH)
