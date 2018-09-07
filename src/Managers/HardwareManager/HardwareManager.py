@@ -7,7 +7,6 @@ from Managers.HardwareManager.Sources import *
 from DataStation_Labview import DataStation_LabviewExtension
 from Constants import DSConstants as DSConstants
 import json as json
-import pyvisa
 from DSWidgets.controlWidget import readyCheckPacket
 
 class HardwareManager(QObject):

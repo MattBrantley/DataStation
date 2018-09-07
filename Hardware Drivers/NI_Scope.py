@@ -5,8 +5,6 @@ import os, traceback, math
 import numpy as np
 import nidaqmx.system
 import niscope
-import niscope
-import pyvisa
 from multiprocessing import Process, Queue, Pipe
 
 class Hardware_Driver(Hardware_Object):

@@ -16,8 +16,10 @@ from Constants import DSConstants as DSConstants
 # pyqtgraph has an import warning that is solved by running "conda install h5py==2.8.0"
 # nidaqmx - pip install nidaqmx
 # nifgen - pip install nifgen
+# niscope - pip install niscope
 # proctitle - pip install setproctitle -- NOT USED?
 # pyserial - pip install pyserial
+# labview runtime is automatically polled and link provided - thanks NI!
 
 
 # --- Break glass in case of bug ---

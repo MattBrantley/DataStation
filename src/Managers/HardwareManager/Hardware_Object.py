@@ -33,7 +33,7 @@ class Hardware_Object(QObject):
         self.initTriggerModes()
         self.onCreationParent()
         self.sourceListData = None
-        self.triggerSocket = None
+        self.triggerComponent = None
         self.forceNoUpdatesOnSourceAddToggle = False
         
         self.workerReady = False
