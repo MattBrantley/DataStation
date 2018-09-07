@@ -35,6 +35,19 @@ class hardwareWidget(QDockWidget):
         self.filterStackWidget.hide()
         self.filterStackWidget.setFloating(True)
 
+        self.gridContainer = QWidget()
+        self.gridContainerLayout = QVBoxLayout()
+        self.gridContainer.setLayout(self.gridContainerLayout)
+
+        self.gridCombo = QComboBox()
+        self.gridCombo.addItem('Sockets: Analog Output')
+        self.gridCombo.addItem('Sockets: Analog Input')
+        self.gridCombo.addItem('Sockets: Digital Output')
+        self.gridCombo.addItem('Sockets: Digital Input')
+        self.gridCombo.currentTextChanged.connect(self.drawScene)
+
+        self.gridContainerLayout.addWidget(self.gridCombo)
+
         self.gridWidget = QGraphicsView()
         self.gridTransform = QTransform()
         self.gridWidget.setTransform(self.gridTransform)
@@ -43,12 +56,16 @@ class hardwareWidget(QDockWidget):
         self.tabWidget = QTabWidget()
         self.gridWidget.setSceneRect(gridRect)
         self.gridWidget.setScene(self.iScene)
+
+        self.gridContainerLayout.addWidget(self.gridWidget)
+
         self.tabWidget.addTab(self.hardwareWidget, "Attached Hardware")
-        self.tabWidget.addTab(self.gridWidget, "Connection Grid")
+        self.tabWidget.addTab(self.gridContainer, "Connection Grid")
         self.tabWidget.addTab(self.filtersWidget, "Filters")
         self.tabWidget.addTab(self.driversWidget, "Hardware Drivers")
         self.mainContainer.setCentralWidget(self.tabWidget)
         self.setWidget(self.mainContainer)
+
         self.hardwareManager.Hardware_Modified.connect(self.drawScene)
         self.instrumentManager.Instrument_Unloaded.connect(self.drawScene)
         self.instrumentManager.Instrument_Loaded.connect(self.drawScene)
@@ -57,15 +74,18 @@ class hardwareWidget(QDockWidget):
         self.drawScene()
 
     def repopulateSocketsAndPlugs(self):        
-        self.plugList = self.hardwareManager.getSourceObjs()
+        typeText = self.gridCombo.currentText()
+            
+        self.plugList = self.hardwareManager.getSourceObjs(typeText)
         if(self.instrumentManager.currentInstrument is not None):
-            self.socketList = self.instrumentManager.currentInstrument.getSockets()
+            self.socketList = self.instrumentManager.currentInstrument.getSocketsByType(typeText)
         else:
             self.socketList = list()
 
     def drawScene(self):
         self.repopulateSocketsAndPlugs()
         self.iScene.itemList.clear()
+        self.iScene.redrawn()
         self.iScene.clear()
         rows = len(self.socketList)
         cols = len(self.plugList)
@@ -263,7 +283,10 @@ class hardwareListItem(QWidget):
     def updateMessages(self):
         newMsgs = self.hardwareObj.getMessages()
         for msg in newMsgs:
+            if(msg.action=='refresh'):
+                self.msgWidget.clear()
             self.msgWidget.addItem(time.strftime('[%m/%d/%Y %H:%M:%S] ') + msg.msg)
+            self.msgWidget.setCurrentRow(self.msgWidget.count()-1)
 
     def setHeight(self):
         if(self.state == 'min'):
@@ -320,7 +343,7 @@ class hardwareListItem(QWidget):
         menu = QMenu()
 
         hardwareConfig = QWidgetAction(self)
-        hardwareConfig.setDefaultWidget(self.hardwareObj.hardwareObjectConfigWidget())
+        hardwareConfig.setDefaultWidget(self.hardwareObj.hardwareObjectConfigWidgetParent())
         menu.addAction(hardwareConfig)
         cursor = QCursor()
 
@@ -357,6 +380,9 @@ class iScene(QGraphicsScene):
         self.widget = widget
         self.transform = transform
 
+    def redrawn(self):
+        self.highlightList.clear()
+
     def sceneWidth(self):
         return len(self.widget.plugList)*self.cellWidth + self.marginLeft
 
@@ -364,15 +390,15 @@ class iScene(QGraphicsScene):
         return len(self.widget.socketList)*self.cellHeight + self.marginTop
 
     def connectPlugsAndSockets(self):
-        self.widget.mW.controlWidget.configChanged()
+        #self.widget.mW.controlWidget.configChanged()
         self.clearItems()
-
         for socket in self.widget.socketList:
             source = socket.getAttachedSource()
             if(source is not None):
                 row = self.getSocketRow(socket)
                 col = self.getPlugCol(source)
-                self.addItemToGrid(row, col, None)
+                if(row is not None and col is not None):
+                    self.addItemToGrid(row, col, None)
 
     def getSocketRow(self, socketIn):
         index = 1

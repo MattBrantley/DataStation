@@ -3,6 +3,7 @@ import os, uuid, time, sys
 from multiprocessing import Process, Queue, Pipe
 from Constants import DSConstants as DSConstants
 from Managers.HardwareManager.Sources import *
+from Managers.InstrumentManager.Sockets import *
 import numpy as np
 from DSWidgets.controlWidget import readyCheckPacket
 
@@ -29,22 +30,92 @@ class Hardware_Object(QObject):
         self.hardwareManager = hardwareManager
         self.sourceList = list()
         self.managerMessages = list()
+        self.initTriggerModes()
         self.onCreationParent()
         self.sourceListData = None
+        self.triggerSocket = None
         self.forceNoUpdatesOnSourceAddToggle = False
         
         self.workerReady = False
         self.workerReadyMessage = 'Worker Not Started!'
 
-        #self.pingTimer = QTimer()
-        #self.pingTimer.timeout.connect(self.checkReadyWorker)
-        #self.pingTimer.start(100)
+    def initTriggerModes(self):
+        self.triggerModes = dict()
+        self.triggerModes['Software'] = True
+        self.triggerModes['Digital Rise'] = False
+        self.triggerModes['Digital Fall'] = False
+
+    def getDeviceList(self):
+        return list()
+
+    def hardwareObjectConfigWidgetParent(self):
+        configWidget = QWidget()
+        configLayout = QVBoxLayout()
+        configWidget.setLayout(configLayout)
+        #configWidget.setMinimumHeight(350)
+        configWidget.setMinimumWidth(200)
+
+        hardwareConfig = QWidget()
+
+        layout = QFormLayout()
+        hardwareConfig.setLayout(layout)
+
+        if('deviceName' in self.hardwareSettings):
+            recoverDeviceTemp = self.hardwareSettings['deviceName'] #Temp fix - updateDevice called at start was whiping deviceName
+        deviceSelection = QComboBox()
+        deviceSelection.addItem('')
+        index = 0
+        for item in self.getDeviceList():
+            index = index + 1
+            deviceSelection.addItem(item)
+            if(item == recoverDeviceTemp):
+                deviceSelection.setCurrentIndex(index)
+        #Doing this after solved the issue of rebuilding the instrument every time widget was shown
+        deviceSelection.currentTextChanged.connect(self.updateDevice)
+        layout.addRow("Device:", deviceSelection)
+
+        if('triggerMode' in self.hardwareSettings):
+            recoverDeviceTemp = self.hardwareSettings['triggerMode'] #Temp fix - updateDevice called at start was whiping deviceName
+        triggerSelection = QComboBox()
+        index = 0
+        for key, val in self.triggerModes.items():
+            if(val is True):
+                index = index + 1
+                triggerSelection.addItem(key)
+                if(key == recoverDeviceTemp):
+                    triggerSelection.setCurrentIndex(index-1)
+        triggerSelection.currentTextChanged.connect(self.updateTrigger)
+
+        layout.addRow("Trigger:", triggerSelection)
+
+        configLayout.addWidget(hardwareConfig)
+        driverConfig = self.hardwareObjectConfigWidget()
+        if(isinstance(driverConfig, QWidget)):
+            configLayout.addWidget(driverConfig)
+
+        return configWidget
+
+    def updateDevice(self, text):
+        self.hardwareSettings['deviceName'] = text
+        self.hardwareSettings['name'] = self.hardwareSettings['deviceName']
+        self.genSources()
+
+    def updateTrigger(self, text):
+        self.hardwareSettings['triggerMode'] = text
+        self.generateTriggerComponent(text)
+
+    def generateTriggerComponent(self, text):
+        if(text in ('Digital Rise', 'Digital Fall')):
+            #self.triggerSource = DISocket()
+            msg = hwm(msg='[Manager]: TRIGGER CHANGED')
+            self.managerMessages.append(msg)
+        else:
+            #self.triggerSource = DISocket()
+            msg = hwm(msg='[Manager]: TRIGGER IS SOFTWARE')
+            self.managerMessages.append(msg)
 
     def hardwareObjectConfigWidget(self):
-        hardwareObjectConfigWidget = QWidget()
-        hardwareObjectConfigWidget.setMinimumWidth(200)
-        hardwareObjectConfigWidget.setMinimumHeight(300)
-        return hardwareObjectConfigWidget
+        return 0
 
     def initHardwareWorker(self):
         self.hardwareWorker = hardwareWorker()
@@ -76,8 +147,12 @@ class Hardware_Object(QObject):
             sourceSavePackets.append(source.onSave())
 
         savePacket['sourceList'] = sourceSavePackets
-
+        #savePacket['triggerSocket'] = self.triggerSocket.onSave()
         return savePacket
+
+    def resetDevice(self):
+        self.newMgrMsg()
+        self.onInitialize()
 
     def onLoadParent(self, loadPacket):
         self.hardwareSettings = {**self.hardwareSettings, **loadPacket['hardwareSettings']}
@@ -85,7 +160,7 @@ class Hardware_Object(QObject):
             self.sourceListData = loadPacket['sourceList']
             self.loadSourceListData()
         self.onLoad(loadPacket)
-        self.onInitialize()
+        self.resetDevice()
 
     def loadSourceListData(self):
         if(self.sourceListData is not None):
@@ -159,14 +234,18 @@ class Hardware_Object(QObject):
 
     def onProgramParent(self):
         self.onProgram()
-        import traceback
-        traceback.print_stack()
+        #import traceback
+        #traceback.print_stack()
         #print(programmingData)
         print('Reprogrammed.emit(self)')
         self.Reprogrammed.emit(self)
 
     def mgrMsg(self, text):
         msg = hwm(msg='[Manager]: ' + text)
+        self.managerMessages.append(msg)
+
+    def newMgrMsg(self):
+        msg = hwm(msg='[Manager]: Device Reset', action='refresh')
         self.managerMessages.append(msg)
 
     def getEvents(self):
@@ -233,6 +312,7 @@ class hardwareWorker():
         responseList = list()
         while(self.inQueues['response'].empty() is False):
             msg = self.inQueues['response'].get()
+            msg.msg = '[Worker]: ' + msg.msg
             responseList.append(msg)
 
         return responseList

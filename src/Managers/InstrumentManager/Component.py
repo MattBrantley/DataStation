@@ -20,6 +20,7 @@ class Component(QObject):
     iconGraphicSrc = 'default.png' # Not adjustable like layoutGraphicSrc is.
     mW = None
     valid = False
+    isTriggerComponent = False
 
     def __init__(self, mW, **kwargs):
         super().__init__()
@@ -29,6 +30,7 @@ class Component(QObject):
         self.compSettings['layoutGraphicSrc'] = self.iconGraphicSrc
         self.compSettings['showSequencer'] = False
         self.compSettings['uuid'] = str(uuid.uuid4())
+        self.compSettings['triggerComp'] = False
         self.mW = mW
         self.name = kwargs.get('name', self.componentType)
         self.socketList = list()
@@ -117,6 +119,7 @@ class Component(QObject):
         savePacket['compSettings'] = self.compSettings
         savePacket['compType'] = self.componentType
         savePacket['compIdentifier'] = self.componentIdentifier
+        savePacket['triggerComp'] = self.isTriggerComponent
         savePacket['iViewSettings'] = self.iViewComponent.onSave()
         savePacket['sockets'] = self.saveSockets()
 
@@ -132,7 +135,6 @@ class Component(QObject):
         sockets = list()
         for socket in self.socketList:
             sockets.append(socket.onSave())
-        
         return sockets
 
     def loadSockets(self, sockets):

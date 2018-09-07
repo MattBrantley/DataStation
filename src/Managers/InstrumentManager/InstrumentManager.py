@@ -1,5 +1,6 @@
 import os, sys, imp, time, inspect
 from Managers.InstrumentManager.Instrument import *
+from Managers.InstrumentManager.Digital_Trigger_Component import Digital_Trigger_Component
 from Constants import DSConstants as DSConstants
 import json as json
 from PyQt5.Qt import *
@@ -98,8 +99,9 @@ class InstrumentManager(QObject):
     def getAvailableComponents(self):
         return self.componentsAvailable
 
-    def newInstrument(self, name):
+    def newInstrument(self, name, rootPath):
         self.currentInstrument = Instrument(self)
+        self.currentInstrument.url = os.path.join(rootPath, name+'.dsinstrument')
         self.currentInstrument.Instrument_Modified.connect(self.Instrument_Modified)
         self.currentInstrument.Component_Modified.connect(self.Component_Modified)
         self.currentInstrument.Events_Modified.connect(self.Events_Modified)
@@ -119,6 +121,12 @@ class InstrumentManager(QObject):
 
         comp = self.componentsAvailable[dropIndex]
         result = self.currentInstrument.addComponent(comp)
+        self.mW.sequencerDockWidget.updatePlotList()
+        self.mW.hardwareWidget.drawScene()
+        return result
+
+    def addTriggerCompToInstrument(self, triggerComp):
+        result = self.currentInstrument.addComponent(triggerComp)
         self.mW.sequencerDockWidget.updatePlotList()
         self.mW.hardwareWidget.drawScene()
         return result
@@ -196,8 +204,9 @@ class InstrumentManager(QObject):
                             if(isinstance(comp['sockets'], list)):
                                 result.loadSockets(comp['sockets'])
                         if('iViewSettings' in comp):
-                            ivs = comp['iViewSettings']
-                            self.mW.instrumentWidget.instrumentView.addComp(result, ivs['x'], ivs['y'], ivs['r'])
+                            if(comp['triggerComp'] is False):
+                                ivs = comp['iViewSettings']
+                                self.mW.instrumentWidget.instrumentView.addComp(result, ivs['x'], ivs['y'], ivs['r'])
                             
         self.clearCurrentInstrument()
         self.currentInstrument = self.tempInstrument
@@ -218,6 +227,9 @@ class InstrumentManager(QObject):
             self.currentInstrument = None
 
     def findCompModelByIdentifier(self, identifier):
+        if(identifier == 'DigiTrigComp_mrb'):
+            return Digital_Trigger_Component(self.mW)
+
         for comp in self.componentsAvailable:
             if(comp.componentIdentifier == identifier):
                 return comp

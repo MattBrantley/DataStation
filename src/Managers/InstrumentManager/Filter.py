@@ -222,3 +222,11 @@ class Filter():
             pass
         else:
             return
+
+class AnalogFilter(Filter):
+    def __init__(self, hardwareManager, **kwargs):
+        super().__init__(hardwareManager, **kwargs)
+
+class DigitalFilter(Filter):
+    def __init__(self, hardwareManager, **kwargs):
+        super().__init__(hardwareManager, **kwargs)

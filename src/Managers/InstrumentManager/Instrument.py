@@ -64,6 +64,23 @@ class Instrument(QObject):
 
         return self.fullSocketList
 
+    def getSocketsByType(self, typeText):
+        typeOut = type(None)
+        if(typeText == 'Sockets: Analog Output'):
+            typeOut = AOSocket
+        elif(typeText == 'Sockets: Analog Input'):
+            typeOut = AISocket
+        elif(typeText == 'Sockets: Digital I/O'):
+            typeOut = DIOSocket
+
+        self.getSockets()
+        self.outList = list()
+
+        for socket in self.fullSocketList:
+            if(isinstance(socket, typeOut) or typeText == 'All'):
+                self.outList.append(socket)
+        return self.outList
+
     def saveInstrument(self):
         saveData = dict()
         saveData['name'] = self.name

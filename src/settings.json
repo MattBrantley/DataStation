@@ -1155,13 +1155,126 @@
             {
                 "hardwareIdentifier": "NI_Scope_MRB",
                 "hardwareSettings": {
-                    "deviceName": "",
-                    "name": "",
+                    "deviceName": "O-SCOPES",
+                    "name": "O-SCOPES",
                     "physID": "",
                     "uuid": "62262726-3dd8-40a4-9bde-94bb6d2c9220"
                 },
                 "hardwareType": "NI_Scope",
-                "sourceList": []
+                "sourceList": [
+                    {
+                        "name": "[O-SCOPES] Channel 0",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "Channel 0",
+                        "prec": 0.1,
+                        "uuid": "b29dee32-1d7c-4bf1-909e-94d6426c8245",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[O-SCOPES] Channel 1",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "Channel 1",
+                        "prec": 0.1,
+                        "uuid": "e83776ce-0598-45d0-a09d-b1364276ec87",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[O-SCOPES] Channel 2",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "Channel 2",
+                        "prec": 0.1,
+                        "uuid": "51ac93e7-13ba-4cba-b93e-ccbcd30aa022",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[O-SCOPES] Channel 3",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "Channel 3",
+                        "prec": 0.1,
+                        "uuid": "197a1e11-4cf7-404a-8213-6838573844e4",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[O-SCOPES] Channel 4",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "Channel 4",
+                        "prec": 0.1,
+                        "uuid": "2b760814-451e-4237-a37e-f18aacef6df1",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[O-SCOPES] Channel 5",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "Channel 5",
+                        "prec": 0.1,
+                        "uuid": "72bccd8a-7f2a-4370-8bce-6011452a036b",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[O-SCOPES] Channel 6",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "Channel 6",
+                        "prec": 0.1,
+                        "uuid": "1bf45f03-9ad2-480e-8812-b463852aa48f",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "name": "[O-SCOPES] Channel 7",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "Channel 7",
+                        "prec": 0.1,
+                        "uuid": "d89623d9-8326-44e1-b9bd-a3cdbcd67479",
+                        "vMax": 10,
+                        "vMin": -10
+                    }
+                ]
             }
         ]
     }

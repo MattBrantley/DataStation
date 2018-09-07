@@ -1,6 +1,6 @@
 import os, sys, imp
 from Managers.InstrumentManager.Instrument import *
-from Managers.InstrumentManager.Filter import Filter
+from Managers.InstrumentManager.Filter import *
 from Managers.InstrumentManager.Sockets import *
 from Managers.HardwareManager.Hardware_Object import Hardware_Object
 from Managers.HardwareManager.Sources import *
@@ -26,7 +26,6 @@ class HardwareManager(QObject):
         self.filtersDir = os.path.join(self.mW.rootDir, 'User Filters')
         self.hardwareDriverDir = os.path.join(self.mW.rootDir, 'Hardware Drivers')
         self.loadFilters()
-        #self.visaAddresses = self.getVISAObjectsList()
         self.loadHardwareDrivers()
         self.loadLabviewInterface()
 
@@ -36,22 +35,6 @@ class HardwareManager(QObject):
         self.mW.postLog('Initializing DataStation Labview Interface... ', DSConstants.LOG_PRIORITY_HIGH)
         self.lvInterface = DataStation_LabviewExtension(self.mW)
         self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
-
-    def getVISAObjectsList(self): #Because for some reason hte VISA drivers from NI don't locate the devices (even though they are seen in Max...)
-        self.mW.postLog('Detecting VISA compatible hardware... ', DSConstants.LOG_PRIORITY_HIGH)
-        rm = pyvisa.highlevel.ResourceManager()
-        visaAddressList = list()
-        for n in range(0, 25):
-            for m in range(0, 25):
-                try:
-                    name = 'PXI' + str(n) + '::' + str(m) + '::INSTR'
-                    pxm = rm.open_resource(name)
-                    visaAddressList.append(pxm.resource_manufacturer_name)
-                except:
-                    pass
-
-        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
-        return visaAddressList
 
     def loadHardwareDrivers(self):
         self.mW.postLog('Loading Hardware Drivers... ', DSConstants.LOG_PRIORITY_HIGH)
@@ -135,11 +118,39 @@ class HardwareManager(QObject):
         class_inst.onCreationParent()
         return class_inst
 
-    def getSourceObjs(self):
+    def getFiltersByType(self, typeText):
+        typeOut = type(None)
+        if(typeText == 'Sockets: Analog Output'):
+            typeOut = AnalogFilter
+        elif(typeText == 'Sockets: Analog Input'):
+            typeOut = AnalogFilter
+        elif(typeText == 'Sockets: Digital Output'):
+            typeOut = DigitalFilter
+        elif(typeText == 'Sockets: Digital Input'):
+            typeOut = DigitalFilter
+
+        filterList = list()
+        for filterClass in self.filtersAvailable:
+            if(issubclass(filterClass, typeOut) or typeText == 'All'):
+                filterList.append()
+
+
+    def getSourceObjs(self, typeText):
+        typeOut = type(None)
+        if(typeText == 'Sockets: Analog Output'):
+            typeOut = AOSource
+        elif(typeText == 'Sockets: Analog Input'):
+            typeOut = AISource
+        elif(typeText == 'Sockets: Digital Output'):
+            typeOut = DOSource
+        elif(typeText == 'Sockets: Digital Input'):
+            typeOut = DISource
+
         self.sourceObjList.clear()
         for hardware in self.hardwareLoaded:
             for source in hardware.sourceList:
-                self.sourceObjList.append(source)
+                if(isinstance(source, typeOut) or typeText == 'All'):
+                    self.sourceObjList.append(source)
 
         return self.sourceObjList
 
@@ -173,7 +184,7 @@ class HardwareManager(QObject):
         for Filter in self.filterList:
             if(Filter.uuid == uuid):
                 return Filter
-        for source in self.getSourceObjs():
+        for source in self.getSourceObjs('All'):
             if(source.uuid == uuid):
                 return source
 
@@ -187,8 +198,6 @@ class HardwareManager(QObject):
         return readyCheckPacket('Hardware Manager', DSConstants.READY_CHECK_READY, subs=subs)
 
     def hardwareModified(self, hardwareObj):
-        print('HARDWAWRE WAS MODIFIED')
-        print(type(hardwareObj))
         print('HARDWARE_MODIFIED.emit()')
         self.Hardware_Modified.emit()
 

@@ -57,6 +57,9 @@ class Socket():
             #print('attached')
 
     def onSave(self):
+        return self.onSaveChild()
+
+    def onSaveChild(self):
         pass
 
     def onLoad(self):
@@ -196,6 +199,67 @@ class AISocket(Socket):
             if('prec' in loadPacket):
                 self.prec = loadPacket['prec']
 
+class DOSocket(Socket):
+    def __init__(self, component, name):
+        super().__init__(component)
+        self.instrumentManager = self.component.instrumentManager
+        self.name = name + ' [DIO]'
+        self.vMin = vMin
+        self.vMax = vMax
+        self.prec = prec
+        self.paths.clear()
+
+    def onSaveChild(self):
+        savePacket = dict()
+        savePacket['name'] = self.name
+        savePacket['uuid'] = self.uuid
+        if(self.filterInputSource is not None):
+            savePacket['filterInputSource'] = self.filterInputSource.uuid
+            savePacket['filterInputPathNo'] = self.filterInputPathNo
+        else:
+            savePacket['filterInputSource'] = None
+            savePacket['filterInputPathNo'] = None
+
+        return savePacket
+
+    def onLoad(self, loadPacket):
+        if(isinstance(loadPacket, dict)):
+            self.loadPacket = loadPacket
+            if('name' in loadPacket):
+                self.name = loadPacket['name']
+            if('uuid' in loadPacket):
+                self.uuid = loadPacket['uuid']
+
+class DISocket(Socket):
+    def __init__(self, component, name):
+        super().__init__(component)
+        self.instrumentManager = self.component.instrumentManager
+        self.name = name + ' [DIO]'
+        self.vMin = vMin
+        self.vMax = vMax
+        self.prec = prec
+        self.paths.clear()
+
+    def onSaveChild(self):
+        savePacket = dict()
+        savePacket['name'] = self.name
+        savePacket['uuid'] = self.uuid
+        if(self.filterInputSource is not None):
+            savePacket['filterInputSource'] = self.filterInputSource.uuid
+            savePacket['filterInputPathNo'] = self.filterInputPathNo
+        else:
+            savePacket['filterInputSource'] = None
+            savePacket['filterInputPathNo'] = None
+
+        return savePacket
+
+    def onLoad(self, loadPacket):
+        if(isinstance(loadPacket, dict)):
+            self.loadPacket = loadPacket
+            if('name' in loadPacket):
+                self.name = loadPacket['name']
+            if('uuid' in loadPacket):
+                self.uuid = loadPacket['uuid']
 
 class waveformPacket():
     def __init__(self, waveformData):

@@ -21,7 +21,32 @@ class Hardware_Driver(Hardware_Object):
     def updateTableClock(self, rate):
             self.hardwareSettings['tableClockSpeed'] = int(rate)
 
-    def getPorts(self):
+    def MIPSYResponseToInt(self, bytes):
+        return int(bytes[1:-2].decode("utf-8"))
+
+    def MIPSYResponseToFloat(self, bytes):
+        return float(bytes[1:-2].decode("utf-8"))
+
+    def parseProgramData(self, programDataList):
+        for programData in programDataList:
+            print('NEW PACKET:')
+            print(programData.physicalConnectorID)
+            print(programData.waveformData)
+            print(self.waveformToClockCount(programData.waveformData))
+
+    def waveformToClockCount(self, waveform):
+        waveOut = np.copy(waveform)
+        waveOut[:,0] = np.vectorize(self.getClockCountAtTimePoint)(waveform[:,0])
+        return waveOut
+
+    def getClockCountAtTimePoint(self, time):
+        #time is in seconds (s)
+        freq = int(self.hardwareSettings['tableClockSpeed'])
+        return float(int(freq*time))
+
+    ##### REQUIRED FUNCTINONS #####
+
+    def getDeviceList(self):
         """ Lists serial port names
 
             :raises EnvironmentError:
@@ -63,69 +88,125 @@ class Hardware_Driver(Hardware_Object):
                 self.forceNoUpdatesOnSourceAdd(True) #FOR SPEED!
                 for channel in range(numDCB):
                     chOut = str(channel+1)
-                    nameTemp = self.hardwareSettings['deviceName'] + '/CH' + chOut
+                    nameTemp = self.hardwareSettings['deviceName'] + '/DCB/CH' + chOut
                     ser.write(b'GDCMIN,' + chOut.encode('ascii') + b'\r\n')
                     minTemp = self.MIPSYResponseToFloat(ser.readline())
                     ser.write(b'GDCMAX,' + chOut.encode('ascii') + b'\r\n')
                     maxTemp = self.MIPSYResponseToFloat(ser.readline())
-                    source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, minTemp, maxTemp, 0.1, chOut)
+                    source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, minTemp, maxTemp, 0.1, 'DCB/'+chOut)
                     self.addSource(source)
 
+                # MIPS has no way to poll Digital Out and Digital In channel counts seperately
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/A'
+                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/A')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/B'
+                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/B')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/C'
+                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/C')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/D'
+                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/D')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/E'
+                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/E')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/F'
+                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/F')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/G'
+                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/G')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/H'
+                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/H')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/I'
+                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/I')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/J'
+                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/J')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/K'
+                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/K')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/L'
+                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/L')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/M'
+                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/M')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/N'
+                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/N')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/O'
+                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/O')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/P'
+                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/P')
+                self.addSource(source)
+
+
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/Q'
+                source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/Q')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/R'
+                source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/R', trigger=True)
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/S'
+                source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/S')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/T'
+                source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/T')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/U'
+                source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/U')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/V'
+                source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/V')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/W'
+                source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/W')
+                self.addSource(source)
+                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/X'
+                source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/X')
+                self.addSource(source)
+
+                '''
+                ser.write(b'GCHAN,DIO\r\n')
+                response = ser.readline()
+                if(response is not None):
+                    numDCB = self.MIPSYResponseToInt(response)
+                else:
+                    numDCB = 0
+                self.forceNoUpdatesOnSourceAdd(True) #FOR SPEED!
+                for channel in range(numDCB):
+                    charChannel = chr((ord('a') + channel) % 123).upper()
+                    #print('--------------' + charChannel + ':')
+                    stringSer = b'SDIO,' + charChannel.encode('utf-8') + b',0\r\n'
+                    #print(stringSer.decode('utf-8'))
+                    ser.write(b'SDIO,' + charChannel.encode('utf-8') + b',0\r\n')
+                    response = ser.readline()
+                    if(response is not None):
+                        print(response)
+                    else:
+                        print('no response')
+
+                    nameTemp = self.hardwareSettings['deviceName'] + '/DO/' + charChannel
+                    source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DO/'+charChannel)
+                    self.addSource(source)
+                '''
+
                 self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
-
-    def MIPSYResponseToInt(self, bytes):
-        return int(bytes[1:-2].decode("utf-8"))
-
-    def MIPSYResponseToFloat(self, bytes):
-        return float(bytes[1:-2].decode("utf-8"))
-
-    def parseProgramData(self, programDataList):
-        for programData in programDataList:
-            print('NEW PACKET:')
-            print(programData.physicalConnectorID)
-            print(programData.waveformData)
-            print(self.waveformToClockCount(programData.waveformData))
-
-    def waveformToClockCount(self, waveform):
-        waveOut = np.copy(waveform)
-        waveOut[:,0] = np.vectorize(self.getClockCountAtTimePoint)(waveform[:,0])
-        return waveOut
-
-    def getClockCountAtTimePoint(self, time):
-        #time is in seconds (s)
-        freq = int(self.hardwareSettings['tableClockSpeed'])
-        return float(int(freq*time))
-
-    def updateDevice(self, text):
-        self.hardwareSettings['deviceName'] = text
-        self.hardwareSettings['name'] = self.hardwareSettings['deviceName']
-        self.genSources()
-
-    ##### REQUIRED FUNCTINONS #####
 
     def initHardwareWorker(self):
         self.hardwareWorker = MIPSYHardwareWorker()
 
     def hardwareObjectConfigWidget(self):
         hardwareConfig = QWidget()
-        hardwareConfig.setMinimumWidth(200)
-        hardwareConfig.setMinimumHeight(300)
 
         layout = QFormLayout()
         hardwareConfig.setLayout(layout)
-        recoverDeviceTemp = self.hardwareSettings['deviceName'] #Temp fix - updateDevice called at start was whiping deviceName
-        
-        deviceSelection = QComboBox()
-        deviceSelection.addItem('')
-        index = 0
-        for item in self.getPorts():
-            index = index + 1
-            deviceSelection.addItem(item)
-            if(item == recoverDeviceTemp):
-                deviceSelection.setCurrentIndex(index)
-
-        #Doing this after solved the issue of rebuilding the instrument every time widget was shown
-        deviceSelection.currentTextChanged.connect(self.updateDevice)
 
         tableClockSelection = QComboBox()
         tableClockSelection.addItem('48000000')
@@ -137,7 +218,6 @@ class Hardware_Driver(Hardware_Object):
 
         tableClockSelection.setCurrentIndex(self.hardwareSettings['tableClockIndex'])
 
-        layout.addRow("Device:", deviceSelection)
         layout.addRow("Table Clock:", tableClockSelection)
 
         return hardwareConfig
@@ -150,7 +230,12 @@ class Hardware_Driver(Hardware_Object):
         pass
 
     def onInitialize(self):
+        self.hardwareWorker.outQueues['command'].put(hwm(action='init'))
         self.genSources()
+        self.triggerModes['Software'] = True
+        self.triggerModes['Digital Rise'] = True
+        self.triggerModes['Digital Fall'] = True
+        self.hardwareWorker.outQueues['command'].put(hwm(action='config'))
 
     def onProgram(self):
         pass
@@ -159,7 +244,6 @@ class Hardware_Driver(Hardware_Object):
     def onRun(self):
         self.program()
         self.hardwareWorker.outQueues['command'].put(hwm(action='run'))
-
 
 class MIPSYHardwareWorker(hardwareWorker):
     def __init__(self):
@@ -195,7 +279,6 @@ class MIPSYHardwareWorker(hardwareWorker):
         if(msgIn.action == 'readyCheck'):
             queueOut.put(hwm(action='readyCheck', msg='Hardware Ready!', data=True))
             return
-
 
         ##### INITILIAZATION
         if(msgIn.action == 'init'):

@@ -140,7 +140,7 @@ class Source():
         self.hardware.program()
 
 class AISource(Source):
-    def __init__(self, hardware, name, vMin, vMax, prec, physConID):
+    def __init__(self, hardware, name, vMin, vMax, prec, physConID, trigger=False):
         super().__init__(hardware)
         self.hardware = hardware
         self.name = name
@@ -151,6 +151,7 @@ class AISource(Source):
         self.paths.append(None)
         self.loadPacket = None
         self.physicalConnectorID = physConID
+        self.trigger = trigger
 
     def parsePacket(self, packetIn):
         if(isinstance(packetIn, waveformPacket) is False):
@@ -162,6 +163,9 @@ class AISource(Source):
         self.programData = packetIn
         self.programData.physicalConnectorID = self.physicalConnectorID
         return readyCheckPacket('Analog Input Source', DSConstants.READY_CHECK_READY)
+
+    def packetInSourceRange(self, packetIn):
+        return True
 
     def onSave(self):
         savePacket = dict()
@@ -237,16 +241,8 @@ class AOSource(Source):
 
     def onLoad(self, loadPacket):
         self.loadPacket = loadPacket
-        #if('name' in loadPacket):
-        #    self.name = loadPacket['name']
         if('uuid' in loadPacket):
             self.uuid = loadPacket['uuid']
-        #if('vMin' in loadPacket):
-        #    self.vMin = loadPacket['vMin']
-        #if('vMax' in loadPacket):
-        #    self.vMax = loadPacket['vMax']
-        #if('prec' in loadPacket):
-        #    self.prec = loadPacket['prec']
         if('physConID' in loadPacket):
             self.physicalConnectorID = loadPacket['physConID']
 
@@ -256,12 +252,78 @@ class AOSource(Source):
                     if(path['data'] is not None and path['pathNo'] is not None):
                         self.paths[path['pathNo']-1] = self.hardware.hardwareManager.loadFilterFromData(self, path['data'], path['pathNo'])
 
-class DIOSource(Source):
+class DOSource(Source):
     def __init__(self, hardware, name, physConID):
         super().__init__(hardware)
         self.hardware = hardware
         self.name = name
+        self.paths.clear()
+        self.paths.append(None)
+        self.loadPacket = None
         self.physicalConnectorID = physConID
+
+    def parsePacket(self, packetIn):
+        if(isinstance(packetIn, waveformPacket) is False):
+            return readyCheckPacket('Digital Output Source', DSConstants.READY_CHECK_ERROR, msg='Digital Output Source Recieved Unknown Packet Type!')
+        
+        if(self.packetInSourceRange(packetIn) is False):
+            return readyCheckPacket('Digital Output Source', DSConstants.READY_CHECK_ERROR, msg='Digital Output Source Waveform Out Of Range!')
+
+        self.programData = packetIn
+        self.programData.physicalConnectorID = self.physicalConnectorID
+        return readyCheckPacket('Digital Output Source', DSConstants.READY_CHECK_READY)
+
+    def packetInSourceRange(self, packetIn):
+        return True
+
+    def onSave(self):
+        savePacket = dict()
+        savePacket['name'] = self.name
+        savePacket['uuid'] = self.uuid
+        savePacket['physConID'] = self.physicalConnectorID
+        savePacket['paths'] = self.savePaths()
+
+        return savePacket
+
+    def onLoad(self, loadPacket):
+        self.loadPacket = loadPacket
+        if('name' in loadPacket):
+            self.name = loadPacket['name']
+        if('uuid' in loadPacket):
+            self.uuid = loadPacket['uuid']
+        if('physConID' in loadPacket):
+            self.physicalConnectorID = loadPacket['physConID']
+
+        if('paths' in loadPacket):
+            for path in loadPacket['paths']:
+                if('pathNo' in path and 'data' in path):
+                    if(path['data'] is not None and path['pathNo'] is not None):
+                        self.paths[path['pathNo']-1] = self.hardware.hardwareManager.loadFilterFromData(self, path['data'], path['pathNo'])
+
+class DISource(Source):
+    def __init__(self, hardware, name, physConID, trigger=False):
+        super().__init__(hardware)
+        self.hardware = hardware
+        self.name = name
+        self.paths.clear()
+        self.paths.append(None)
+        self.loadPacket = None
+        self.physicalConnectorID = physConID
+        self.trigger = True
+
+    def parsePacket(self, packetIn):
+        if(isinstance(packetIn, waveformPacket) is False):
+            return readyCheckPacket('Digital Input Source', DSConstants.READY_CHECK_ERROR, msg='Digital Input Source Recieved Unknown Packet Type!')
+        
+        if(self.packetInSourceRange(packetIn) is False):
+            return readyCheckPacket('Digital Input Source', DSConstants.READY_CHECK_ERROR, msg='Digital Input Source Waveform Out Of Range!')
+
+        self.programData = packetIn
+        self.programData.physicalConnectorID = self.physicalConnectorID
+        return readyCheckPacket('Digital Input Source', DSConstants.READY_CHECK_READY)
+
+    def packetInSourceRange(self, packetIn):
+        return True
 
     def onSave(self):
         savePacket = dict()

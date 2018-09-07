@@ -81,7 +81,7 @@ class instrumentWidget(QDockWidget):
         self.mW.postLog('Creating new instrument', DSConstants.LOG_PRIORITY_HIGH)
         fname, ok = QInputDialog.getText(self.mW, "Virtual Instrument Name", "Virtual Instrument Name")
         if(ok):
-            self.instrumentManager.newInstrument(fname)
+            self.instrumentManager.newInstrument(fname, self.rootPath)
         else:
             return
         self.updateTitle()

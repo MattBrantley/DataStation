@@ -273,7 +273,6 @@ class sequencerDockWidget(QDockWidget):
             self.plots.clear()
             if(self.instrumentManager.currentInstrument is not None):
                 for component in self.instrumentManager.currentInstrument.components:
-                    print(type(component))
                     if(component.compSettings['showSequencer'] is True):
                         plotHolder = self.sequenceView.addPlot(component.compSettings['name'], component)
                         if(component.valid is True):

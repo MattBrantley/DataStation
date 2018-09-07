@@ -2,14 +2,14 @@
 """
 A simple DC Amplifier.
 """
-from Managers.InstrumentManager.Filter import Filter
+from Managers.InstrumentManager.Filter import *
 from Managers.InstrumentManager.Sockets import *
 from PyQt5.Qt import *
 from PyQt5.QtGui import *
 import numpy as np
 import os
 
-class User_Filter(Filter):
+class User_Filter(AnalogFilter):
     filterType = 'Simple Amplifier'
     filterIdentifier = 'SimpAmp_MRB'
     filterVersion = '1.0'
@@ -17,6 +17,7 @@ class User_Filter(Filter):
     filterVersionDate = '8/13/2018'
     iconGraphicSrc = 'default.png'
     numPaths = 1
+
     valid = False
 
     def onCreation(self):

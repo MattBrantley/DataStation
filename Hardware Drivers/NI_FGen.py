@@ -24,44 +24,6 @@ class Hardware_Driver(Hardware_Object):
             except nidaqmx.errors.DaqError:
                 self.maxRate = None
 
-    def getDeviceList(self): 
-        deviceList = list()
-        devices = self.hardwareManager.lvInterface.devices['NI-FGEN']
-        for device in devices:
-            deviceList.append(device['Device Name'])
-
-        return deviceList
-
-    def updateDevice(self, text):
-        self.hardwareSettings['deviceName'] = text
-        self.hardwareSettings['name'] = self.hardwareSettings['deviceName']
-        self.onInitialize() #Resets the instrument
-        #self.genSources()
-
-    def genSources(self):
-        self.clearSourceList()
-        if(self.hardwareSettings['deviceName'] in self.getDeviceList()):
-
-            self.forceNoUpdatesOnSourceAdd(True) #FOR SPEED!
-            print(self.hardwareSettings['deviceName'])
-        #    with nifgen.Session(self.hardwareSettings['deviceName']) as session:
-        #        for i in range(0, session.channel_count):
-        #            source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] Output '+str(i), -10, 10, 0.1, 'Output '+str(i))
-        #            self.addSource(source)
-        #    self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
-        else:
-            print('Config_Modified.emit()')
-            self.Config_Modified.emit(self)
-        #    device = nidaqmx.system.Device(self.hardwareSettings['deviceName'])
-        #    self.forceNoUpdatesOnSourceAdd(True) #FOR SPEED!
-        #    for chan in device.ao_physical_chans:
-        #        source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] '+chan.name, -10, 10, 0.1, chan.name)
-        #        self.addSource(source)
-        #    self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
-        #else:
-        #    print('Config_Modified.emit()')
-        #    self.Config_Modified.emit(self)
-
     def parseProgramData(self):
         eventData = self.getEvents()
 
@@ -125,32 +87,43 @@ class Hardware_Driver(Hardware_Object):
         return gran
 
     ##### REQUIRED FUNCTIONS #####
+    def genSources(self):
+        self.clearSourceList()
+        if(self.hardwareSettings['deviceName'] in self.getDeviceList()):
+
+            self.forceNoUpdatesOnSourceAdd(True) #FOR SPEED!
+            print(self.hardwareSettings['deviceName'])
+        #    with nifgen.Session(self.hardwareSettings['deviceName']) as session:
+        #        for i in range(0, session.channel_count):
+        #            source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] Output '+str(i), -10, 10, 0.1, 'Output '+str(i))
+        #            self.addSource(source)
+        #    self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
+        else:
+            print('Config_Modified.emit()')
+            self.Config_Modified.emit(self)
+        #    device = nidaqmx.system.Device(self.hardwareSettings['deviceName'])
+        #    self.forceNoUpdatesOnSourceAdd(True) #FOR SPEED!
+        #    for chan in device.ao_physical_chans:
+        #        source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] '+chan.name, -10, 10, 0.1, chan.name)
+        #        self.addSource(source)
+        #    self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
+        #else:
+        #    print('Config_Modified.emit()')
+        #    self.Config_Modified.emit(self)
+
+    def getDeviceList(self): 
+        deviceList = list()
+        devices = self.hardwareManager.lvInterface.devices['NI-FGEN']
+        for device in devices:
+            deviceList.append(device['Device Name'])
+
+        return deviceList
+
     def initHardwareWorker(self):
         self.hardwareWorker = NI_FGenHardwareWorker()
 
     def hardwareObjectConfigWidget(self):
         hardwareConfig = QWidget()
-        hardwareConfig.setMinimumWidth(200)
-        hardwareConfig.setMinimumHeight(300)
-
-        layout = QFormLayout()
-        hardwareConfig.setLayout(layout)
-        recoverDeviceTemp = self.hardwareSettings['deviceName'] #Temp fix - updateDevice called at start was whiping deviceName
-        
-        deviceSelection = QComboBox()
-        deviceSelection.addItem('')
-        index = 0
-        for item in self.getDeviceList():
-            index = index + 1
-            deviceSelection.addItem(item)
-            if(item == recoverDeviceTemp):
-                deviceSelection.setCurrentIndex(index)
-
-        #Doing this after solved the issue of rebuilding the instrument every time widget was shown
-        deviceSelection.currentTextChanged.connect(self.updateDevice)
-
-        layout.addRow("Device:", deviceSelection)
-
         return hardwareConfig
 
     def onCreation(self):
@@ -161,8 +134,10 @@ class Hardware_Driver(Hardware_Object):
         # Any hardwareSettings specifically saved by this device are contained in loadPacket
 
     def onInitialize(self):
+        self.hardwareWorker.outQueues['command'].put(hwm(action='init'))
         self.getDeviceInfo()
         self.genSources()
+        self.hardwareWorker.outQueues['command'].put(hwm(action='config'))
 
     def onProgram(self):
         programmingData = self.parseProgramData()

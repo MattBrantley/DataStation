@@ -30,3 +30,5 @@ class logDockWidget(QDockWidget):
                 return
 
         self.logTextEdit.appendPlainText(time.strftime('[%m/%d/%Y %H:%M:%S] ') + text)
+        self.logTextEdit.verticalScrollBar().setValue(self.logTextEdit.verticalScrollBar().maximum())
+        

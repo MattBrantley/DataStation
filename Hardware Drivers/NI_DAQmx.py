@@ -22,33 +22,6 @@ class Hardware_Driver(Hardware_Object):
             except nidaqmx.errors.DaqError:
                 self.maxRate = None
 
-    def getDeviceList(self):
-        system = nidaqmx.system.System.local()
-        deviceList = list()
-        for device in system.devices:
-            deviceList.append(device.name)
-
-        return deviceList
-
-    def updateDevice(self, text):
-        self.hardwareSettings['deviceName'] = text
-        self.hardwareSettings['name'] = self.hardwareSettings['deviceName']
-        self.onInitialize() #Resets the instrument
-        #self.genSources()
-
-    def genSources(self):
-        self.clearSourceList()
-        if(self.hardwareSettings['deviceName'] in self.getDeviceList()):
-            device = nidaqmx.system.Device(self.hardwareSettings['deviceName'])
-            self.forceNoUpdatesOnSourceAdd(True) #FOR SPEED!
-            for chan in device.ao_physical_chans:
-                source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] '+chan.name, -10, 10, 0.1, chan.name)
-                self.addSource(source)
-            self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
-        else:
-            print('Config_Modified.emit()')
-            self.Config_Modified.emit(self)
-
     def parseProgramData(self):
         eventData = self.getEvents()
 
@@ -112,32 +85,32 @@ class Hardware_Driver(Hardware_Object):
         return gran
 
     ##### REQUIRED FUNCTIONS #####
+    def genSources(self):
+        self.clearSourceList()
+        if(self.hardwareSettings['deviceName'] in self.getDeviceList()):
+            device = nidaqmx.system.Device(self.hardwareSettings['deviceName'])
+            self.forceNoUpdatesOnSourceAdd(True) #FOR SPEED!
+            for chan in device.ao_physical_chans:
+                source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] '+chan.name, -10, 10, 0.1, chan.name)
+                self.addSource(source)
+            self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
+        else:
+            print('Config_Modified.emit()')
+            self.Config_Modified.emit(self)
+
+    def getDeviceList(self):
+        system = nidaqmx.system.System.local()
+        deviceList = list()
+        for device in system.devices:
+            deviceList.append(device.name)
+
+        return deviceList
+
     def initHardwareWorker(self):
         self.hardwareWorker = NI_DAQmxHardwareWorker()
 
     def hardwareObjectConfigWidget(self):
         hardwareConfig = QWidget()
-        hardwareConfig.setMinimumWidth(200)
-        hardwareConfig.setMinimumHeight(300)
-
-        layout = QFormLayout()
-        hardwareConfig.setLayout(layout)
-        recoverDeviceTemp = self.hardwareSettings['deviceName'] #Temp fix - updateDevice called at start was whiping deviceName
-        
-        deviceSelection = QComboBox()
-        deviceSelection.addItem('')
-        index = 0
-        for item in self.getDeviceList():
-            index = index + 1
-            deviceSelection.addItem(item)
-            if(item == recoverDeviceTemp):
-                deviceSelection.setCurrentIndex(index)
-
-        #Doing this after solved the issue of rebuilding the instrument every time widget was shown
-        deviceSelection.currentTextChanged.connect(self.updateDevice)
-
-        layout.addRow("Device:", deviceSelection)
-
         return hardwareConfig
 
     def onCreation(self):
@@ -148,8 +121,13 @@ class Hardware_Driver(Hardware_Object):
         # Any hardwareSettings specifically saved by this device are contained in loadPacket
 
     def onInitialize(self):
+        self.hardwareWorker.outQueues['command'].put(hwm(action='init'))
         self.getDeviceInfo()
         self.genSources()
+        self.triggerModes['Software'] = True
+        self.triggerModes['Digital Rise'] = True
+        self.triggerModes['Digital Fall'] = True
+        self.hardwareWorker.outQueues['command'].put(hwm(action='config'))
 
     def onProgram(self):
         programmingData = self.parseProgramData()
@@ -187,7 +165,7 @@ class NI_DAQmxHardwareWorker(hardwareWorker):
         if(self.configured is False and msgIn.action in ('readyCheck', 'run', 'arm', 'program')):
             queueOut.put(hwm(action=response, msg='Hardware Not Configured', data=False))
             return
-        if(self.configured is False and msgIn.action in ('readyCheck', 'run', 'arm', 'program', 'configure')):
+        if(self.initialized is False and msgIn.action in ('readyCheck', 'run', 'arm', 'program', 'configure')):
             queueOut.put(hwm(action=response, msg='Hardware Not Initialized', data=False))
             return
         if(msgIn.action == 'readyCheck'):
@@ -199,18 +177,24 @@ class NI_DAQmxHardwareWorker(hardwareWorker):
         if(msgIn.action == 'init'):
             queueOut.put(hwm(action='textUpdate', msg='Initializing..'))
             self.initialized = True
+            self.configured = False
+            self.programmed = False
+            self.armed = False
             queueOut.put(hwm(action='textUpdate', msg='Done! Ready for Configuration..'))
 
         #### CONFIGURING
         if(msgIn.action == 'config'):
             queueOut.put(hwm(action='textUpdate', msg='Configuring..'))
             self.configured = True
+            self.programmed = False
+            self.armed = False
             queueOut.put(hwm(action='textUpdate', msg='Done! Ready for Waveform Programming..'))
 
         ##### PROGRAMMING
         if(msgIn.action == 'program'):
             queueOut.put(hwm(action='textUpdate', msg='Writing Program to Card..'))
             self.programmed = True
+            self.armed = False
             queueOut.put(hwm(action='textUpdate', msg='Done! Ready for Trigger Arming..'))
 
         ##### ARM

@@ -2,12 +2,12 @@
 """
 Splits an incoming signal to two outputs
 """
-from Managers.InstrumentManager.Filter import Filter
+from Managers.InstrumentManager.Filter import *
 from PyQt5.Qt import *
 from PyQt5.QtGui import *
 import os
 
-class User_Filter(Filter):
+class User_Filter(AnalogFilter):
     filterType = 'Signal Splitter 2-Way'
     filterIdentifier = 'SigSplit2_MRB'
     filterVersion = '1.0'

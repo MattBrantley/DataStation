@@ -14,7 +14,7 @@ class filterStackWidget(QDockWidget):
         super().__init__('Filter Stack Editor', parent=parent)
         self.hardwareManager = parent.hardwareManager
         self.instrumentManager = parent.instrumentManager 
-        self.parent = parent
+        self.widget = parent
         self.mW = mW
         self.hide()
         self.setAllowedAreas(Qt.NoDockWidgetArea)
@@ -328,7 +328,8 @@ class socketSelectionWidget(QWidgetAction):
         self.menu.close()
 
     def populateBox(self):
-        for socket in self.parent.view.parent.mW.instrumentWidget.instrumentManager.currentInstrument.getSockets():
+        
+        for socket in self.parent.view.parent.mW.instrumentWidget.instrumentManager.currentInstrument.getSocketsByType(self.parent.view.parent.mW.hardwareWidget.gridCombo.currentText()):
             item = socketSelectionItem(socket.name, socket)
             self.pSpinBox.addItem(item)
 

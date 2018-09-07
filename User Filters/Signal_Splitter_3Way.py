@@ -2,12 +2,12 @@
 """
 Splits an incoming signal to three outputs
 """
-from Managers.InstrumentManager.Filter import Filter
+from Managers.InstrumentManager.Filter import *
 from PyQt5.Qt import *
 from PyQt5.QtGui import *
 import os
 
-class User_Filter(Filter):
+class User_Filter(AnalogFilter):
     filterType = 'Signal Splitter 3-Way'
     filterIdentifier = 'SigSplit3_MRB'
     filterVersion = '1.0'
