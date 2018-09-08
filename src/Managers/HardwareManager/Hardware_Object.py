@@ -4,6 +4,7 @@ from multiprocessing import Process, Queue, Pipe
 from Constants import DSConstants as DSConstants
 from Managers.HardwareManager.Sources import *
 from Managers.InstrumentManager.Sockets import *
+
 import numpy as np
 from DSWidgets.controlWidget import readyCheckPacket
 
@@ -13,6 +14,7 @@ sys.path.append(str(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirn
 class Hardware_Object(QObject):
     Config_Modified = pyqtSignal(object)
     Reprogrammed = pyqtSignal(object)
+    Trigger_Modified = pyqtSignal(object)
 
     hardwareType = 'Default Hardware Object'
     hardwareIdentifier = 'DefHardObj'
@@ -27,6 +29,8 @@ class Hardware_Object(QObject):
         self.hardwareSettings['name'] = ''
         self.hardwareSettings['physID'] = ''
         self.hardwareSettings['uuid'] = str(uuid.uuid4())
+        self.hardwareSettings['triggerCompUUID'] = ''
+        self.hardwareSettings['triggerMode'] = ''
         self.hardwareManager = hardwareManager
         self.sourceList = list()
         self.managerMessages = list()
@@ -35,6 +39,7 @@ class Hardware_Object(QObject):
         self.sourceListData = None
         self.triggerComponent = None
         self.forceNoUpdatesOnSourceAddToggle = False
+        self.instrumentIsLoaded = False
         
         self.workerReady = False
         self.workerReadyMessage = 'Worker Not Started!'
@@ -78,6 +83,7 @@ class Hardware_Object(QObject):
             recoverDeviceTemp = self.hardwareSettings['triggerMode'] #Temp fix - updateDevice called at start was whiping deviceName
         triggerSelection = QComboBox()
         index = 0
+        print(self.triggerModes)
         for key, val in self.triggerModes.items():
             if(val is True):
                 index = index + 1
@@ -100,6 +106,18 @@ class Hardware_Object(QObject):
         self.hardwareSettings['name'] = self.hardwareSettings['deviceName']
         self.genSources()
 
+##### INSTRUMENT STATUS ######
+
+    def instrumentLoaded(self):
+        self.instrumentIsLoaded = True
+        self.verifyTriggerComponentExists()
+        self.Trigger_Modified.emit(self)
+
+    def instrumentUnloaded(self):
+        self.instrumentIsLoaded = False
+
+##### TRIGGER COMPONENT ######
+
     def updateTrigger(self, text):
         self.hardwareSettings['triggerMode'] = text
         self.generateTriggerComponent(text)
@@ -107,12 +125,34 @@ class Hardware_Object(QObject):
     def generateTriggerComponent(self, text):
         if(text in ('Digital Rise', 'Digital Fall')):
             #self.triggerSource = DISocket()
-            msg = hwm(msg='[Manager]: TRIGGER CHANGED')
+            self.triggerComponent = self.hardwareManager.addDigitalTriggerComp(self)
+            self.hardwareSettings['triggerCompUUID'] = self.triggerComponent.compSettings['uuid']
+            msg = hwm(msg='[Manager]: Digital Trigger Component Generated')
+            self.managerMessages.append(msg)
+        elif(text is 'Software'):
+            #self.triggerSource = DISocket()
+            self.removeTriggerComponent()
+            msg = hwm(msg='[Manager]: Software Trgiger Enabled')
+            self.hardwareSettings['triggerCompUUID'] = ''
             self.managerMessages.append(msg)
         else:
-            #self.triggerSource = DISocket()
-            msg = hwm(msg='[Manager]: TRIGGER IS SOFTWARE')
-            self.managerMessages.append(msg)
+            pass
+        print('Trigger_Modified.emit()')
+        self.Trigger_Modified.emit(self)
+
+    def removeTriggerComponent(self):
+        self.hardwareSettings['triggerCompUUID'] = ''
+
+    def verifyTriggerComponentExists(self):
+        print('Checking for Trigger Comp!' + self.hardwareSettings['name'])
+        print(self.hardwareSettings['uuid'])
+        if(self.hardwareManager.getTrigCompsRefUUID(self.hardwareSettings['uuid']) is None):
+            print('Trigger Comp Not Found')
+            self.updateTrigger(self.hardwareSettings['triggerMode'])
+        else:
+            print('Trigger Comp Found!')
+
+##### 
 
     def hardwareObjectConfigWidget(self):
         return 0
@@ -130,6 +170,8 @@ class Hardware_Object(QObject):
         return self.sourceList
     
     def readyCheck(self):
+        #if(self.instrumentIsLoaded is True):
+        #    self.verifyTriggerComponentExists()
         subs = list()
         for source in self.sourceList:
             subs.append(source.readyCheck())
@@ -141,7 +183,6 @@ class Hardware_Object(QObject):
         savePacket['hardwareType'] = self.hardwareType
         savePacket['hardwareIdentifier'] = self.hardwareIdentifier
         savePacket['hardwareSettings'] = self.hardwareSettings
-
         sourceSavePackets = list()
         for source in self.sourceList:
             sourceSavePackets.append(source.onSave())
@@ -225,7 +266,7 @@ class Hardware_Object(QObject):
 
     def getPingTime(self):
         return self.hardwareWorker.checkPing()
-        
+
     def onRun(self):
         self.hardwareWorker.outQueues['command'].put(hwm(action='run'))
 

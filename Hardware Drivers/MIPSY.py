@@ -75,7 +75,6 @@ class Hardware_Driver(Hardware_Object):
         return result
 
     def genSources(self):
-        print('GENERATING SOURCES: ' + self.hardwareSettings['deviceName'])
         self.clearSourceList()
         if(self.hardwareSettings['deviceName'] != ''):
             with serial.Serial(self.hardwareSettings['deviceName'], 115200, timeout=1) as ser:

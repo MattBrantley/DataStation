@@ -35,9 +35,9 @@ class Filter():
     def getPacketType(self, packetIn):
         if(packetIn is None):
             return None
-        if(issubclass(type(packetIn), DCWaveformPacket)):
+        if(issubclass(type(packetIn), waveformPacket)):
             return self.FILTER_PACKET_DC_WAVEFORM
-        if(issubclass(type(packetIn), DIOWaveformPacket)):
+        if(issubclass(type(packetIn), waveformPacket)):
             return self.FILTER_PACKET_DIO_WAVEFORM
         
         return None
@@ -141,6 +141,8 @@ class Filter():
         self.paths[pathNo-1] = socketIn
 
     def reattachSocket(self, socketIn, pathNo):
+        if(self.paths[pathNo-1] is socketIn):
+            return self
         if(self.paths[pathNo-1] is not None):
             return None
         else:

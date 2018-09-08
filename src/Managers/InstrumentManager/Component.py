@@ -95,6 +95,16 @@ class Component(QObject):
         self.socketList.append(socket)
         return socket
 
+    def addDOSocket(self, name):
+        socket = DOSocket(self, name)
+        self.socketList.append(socket)
+        return socket
+
+    def addDISocket(self, name):
+        socket = DISocket(self, name)
+        self.socketList.append(socket)
+        return socket
+
     def registeriViewComponent(self, component):
         self.iViewComponent = component
 
@@ -120,7 +130,8 @@ class Component(QObject):
         savePacket['compType'] = self.componentType
         savePacket['compIdentifier'] = self.componentIdentifier
         savePacket['triggerComp'] = self.isTriggerComponent
-        savePacket['iViewSettings'] = self.iViewComponent.onSave()
+        if(hasattr(self, 'iViewComponent')):
+            savePacket['iViewSettings'] = self.iViewComponent.onSave()
         savePacket['sockets'] = self.saveSockets()
 
         return savePacket
@@ -138,6 +149,8 @@ class Component(QObject):
         return sockets
 
     def loadSockets(self, sockets):
+        if(self.isTriggerComponent is True):
+            self.genTriggerSocket()
         index = 0
         for socket in sockets:
             self.socketList[index].onLoad(socket)
@@ -170,6 +183,8 @@ class Component(QObject):
 
     def onRemovalParent(self):
         self.instrumentManager.mW.postLog('Removing Instrument Component: ' + self.componentType, DSConstants.LOG_PRIORITY_MED)
+        for socket in self.socketList:
+            socket.unattach()
         self.onRemoval()
 
     def onRemoval(self):

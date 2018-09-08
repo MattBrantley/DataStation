@@ -18,6 +18,18 @@ class Instrument(QObject):
         self.components = list()
         self.fullSocketList = list()
 
+    def checkTriggerComponents(self):
+        removeList = list()
+
+        for component in self.components:
+            if(component.isTriggerComponent is True):
+                obj = self.instrumentManager.getHardwareObjectByUUID(component.compSettings['hardwareObjectUUID'])
+                if(obj is None):
+                    removeList.append(component)
+
+        for component in removeList:
+            self.removeComponent(component)
+                
     def readyCheck(self):
         subs = list()
         if(len(self.components) == 0):
@@ -48,6 +60,14 @@ class Instrument(QObject):
                     return comp
         return None
 
+    def getTrigCompsRefUUID(self, uuid):
+        for comp in self.components:
+            if('uuid' in comp.compSettings and comp.isTriggerComponent is True):
+                print('Checking - ' + comp.compSettings['uuid'] + ':' + uuid)
+                if(comp.compSettings['hardwareObjectUUID'] == uuid):
+                    return comp
+        return None
+
     def removeComponent(self, comp):
         comp.onRemovalParent()
         self.components.remove(comp)
@@ -70,8 +90,10 @@ class Instrument(QObject):
             typeOut = AOSocket
         elif(typeText == 'Sockets: Analog Input'):
             typeOut = AISocket
-        elif(typeText == 'Sockets: Digital I/O'):
-            typeOut = DIOSocket
+        elif(typeText == 'Sockets: Digital Output'):
+            typeOut = DOSocket
+        elif(typeText == 'Sockets: Digital Input'):
+            typeOut = DISocket
 
         self.getSockets()
         self.outList = list()

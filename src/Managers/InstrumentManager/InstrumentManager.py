@@ -43,7 +43,19 @@ class InstrumentManager(QObject):
         self.componentsAvailable = list()
 
         self.mW.DataStation_Closing.connect(self.unsavedChangesCheck)
+        self.Instrument_Loaded.connect(self.checkTriggerComponents)
         #self.Instrument_Modified.
+
+    def getHardwareObjectByUUID(self, uuid):
+        return self.mW.hardwareManager.getHardwareObjectByUUID(uuid)
+
+    def connections(self):
+        pass
+        self.mW.hardwareManager.Trigger_Modified.connect(self.checkTriggerComponents)
+
+    def checkTriggerComponents(self):
+        if(self.currentInstrument is not None):
+            self.currentInstrument.checkTriggerComponents()
 
     def unsavedChangesCheck(self):
         print('UNSAVED CHANGES TO INSTRUMENT')
@@ -111,7 +123,11 @@ class InstrumentManager(QObject):
         print('Instrument_Unloaded.emit()')
         self.Instrument_Unloaded.emit()
 
-    def addCompToInstrument(self, dropIndex):
+    def addCompByIndex(self, dropIndex):
+        comp = self.componentsAvailable[dropIndex]
+        return self.addCompToInstrument(comp)
+
+    def addCompToInstrument(self, comp):
         if (self.currentInstrument is None):
             self.mW.postLog('No instrument is loaded - creating new one! ', DSConstants.LOG_PRIORITY_HIGH)
             self.currentInstrument = Instrument(self)
@@ -119,17 +135,22 @@ class InstrumentManager(QObject):
             self.currentInstrument.Component_Modified.connect(self.Component_Modified)
             self.currentInstrument.Events_Modified.connect(self.Events_Modified)
 
-        comp = self.componentsAvailable[dropIndex]
-        result = self.currentInstrument.addComponent(comp)
+        result = self.currentInstrument.addComponent(comp(self.mW))
         self.mW.sequencerDockWidget.updatePlotList()
         self.mW.hardwareWidget.drawScene()
         return result
 
-    def addTriggerCompToInstrument(self, triggerComp):
-        result = self.currentInstrument.addComponent(triggerComp)
-        self.mW.sequencerDockWidget.updatePlotList()
-        self.mW.hardwareWidget.drawScene()
-        return result
+    def getComponentByUUID(self, uuid):
+        if(self.currentInstrument is not None):
+            return self.currentInstrument.getComponentByUUID(uuid)
+        else:
+            return None
+
+    def getTrigCompsRefUUID(self, uuid):
+        if(self.currentInstrument is not None):
+            return self.currentInstrument.getTrigCompsRefUUID(uuid)
+        else:
+            return None
 
     def saveInstrument(self, url):
         if(self.currentInstrument is not None):

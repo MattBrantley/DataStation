@@ -44,6 +44,9 @@ class Source():
     def unattach(self, pathNo):
         self.paths[pathNo-1] = None
 
+    def onUnattach(self):
+        self.paths[0] = None
+
     def detachSockets(self):
         if(self.paths[0] is not None):
             if(issubclass(type(self.paths[0]), Socket)):
@@ -85,7 +88,9 @@ class Source():
                 pathList.append(path.uuid)
 
     def reattachSocket(self, socketIn, pathNo):
-        if(self.paths[pathNo-1] is not None):
+        if(self.paths[pathNo-1] is socketIn):
+            return self
+        elif(self.paths[pathNo-1] is not None):
             return None
         else:
             self.paths[pathNo-1] = socketIn

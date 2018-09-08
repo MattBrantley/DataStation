@@ -67,6 +67,7 @@ class hardwareWidget(QDockWidget):
         self.setWidget(self.mainContainer)
 
         self.hardwareManager.Hardware_Modified.connect(self.drawScene)
+        self.hardwareManager.Trigger_Modified.connect(self.drawScene)
         self.instrumentManager.Instrument_Unloaded.connect(self.drawScene)
         self.instrumentManager.Instrument_Loaded.connect(self.drawScene)
         self.instrumentManager.Instrument_Modified.connect(self.drawScene)

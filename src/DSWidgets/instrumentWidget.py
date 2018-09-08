@@ -412,7 +412,7 @@ class iView(pg.GraphicsWindow):
         text = stream.readQString()
         index = stream2.readInt()
 
-        result = self.mW.instrumentManager.addCompToInstrument(index)
+        result = self.mW.instrumentManager.addCompByIndex(index)
 
         if result is not None:
             m = iViewComponent(self.mW, result, self, width=1, height=1, pos=(dropX, dropY))

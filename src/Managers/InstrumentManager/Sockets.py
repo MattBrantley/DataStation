@@ -101,6 +101,11 @@ class Socket():
         return readyCheckPacket('Socket', DSConstants.READY_CHECK_READY, subs=subs)
 
     def onLink(self):
+# --- Break glass in case of bug ---
+        #import traceback
+        #traceback.print_stack()
+# ---                            ---
+
         if(self.loadPacket is not None):
             if('filterInputSource' in self.loadPacket):
                 if(self.loadPacket['filterInputSource'] is not None):
@@ -110,6 +115,7 @@ class Socket():
                         self.filterInputSource = None
                     else:
                         self.filterInputPathNo = self.loadPacket['filterInputPathNo']
+                        print(type(targetFilter))
                         self.filterInputSource = targetFilter.reattachSocket(self, self.filterInputPathNo)
                         if(self.filterInputSource is None): #This happens if you try to attach to a filter/source on a path that is already occupied
                             self.filterInputPathNo = None
@@ -204,9 +210,6 @@ class DOSocket(Socket):
         super().__init__(component)
         self.instrumentManager = self.component.instrumentManager
         self.name = name + ' [DIO]'
-        self.vMin = vMin
-        self.vMax = vMax
-        self.prec = prec
         self.paths.clear()
 
     def onSaveChild(self):
@@ -235,9 +238,6 @@ class DISocket(Socket):
         super().__init__(component)
         self.instrumentManager = self.component.instrumentManager
         self.name = name + ' [DIO]'
-        self.vMin = vMin
-        self.vMax = vMax
-        self.prec = prec
         self.paths.clear()
 
     def onSaveChild(self):

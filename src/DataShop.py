@@ -126,7 +126,11 @@ class mainWindow(QMainWindow):
         self.instrumentManager = InstrumentManager(self)
         self.instrumentManager.loadComponents()
         self.hardwareManager = HardwareManager(self)
+        self.instrumentManager.connections()
+        self.hardwareManager.connections()
         #self.DSInstrumentManager = InstrumentManager(self)
+
+        self.instrumentManager.Instrument_Loaded.connect(self.loadPreviousSequence)
 
     def connectManagers(self):
         self.workspaceManager.connectWidgets()
@@ -171,7 +175,7 @@ class mainWindow(QMainWindow):
         self.restoreWindowStates()
         self.workspaceManager.loadPreviousWS()
         self.loadPreviousInstrument()
-        self.loadPreviousSequence()
+        #self.loadPreviousSequence()
         print('DataStation_Loaded.emit()')
         self.DataStation_Loaded.emit()
         self.postLog('Data Station Finished Loading!', DSConstants.LOG_PRIORITY_HIGH)
@@ -374,6 +378,7 @@ class mainWindow(QMainWindow):
 
     def softExit(self):
         self.postLog('Shutting down Datastation!', DSConstants.LOG_PRIORITY_HIGH)
+        self.trayIcon.hide()
         print('DataStation_Closing.emit()')
         self.DataStation_Closing.emit()
         self.DataStation_Closing_Final.emit()

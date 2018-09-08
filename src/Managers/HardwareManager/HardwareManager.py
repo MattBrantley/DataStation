@@ -2,6 +2,7 @@ import os, sys, imp
 from Managers.InstrumentManager.Instrument import *
 from Managers.InstrumentManager.Filter import *
 from Managers.InstrumentManager.Sockets import *
+from Managers.InstrumentManager.Digital_Trigger_Component import Digital_Trigger_Component
 from Managers.HardwareManager.Hardware_Object import Hardware_Object
 from Managers.HardwareManager.Sources import *
 from DataStation_Labview import DataStation_LabviewExtension
@@ -11,6 +12,9 @@ from DSWidgets.controlWidget import readyCheckPacket
 
 class HardwareManager(QObject):
     Hardware_Modified = pyqtSignal()
+    Trigger_Modified = pyqtSignal()
+    Instrument_Loaded = pyqtSignal()
+    Instrument_Unloaded = pyqtSignal()
 
     hardwareList = list()
     sourceObjList = list()
@@ -29,6 +33,12 @@ class HardwareManager(QObject):
         self.loadLabviewInterface()
 
         self.mW.DataStation_Closing.connect(self.saveHardwareState)
+
+    def connections(self):
+        self.iM = self.mW.instrumentManager
+        self.iM.Instrument_Loaded.connect(self.Instrument_Loaded)
+        self.iM.Instrument_Unloaded.connect(self.Instrument_Unloaded)
+        self.wM = self.mW.workspaceManager
 
     def loadLabviewInterface(self):
         self.mW.postLog('Initializing DataStation Labview Interface... ', DSConstants.LOG_PRIORITY_HIGH)
@@ -133,6 +143,20 @@ class HardwareManager(QObject):
             if(issubclass(filterClass, typeOut) or typeText == 'All'):
                 filterList.append()
 
+    def getTrigCompsRefUUID(self, uuid):
+        return self.mW.instrumentManager.getTrigCompsRefUUID(uuid)
+
+    def getHardwareObjectByUUID(self, uuid):
+        for hardware in self.hardwareLoaded:
+            #print(hardware.hardwareSettings['uuid'] + ':' + uuid)
+            if(hardware.hardwareSettings['uuid'] == uuid):
+                return hardware
+        return None
+
+    def addDigitalTriggerComp(self, hardwareObj):
+        triggerComp = self.mW.instrumentManager.addCompToInstrument(Digital_Trigger_Component)
+        triggerComp.onConnect(hardwareObj.hardwareSettings['name'], hardwareObj.hardwareSettings['uuid'])
+        return triggerComp
 
     def getSourceObjs(self, typeText):
         typeOut = type(None)
@@ -202,15 +226,23 @@ class HardwareManager(QObject):
 
     def addHardwareObj(self, hardwareObj):
         self.hardwareLoaded.append(hardwareObj)
+        self.Instrument_Loaded.connect(hardwareObj.instrumentLoaded)
+        self.Instrument_Unloaded.connect(hardwareObj.instrumentUnloaded)
         hardwareObj.Config_Modified.connect(self.hardwareModified)
-        print('HARDWARE_MODIFIED.emit()')
+        hardwareObj.Trigger_Modified.connect(self.Trigger_Modified)
+        #print('HARDWARE_MODIFIED.emit()')
         self.Hardware_Modified.emit()
+        print('Trigger_Modified.emit()')
+        self.Trigger_Modified.emit()
+        hardwareObj.resetDevice()
 
     def removeHardwareObj(self, hardwareObj):
         hardwareObj.onRemove()
         self.hardwareLoaded.remove(hardwareObj)
         print('HARDWARE_MODIFIED.emit()')
         self.Hardware_Modified.emit()
+        print('Trigger_Modified.emit()')
+        self.Trigger_Modified.emit()
 
     def findHardwareModelByIdentifier(self, identifier):
         for hardwareModel in self.driversAvailable:
