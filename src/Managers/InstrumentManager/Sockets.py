@@ -6,11 +6,15 @@ import os, sys, imp, math
 from Constants import DSConstants as DSConstants
 from DSWidgets.controlWidget import readyCheckPacket
 
-class Socket():
+class Socket(QObject):
+    Socket_Attached = pyqtSignal(object)
+    Socket_Unattached = pyqtSignal(object)
+
     name = "NULL"
     paths = list()
 
     def __init__(self, component):
+        super().__init__()
         self.filterInputSource = None
         self.filterInputPathNo = None
         self.paths.clear()
@@ -47,11 +51,13 @@ class Socket():
             newRoot = True
 
     def onUnattach(self):
+        self.Socket_Unattached.emit(self)
         if(self.component is not None):
             pass
             #print('unattached')
 
     def onAttach(self, attachedTo):
+        self.Socket_Attached.emit(self)
         if(self.component is not None):
             pass
             #print('attached')
@@ -76,9 +82,9 @@ class Socket():
 
     def readyCheck(self):
         if(self.getAttachedSource() is not None):
-            return readyCheckPacket('Socket', DSConstants.READY_CHECK_READY)
+            return readyCheckPacket('Socket [' + self.name + ']', DSConstants.READY_CHECK_READY)
         else:
-            return readyCheckPacket('Socket', DSConstants.READY_CHECK_ERROR, msg='Socket Has No Source!')
+            return readyCheckPacket('Socket [' + self.name + ']', DSConstants.READY_CHECK_ERROR, msg='Socket Has No Source!')
 
     def onDataToSourcesParent(self, packet):
         subs = list()
@@ -105,17 +111,18 @@ class Socket():
         #import traceback
         #traceback.print_stack()
 # ---                            ---
-
         if(self.loadPacket is not None):
             if('filterInputSource' in self.loadPacket):
+                print(str(type(self)) + ': ' + str(self.loadPacket['filterInputSource']))
                 if(self.loadPacket['filterInputSource'] is not None):
                     targetFilter = self.instrumentManager.mW.hardwareWidget.hardwareManager.objFromUUID(self.loadPacket['filterInputSource'])
+                    print('--> ' + str(type(targetFilter)))
                     if(targetFilter is None): #Contigency incase objFromUUID fails
                         self.filterInputPathNo = None
                         self.filterInputSource = None
                     else:
                         self.filterInputPathNo = self.loadPacket['filterInputPathNo']
-                        print(type(targetFilter))
+                        #print(type(targetFilter))
                         self.filterInputSource = targetFilter.reattachSocket(self, self.filterInputPathNo)
                         if(self.filterInputSource is None): #This happens if you try to attach to a filter/source on a path that is already occupied
                             self.filterInputPathNo = None

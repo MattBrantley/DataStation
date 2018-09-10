@@ -37,8 +37,13 @@ class HardwareManager(QObject):
     def connections(self):
         self.iM = self.mW.instrumentManager
         self.iM.Instrument_Loaded.connect(self.Instrument_Loaded)
+        self.iM.After_Instrument_Loaded.connect(self.programAllDevices)
         self.iM.Instrument_Unloaded.connect(self.Instrument_Unloaded)
         self.wM = self.mW.workspaceManager
+
+    def programAllDevices(self):
+        for device in self.hardwareLoaded:
+            device.program()
 
     def loadLabviewInterface(self):
         self.mW.postLog('Initializing DataStation Labview Interface... ', DSConstants.LOG_PRIORITY_HIGH)
@@ -146,6 +151,12 @@ class HardwareManager(QObject):
     def getTrigCompsRefUUID(self, uuid):
         return self.mW.instrumentManager.getTrigCompsRefUUID(uuid)
 
+    def removeCompByRefUUID(self, uuid):
+        return self.mW.instrumentManager.removeCompByUUID(self.getTrigCompsRefUUID(uuid))
+
+    def removeCompByUUID(self, uuid):
+        return self.mW.instrumentManager.removeCompByUUID(uuid)
+
     def getHardwareObjectByUUID(self, uuid):
         for hardware in self.hardwareLoaded:
             #print(hardware.hardwareSettings['uuid'] + ':' + uuid)
@@ -224,17 +235,26 @@ class HardwareManager(QObject):
         print('HARDWARE_MODIFIED.emit()')
         self.Hardware_Modified.emit()
 
-    def addHardwareObj(self, hardwareObj):
-        self.hardwareLoaded.append(hardwareObj)
-        self.Instrument_Loaded.connect(hardwareObj.instrumentLoaded)
-        self.Instrument_Unloaded.connect(hardwareObj.instrumentUnloaded)
-        hardwareObj.Config_Modified.connect(self.hardwareModified)
-        hardwareObj.Trigger_Modified.connect(self.Trigger_Modified)
-        #print('HARDWARE_MODIFIED.emit()')
+    def addHardwareObj(self, hardwareClass, loadData=None):
+        #self.addHardwareObj(hardwareClass)
+        tempHardware = type(hardwareClass)(self)
+        tempHardware.initHardwareWorker()
+
+        self.hardwareLoaded.append(tempHardware)
+        self.Instrument_Loaded.connect(tempHardware.instrumentLoaded)
+        self.Instrument_Unloaded.connect(tempHardware.instrumentUnloaded)
+        tempHardware.Config_Modified.connect(self.hardwareModified)
+        tempHardware.Trigger_Modified.connect(self.Trigger_Modified)
+        print('HARDWARE_MODIFIED.emit()')
         self.Hardware_Modified.emit()
         print('Trigger_Modified.emit()')
         self.Trigger_Modified.emit()
-        hardwareObj.resetDevice()
+
+        if(loadData is None):
+            tempHardware.resetDevice()
+        else:
+            tempHardware.onLoadParent(loadData)
+        return tempHardware
 
     def removeHardwareObj(self, hardwareObj):
         hardwareObj.onRemove()
@@ -270,9 +290,11 @@ class HardwareManager(QObject):
                 if(('hardwareIdentifier') in state):
                     hardwareModel = self.findHardwareModelByIdentifier(state['hardwareIdentifier'])
                     if(hardwareModel is not None):
-                        hardwareObj = self.mW.hardwareWidget.hardwareWidget.addHardware(hardwareModel)
-                        if('hardwareSettings' in state):
-                            hardwareObj.onLoadParent(state)
+                        self.mW.hardwareWidget.hardwareWidget.addHardware(hardwareModel, loadData=state)
+                        #self.addHardwareObj(hardwareModel, loadData=state)
+                        #hardwareObj = self.mW.hardwareWidget.hardwareWidget.addHardware(hardwareModel)
+                        #if('hardwareSettings' in state):
+                        #    hardwareObj.onLoadParent(state)
                     else:
                         self.mW.postLog('Hardware Component State Found (Identifier: ' + state['hardwareIdentifier'] + ') But No Drivers Are Present For This Identifier! Partial Hardware State Import Continuing...', DSConstants.LOG_PRIORITY_HIGH)
                         

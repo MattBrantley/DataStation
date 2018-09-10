@@ -31,6 +31,8 @@ class Hardware_Driver(Hardware_Object):
             gran = self.getGranularity(eventData)
             if(gran is not None):
                 granularity = round(self.getGranularity(eventData), int(math.log10(self.maxRate)))
+                if(granularity == 0):
+                    granularity = 1/self.maxRate
             else:
                 return None
             freq = 1/granularity
@@ -90,9 +92,19 @@ class Hardware_Driver(Hardware_Object):
         if(self.hardwareSettings['deviceName'] in self.getDeviceList()):
             device = nidaqmx.system.Device(self.hardwareSettings['deviceName'])
             self.forceNoUpdatesOnSourceAdd(True) #FOR SPEED!
+            for chan in device.ai_physical_chans:
+                source = AISource(self, '['+self.hardwareSettings['deviceName']+'] '+chan.name, -10, 10, 0.1, chan.name)
+                self.addSource(source)
             for chan in device.ao_physical_chans:
                 source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] '+chan.name, -10, 10, 0.1, chan.name)
                 self.addSource(source)
+            for chan in device.di_lines:
+                source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+chan.name, chan.name, trigger=True)
+                self.addSource(source)
+            for chan in device.do_lines:
+                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+chan.name, chan.name)
+                #self.addSource(source)
+
             self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
         else:
             print('Config_Modified.emit()')

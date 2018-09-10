@@ -21,6 +21,7 @@ class InstrumentManager(QObject):
     Instrument_Modified = pyqtSignal(object)
     Instrument_Unloaded = pyqtSignal()
     Instrument_Loaded = pyqtSignal(object)
+    After_Instrument_Loaded = pyqtSignal()
 
     Component_Modified = pyqtSignal(object)
     Events_Modified = pyqtSignal(object)
@@ -29,6 +30,9 @@ class InstrumentManager(QObject):
     Sequence_Loading = pyqtSignal()
     Sequence_Loaded = pyqtSignal()
     Sequence_Name_Changed = pyqtSignal(str)
+
+    Socket_Attached = pyqtSignal(object)
+    Socket_Unattached = pyqtSignal(object)
 
     instrumentWidget = None
 
@@ -146,6 +150,12 @@ class InstrumentManager(QObject):
         else:
             return None
 
+    def removeCompByUUID(self, uuid):
+        if(self.currentInstrument is not None):
+            print(self.getComponentByUUID(uuid))
+            self.currentInstrument.removeComponent(self.getComponentByUUID(uuid))
+        return True
+
     def getTrigCompsRefUUID(self, uuid):
         if(self.currentInstrument is not None):
             return self.currentInstrument.getTrigCompsRefUUID(uuid)
@@ -198,8 +208,13 @@ class InstrumentManager(QObject):
 
         self.instrumentWidget.updateTitle()
 
+        self.currentInstrument.Socket_Attached.connect(self.Socket_Attached)
+        self.currentInstrument.Socket_Unattached.connect(self.Socket_Unattached)
+
         print('Instrument_Loaded.emit()')
         self.Instrument_Loaded.emit(self.currentInstrument)
+        print('After_Instrument_Loaded.emit()')
+        self.After_Instrument_Loaded.emit()
 
     def processInstrumentData(self, instrumentData, url):
         self.tempInstrument = Instrument(self)

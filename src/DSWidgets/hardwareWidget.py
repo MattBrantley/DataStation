@@ -163,11 +163,10 @@ class hardwareListWidget(QWidget):
         menu.addAction(hardwareMenuAction)
         action = menu.exec_(QCursor().pos())
 
-    def addHardware(self, hardwareClass):
-        tempHardware = type(hardwareClass)(self.hardwareManager)
-        tempHardware.initHardwareWorker()
+    def addHardware(self, hardwareClass, loadData=None):
+        tempHardware = self.hardwareManager.addHardwareObj(hardwareClass, loadData=loadData)
+
         widgetItem = hardwareListItem(self.hardwareList, self.hardwareManager, tempHardware)
-        self.hardwareManager.addHardwareObj(tempHardware)
         
         self.hardwareList.addWidget(widgetItem)
         return tempHardware
@@ -394,6 +393,11 @@ class iScene(QGraphicsScene):
         #self.widget.mW.controlWidget.configChanged()
         self.clearItems()
         for socket in self.widget.socketList:
+            if(socket.component.isTriggerComponent is True):
+                for source in self.widget.plugList:
+                    if(source.trigger == False):
+                        self.addItemToGrid(self.getSocketRow(socket), self.getPlugCol(source), None, color='grey')
+
             source = socket.getAttachedSource()
             if(source is not None):
                 row = self.getSocketRow(socket)
@@ -508,14 +512,14 @@ class iScene(QGraphicsScene):
 
         return None
 
-    def addItemToGrid(self, row, col, itemStatus):
+    def addItemToGrid(self, row, col, itemStatus, color='red'):
         if(self.isGridPointValid(row, col) is False):
             return
         if(self.multiConnectPlugs is False):
             self.clearCol(col)
         if(self.multiConnectSockets is False):
             self.clearRow(row)
-        item = iSceneItem(self, row, col, None)
+        item = iSceneItem(self, row, col, None, color)
         self.addItem(item)
         self.itemList.append(item)
 
@@ -557,13 +561,16 @@ class iScene(QGraphicsScene):
         return QPointF(tempX, tempY)
 
 class iSceneItem(QGraphicsRectItem):
-    def __init__(self, scene, row, col, status):
+    def __init__(self, scene, row, col, status, color):
         self.row = row
         self.col = col
         self.iScene = scene
         point = self.iScene.getPointAtGrid(row, col)
         super().__init__(point.x()+2, point.y()+2, iScene.cellWidth-4, iScene.cellHeight-4)
-        self.setBrush(QColor(255, 0, 0))
+        if(color == 'red'):
+            self.setBrush(QColor(255, 0, 0))
+        else:
+            self.setBrush(QColor(100, 100, 100))
 
 class iSceneRowHighlight(QGraphicsRectItem):
     def __init__(self, scene, row, color):

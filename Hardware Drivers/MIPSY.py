@@ -257,7 +257,7 @@ class MIPSYHardwareWorker(hardwareWorker):
         queueOut.put(resp)
 
     def onCommand(self, msgIn, queueOut):
-
+        print('MIPSY COMMAND: ' + msgIn.action)
         if(msgIn.action == 'readyCheck'):
             response = 'readyCheck'
         else:

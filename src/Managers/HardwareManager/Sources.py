@@ -12,12 +12,13 @@ class Source():
     name = "NULL"
     numPaths = 1
 
-    def __init__(self, hardware):
+    def __init__(self, hardware, trigger=False):
         self.filterInputSource = None
         self.hardware = hardware
         self.paths = list()
         self.uuid = str(uuid.uuid4())
         self.physicalConnectorID = ''
+        self.trigger = trigger
         self.programData = None
         
     def addFilter(self, pathNo, filterIn):
@@ -156,7 +157,6 @@ class AISource(Source):
         self.paths.append(None)
         self.loadPacket = None
         self.physicalConnectorID = physConID
-        self.trigger = trigger
 
     def parsePacket(self, packetIn):
         if(isinstance(packetIn, waveformPacket) is False):
@@ -307,14 +307,13 @@ class DOSource(Source):
 
 class DISource(Source):
     def __init__(self, hardware, name, physConID, trigger=False):
-        super().__init__(hardware)
+        super().__init__(hardware, trigger)
         self.hardware = hardware
         self.name = name
         self.paths.clear()
         self.paths.append(None)
         self.loadPacket = None
         self.physicalConnectorID = physConID
-        self.trigger = True
 
     def parsePacket(self, packetIn):
         if(isinstance(packetIn, waveformPacket) is False):

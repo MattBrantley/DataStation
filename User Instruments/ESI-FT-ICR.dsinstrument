@@ -21,7 +21,7 @@
             "sockets": [
                 {
                     "filterInputPathNo": 1,
-                    "filterInputSource": "0395891c-f9c4-406a-814d-e89dcb802baa",
+                    "filterInputSource": "dcd796fe-8a65-4326-a2ae-8815734411f2",
                     "name": "Unnamed Circular Lens [AO]",
                     "prec": 0.1,
                     "uuid": "eae13093-2f27-42dd-ba58-a8c9d6ea13d5",
@@ -46,7 +46,14 @@
                 "x": -1261.0,
                 "y": 1128.0
             },
-            "sockets": [],
+            "sockets": [
+                {
+                    "filterInputPathNo": 1,
+                    "filterInputSource": "258cd8b7-3e65-420f-b957-52608379b0fc",
+                    "name": " [DIO]",
+                    "uuid": "c89d03b0-f420-4d4e-ab10-a5089038123d"
+                }
+            ],
             "triggerComp": false
         },
         {
@@ -70,7 +77,7 @@
             "sockets": [
                 {
                     "filterInputPathNo": 1,
-                    "filterInputSource": "3bcd0109-d88f-44b6-ba14-6a57ecbe06ce",
+                    "filterInputSource": "cbb1f3c6-9375-4a65-b64c-11de67bfe61e",
                     "name": "Unnamed Circular Lens [AO]",
                     "prec": 0.1,
                     "uuid": "af8f49c7-6749-4c96-b4b6-a311e4c76fc9",
@@ -100,8 +107,8 @@
             },
             "sockets": [
                 {
-                    "filterInputPathNo": null,
-                    "filterInputSource": null,
+                    "filterInputPathNo": 1,
+                    "filterInputSource": "4ef7036c-2b78-4f0f-8c6e-243294f5d306",
                     "name": "Unnamed Circular Lens [AO]",
                     "prec": 0.1,
                     "uuid": "53c957e3-3260-4729-81dd-f3307a2d19d4",
@@ -126,7 +133,14 @@
                 "x": -506.0,
                 "y": 1118.0
             },
-            "sockets": [],
+            "sockets": [
+                {
+                    "filterInputPathNo": 1,
+                    "filterInputSource": "14287cc5-aa56-4c96-a341-76143fdb47f1",
+                    "name": " [DIO]",
+                    "uuid": "9248b817-b430-46f6-a485-b638caaf2d9b"
+                }
+            ],
             "triggerComp": false
         },
         {
@@ -149,8 +163,8 @@
             },
             "sockets": [
                 {
-                    "filterInputPathNo": 2,
-                    "filterInputSource": "251e9b4e-b217-45de-b48c-3919f926aba0",
+                    "filterInputPathNo": 1,
+                    "filterInputSource": "9efe0ac5-6a49-42da-86f8-46b02f8fe86d",
                     "name": "Unnamed Circular Lens [AO]",
                     "prec": 0.1,
                     "uuid": "1864ccfb-a199-4f5f-82d1-f11d881afa54",
@@ -175,7 +189,14 @@
                 "x": 231.0,
                 "y": 1112.0
             },
-            "sockets": [],
+            "sockets": [
+                {
+                    "filterInputPathNo": 1,
+                    "filterInputSource": "3a7b9c6b-6b8f-41ea-bc15-9ff661e23687",
+                    "name": " [DIO]",
+                    "uuid": "d237cb89-253b-4e12-90ab-fb0d18b2f963"
+                }
+            ],
             "triggerComp": false
         },
         {
@@ -198,8 +219,8 @@
             },
             "sockets": [
                 {
-                    "filterInputPathNo": null,
-                    "filterInputSource": null,
+                    "filterInputPathNo": 1,
+                    "filterInputSource": "cf49114a-30f8-4669-b612-7e7743f4be9f",
                     "name": "Unnamed Circular Lens [AO]",
                     "prec": 0.1,
                     "uuid": "96da2d1d-3015-40e8-98f9-5a39d03c709a",
@@ -229,8 +250,8 @@
             },
             "sockets": [
                 {
-                    "filterInputPathNo": null,
-                    "filterInputSource": null,
+                    "filterInputPathNo": 1,
+                    "filterInputSource": "2bb8f39f-62b9-48c0-87b6-d0ff585375bb",
                     "name": "Unnamed Circular Lens [AO]",
                     "prec": 0.1,
                     "uuid": "ee6c983d-148d-4c17-a8b6-f4527af53883",
@@ -257,8 +278,8 @@
             },
             "sockets": [
                 {
-                    "filterInputPathNo": null,
-                    "filterInputSource": null,
+                    "filterInputPathNo": 1,
+                    "filterInputSource": "c2d1b722-a642-40c7-90cb-ae2100b71db1",
                     "name": "Unnamed Excitation Plates [AO]",
                     "prec": 0.1,
                     "uuid": "3ebe5821-4955-409c-921b-9ed6815a659f",
@@ -285,8 +306,8 @@
             },
             "sockets": [
                 {
-                    "filterInputPathNo": null,
-                    "filterInputSource": null,
+                    "filterInputPathNo": 1,
+                    "filterInputSource": "2d9fa778-a665-476a-8758-b113ccb04ea3",
                     "name": "Unnamed Detection Plates [AI]",
                     "prec": 0.1,
                     "uuid": "f2dc81bc-7164-4d75-bb82-deba118f8064",
@@ -299,41 +320,20 @@
         {
             "compIdentifier": "DigiTrigComp_mrb",
             "compSettings": {
-                "hardwareObjectUUID": "e18f3ef2-7093-4ba1-8f9f-08c2f76f7084",
+                "hardwareObjectUUID": "978a50ed-1459-4c95-a7ad-51c10ebe4fb1",
                 "layoutGraphicSrc": "default.png",
                 "name": "Digital Trigger",
                 "showSequencer": false,
                 "triggerComp": true,
-                "uuid": "5f0686b2-d292-42ef-a16f-54a92d380298"
+                "uuid": "02928929-7b9b-4daf-b5f1-cac1af315386"
             },
             "compType": "Digital Trigger Component",
             "sockets": [
                 {
                     "filterInputPathNo": 1,
-                    "filterInputSource": "2488f527-294f-43e6-bcb4-dab295aa0285",
-                    "name": "[DIGI TRIG]: COM14 [DIO]",
-                    "uuid": "0f9ffd03-b900-44fe-bfb8-2db5b2ffead5"
-                }
-            ],
-            "triggerComp": true
-        },
-        {
-            "compIdentifier": "DigiTrigComp_mrb",
-            "compSettings": {
-                "hardwareObjectUUID": "a10cfcc2-b0d2-4a70-85c0-8b6fa0ad693f",
-                "layoutGraphicSrc": "default.png",
-                "name": "Digital Trigger",
-                "showSequencer": false,
-                "triggerComp": true,
-                "uuid": "468e82ef-17ea-4153-af1e-73d5e1b6a543"
-            },
-            "compType": "Digital Trigger Component",
-            "sockets": [
-                {
-                    "filterInputPathNo": 1,
-                    "filterInputSource": "2cb2916e-1ba7-47aa-88a1-31b57df7b946",
-                    "name": "[DIGI TRIG]:  [DIO]",
-                    "uuid": "ca62aec2-565e-4069-9c5f-a2e636e598ce"
+                    "filterInputSource": "1b9fa7e1-69cf-4085-97eb-b9ad6e6d87db",
+                    "name": "[DIGI TRIG]: PXI1Slot2 [DIO]",
+                    "uuid": "1d5ff1de-181b-4210-8d7d-91edb3b4ff42"
                 }
             ],
             "triggerComp": true

@@ -10,6 +10,8 @@ from DSWidgets.controlWidget import readyCheckPacket
 class Component(QObject):
     Component_Modified = pyqtSignal(object)
     Events_Modified = pyqtSignal(object)
+    Socket_Attached = pyqtSignal(object)
+    Socket_Unattached = pyqtSignal(object)
 
     indexMe = True
     componentType = 'Default Component'
@@ -87,21 +89,29 @@ class Component(QObject):
 
     def addAOSocket(self, name):
         socket = AOSocket(self, name, 0, 10, 0.1)
+        socket.Socket_Attached.connect(self.Socket_Attached)
+        socket.Socket_Unattached.connect(self.Socket_Unattached)
         self.socketList.append(socket)
         return socket
 
     def addAISocket(self, name):
         socket = AISocket(self, name, 0, 10, 0.1)
+        socket.Socket_Attached.connect(self.Socket_Attached)
+        socket.Socket_Unattached.connect(self.Socket_Unattached)
         self.socketList.append(socket)
         return socket
 
     def addDOSocket(self, name):
         socket = DOSocket(self, name)
+        socket.Socket_Attached.connect(self.Socket_Attached)
+        socket.Socket_Unattached.connect(self.Socket_Unattached)
         self.socketList.append(socket)
         return socket
 
     def addDISocket(self, name):
         socket = DISocket(self, name)
+        socket.Socket_Attached.connect(self.Socket_Attached)
+        socket.Socket_Unattached.connect(self.Socket_Unattached)
         self.socketList.append(socket)
         return socket
 
@@ -231,7 +241,7 @@ class Component(QObject):
                     goodToContinue = False
             else:
                 if(runResults is not True):
-                    subs.append(readyCheckPacket('User Component', DSConstants.READY_CHECK_ERROR, msg='User Component onRun() Did Not Return readyCheckPacket or True!'))
+                    subs.append(readyCheckPacket('User Component [' + self.compSettings['name'] + ']', DSConstants.READY_CHECK_ERROR, msg='User Component onRun() Did Not Return readyCheckPacket or True!'))
                     goodToContinue = False
         
         if(goodToContinue is True):
@@ -243,7 +253,7 @@ class Component(QObject):
                     #else:
                     subs.append(socket.onDataToSourcesParent(self.pathDataPackets[index]))
                 else:
-                    subs.append(readyCheckPacket('User Component', DSConstants.READY_CHECK_ERROR, msg='User Component onRun() Did Not Populate pathDataPackets for Path #' + str(index+1) + '!'))
+                    subs.append(readyCheckPacket('User Component [' + self.compSettings['name'] + ']', DSConstants.READY_CHECK_ERROR, msg='User Component onRun() Did Not Populate pathDataPackets for Path #' + str(index+1) + '!'))
                 index = index + 1
     
         if(goodToContinue is True):

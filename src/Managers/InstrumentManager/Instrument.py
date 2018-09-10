@@ -6,6 +6,8 @@ class Instrument(QObject):
     Instrument_Modified = pyqtSignal(object)
     Component_Modified = pyqtSignal(object)
     Events_Modified = pyqtSignal(object)
+    Socket_Attached = pyqtSignal(object)
+    Socket_Unattached = pyqtSignal(object)
 
     name = ''
 
@@ -48,6 +50,8 @@ class Instrument(QObject):
         newComp.name = 'Unnamed Component'
         newComp.onCreationParent()
         newComp.onCreationFinishedParent()
+        newComp.Socket_Attached.connect(self.Socket_Attached)
+        newComp.Socket_Unattached.connect(self.Socket_Unattached)
         self.components.append(newComp)
         print('Instrument_Modified.emit()')
         self.Instrument_Modified.emit(self)
@@ -69,12 +73,13 @@ class Instrument(QObject):
         return None
 
     def removeComponent(self, comp):
-        comp.onRemovalParent()
-        self.components.remove(comp)
-        self.instrumentManager.mW.sequencerDockWidget.updatePlotList()
-        self.instrumentManager.mW.hardwareWidget.drawScene()
-        print('Instrument_Modified.emit()')
-        self.Instrument_Modified.emit(self)
+        if(comp is not None):
+            comp.onRemovalParent()
+            self.components.remove(comp)
+            self.instrumentManager.mW.sequencerDockWidget.updatePlotList()
+            self.instrumentManager.mW.hardwareWidget.drawScene()
+            print('Instrument_Modified.emit()')
+            self.Instrument_Modified.emit(self)
 
     def getSockets(self):
         self.fullSocketList.clear()

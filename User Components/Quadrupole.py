@@ -19,6 +19,7 @@ class Quadrupole(Component):
         self.compSettings['layoutGraphicSrc'] = self.iconGraphicSrc
         self.compSettings['showSequencer'] = False
         self.compSettings['uuid'] = str(uuid.uuid4())
+        self.socket = self.addDISocket(self.compSettings['name'])
 
     def onRun(self):
         return True

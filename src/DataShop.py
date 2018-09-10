@@ -22,10 +22,10 @@ from Constants import DSConstants as DSConstants
 # labview runtime is automatically polled and link provided - thanks NI!
 
 
-# --- Break glass in case of bug ---
+# --- In case of bug: break glass! ---
 #import traceback
-#traceback.print_stack()
-# ---                            ---
+#traceback.print_stack() 
+# ---                              ---
 
 def warn(*args, **kwargs):
     pass

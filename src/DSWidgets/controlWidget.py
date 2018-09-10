@@ -37,8 +37,10 @@ class controlWidget(QDockWidget):
         self.instrumentManager = instrumentManager
         self.hardwareManager = hardwareManager
 
+        self.instrumentManager.Instrument_Loaded.connect(self.readyChecks)
         self.instrumentManager.Instrument_Modified.connect(self.readyChecks)
         self.instrumentManager.Events_Modified.connect(self.readyChecks)
+        self.instrumentManager.Socket_Attached.connect(self.readyChecks)
         self.hardwareManager.Hardware_Modified.connect(self.readyChecks)
 
     def initButtons(self):

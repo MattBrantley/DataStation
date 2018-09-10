@@ -104,7 +104,8 @@ class Hardware_Object(QObject):
     def updateDevice(self, text):
         self.hardwareSettings['deviceName'] = text
         self.hardwareSettings['name'] = self.hardwareSettings['deviceName']
-        self.genSources()
+        self.resetDevice()
+        #self.genSources()
 
 ##### INSTRUMENT STATUS ######
 
@@ -123,34 +124,31 @@ class Hardware_Object(QObject):
         self.generateTriggerComponent(text)
 
     def generateTriggerComponent(self, text):
-        if(text in ('Digital Rise', 'Digital Fall')):
-            #self.triggerSource = DISocket()
-            self.triggerComponent = self.hardwareManager.addDigitalTriggerComp(self)
-            self.hardwareSettings['triggerCompUUID'] = self.triggerComponent.compSettings['uuid']
-            msg = hwm(msg='[Manager]: Digital Trigger Component Generated')
-            self.managerMessages.append(msg)
-        elif(text is 'Software'):
-            #self.triggerSource = DISocket()
-            self.removeTriggerComponent()
-            msg = hwm(msg='[Manager]: Software Trgiger Enabled')
-            self.hardwareSettings['triggerCompUUID'] = ''
-            self.managerMessages.append(msg)
-        else:
-            pass
+        self.removeTriggerComponent()
+        if(self.hardwareSettings['deviceName'] != ''):
+            if(text in ('Digital Rise', 'Digital Fall')):
+                #self.triggerSource = DISocket()
+                self.triggerComponent = self.hardwareManager.addDigitalTriggerComp(self)
+                self.hardwareSettings['triggerCompUUID'] = self.triggerComponent.compSettings['uuid']
+                msg = hwm(msg='[Manager]: Digital Trigger Component Generated')
+                self.managerMessages.append(msg)
+            elif(text == 'Software'):
+                #self.triggerSource = DISocket()
+                msg = hwm(msg='[Manager]: Software Trgiger Enabled')
+                self.hardwareSettings['triggerCompUUID'] = ''
+                self.managerMessages.append(msg)
+
         print('Trigger_Modified.emit()')
         self.Trigger_Modified.emit(self)
 
     def removeTriggerComponent(self):
+        print(self.hardwareSettings['triggerCompUUID'])
+        self.hardwareManager.removeCompByUUID(self.hardwareSettings['triggerCompUUID'])
         self.hardwareSettings['triggerCompUUID'] = ''
 
     def verifyTriggerComponentExists(self):
-        print('Checking for Trigger Comp!' + self.hardwareSettings['name'])
-        print(self.hardwareSettings['uuid'])
         if(self.hardwareManager.getTrigCompsRefUUID(self.hardwareSettings['uuid']) is None):
-            print('Trigger Comp Not Found')
             self.updateTrigger(self.hardwareSettings['triggerMode'])
-        else:
-            print('Trigger Comp Found!')
 
 ##### 
 
@@ -193,7 +191,13 @@ class Hardware_Object(QObject):
 
     def resetDevice(self):
         self.newMgrMsg()
-        self.onInitialize()
+        #self.removeTriggerComponent()
+        if(self.hardwareSettings['deviceName'] not in self.getDeviceList() and self.hardwareSettings['deviceName'] != ''):
+            self.mgrMsg('Device ' + self.hardwareSettings['deviceName'] + ' is not recognized. Resettings hardware driver!')
+            self.hardwareSettings['deviceName'] = ''
+        
+        if(self.hardwareSettings['deviceName'] != ''):
+            self.onInitialize()
 
     def onLoadParent(self, loadPacket):
         self.hardwareSettings = {**self.hardwareSettings, **loadPacket['hardwareSettings']}
@@ -316,15 +320,7 @@ class hardwareWorker():
                             'ping': Queue()
                         }
 
-        #self.outQueues['command'].put(hwm(action='init'))
-        #self.outQueues['command'].put(hwm(action='config'))
-        #self.outQueues['command'].put(hwm(action='program'))
-        #self.outQueues['command'].put(hwm(action='arm'))
-
         self.initProcess()
-        #self.pingTimer = QTimer()
-        #self.pingTimer.timeout.connect(self.checkPing)
-        #self.pingTimer.start(100)
 
     def initProcess(self):        
         self.process = Process(group=None, name='Hardware Worker', target=self.runWorker, args=(self.inQueues, self.outQueues, ))
