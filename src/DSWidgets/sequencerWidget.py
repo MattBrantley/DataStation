@@ -13,16 +13,17 @@ class DSGraphicsLayout():
     sequencePLT1Color = QColor(0, 0, 0) #Intended to be user-editable at a future date. This is the programming plot
     sequencePLT2Color = QColor(255, 0, 0) #Intended to be user-editable at a future date. This is the readback plot
 
-    def __init__(self, dockWidget):
+    def __init__(self, mW, dockWidget):
         self.dockWidget = dockWidget
         self.plots = list()
         self.referencePlot = None
+        self.mW = mW
         self.plotLayoutWidget = DSGraphicsLayoutWidget(self)
         self.plotLayoutWidget.setBackground(self.sequenceBGColor)
 
     def addPlot(self, name, comp):
         self.plotLayoutWidget.nextRow()
-        plot = DSPlotItem(self, self.dockWidget, name, comp)
+        plot = DSPlotItem(self.mW, self, self.dockWidget, name, comp)
         self.plots.append(plot)
 
         if(len(self.plots) == 1):
@@ -86,10 +87,13 @@ class DSGraphicsLayoutWidget(pg.GraphicsLayoutWidget):
         else:
             super().mouseMoveEvent(event)
 
-class DSPlotItem():
+class DSPlotItem(QObject):
     plotPaddingPercent = 1
 
-    def __init__(self, plotLayout, sequencerWidget, name, comp):
+    def __init__(self, mW, plotLayout, sequencerWidget, name, comp):
+        super().__init__()
+
+        self.mW = mW
         self.component = comp
         self.sequencerWidget = sequencerWidget
         self.component.registerPlotItem(self)
@@ -99,12 +103,10 @@ class DSPlotItem():
         self.LODs = []
         self.data = []
         self.pen = []
-
-        self.component.Events_Modified.connect(self.updatePlot)
     
     def updatePlot(self):
         data = self.component.parentPlotSequencer()
-        self.xMin, self.xMax = self.component.instrumentManager.mW.sequencerDockWidget.getSequenceXRange()
+        self.xMin, self.xMax = self.component.iM.mW.sequencerDockWidget.getSequenceXRange()
         if(data is not None):
             self.plotItem.clear()
             if(data.ndim < 2):
@@ -126,7 +128,7 @@ class DSPlotItem():
             self.plotItem.plot(x=self.data[:,0], y=self.data[:,1], pen = self.plotLayout.sequencePLT1Color)
 
             self.plotItem.autoRange()
-            self.component.instrumentManager.mW.sequencerDockWidget.redrawSequence()
+            self.component.iM.mW.sequencerDockWidget.redrawSequence()
 
     def plot(self, showXAxis, xMinIn, xMaxIn):
         data = self.component.parentPlotSequencer()
@@ -167,7 +169,7 @@ class DSPlotItem():
             self.plotItem.showAxis('bottom', False)
             self.plotItem.showLabel('bottom', False)
         self.plotItem.setLabel('left', self.name)
-        self.plotItem.setDownsampling(ds=True, auto=True, mode='peak') #mode='peak' produces strange results with large gaps in data
+        #self.plotItem.setDownsampling(ds=True, auto=True, mode='peak') #mode='peak' produces strange results with large gaps in data
         #self.plotItem.setClipToView(True)
         axis = self.plotItem.getAxis('bottom')
         
@@ -215,11 +217,11 @@ class sequencerDockWidget(QDockWidget):
     def __init__(self, mW):
         super().__init__('Sequencer (None)')
         self.mW = mW
-        self.instrumentManager = mW.instrumentManager
+        self.iM = mW.iM
         self.hide()
         self.resize(1000, 800)
         self.fileSystem = DSEditorFSModel()
-        self.fsRoot = self.mW.instrumentManager.sequencesDir
+        self.fsRoot = self.mW.iM.sequencesDir
         self.fsRoot = os.path.join(self.mW.rootDir, 'sequences')
         #self.fsRoot = os.path.abspath(os.path.join(os.path.join(os.path.dirname(os.path.dirname(__file__)), os.path.pardir), 'sequences'))
         self.fsIndex = self.fileSystem.setRootPath(self.fsRoot)  #This is a placeholder - will need updating.
@@ -238,7 +240,7 @@ class sequencerDockWidget(QDockWidget):
         self.initActions()
         self.initToolbar()
 
-        self.sequenceView = DSGraphicsLayout(self)
+        self.sequenceView = DSGraphicsLayout(self.mW, self)
         self.initSequenceView()
         
         self.sequencerContainer.addWidget(self.sequenceNavigator)
@@ -249,15 +251,16 @@ class sequencerDockWidget(QDockWidget):
         self.mainContainer.setCentralWidget(self.sequencerContainer)
         self.updateToolbarState()
 
-        self.instrumentManager.Instrument_Modified.connect(self.redrawSequence)
-        self.instrumentManager.Sequence_Loaded.connect(self.sequenceLoaded)
-        self.instrumentManager.Sequence_Unloaded.connect(self.sequenceUnloaded)
+        self.iM.Instrument_Modified.connect(self.redrawSequence)
+        self.iM.Instrument_Loaded.connect(self.redrawSequence)
+        self.iM.Sequence_Loaded.connect(self.sequenceLoaded)
+        self.iM.After_Sequence_Loaded.connect(self.redrawSequence)
+        self.iM.Sequence_Unloaded.connect(self.sequenceUnloaded)
 
         self.redrawSequence()
 
     def sequenceLoaded(self):
-        self.setWindowTitle('Sequencer (' + os.path.basename(self.instrumentManager.currentSequenceURL) + ')')
-        self.redrawSequence()
+        self.setWindowTitle('Sequencer (' + os.path.basename(self.iM.currentSequenceURL) + ')')
 
     def sequenceUnloaded(self):
         self.setWindowTitle('Sequencer (None)')
@@ -271,20 +274,19 @@ class sequencerDockWidget(QDockWidget):
         if(self.isPlotListDirty()):
             self.sequenceView.clearPlots()
             self.plots.clear()
-            if(self.instrumentManager.currentInstrument is not None):
-                for component in self.instrumentManager.currentInstrument.components:
+            if(self.iM.currentInstrument is not None):
+                for component in self.iM.currentInstrument.components:
                     if(component.compSettings['showSequencer'] is True):
                         plotHolder = self.sequenceView.addPlot(component.compSettings['name'], component)
                         if(component.valid is True):
                             pass
-                            #plotHolder.plotItem.getViewBox().setBackgroundColor(None)
                         else:
                             plotHolder.plotItem.getViewBox().setBackgroundColor(QColor(255,0,0,alpha=100))
                         self.plots.append(plotHolder)
 
             self.redrawSequence()
-        if hasattr(self.instrumentManager.mW, 'hardwareWidget'):
-            self.instrumentManager.mW.hardwareWidget.drawScene()
+        if hasattr(self.iM.mW, 'hardwareWidget'):
+            self.iM.mW.hardwareWidget.drawScene()
 
     def xRangeUpdate(self, xMinTest, xMaxTest):
         if(xMinTest < self.xMin):
@@ -357,15 +359,15 @@ class sequencerDockWidget(QDockWidget):
         self.newAction = QAction('New', self)
         self.newAction.setShortcut('Ctrl+N')
         self.newAction.setStatusTip('New')
-        self.newAction.triggered.connect(self.instrumentManager.newSequence)
+        self.newAction.triggered.connect(self.iM.newSequence)
 
         self.saveAction = QAction('Save', self)
         self.saveAction.setStatusTip('Save')
-        self.saveAction.triggered.connect(self.instrumentManager.saveSequence)
+        self.saveAction.triggered.connect(self.iM.saveSequence)
 
         self.saveAsAction = QAction('Save As', self)
         self.saveAsAction.setStatusTip('Save As')
-        self.saveAsAction.triggered.connect(self.instrumentManager.saveSequenceAs)
+        self.saveAsAction.triggered.connect(self.iM.saveSequenceAs)
 
         self.toggleTree = QToolButton(self)
         self.toggleTree.setIcon(QIcon(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'icons3\css.png')))
@@ -388,7 +390,7 @@ class sequencerDockWidget(QDockWidget):
             self.openSequence(filePath)
 
     def openSequence(self, filePath):
-        self.instrumentManager.openSequence(filePath)
+        self.iM.openSequence(filePath)
 
     def updateToolbarState(self):
         self.saveAction.setEnabled(True)

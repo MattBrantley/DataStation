@@ -24,13 +24,83 @@ class WorkspaceTreeWidget(QTreeWidget):
     def __init__(self, mW):
         super().__init__()
         self.mW = mW
-        self.workspaceManager = mW.workspaceManager
+        self.wM = mW.wM
         self.setDragEnabled(True)
         self.setHeaderHidden(True)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.openMenu)
+        self.initMenu()
+        self.initToolbar()
 
         self.itemSelectionChanged.connect(self.selectionChangedFunc)
+
+    def initActions(self):
+
+        self.exitAction = QAction(QIcon(os.path.join(self.mW.srcDir, r'icons2\minimize.png')), 'Exit', self)
+        self.exitAction.setShortcut('Ctrl+Q')
+        self.exitAction.setStatusTip('Exit Application')
+        self.exitAction.triggered.connect(self.close)
+
+        self.newAction = QAction(QIcon(os.path.join(self.mW.srcDir, r'icons2\controller.png')), 'New Workspace', self)
+        self.newAction.setShortcut('Ctrl+N')
+        self.newAction.setStatusTip('Create a New Workspace')
+        self.newAction.triggered.connect(self.wM.newWorkspace)
+
+        self.saveAction = QAction(QIcon(os.path.join(self.srcDir, r'icons2\save.png')), 'Save Workspace As..', self)
+        self.saveAction.setShortcut('Ctrl+S')
+        self.saveAction.setStatusTip('Save Workspace As..')
+        self.saveAction.triggered.connect(self.wM.saveWSToNewSql)
+
+        self.openAction = QAction(QIcon(os.path.join(self.mW.srcDir, r'icons2\\folder.png')), 'Open Workspace', self)
+        self.openAction.setShortcut('Ctrl+O')
+        self.openAction.setStatusTip('Open Workspace')
+        self.openAction.triggered.connect(self.wM.loadWSFromSql)
+
+        self.settingsAction = QAction(QIcon(os.path.join(self.mW.srcDir, r'icons2\settings.png')), 'Settings', self)
+        self.settingsAction.setShortcut('Ctrl+S')
+        self.settingsAction.setStatusTip('Adjust Settings')
+
+        self.importAction = QAction(QIcon(os.path.join(self.mW.srcDir, r'icons2\pendrive.png')), 'Import', self)
+        self.importAction.setStatusTip('Import Data')
+        self.importAction.triggered.connect(self.wM.importData)
+
+        self.viewWindowsAction = QAction('Import', self)
+        self.viewWindowsAction.triggered.connect(self.populateViewWindowMenu)
+
+    def initMenu(self):
+        self.menubar = self.menuBar()
+        self.fileMenu = self.menubar.addMenu('&File')
+        self.fileMenu.addAction(self.newAction)
+        self.fileMenu.addAction(self.saveAction)
+        self.fileMenu.addAction(self.openAction)
+        self.fileMenu.addSeparator()
+        self.fileMenu.addAction(self.settingsAction)
+        self.fileMenu.addSeparator()
+        self.fileMenu.addAction(self.importAction)
+        self.fileMenu.addSeparator()
+        self.fileMenu.addAction(self.exitAction)
+
+        self.viewWindowsMenu = QMenu('Windows')
+        self.viewWindowsMenu.aboutToShow.connect(self.populateViewWindowMenu)
+
+        self.viewMenu = self.menubar.addMenu('&View')
+        self.viewMenu.addMenu(self.viewWindowsMenu)
+
+        self.importMenu = self.menubar.addMenu('&Import')
+        self.wM.userScriptController.populateImportMenu(self.importMenu, self)
+
+    def initToolbar(self):
+        self.toolbar = self.addToolBar('Toolbar')
+        self.toolbar.setObjectName('toolbar')
+        self.toolbar.addAction(self.newAction)
+        self.toolbar.addAction(self.saveAction)
+        self.toolbar.addAction(self.openAction)
+        self.toolbar.addSeparator()
+        self.toolbar.addAction(self.settingsAction)
+        self.toolbar.addSeparator()
+        self.toolbar.addAction(self.importAction)
+        self.toolbar.addSeparator()
+        self.toolbar.addAction(self.exitAction)
 
     def selectionChangedFunc(self):
         if(len(self.selectedItems()) > 0):
@@ -52,7 +122,7 @@ class WorkspaceTreeWidget(QTreeWidget):
     def dropEvent(self, event):
         for url in event.mimeData().urls():
             if(url.isValid):
-                self.workspaceManager.importDataByURL(url.toLocalFile())
+                self.wM.importDataByURL(url.toLocalFile())
 
     def getItemLevel(self, item):
         level = 0
@@ -132,8 +202,8 @@ class WorkspaceTreeWidget(QTreeWidget):
         if(ok):
             selectedItem.setText(0, self.workspace.cleanStringName(text))
             selectedItem.setData(0, self.ITEM_NAME, text)
-            self.workspaceManager.renameDSInSql(selectedItem)
-            self.workspaceManager.saveWSToSql()
+            self.wM.renameDSInSql(selectedItem)
+            self.wM.saveWSToSql()
 
     def treeWidgetItemByGUID(self, GUID):
         iterator = QTreeWidgetItemIterator(self)
@@ -171,11 +241,11 @@ class WorkspaceTreeWidget(QTreeWidget):
 
         self.linePlotAction = QAction(QIcon('icons\\analytics-4.png'),'Line Plot', self.mW)
         self.linePlotAction.setStatusTip('Generate a line plot of this DataSet')
-        self.linePlotAction.triggered.connect(lambda: self.workspaceManager.linePlotItem(selectedItem))
+        self.linePlotAction.triggered.connect(lambda: self.wM.linePlotItem(selectedItem))
 
         self.surfacePlotAction = QAction(QIcon('icons\\analytics-4.png'),'Surface Plot', self.mW)
         self.surfacePlotAction.setStatusTip('Generate a surface plot of this DataSet')
-        self.surfacePlotAction.triggered.connect(lambda: self.workspaceManager.surfacePlotItem(selectedItem))
+        self.surfacePlotAction.triggered.connect(lambda: self.wM.surfacePlotItem(selectedItem))
 
     def initContextMenu(self):
         selectedItem = self.currentItem()
@@ -184,7 +254,7 @@ class WorkspaceTreeWidget(QTreeWidget):
         self.contextMenu = QMenu()
 
         #Universal Workspace Context Menu Actions
-        if(self.workspaceManager.userScripts.processManager.processWidget.processList.count() is not 0):
+        if(self.wM.userScripts.processManager.processWidget.processList.count() is not 0):
             self.renameAction.setEnabled(False)
             self.deleteAction.setEnabled(False)
         self.contextMenu.addAction(self.renameAction)
@@ -196,7 +266,7 @@ class WorkspaceTreeWidget(QTreeWidget):
             self.contextMenu.addAction(self.linePlotAction)
             self.contextMenu.addAction(self.surfacePlotAction)
             self.contextMenu.addSeparator()
-            self.workspaceManager.userScripts.populateActionMenu(self.contextMenu.addMenu('Operations'), UserOperation, self.mW, selectedItem)
+            self.wM.userScripts.populateActionMenu(self.contextMenu.addMenu('Operations'), UserOperation, self.mW, selectedItem)
 
     def initDefaultContextMenu(self):
         warningAction = QAction('Nothing selected!', self.mW)

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-from Managers.InstrumentManager.Component import Component
+from Managers.InstrumentManager.Component import *
+from Managers.InstrumentManager.Sockets import *
 import os, uuid
+import numpy as np
 
 class Digital_Trigger_Component(Component):
     componentType = 'Digital Trigger Component'
@@ -27,5 +29,8 @@ class Digital_Trigger_Component(Component):
     def genTriggerSocket(self, name = ''):
         self.socket = self.addDISocket('[DIGI TRIG]: ' + name)
 
-    def onRun(self):
+    def onRun(self, events):
+        #Update self.data here
+        dataPacket = waveformPacket(self.data)
+        self.setPathDataPacket(1, dataPacket)
         return True

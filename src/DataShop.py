@@ -64,6 +64,13 @@ class mainWindow(QMainWindow):
     DataStation_Closing = pyqtSignal()
     DataStation_Closing_Final = pyqtSignal()
 
+    def center(self):
+        frameGm = self.frameGeometry()
+        screen = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
+        centerPoint = QApplication.desktop().screenGeometry(screen).center()
+        frameGm.moveCenter(centerPoint)
+        self.move(frameGm.topLeft())
+
     def __init__(self, app):
         super().__init__()
         self.app = app
@@ -74,14 +81,15 @@ class mainWindow(QMainWindow):
         self.loadWindowIcons()
         self.loadingScreenWidgets()
         self.initManagers()
-        self.initLoading()
+        self.loadWDockWidgets()
         self.initActions()
-        self.hardwareManager.loadHardwareState()
+        self.hM.loadHardwareState()
         self.loginWindow = loginDockWidget(self)
         self.loginWindow.setObjectName('loginWindow')
         self.postLog('Waiting on User Profile selection..', DSConstants.LOG_PRIORITY_HIGH)
         self.loginWindow.runModal() #Open the login window and then waits until it finishes and calls the finishInitWithUser function
-        self.connectManagers()
+
+        self.wM.connectWidgets() ## THIS NEEDS TO GO BYE BYE
 
         self.DataStation_Closing.connect(self.updateUserProfile)
 
@@ -93,18 +101,10 @@ class mainWindow(QMainWindow):
         self.app_icon.addFile(os.path.join(self.srcDir, r'DSIcons\DataStation_Small_48.png'), QSize(48,48))
         self.app_icon.addFile(os.path.join(self.srcDir, r'DSIcons\DataStation_Small_256.png'), QSize(256,256))
         self.app.setWindowIcon(self.app_icon)
-        self.trayIcon = QSystemTrayIcon(self.app_icon, self)
-        self.trayIcon.show()
-        
-    def center(self):
-        frameGm = self.frameGeometry()
-        screen = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
-        centerPoint = QApplication.desktop().screenGeometry(screen).center()
-        frameGm.moveCenter(centerPoint)
-        self.move(frameGm.topLeft())
+        #self.trayIcon = QSystemTrayIcon(self.app_icon, self)
+        #self.trayIcon.show()
 
     def loadingScreenWidgets(self):
-        #self.setGeometry(300, 300, 640, 480)
         self.setWindowTitle('DataStation (Alpha) - Loading...')
 
         self.logoDockWidget = logoDockWidget(self)
@@ -122,20 +122,23 @@ class mainWindow(QMainWindow):
         app.processEvents()
 
     def initManagers(self):
-        self.workspaceManager = WorkspaceManager(self)
-        self.instrumentManager = InstrumentManager(self)
-        self.instrumentManager.loadComponents()
-        self.hardwareManager = HardwareManager(self)
-        self.instrumentManager.connections()
-        self.hardwareManager.connections()
-        #self.DSInstrumentManager = InstrumentManager(self)
+        self.wM = WorkspaceManager(self)
+        self.wM.initUserScriptController()
+        self.wM.initDatabaseCommManager()
 
-        self.instrumentManager.Instrument_Loaded.connect(self.loadPreviousSequence)
+        self.iM = InstrumentManager(self)
+        self.iM.loadComponents()
 
-    def connectManagers(self):
-        self.workspaceManager.connectWidgets()
+        self.hM = HardwareManager(self)
+        self.hM.loadFilters()
+        self.hM.loadHardwareDrivers()
+        self.hM.loadLabviewInterface()
 
-    def initLoading(self):
+        self.wM.connections(self.iM, self.hM)
+        self.iM.connections(self.wM, self.hM)
+        self.hM.connections(self.wM, self.iM)
+
+    def loadWDockWidgets(self):
         # All used widgets need to be registered here - they autopopulate into the menu.
         # Also, ensure the widget is imported in the import statements above.
         # Generate a widget instance in initUI()
@@ -148,113 +151,29 @@ class mainWindow(QMainWindow):
         self.workspaceTreeDockWidget = workspaceTreeDockWidget(self)
         self.workspaceTreeDockWidget.setObjectName('workspaceTreeDockWidget')
         self.settingsDockWidget = settingsDockWidget(self)
-        self.settingsDockWidget .setObjectName('settingsDockWidget')
+        self.settingsDockWidget.setObjectName('settingsDockWidget')
         self.inspectorDockWidget = inspectorDockWidget(self)
         self.inspectorDockWidget.setObjectName('inspectorDockWidget')
         self.editorWidget = editorWidget(self)
         self.editorWidget.setObjectName('editorWidget')
         self.sequencerDockWidget = sequencerDockWidget(self)
         self.sequencerDockWidget.setObjectName('sequencerDockWidget')
-        self.instrumentWidget = instrumentWidget(self, self.instrumentManager)
+        self.instrumentWidget = instrumentWidget(self, self.iM)
         self.instrumentWidget.setObjectName('instrumentWidget')
-        self.instrumentManager.instrumentWidget = self.instrumentWidget #HOTFIX - Order of Execution Issue... NOT PRETTY
+        self.iM.instrumentWidget = self.instrumentWidget #HOTFIX - Order of Execution Issue... NOT PRETTY
         self.newsWidget = newsWidget(self)
         self.newsWidget.setObjectName('newsWidget')
-        self.hardwareWidget = hardwareWidget(self, self.instrumentManager, self.hardwareManager)
+        self.hardwareWidget = hardwareWidget(self, self.iM, self.hM)
         self.hardwareWidget.setObjectName('hardwareWidget')
 
-        self.workspaceManager.workspaceTreeWidget = self.workspaceTreeDockWidget.workspaceTreeWidget
-        self.workspaceManager.workspaceTreeWidget.setObjectName('workspaceTreeWidget')
+        self.wM.workspaceTreeWidget = self.workspaceTreeDockWidget.workspaceTreeWidget
+        self.wM.workspaceTreeWidget.setObjectName('workspaceTreeWidget')
 
-        self.controlWidget.registerManagers(self.instrumentWidget.instrumentManager, self.hardwareWidget.hardwareManager)
+        self.controlWidget.registerManagers(self.instrumentWidget.iM, self.hardwareWidget.hM)
 
     def finishInitWithUser(self, userData):
         self.postLog('User Profile Selected: ' + userData['First Name'] + ' ' + userData['Last Name'], DSConstants.LOG_PRIORITY_HIGH)
-        self.workspaceManager.userProfile = userData
-        self.initUI()
-        self.restoreWindowStates()
-        self.workspaceManager.loadPreviousWS()
-        self.loadPreviousInstrument()
-        #self.loadPreviousSequence()
-        print('DataStation_Loaded.emit()')
-        self.DataStation_Loaded.emit()
-        self.postLog('Data Station Finished Loading!', DSConstants.LOG_PRIORITY_HIGH)
-
-    def loadPreviousInstrument(self):
-        if('instrumentURL' in self.workspaceManager.userProfile):
-            if(self.workspaceManager.userProfile['instrumentURL'] is not None):
-                self.instrumentWidget.instrumentManager.loadInstrument(self.workspaceManager.userProfile['instrumentURL'])
-
-    def loadPreviousSequence(self):
-        if('sequenceURL' in self.workspaceManager.userProfile):
-            if(self.workspaceManager.userProfile['sequenceURL'] is not None):
-                self.sequencerDockWidget.openSequence(self.workspaceManager.userProfile['sequenceURL'])
-
-    def updateState(self, state):
-        if(state == DSConstants.MW_STATE_NO_WORKSPACE):
-            self.exitAction.setEnabled(True)
-            self.newAction.setEnabled(True)
-            self.saveAction.setEnabled(False)
-            self.openAction.setEnabled(True)
-            self.settingsAction.setEnabled(False)
-            self.importAction.setEnabled(False)
-            self.importMenu.setEnabled(False)
-            self.workspaceTreeDockWidget.workspaceTreeWidget.setAcceptDrops(False)
-        elif(state == DSConstants.MW_STATE_WORKSPACE_LOADED):
-            self.exitAction.setEnabled(True)
-            self.newAction.setEnabled(True)
-            self.saveAction.setEnabled(True)
-            self.openAction.setEnabled(True)
-            self.settingsAction.setEnabled(False)
-            self.importAction.setEnabled(True)
-            self.importMenu.setEnabled(True)
-            self.workspaceTreeDockWidget.workspaceTreeWidget.setAcceptDrops(True)
-        else:
-            self.exitAction.setEnabled(False)
-            self.newAction.setEnabled(False)
-            self.saveAction.setEnabled(False)
-            self.openAction.setEnabled(False)
-            self.settingsAction.setEnabled(False)
-            self.importAction.setEnabled(False)
-            self.importMenu.setEnabled(False)
-            self.workspaceTreeDockWidget.workspaceTreeWidget.setAcceptDrops(False)
-
-    def initActions(self):
-
-        self.exitAction = QAction(QIcon(os.path.join(self.srcDir, r'icons2\minimize.png')), 'Exit', self)
-        self.exitAction.setShortcut('Ctrl+Q')
-        self.exitAction.setStatusTip('Exit Application')
-        self.exitAction.triggered.connect(self.close)
-
-        self.newAction = QAction(QIcon(os.path.join(self.srcDir, r'icons2\controller.png')), 'New Workspace', self)
-        self.newAction.setShortcut('Ctrl+N')
-        self.newAction.setStatusTip('Create a New Workspace')
-        self.newAction.triggered.connect(self.workspaceManager.newWorkspace)
-
-        self.saveAction = QAction(QIcon(os.path.join(self.srcDir, r'icons2\save.png')), 'Save Workspace As..', self)
-        self.saveAction.setShortcut('Ctrl+S')
-        self.saveAction.setStatusTip('Save Workspace As..')
-        self.saveAction.triggered.connect(self.workspaceManager.saveWSToNewSql)
-
-        self.openAction = QAction(QIcon(os.path.join(self.srcDir, r'icons2\\folder.png')), 'Open Workspace', self)
-        self.openAction.setShortcut('Ctrl+O')
-        self.openAction.setStatusTip('Open Workspace')
-        self.openAction.triggered.connect(self.workspaceManager.loadWSFromSql)
-
-        self.settingsAction = QAction(QIcon(os.path.join(self.srcDir, r'icons2\settings.png')), 'Settings', self)
-        self.settingsAction.setShortcut('Ctrl+S')
-        self.settingsAction.setStatusTip('Adjust Settings')
-
-        self.importAction = QAction(QIcon(os.path.join(self.srcDir, r'icons2\pendrive.png')), 'Import', self)
-        self.importAction.setStatusTip('Import Data')
-        self.importAction.triggered.connect(self.workspaceManager.importData)
-
-        self.viewWindowsAction = QAction('Import', self)
-        self.viewWindowsAction.triggered.connect(self.populateViewWindowMenu)
-
-    def initUI(self):
-        self.initMenu()
-        self.initToolbar()
+        self.wM.userProfile = userData
         self.updateState(DSConstants.MW_STATE_NO_WORKSPACE)
         
         self.statusBar()
@@ -295,6 +214,43 @@ class mainWindow(QMainWindow):
         self.setGeometry(300, 300, 1280, 720)
         self.setWindowTitle('DataStation (Alpha)')
         self.show()
+        self.restoreWindowStates()
+        self.wM.loadPreviousWS()
+        self.iM.loadPreviousInstrument()
+        self.iM.loadPreviousSequence()
+
+        self.DataStation_Loaded.emit()
+        self.postLog('Data Station Finished Loading!', DSConstants.LOG_PRIORITY_HIGH)
+
+
+    def updateState(self, state):
+        if(state == DSConstants.MW_STATE_NO_WORKSPACE):
+            self.exitAction.setEnabled(True)
+            self.newAction.setEnabled(True)
+            self.saveAction.setEnabled(False)
+            self.openAction.setEnabled(True)
+            self.settingsAction.setEnabled(False)
+            self.importAction.setEnabled(False)
+            self.importMenu.setEnabled(False)
+            self.workspaceTreeDockWidget.workspaceTreeWidget.setAcceptDrops(False)
+        elif(state == DSConstants.MW_STATE_WORKSPACE_LOADED):
+            self.exitAction.setEnabled(True)
+            self.newAction.setEnabled(True)
+            self.saveAction.setEnabled(True)
+            self.openAction.setEnabled(True)
+            self.settingsAction.setEnabled(False)
+            self.importAction.setEnabled(True)
+            self.importMenu.setEnabled(True)
+            self.workspaceTreeDockWidget.workspaceTreeWidget.setAcceptDrops(True)
+        else:
+            self.exitAction.setEnabled(False)
+            self.newAction.setEnabled(False)
+            self.saveAction.setEnabled(False)
+            self.openAction.setEnabled(False)
+            self.settingsAction.setEnabled(False)
+            self.importAction.setEnabled(False)
+            self.importMenu.setEnabled(False)
+            self.workspaceTreeDockWidget.workspaceTreeWidget.setAcceptDrops(False)
 
     def postLog(self, key, level, **kwargs):
         useKey = kwargs.get('textKey', False)
@@ -310,16 +266,16 @@ class mainWindow(QMainWindow):
 
     def updateWindowStates(self):
         windowStates = self.saveState()
-        self.workspaceManager.userProfile['windowStates'] = json.dumps(bytes(windowStates.toHex()).decode('ascii'))
+        self.wM.userProfile['windowStates'] = json.dumps(bytes(windowStates.toHex()).decode('ascii'))
         windowGeometry = self.saveGeometry()
-        self.workspaceManager.userProfile['windowGeometry'] = json.dumps(bytes(windowGeometry.toHex()).decode('ascii'))
+        self.wM.userProfile['windowGeometry'] = json.dumps(bytes(windowGeometry.toHex()).decode('ascii'))
 
     def restoreWindowStates(self):
-        if('windowGeometry' in self.workspaceManager.userProfile):
-            tempGeometry = QByteArray.fromHex(bytes(json.loads(self.workspaceManager.userProfile['windowGeometry']), 'ascii'))
+        if('windowGeometry' in self.wM.userProfile):
+            tempGeometry = QByteArray.fromHex(bytes(json.loads(self.wM.userProfile['windowGeometry']), 'ascii'))
             self.restoreGeometry(tempGeometry)
-        if('windowStates' in self.workspaceManager.userProfile):
-            tempState = QByteArray.fromHex(bytes(json.loads(self.workspaceManager.userProfile['windowStates']), 'ascii'))
+        if('windowStates' in self.wM.userProfile):
+            tempState = QByteArray.fromHex(bytes(json.loads(self.wM.userProfile['windowStates']), 'ascii'))
             self.restoreState(tempState)
 
         #These can be restored to show but shouldn't be.
@@ -340,41 +296,6 @@ class mainWindow(QMainWindow):
                     action.triggered.connect(window.show)
 
                 self.viewWindowsMenu.addAction(action)
-
-    def initMenu(self):
-        self.menubar = self.menuBar()
-        self.fileMenu = self.menubar.addMenu('&File')
-        self.fileMenu.addAction(self.newAction)
-        self.fileMenu.addAction(self.saveAction)
-        self.fileMenu.addAction(self.openAction)
-        self.fileMenu.addSeparator()
-        self.fileMenu.addAction(self.settingsAction)
-        self.fileMenu.addSeparator()
-        self.fileMenu.addAction(self.importAction)
-        self.fileMenu.addSeparator()
-        self.fileMenu.addAction(self.exitAction)
-
-        self.viewWindowsMenu = QMenu('Windows')
-        self.viewWindowsMenu.aboutToShow.connect(self.populateViewWindowMenu)
-
-        self.viewMenu = self.menubar.addMenu('&View')
-        self.viewMenu.addMenu(self.viewWindowsMenu)
-
-        self.importMenu = self.menubar.addMenu('&Import')
-        self.workspaceManager.userScriptController.populateImportMenu(self.importMenu, self)
-
-    def initToolbar(self):
-        self.toolbar = self.addToolBar('Toolbar')
-        self.toolbar.setObjectName('toolbar')
-        self.toolbar.addAction(self.newAction)
-        self.toolbar.addAction(self.saveAction)
-        self.toolbar.addAction(self.openAction)
-        self.toolbar.addSeparator()
-        self.toolbar.addAction(self.settingsAction)
-        self.toolbar.addSeparator()
-        self.toolbar.addAction(self.importAction)
-        self.toolbar.addSeparator()
-        self.toolbar.addAction(self.exitAction)
 
     def softExit(self):
         self.postLog('Shutting down Datastation!', DSConstants.LOG_PRIORITY_HIGH)

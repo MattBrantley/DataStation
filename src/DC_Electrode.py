@@ -37,7 +37,8 @@ class DC_Electrode(Component):
         self.addSequencerEventType(pulseTrainEvent())
         self.addSequencerEventType(linearRampEvent())
 
-    def onRun(self):
+    def onRun(self, events):
+        self.prepSequencerData(events)
         dataPacket = waveformPacket(self.data)
         self.setPathDataPacket(1, dataPacket)
         return True
@@ -76,7 +77,7 @@ class DC_Electrode(Component):
         self.container.setLayout(self.fbox)
         return self.container
 
-    def parseSequenceEvents(self, events):
+    def prepSequencerData(self, events):
         self.data = None
         lastEventVoltage = 0
         for event in events:
@@ -128,7 +129,7 @@ class DC_Electrode(Component):
         return self.data
 
     def plotSequencer(self, events):
-        return self.parseSequenceEvents(events)
+        return self.data
 
     def saveWidgetValues(self):
         self.compSettings['showSequencer'] = self.showSequenceBox.isChecked()

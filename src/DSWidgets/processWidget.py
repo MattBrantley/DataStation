@@ -6,7 +6,7 @@ class processWidget(QDockWidget):
     ITEM_GUID = Qt.UserRole
 
     def __init__(self, mW):
-        super().__init__('Log')
+        super().__init__( 'Log')
         
         self.setFeatures(QDockWidget.DockWidgetFloatable | QDockWidget.DockWidgetMovable)
 

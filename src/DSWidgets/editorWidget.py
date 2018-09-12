@@ -2,12 +2,13 @@ from PyQt5.Qt import *
 from pyqode.core import api, modes, panels
 import os
 from shutil import copyfile
+from DSWidgets.networkViewWidget import netObject
 
 class editorWidget(QDockWidget):
     ITEM_GUID = Qt.UserRole
 
     def __init__(self, mW):
-        super().__init__('Code Editor')
+        super().__init__("Code Editor")
         self.mW = mW
         self.hide()
         self.resize(1000, 800)

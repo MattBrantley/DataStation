@@ -12,13 +12,12 @@ class filterStackWidget(QDockWidget):
 
     def __init__(self, parent, mW):
         super().__init__('Filter Stack Editor', parent=parent)
-        self.hardwareManager = parent.hardwareManager
-        self.instrumentManager = parent.instrumentManager 
+        self.hM = parent.hM
+        self.IM = parent.iM
         self.widget = parent
         self.mW = mW
         self.hide()
         self.setAllowedAreas(Qt.NoDockWidgetArea)
-        #self.setFeatures(QDockWidget.DockWidgetClosable)
 
         self.filterViewTransform = QTransform()
         self.filterViewScene = filterScene(self, self.filterViewTransform)
@@ -30,7 +29,6 @@ class filterStackWidget(QDockWidget):
     def drawScene(self, rootSource, pos):
         self.filterView.drawScene(rootSource)
         self.setWindowTitle('Filter Stack: '+ rootSource.name)
-        #self.move(QPoint(pos.x() + 2, pos.y() + 2))
         self.show()
 
 class filterView(QGraphicsView):
@@ -46,7 +44,7 @@ class filterView(QGraphicsView):
         super().__init__()
         self.parent = parent
         self.mainScene = scene
-        self.hardwareManager = parent.hardwareManager
+        self.hM = parent.hM
         self.setScene(scene)
         self.mainTransform = transform
         self.setTransform(transform)
@@ -236,7 +234,7 @@ class filterWidgetObject():
         self.view.drawScene(self.view.rootSource)
 
     def addFilter(self, Filter, pathNo):
-        tempFilter = type(Filter)(self.view.parent.hardwareManager)
+        tempFilter = type(Filter)(self.view.parent.hM)
         tempFilter.onCreationParent()
         self.sourceObject.addFilter(pathNo, tempFilter)
         self.view.drawScene(self.view.rootSource)
@@ -293,7 +291,7 @@ class filterSelectionWidget(QWidgetAction):
         self.menu.close()
 
     def populateBox(self):
-        for filterClass in self.parent.view.parent.hardwareManager.filtersAvailable:
+        for filterClass in self.parent.view.parent.hM.filtersAvailable:
             item = filterSelectionItem(filterClass.filterType, filterClass)
             self.pSpinBox.addItem(item)
 
@@ -329,7 +327,7 @@ class socketSelectionWidget(QWidgetAction):
 
     def populateBox(self):
         
-        for socket in self.parent.view.parent.mW.instrumentWidget.instrumentManager.currentInstrument.getSocketsByType(self.parent.view.parent.mW.hardwareWidget.gridCombo.currentText()):
+        for socket in self.parent.view.parent.mW.instrumentWidget.iM.currentInstrument.getSocketsByType(self.parent.view.parent.mW.hardwareWidget.gridCombo.currentText()):
             item = socketSelectionItem(socket.name, socket)
             self.pSpinBox.addItem(item)
 

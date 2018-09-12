@@ -5,7 +5,6 @@ import os, traceback, math
 import numpy as np
 import nidaqmx.system
 import nifgen
-from nifgen import Session
 from multiprocessing import Process, Queue, Pipe
 
 class Hardware_Driver(Hardware_Object):
@@ -17,12 +16,10 @@ class Hardware_Driver(Hardware_Object):
 
     ##### SUPPORT FUNCTIONS #####
     def getDeviceInfo(self):
+        print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         if(self.hardwareSettings['deviceName'] in self.getDeviceList()):
-            device = nidaqmx.system.Device(self.hardwareSettings['deviceName'])
-            try:
-                self.maxRate = device.ao_max_rate
-            except nidaqmx.errors.DaqError:
-                self.maxRate = None
+            with nifgen.Session(self.hardwareSettings['deviceName']) as session:
+                self.maxRate = session.arb_sample_rate
 
     def parseProgramData(self):
         eventData = self.getEvents()
@@ -33,12 +30,15 @@ class Hardware_Driver(Hardware_Object):
             gran = self.getGranularity(eventData)
             if(gran is not None):
                 granularity = round(self.getGranularity(eventData), int(math.log10(self.maxRate)))
+                if(granularity == 0):
+                    granularity = 1/self.maxRate
             else:
                 return None
             freq = 1/granularity
             xAxis = np.arange(timingBounds['min'], timingBounds['max'] + granularity, granularity)
             yAxisData = None
             for dataPacket in eventData:
+                print('DATA PACKET')
                 if(dataPacket.waveformData is None):
                     break
                 channelList.append(dataPacket.physicalConnectorID)
@@ -80,8 +80,11 @@ class Hardware_Driver(Hardware_Object):
         for dataPacket in programDataList:
             if(dataPacket.waveformData is None):
                 break
-            diffs = np.ediff1d(dataPacket.waveformData[:,0])
-            minDiff = diffs.min()
+            if(dataPacket.rate is None):
+                diffs = np.ediff1d(dataPacket.waveformData[:,0])
+                minDiff = diffs.min()
+            else:
+                minDiff = 1/dataPacket.rate
             if(gran == None or gran > minDiff):
                 gran = minDiff
         return gran
@@ -91,29 +94,18 @@ class Hardware_Driver(Hardware_Object):
         self.clearSourceList()
         if(self.hardwareSettings['deviceName'] in self.getDeviceList()):
 
-            self.forceNoUpdatesOnSourceAdd(True) #FOR SPEED!
             print(self.hardwareSettings['deviceName'])
-        #    with nifgen.Session(self.hardwareSettings['deviceName']) as session:
-        #        for i in range(0, session.channel_count):
-        #            source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] Output '+str(i), -10, 10, 0.1, 'Output '+str(i))
-        #            self.addSource(source)
-        #    self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
+            with nifgen.Session(self.hardwareSettings['deviceName']) as session:
+                for i in range(0, 2): #For some reason fgen doesn't have .channel_count despite the docs saying it does..
+                    source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] Output '+str(i), -10, 10, 0.1, 'Output '+str(i))
+                    self.addSource(source)
         else:
-            print('Config_Modified.emit()')
-            self.Config_Modified.emit(self)
-        #    device = nidaqmx.system.Device(self.hardwareSettings['deviceName'])
-        #    self.forceNoUpdatesOnSourceAdd(True) #FOR SPEED!
-        #    for chan in device.ao_physical_chans:
-        #        source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] '+chan.name, -10, 10, 0.1, chan.name)
-        #        self.addSource(source)
-        #    self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
-        #else:
-        #    print('Config_Modified.emit()')
-        #    self.Config_Modified.emit(self)
+            #self.Config_Modified.emit(self)
+            self.hM.configModified(self)
 
     def getDeviceList(self): 
         deviceList = list()
-        devices = self.hardwareManager.lvInterface.devices['NI-FGEN']
+        devices = self.hM.lvInterface.devices['NI-FGEN']
         for device in devices:
             deviceList.append(device['Device Name'])
 
@@ -137,11 +129,18 @@ class Hardware_Driver(Hardware_Object):
         self.hardwareWorker.outQueues['command'].put(hwm(action='init'))
         self.getDeviceInfo()
         self.genSources()
-        self.hardwareWorker.outQueues['command'].put(hwm(action='config'))
+        self.triggerModes['Software'] = True
+        self.triggerModes['Digital Rise'] = True
+        self.triggerModes['Digital Fall'] = True
 
     def onProgram(self):
         programmingData = self.parseProgramData()
         if(programmingData is not None):
+            print('FGEN PROGRAMMING -----------------------------------------')
+            print(programmingData['channelList'])
+            print(programmingData['freq'])
+            print(programmingData['yAxis'].shape)
+            self.hardwareWorker.outQueues['command'].put(hwm(action='config'))
             self.hardwareWorker.outQueues['command'].put(hwm(action='program'))
 
     def onRun(self):

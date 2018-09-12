@@ -16,10 +16,11 @@ class Hardware_Driver(Hardware_Object):
     ##### SUPPORT FUNCTIONS #####
 
     def updateTableClockIndex(self, index):
-            self.hardwareSettings['tableClockIndex'] = index
+        self.hardwareSettings['tableClockIndex'] = index
 
     def updateTableClock(self, rate):
-            self.hardwareSettings['tableClockSpeed'] = int(rate)
+        self.hardwareSettings['tableClockSpeed'] = int(rate)
+        self.program()
 
     def MIPSYResponseToInt(self, bytes):
         return int(bytes[1:-2].decode("utf-8"))
@@ -27,12 +28,64 @@ class Hardware_Driver(Hardware_Object):
     def MIPSYResponseToFloat(self, bytes):
         return float(bytes[1:-2].decode("utf-8"))
 
-    def parseProgramData(self, programDataList):
-        for programData in programDataList:
-            print('NEW PACKET:')
-            print(programData.physicalConnectorID)
-            print(programData.waveformData)
-            print(self.waveformToClockCount(programData.waveformData))
+    def MIPSToString(self, array):
+        strOut = 'STBLDAT;'
+        if(array is None):
+            return None
+        uniques = np.unique(array[:,0])
+
+        for val in uniques:
+            strOut += str(int(val))
+            lines = array[np.where(array[:,0] == val)]
+            lines = np.split(lines, lines.shape[0])
+
+            for line in lines:
+                if(line[0,2] == 0):
+                    token = str(int(line[0,3]))
+                else:
+                    token = chr(line[0,3])
+                
+                strOut += (':' + token + ':' + str(round(line[0,1], 2)))
+            
+            strOut += ','
+
+        strOut = strOut[:-1] + ';'
+        return strOut
+
+        
+        #length = array.shape[0]
+
+        #for i in range(0, length)
+
+    def parseProgramData(self):
+        eventData = self.getEvents()
+
+        cD = None
+
+        for programData in eventData:
+            if(programData.waveformData is not None):
+                if(programData.physicalConnectorID[:3] == 'DCB'):
+                    channelTag = 0 #This lets us unsort it to know it's an integer
+                    channelToken = int(programData.physicalConnectorID[4:])
+                if(programData.physicalConnectorID[:3] == 'DIO'):
+                    channelTag = 1 #This lets us unsort it to know it's a char
+                    channelToken = ord(programData.physicalConnectorID[4:])
+                data = self.waveformToClockCount(programData.waveformData)
+                length = programData.waveformData.shape[0]
+                channelColumns = np.zeros((length,2))
+                channelColumns[:,0] = channelColumns[:,0] + channelTag
+                channelColumns[:,1] = channelColumns[:,1] + channelToken
+
+                wfm = np.hstack((data, channelColumns))
+
+                if(cD is None):
+                    cD = wfm
+                else:
+                    cD = np.vstack((cD, wfm))
+
+        out = self.MIPSToString(cD)
+
+        return out
 
     def waveformToClockCount(self, waveform):
         waveOut = np.copy(waveform)
@@ -43,6 +96,20 @@ class Hardware_Driver(Hardware_Object):
         #time is in seconds (s)
         freq = int(self.hardwareSettings['tableClockSpeed'])
         return float(int(freq*time))
+
+    def prepareConfigData(self):
+        configs = dict()
+        configs['ch'] = self.hardwareSettings['deviceName']
+        configs['tableClockSpeed'] = self.hardwareSettings['tableClockSpeed']
+        return configs
+
+    def prepareArmData(self):
+        if(self.hardwareSettings['triggerMode'] == 'Software'):
+            return 'STBLTRG,SW'
+        if(self.hardwareSettings['triggerMode'] == 'Digital Rise'):
+            return 'STBLTRG,POS'
+        if(self.hardwareSettings['triggerMode'] == 'Digital Fall'):
+            return 'STBLTRG,NEG'
 
     ##### REQUIRED FUNCTINONS #####
 
@@ -84,7 +151,7 @@ class Hardware_Driver(Hardware_Object):
                     numDCB = self.MIPSYResponseToInt(response)
                 else:
                     numDCB = 0
-                self.forceNoUpdatesOnSourceAdd(True) #FOR SPEED!
+
                 for channel in range(numDCB):
                     chOut = str(channel+1)
                     nameTemp = self.hardwareSettings['deviceName'] + '/DCB/CH' + chOut
@@ -196,7 +263,6 @@ class Hardware_Driver(Hardware_Object):
                     self.addSource(source)
                 '''
 
-                self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
 
     def initHardwareWorker(self):
         self.hardwareWorker = MIPSYHardwareWorker()
@@ -234,14 +300,18 @@ class Hardware_Driver(Hardware_Object):
         self.triggerModes['Software'] = True
         self.triggerModes['Digital Rise'] = True
         self.triggerModes['Digital Fall'] = True
-        self.hardwareWorker.outQueues['command'].put(hwm(action='config'))
+        self.hardwareSettings['tableClockSpeed'] = 48000000
 
     def onProgram(self):
-        pass
-        #print('I would program now')
+        configData = self.prepareConfigData()
+        programmingData = self.parseProgramData()
+        armData = self.prepareArmData()
+        if(programmingData is not None):
+            self.hardwareWorker.outQueues['command'].put(hwm(action='config', data=configData))
+            self.hardwareWorker.outQueues['command'].put(hwm(action='program', data=programmingData))
+            self.hardwareWorker.outQueues['command'].put(hwm(action='arm', data=armData))
 
     def onRun(self):
-        self.program()
         self.hardwareWorker.outQueues['command'].put(hwm(action='run'))
 
 class MIPSYHardwareWorker(hardwareWorker):
@@ -250,6 +320,7 @@ class MIPSYHardwareWorker(hardwareWorker):
         self.configured = False
         self.programmed = False
         self.armed = False
+        self.ch = None
         super().__init__()
 
     def onConfig(self, msgIn, queueOut):
@@ -257,7 +328,6 @@ class MIPSYHardwareWorker(hardwareWorker):
         queueOut.put(resp)
 
     def onCommand(self, msgIn, queueOut):
-        print('MIPSY COMMAND: ' + msgIn.action)
         if(msgIn.action == 'readyCheck'):
             response = 'readyCheck'
         else:
@@ -288,21 +358,46 @@ class MIPSYHardwareWorker(hardwareWorker):
         #### CONFIGURING
         if(msgIn.action == 'config'):
             queueOut.put(hwm(action='textUpdate', msg='Configuring..'))
+            if('ch' in msgIn.data):
+                self.ch = msgIn.data['ch']
+                with serial.Serial(self.ch, 115200, timeout=1) as ser:
+                    queueOut.put(hwm(action='textUpdate', msg='Writing: \"SMOD,LOC\"'))
+                    ser.write(b'SMOD,LOC\r\n')
+                    queueOut.put(hwm(action='textUpdate', msg='Writing: \"STBLCLK,' + str(msgIn.data['tableClockSpeed']) + '\"'))
+                    ser.write(b'STBLCLK,' + str(msgIn.data['tableClockSpeed']).encode('ascii') + b'\r\n')
+
             self.configured = True
             queueOut.put(hwm(action='textUpdate', msg='Done! Ready for Waveform Programming..'))
 
         ##### PROGRAMMING
         if(msgIn.action == 'program'):
             queueOut.put(hwm(action='textUpdate', msg='Writing Program to Card..'))
+    
+            if(self.ch is not None):
+                with serial.Serial(self.ch, 115200, timeout=1) as ser:
+                    queueOut.put(hwm(action='textUpdate', msg='Program Writing: \"' + msgIn.data + '\"'))
+                    ser.write(msgIn.data.encode('ascii') + b'\r\n')
+
             self.programmed = True
             queueOut.put(hwm(action='textUpdate', msg='Done! Ready for Trigger Arming..'))
 
         ##### ARM
         if(msgIn.action == 'arm'):
-            queueOut.put(hwm(action='textUpdate', msg='Writing Program to Card..'))
+            queueOut.put(hwm(action='textUpdate', msg='Arming..'))
+            if(self.ch is not None):
+                with serial.Serial(self.ch, 115200, timeout=1) as ser:
+                    queueOut.put(hwm(action='textUpdate', msg='Writing Trigger: \"' + msgIn.data + '\"'))
+                    ser.write(msgIn.data.encode('ascii') + b'\r\n')
+                    queueOut.put(hwm(action='textUpdate', msg='Writing: \"SMOD,TBL\"'))
+                    ser.write(b'SMOD,TBL\r\n')
+
             self.armed = True
             queueOut.put(hwm(action='textUpdate', msg='Done! DAQ is Armed and Ready!'))
 
         ##### RUN
         if(msgIn.action == 'run'):
             queueOut.put(hwm(action='textUpdate', msg='Running!', data=False))
+            if(self.ch is not None):
+                with serial.Serial(self.ch, 115200, timeout=1) as ser:
+                    queueOut.put(hwm(action='textUpdate', msg='Writing: \"TBLSTRT\"'))
+                    ser.write(b'TBLSTRT\r\n')

@@ -10,11 +10,11 @@ class hardwareWidget(QDockWidget):
     socketList = list()
     plugList = list()
 
-    def __init__(self, mW, instrumentManager, hardwareManager):
+    def __init__(self, mW, iM, hM):
         super().__init__('Hardware')
         self.mW = mW
-        self.instrumentManager = instrumentManager
-        self.hardwareManager = hardwareManager
+        self.iM = iM
+        self.hM = hM
 
         self.hide()
         self.resize(800, 800)
@@ -27,7 +27,7 @@ class hardwareWidget(QDockWidget):
 
         self.filtersWidget = QWidget()
 
-        self.hardwareWidget = hardwareListWidget(self, self.hardwareManager)
+        self.hardwareWidget = hardwareListWidget(self, self.hM)
 
         self.filterStackWidget = filterStackWidget(self, self.mW)
         self.filterStackWidget.setObjectName('filterStackWidget')
@@ -66,20 +66,20 @@ class hardwareWidget(QDockWidget):
         self.mainContainer.setCentralWidget(self.tabWidget)
         self.setWidget(self.mainContainer)
 
-        self.hardwareManager.Hardware_Modified.connect(self.drawScene)
-        self.hardwareManager.Trigger_Modified.connect(self.drawScene)
-        self.instrumentManager.Instrument_Unloaded.connect(self.drawScene)
-        self.instrumentManager.Instrument_Loaded.connect(self.drawScene)
-        self.instrumentManager.Instrument_Modified.connect(self.drawScene)
+        self.hM.Hardware_Modified.connect(self.drawScene)
+        self.hM.Trigger_Modified.connect(self.drawScene)
+        self.iM.Instrument_Unloaded.connect(self.drawScene)
+        self.iM.Instrument_Loaded.connect(self.drawScene)
+        self.iM.Instrument_Modified.connect(self.drawScene)
 
         self.drawScene()
 
     def repopulateSocketsAndPlugs(self):        
         typeText = self.gridCombo.currentText()
             
-        self.plugList = self.hardwareManager.getSourceObjs(typeText)
-        if(self.instrumentManager.currentInstrument is not None):
-            self.socketList = self.instrumentManager.currentInstrument.getSocketsByType(typeText)
+        self.plugList = self.hM.getSourceObjs(typeText)
+        if(self.iM.currentInstrument is not None):
+            self.socketList = self.iM.currentInstrument.getSocketsByType(typeText)
         else:
             self.socketList = list()
 
@@ -114,7 +114,7 @@ class hardwareWidget(QDockWidget):
         offsetY = self.iScene.marginTop
         self.iScene.addLine(self.iScene.marginLeft, offsetY, self.iScene.marginLeft+totalWidth, offsetY)
         for socket in self.socketList:
-            text = self.iScene.addText(socket.name)
+            text = self.iScene.addText(socket.socketSettings['name'])
             text.setPos(self.iScene.marginLeft - text.boundingRect().width(), offsetY)
             
             offsetY = offsetY + self.iScene.cellWidth
@@ -125,7 +125,7 @@ class hardwareWidget(QDockWidget):
         transformTopText = QTransform()
         transformTopText.rotate(270)
         for plug in self.plugList:
-            text = self.iScene.addText(plug.name)
+            text = self.iScene.addText(plug.sourceSettings['name'])
             text.setTransform(transformTopText)
             text.setPos(offsetX + text.boundingRect().height() - self.iScene.cellWidth, self.iScene.marginTop)
 
@@ -136,13 +136,13 @@ class hardwareWidget(QDockWidget):
 
 class hardwareListWidget(QWidget):
 
-    def __init__(self, hardwareWidget, hardwareManager):
+    def __init__(self, hardwareWidget, hM):
         super().__init__()
         self.hardwareWidget = hardwareWidget
-        self.hardwareManager = hardwareManager
+        self.hM = hM
 
         self.mainLayout = QVBoxLayout()
-        self.hardwareList = hardwareListView(self, self.hardwareManager)
+        self.hardwareList = hardwareListView(self, self.hM)
         self.setLayout(self.mainLayout)
 
         self.scroll = QScrollArea(self)
@@ -164,9 +164,9 @@ class hardwareListWidget(QWidget):
         action = menu.exec_(QCursor().pos())
 
     def addHardware(self, hardwareClass, loadData=None):
-        tempHardware = self.hardwareManager.addHardwareObj(hardwareClass, loadData=loadData)
+        tempHardware = self.hM.addHardwareObj(hardwareClass, loadData=loadData)
 
-        widgetItem = hardwareListItem(self.hardwareList, self.hardwareManager, tempHardware)
+        widgetItem = hardwareListItem(self.hardwareList, self.hM, tempHardware)
         
         self.hardwareList.addWidget(widgetItem)
         return tempHardware
@@ -193,7 +193,7 @@ class hardwareSelectionWidget(QWidgetAction):
         self.menu.close()
 
     def populateBox(self):
-        for hardwareClass in self.parent.hardwareManager.driversAvailable:
+        for hardwareClass in self.parent.hM.driversAvailable:
             item = hardwareSelectionItem(hardwareClass.hardwareType, hardwareClass)
             self.pSpinBox.addItem(item)
 
@@ -205,10 +205,10 @@ class hardwareSelectionItem(QListWidgetItem):
 
 class hardwareListView(QWidget):
 
-    def __init__(self, parent, hardwareManager):
+    def __init__(self, parent, hM):
         super().__init__()
         self.parent = parent
-        self.hardwareManager = hardwareManager
+        self.hM = hM
         self.hardwareItemList = list()
         self.mainLayout = QVBoxLayout()
         self.setLayout(self.mainLayout)
@@ -226,11 +226,11 @@ class hardwareListItem(QWidget):
     heightMaximized = 400
     state = 'min'
 
-    def __init__(self, hardwareListView, hardwareManager, hardwareObj):
+    def __init__(self, hardwareListView, hM, hardwareObj):
         super().__init__()
         self.hardwareListView = hardwareListView
         self.hardwareSelectionWidget = hardwareSelectionWidget
-        self.hardwareManager = hardwareManager
+        self.hM = hM
         self.hardwareObj = hardwareObj
         self.msgWidget = driverMessageWidget()
 
@@ -308,7 +308,7 @@ class hardwareListItem(QWidget):
         self.setHeight()
 
     def closeButton(self):
-        self.hardwareManager.removeHardwareObj(self.hardwareObj)
+        self.hM.removeHardwareObj(self.hardwareObj)
         self.setParent(None)
 
     def paintEvent(self, e):
@@ -393,12 +393,12 @@ class iScene(QGraphicsScene):
         #self.widget.mW.controlWidget.configChanged()
         self.clearItems()
         for socket in self.widget.socketList:
-            if(socket.component.isTriggerComponent is True):
+            if(socket.cP.isTriggerComponent is True):
                 for source in self.widget.plugList:
                     if(source.trigger == False):
                         self.addItemToGrid(self.getSocketRow(socket), self.getPlugCol(source), None, color='grey')
 
-            source = socket.getAttachedSource()
+            source = socket.getSource()
             if(source is not None):
                 row = self.getSocketRow(socket)
                 col = self.getPlugCol(source)

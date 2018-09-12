@@ -74,14 +74,17 @@ class Hardware_Driver(Hardware_Object):
         bounds['min'] = xMin
         bounds['max'] = xMax
         return bounds
-    
+
     def getGranularity(self, programDataList):
         gran = None
         for dataPacket in programDataList:
             if(dataPacket.waveformData is None):
                 break
-            diffs = np.ediff1d(dataPacket.waveformData[:,0])
-            minDiff = diffs.min()
+            if(dataPacket.rate is None):
+                diffs = np.ediff1d(dataPacket.waveformData[:,0])
+                minDiff = diffs.min()
+            else:
+                minDiff = 1/dataPacket.rate
             if(gran == None or gran > minDiff):
                 gran = minDiff
         return gran
@@ -107,8 +110,8 @@ class Hardware_Driver(Hardware_Object):
 
             self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
         else:
-            print('Config_Modified.emit()')
-            self.Config_Modified.emit(self)
+            #self.Config_Modified.emit(self)
+            self.hM.configModified(self)
 
     def getDeviceList(self):
         system = nidaqmx.system.System.local()
@@ -139,11 +142,11 @@ class Hardware_Driver(Hardware_Object):
         self.triggerModes['Software'] = True
         self.triggerModes['Digital Rise'] = True
         self.triggerModes['Digital Fall'] = True
-        self.hardwareWorker.outQueues['command'].put(hwm(action='config'))
 
     def onProgram(self):
         programmingData = self.parseProgramData()
         if(programmingData is not None):
+            self.hardwareWorker.outQueues['command'].put(hwm(action='config'))
             self.hardwareWorker.outQueues['command'].put(hwm(action='program'))
 
     def onRun(self):

@@ -23,7 +23,8 @@ class Detection_Plates(Component):
         self.addSequencerEventType(timedCollectionEvent())
         self.addSequencerEventType(nCountCollectionEvent())
 
-    def onRun(self):
+    def onRun(self, events):
+        self.parseSequenceEvents(events)
         dataPacket = waveformPacket(self.data)
         self.setPathDataPacket(1, dataPacket)
         return True
@@ -84,7 +85,7 @@ class Detection_Plates(Component):
         return self.data
 
     def plotSequencer(self, events):
-        return self.parseSequenceEvents(events)
+        return self.data
 
 
 class timedCollectionEvent(sequencerEventType):

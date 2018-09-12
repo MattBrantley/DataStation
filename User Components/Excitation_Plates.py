@@ -23,13 +23,18 @@ class Excitation_Plates(Component):
 
         self.addSequencerEventType(chirpEvent())
 
-    def onRun(self):
-        dataPacket = waveformPacket(self.data)
+    def onRun(self, events):
+        self.prepSequencerData(events)
+        dataPacket = waveformPacket(self.data, rate=self.dataRate)
         self.setPathDataPacket(1, dataPacket)
         return True
 
-    def parseSequenceEvents(self, events):
+    def makeWaveformPacketFromEvent(self,  event):
+        pass
+
+    def prepSequencerData(self, events):
         self.data = None
+        self.dataRate = 0
         self.plotFrequency = 1e4
         lastEventTimeEnd = 0
         for event in events:
@@ -40,8 +45,10 @@ class Excitation_Plates(Component):
             gapY = np.zeros(len(gapX))
             gap = np.vstack((gapX, gapY)).transpose()
 
-
             if(isinstance(event['type'], chirpEvent) is True):
+                if(event['settings']['Rate'] > self.dataRate):
+                    self.dataRate = int(event['settings']['Rate'])
+
                 points = event['settings']['Rate']*event['settings']['Duration']
                 xAxisR = np.linspace(0, event['settings']['Duration'], points)
                 xAxis = np.add(xAxisR, event['time'])
@@ -55,8 +62,6 @@ class Excitation_Plates(Component):
 
                 lastEventTimeEnd = event['time']+event['settings']['Duration']
 
-
-
             if(newEventData is not None):
                 newEventData = np.vstack((gap, newEventData))
                 if(self.data is None):
@@ -67,8 +72,7 @@ class Excitation_Plates(Component):
         return self.data
 
     def plotSequencer(self, events):
-        return self.parseSequenceEvents(events)
-
+        return self.data
 
 class chirpEvent(sequencerEventType):
     def __init__(self):

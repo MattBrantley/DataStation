@@ -37,6 +37,7 @@ class controlWidget(QDockWidget):
         self.instrumentManager = instrumentManager
         self.hardwareManager = hardwareManager
 
+        self.instrumentManager.Sequence_Loaded.connect(self.readyChecks)
         self.instrumentManager.Instrument_Loaded.connect(self.readyChecks)
         self.instrumentManager.Instrument_Modified.connect(self.readyChecks)
         self.instrumentManager.Events_Modified.connect(self.readyChecks)

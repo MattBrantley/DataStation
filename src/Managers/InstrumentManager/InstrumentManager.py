@@ -29,6 +29,7 @@ class InstrumentManager(QObject):
     Sequence_Unloaded = pyqtSignal()
     Sequence_Loading = pyqtSignal()
     Sequence_Loaded = pyqtSignal()
+    After_Sequence_Loaded = pyqtSignal()
     Sequence_Name_Changed = pyqtSignal(str)
 
     Socket_Attached = pyqtSignal(object)
@@ -48,105 +49,58 @@ class InstrumentManager(QObject):
 
         self.mW.DataStation_Closing.connect(self.unsavedChangesCheck)
         self.Instrument_Loaded.connect(self.checkTriggerComponents)
-        #self.Instrument_Modified.
 
-    def getHardwareObjectByUUID(self, uuid):
-        return self.mW.hardwareManager.getHardwareObjectByUUID(uuid)
+##### Functions Called By Current Instrument #####
+
+    def instrumentModified(self, instrument):
+        pass
+
+    def componentModified(self, instrument):
+        pass
+
+    def eventsModified(self, instrument):
+        pass
+
+    def socketAttached(self, instrument, component, socket):
+        pass
+
+    def socketDetatched(self, instrument, component, socket):
+        pass
+
+##### DataStation Interface Functions #####
 
     def connections(self):
-        pass
-        self.mW.hardwareManager.Trigger_Modified.connect(self.checkTriggerComponents)
-
-    def checkTriggerComponents(self):
-        if(self.currentInstrument is not None):
-            self.currentInstrument.checkTriggerComponents()
+        # Called after all managers are created so they can connect to each other's signals
+        self.mW.hM.Trigger_Modified.connect(self.checkTriggerComponents)
 
     def unsavedChangesCheck(self):
         print('UNSAVED CHANGES TO INSTRUMENT')
-
-    def loadComponents(self):
-        self.mW.postLog('Loading User Components... ', DSConstants.LOG_PRIORITY_HIGH)
-
-        for root, dirs, files in os.walk(self.componentsDir):
-            for name in files:
-                url = os.path.join(root, name)
-                compHolder = self.loadComponentFromFile(url)
-                if (compHolder != None):
-                    self.componentsAvailable.append(compHolder)
-
-        self.mW.postLog('Finished Loading User Components!', DSConstants.LOG_PRIORITY_HIGH)
-
-    def loadComponentFromFile(self, filepath):
-        class_inst = None
-        expected_class = 'User_Component'
-        py_mod = None
-        mod_name, file_ext = os.path.splitext(os.path.split(filepath)[-1])
-        loaded = False
-
-        if file_ext.lower() == '.py':
-            self.mW.postLog('   Found Component Script: ' + filepath, DSConstants.LOG_PRIORITY_MED)
-            py_mod = imp.load_source(mod_name, filepath)
+        
+    def readyCheck(self):
+        subs = list()
+        if(self.currentInstrument is not None):
+            subs.append(self.currentInstrument.readyCheck())
         else:
-            return
+            return readyCheckPacket('Instrument Manager', DSConstants.READY_CHECK_ERROR, msg='No Instrument Loaded!')
 
-        #if (py_mod != None):
-        #    if hasattr(py_mod, expected_class):  # verify that Component is a class in this file
-        #        loaded = True
-        #        class_temp = getattr(py_mod, expected_class)(filepath)
-        #        if isinstance(class_temp, Component):  # verify that Component inherits the correct class
-        #            class_inst = class_temp
+        return readyCheckPacket('Instrument Manager', DSConstants.READY_CHECK_READY, subs=subs)
 
-        if (py_mod != None):
-            if(hasattr(py_mod, mod_name) is True):
-                class_temp = getattr(py_mod, mod_name)(self.mW)
-                if issubclass(type(class_temp), Component):
-                    class_inst = class_temp
-                    loaded = True
+##### Search Functions ######
+    def getHardwareObjectByUUID(self, uuid):
+        return self.mW.hM.getHardwareObjectByUUID(uuid)
 
-        if(loaded):
-            class_inst.instrumentManager = self
-            class_inst.setupWidgets()
-            self.mW.postLog('  (Success!)', DSConstants.LOG_PRIORITY_MED, newline=False)
-        else:
-            self.mW.postLog(' (Failed!)', DSConstants.LOG_PRIORITY_MED, newline=False)
-
-        return class_inst
-
-    def getAvailableComponents(self):
-        return self.componentsAvailable
-
-    def newInstrument(self, name, rootPath):
-        self.currentInstrument = Instrument(self)
-        self.currentInstrument.url = os.path.join(rootPath, name+'.dsinstrument')
-        self.currentInstrument.Instrument_Modified.connect(self.Instrument_Modified)
-        self.currentInstrument.Component_Modified.connect(self.Component_Modified)
-        self.currentInstrument.Events_Modified.connect(self.Events_Modified)
-        self.currentInstrument.name = name
-        print('Instrument_Modified.emit()')
-        self.Instrument_Modified.emit(self.currentInstrument)
-        print('Instrument_Unloaded.emit()')
-        self.Instrument_Unloaded.emit()
-
-    def addCompByIndex(self, dropIndex):
-        comp = self.componentsAvailable[dropIndex]
-        return self.addCompToInstrument(comp)
-
-    def addCompToInstrument(self, comp):
-        if (self.currentInstrument is None):
-            self.mW.postLog('No instrument is loaded - creating new one! ', DSConstants.LOG_PRIORITY_HIGH)
-            self.currentInstrument = Instrument(self)
-            self.currentInstrument.Instrument_Modified.connect(self.Instrument_Modified)
-            self.currentInstrument.Component_Modified.connect(self.Component_Modified)
-            self.currentInstrument.Events_Modified.connect(self.Events_Modified)
-
-        result = self.currentInstrument.addComponent(comp(self.mW))
-        self.mW.sequencerDockWidget.updatePlotList()
-        self.mW.hardwareWidget.drawScene()
-        return result
+    def getFilterOrSourceByUUID(self, uuid):
+        return self.mW.hM.getFilterOrSourceByUUID(uuid)
 
     def getComponentByUUID(self, uuid):
         if(self.currentInstrument is not None):
-            return self.currentInstrument.getComponentByUUID(uuid)
+            return self.currentInstrument.getComponentByUUID(uuid) # Search Components
+        else:
+            return None
+
+    def getSocketByUUID(self, uuid):
+        if(self.currentInstrument is not None):
+            return self.currentInstrument.getComponentByUUID(uuid) # Search Components
         else:
             return None
 
@@ -162,6 +116,39 @@ class InstrumentManager(QObject):
         else:
             return None
 
+    def findCompModelByIdentifier(self, identifier):
+        if(identifier == 'DigiTrigComp_mrb'):
+            return Digital_Trigger_Component(self.mW)
+
+        for comp in self.componentsAvailable:
+            if(comp.componentIdentifier == identifier):
+                return comp
+        return None
+
+##### Instrument Manipulations ######
+
+    def loadPreviousInstrument(self):
+        if('instrumentURL' in self.wM.userProfile):
+            if(self.wM.userProfile['instrumentURL'] is not None):
+                self.loadInstrument(self.wM.userProfile['instrumentURL'])
+
+    def loadPreviousSequence(self):
+        if('sequenceURL' in self.wM.userProfile):
+            if(self.wM.userProfile['sequenceURL'] is not None):
+                self.mW.sequencerDockWidget.openSequence(self.wM.userProfile['sequenceURL'])
+
+    def newInstrument(self, name, rootPath):
+        self.currentInstrument = Instrument(self)
+        self.currentInstrument.url = os.path.join(rootPath, name+'.dsinstrument')
+        self.currentInstrument.Instrument_Modified.connect(self.Instrument_Modified)
+        self.currentInstrument.Component_Modified.connect(self.Component_Modified)
+        self.currentInstrument.Events_Modified.connect(self.Events_Modified)
+        self.currentInstrument.name = name
+        print('Instrument_Modified.emit()')
+        self.Instrument_Modified.emit(self.currentInstrument)
+        print('Instrument_Unloaded.emit()')
+        self.Instrument_Unloaded.emit()
+
     def saveInstrument(self, url):
         if(self.currentInstrument is not None):
             self.mW.postLog('VI_Save', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
@@ -174,15 +161,6 @@ class InstrumentManager(QObject):
             self.mW.postLog('VI_Save_No_VI', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
             
         self.instrumentWidget.updateTitle()
-        
-    def readyCheck(self):
-        subs = list()
-        if(self.currentInstrument is not None):
-            subs.append(self.currentInstrument.readyCheck())
-        else:
-            return readyCheckPacket('Instrument Manager', DSConstants.READY_CHECK_ERROR, msg='No Instrument Loaded!')
-
-        return readyCheckPacket('Instrument Manager', DSConstants.READY_CHECK_READY, subs=subs)
 
     def loadInstrument(self, url):
         self.mW.postLog('Loading User Instrument (' + url + ')... ', DSConstants.LOG_PRIORITY_HIGH)
@@ -202,18 +180,14 @@ class InstrumentManager(QObject):
                 self.mW.postLog('Corrupted instrument at (' + url + ') - aborting! ', DSConstants.LOG_PRIORITY_MED)
                 return
         self.mW.postLog('Finished Loading User Instrument!', DSConstants.LOG_PRIORITY_HIGH)
-        self.mW.workspaceManager.userProfile['instrumentURL'] = self.currentInstrument.url
+        self.mW.wM.userProfile['instrumentURL'] = self.currentInstrument.url
         self.mW.sequencerDockWidget.updatePlotList()
         self.mW.hardwareWidget.drawScene()
 
         self.instrumentWidget.updateTitle()
 
-        self.currentInstrument.Socket_Attached.connect(self.Socket_Attached)
-        self.currentInstrument.Socket_Unattached.connect(self.Socket_Unattached)
-
-        print('Instrument_Loaded.emit()')
+        
         self.Instrument_Loaded.emit(self.currentInstrument)
-        print('After_Instrument_Loaded.emit()')
         self.After_Instrument_Loaded.emit()
 
     def processInstrumentData(self, instrumentData, url):
@@ -246,14 +220,7 @@ class InstrumentManager(QObject):
                             
         self.clearCurrentInstrument()
         self.currentInstrument = self.tempInstrument
-        self.currentInstrument.Instrument_Modified.connect(self.Instrument_Modified)
-        self.currentInstrument.Component_Modified.connect(self.Component_Modified)
-        self.currentInstrument.Events_Modified.connect(self.Events_Modified)
         self.currentInstrument.reattachSockets()
-
-    def reattachSockets(self):
-        if(self.currentInstrument is not None):
-            self.currentInstrument.reattachSockets()
 
     def clearCurrentInstrument(self):
         if(self.currentInstrument is not None):
@@ -261,15 +228,6 @@ class InstrumentManager(QObject):
                 socket.unattach()
 
             self.currentInstrument = None
-
-    def findCompModelByIdentifier(self, identifier):
-        if(identifier == 'DigiTrigComp_mrb'):
-            return Digital_Trigger_Component(self.mW)
-
-        for comp in self.componentsAvailable:
-            if(comp.componentIdentifier == identifier):
-                return comp
-        return None
 
     def writeInstrumentToFile(self, saveData, url):
         if(url is None):
@@ -284,12 +242,30 @@ class InstrumentManager(QObject):
         with open(instrumentSaveURL, 'w') as file:
             json.dump(saveData, file, sort_keys=True, indent=4)
 
-    def socketUnattached(self, socket):
-        self.mW.hardwareWidget.iScene.connectPlugsAndSockets()
+    def checkTriggerComponents(self):
+        if(self.currentInstrument is not None):
+            self.currentInstrument.checkTriggerComponents()
 
-###### SEQUENCE ######
+    def addCompByIndex(self, dropIndex):
+        comp = self.componentsAvailable[dropIndex]
+        return self.addCompToInstrument(comp)
 
-    @pyqtSlot()
+    def addCompToInstrument(self, comp):
+        if (self.currentInstrument is None):
+            self.mW.postLog('No instrument is loaded - creating new one! ', DSConstants.LOG_PRIORITY_HIGH)
+            self.currentInstrument = Instrument(self)
+            self.currentInstrument.Instrument_Modified.connect(self.Instrument_Modified)
+            self.currentInstrument.Component_Modified.connect(self.Component_Modified)
+            self.currentInstrument.Events_Modified.connect(self.Events_Modified)
+
+        result = self.currentInstrument.addComponent(comp(self.mW))
+        result.mW = self.mW
+        self.mW.sequencerDockWidget.updatePlotList()
+        self.mW.hardwareWidget.drawScene()
+        return result
+
+##### Sequence Manipulation #####
+
     def saveSequence(self):
         if(self.currentSequenceURL is None):
             self.saveAs()
@@ -308,7 +284,6 @@ class InstrumentManager(QObject):
             json.dump(saveData, file, sort_keys=True, indent=4)
         self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
-    @pyqtSlot()
     def saveSequenceAs(self):
         fname, ok = QInputDialog.getText(self.mW, "Sequence Name", "Sequence Name")
         if(os.path.exists(os.path.join(self.sequencesDir, self.currentInstrument.name)) is False):
@@ -316,7 +291,6 @@ class InstrumentManager(QObject):
         saveURL = os.path.join(os.path.join(self.sequencesDir, self.currentInstrument.name), fname + '.dssequence')
         if(ok):
             pass
-            #self.instrumentManager.currentInstrument.name = fname
         else:
             return
 
@@ -334,7 +308,6 @@ class InstrumentManager(QObject):
         self.currentSequenceURL = saveURL
         self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
-    @pyqtSlot()
     def newSequence(self):
         result = DSNewFileDialog.newFile()
 
@@ -369,7 +342,6 @@ class InstrumentManager(QObject):
 
         self.mW.postLog('Loading Sequence (' + filePath + ')... ', DSConstants.LOG_PRIORITY_HIGH)
         self.Sequence_Loading.emit()
-        self.currentInstrument.Events_Modified.disconnect(self.Events_Modified)
 
         if(os.path.isfile(filePath) is True):
             with open(filePath, 'r') as file:
@@ -383,11 +355,13 @@ class InstrumentManager(QObject):
                     self.mW.postLog('Corrupted sequence at (' + filePath + ') - aborting! ', DSConstants.LOG_PRIORITY_HIGH)
                     return
 
-        self.mW.workspaceManager.userProfile['sequenceURL'] = filePath
+        self.mW.wM.userProfile['sequenceURL'] = filePath
 
         if(self.currentSequenceURL is not None):
             print('Sequence_Loaded.emit()')
             self.Sequence_Loaded.emit()
+            print('After_Sequence_Loaded.emit()')
+            self.After_Sequence_Loaded.emit()
         else:
             print('Sequence_Unloaded.emit()')
             self.Sequence_Unloaded.emit()
@@ -418,3 +392,48 @@ class InstrumentManager(QObject):
                 comp.loadSequenceData(datum['events'])
         
         return True
+
+##### User Components #####
+
+    def loadComponents(self):
+        self.mW.postLog('Loading User Components... ', DSConstants.LOG_PRIORITY_HIGH)
+
+        for root, dirs, files in os.walk(self.componentsDir):
+            for name in files:
+                url = os.path.join(root, name)
+                compHolder = self.loadComponentFromFile(url)
+                if (compHolder != None):
+                    self.componentsAvailable.append(compHolder)
+
+        self.mW.postLog('Finished Loading User Components!', DSConstants.LOG_PRIORITY_HIGH)
+
+    def loadComponentFromFile(self, filepath): # I think this is only for the models
+        class_inst = None
+        expected_class = 'User_Component'
+        py_mod = None
+        mod_name, file_ext = os.path.splitext(os.path.split(filepath)[-1])
+        loaded = False
+
+        if file_ext.lower() == '.py':
+            self.mW.postLog('   Found Component Script: ' + filepath, DSConstants.LOG_PRIORITY_MED)
+            py_mod = imp.load_source(mod_name, filepath)
+        else:
+            return
+
+        if (py_mod != None):
+            if(hasattr(py_mod, mod_name) is True):
+                class_temp = getattr(py_mod, mod_name)(self.mW)
+                if issubclass(type(class_temp), Component):
+                    class_inst = class_temp
+                    loaded = True
+
+        if(loaded):
+            class_inst.iM = self
+            #class_inst.setupWidgets()
+            self.mW.postLog('  (Success!)', DSConstants.LOG_PRIORITY_MED, newline=False)
+        else:
+            self.mW.postLog(' (Failed!)', DSConstants.LOG_PRIORITY_MED, newline=False)
+
+        return class_inst
+
+#####

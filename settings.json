@@ -8,1192 +8,552 @@
     "hardwareState": {
         "hardwareStates": [
             {
-                "hardwareIdentifier": "NI_DAQmx_MRB",
+                "hardwareIdentifier": "MIPSY_MRB",
                 "hardwareSettings": {
-                    "deviceName": "Input_Test",
-                    "name": "Input_Test",
+                    "deviceName": "COM14",
+                    "name": "COM14",
                     "physID": "",
-                    "triggerCompUUID": "02928929-7b9b-4daf-b5f1-cac1af315386",
-                    "triggerMode": "Digital Fall",
-                    "uuid": "978a50ed-1459-4c95-a7ad-51c10ebe4fb1"
+                    "tableClockIndex": 3,
+                    "tableClockSpeed": 48000000,
+                    "triggerCompUUID": "",
+                    "triggerMode": "",
+                    "uuid": "e0b4f00c-8ff9-459f-9895-d93666e7d1c3"
                 },
-                "hardwareType": "NI_DAQmx",
+                "hardwareType": "MIPSY",
                 "sourceList": [
                     {
-                        "name": "[Input_Test] Input_Test/ao0",
-                        "paths": [
-                            {
-                                "data": {
-                                    "filterInputPathNo": 1,
-                                    "filterInputSource": "dcd796fe-8a65-4326-a2ae-8815734411f2",
-                                    "name": "Unnamed Circular Lens [AO]",
-                                    "prec": 0.1,
-                                    "uuid": "eae13093-2f27-42dd-ba58-a8c9d6ea13d5",
-                                    "vMax": 10,
-                                    "vMin": 0
-                                },
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Input_Test/ao0",
-                        "prec": 0.1,
-                        "uuid": "dcd796fe-8a65-4326-a2ae-8815734411f2",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Input_Test] Input_Test/ao1",
-                        "paths": [
-                            {
-                                "data": {
-                                    "filterInputPathNo": 1,
-                                    "filterInputSource": "cbb1f3c6-9375-4a65-b64c-11de67bfe61e",
-                                    "name": "Unnamed Circular Lens [AO]",
-                                    "prec": 0.1,
-                                    "uuid": "af8f49c7-6749-4c96-b4b6-a311e4c76fc9",
-                                    "vMax": 10,
-                                    "vMin": 0
-                                },
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Input_Test/ao1",
-                        "prec": 0.1,
-                        "uuid": "cbb1f3c6-9375-4a65-b64c-11de67bfe61e",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Input_Test] Input_Test/ao2",
-                        "paths": [
-                            {
-                                "data": {
-                                    "filterInputPathNo": 1,
-                                    "filterInputSource": "4ef7036c-2b78-4f0f-8c6e-243294f5d306",
-                                    "name": "Unnamed Circular Lens [AO]",
-                                    "prec": 0.1,
-                                    "uuid": "53c957e3-3260-4729-81dd-f3307a2d19d4",
-                                    "vMax": 10,
-                                    "vMin": 0
-                                },
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Input_Test/ao2",
-                        "prec": 0.1,
-                        "uuid": "4ef7036c-2b78-4f0f-8c6e-243294f5d306",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Input_Test] Input_Test/ao3",
-                        "paths": [
-                            {
-                                "data": {
-                                    "filterInputPathNo": 1,
-                                    "filterInputSource": "9efe0ac5-6a49-42da-86f8-46b02f8fe86d",
-                                    "name": "Unnamed Circular Lens [AO]",
-                                    "prec": 0.1,
-                                    "uuid": "1864ccfb-a199-4f5f-82d1-f11d881afa54",
-                                    "vMax": 10,
-                                    "vMin": 0
-                                },
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Input_Test/ao3",
-                        "prec": 0.1,
-                        "uuid": "9efe0ac5-6a49-42da-86f8-46b02f8fe86d",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Input_Test] Input_Test/ao4",
-                        "paths": [
-                            {
-                                "data": {
-                                    "filterInputPathNo": 1,
-                                    "filterInputSource": "cf49114a-30f8-4669-b612-7e7743f4be9f",
-                                    "name": "Unnamed Circular Lens [AO]",
-                                    "prec": 0.1,
-                                    "uuid": "96da2d1d-3015-40e8-98f9-5a39d03c709a",
-                                    "vMax": 10,
-                                    "vMin": 0
-                                },
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Input_Test/ao4",
-                        "prec": 0.1,
-                        "uuid": "cf49114a-30f8-4669-b612-7e7743f4be9f",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Input_Test] Input_Test/ao5",
-                        "paths": [
-                            {
-                                "data": {
-                                    "filterInputPathNo": 1,
-                                    "filterInputSource": "2bb8f39f-62b9-48c0-87b6-d0ff585375bb",
-                                    "name": "Unnamed Circular Lens [AO]",
-                                    "prec": 0.1,
-                                    "uuid": "ee6c983d-148d-4c17-a8b6-f4527af53883",
-                                    "vMax": 10,
-                                    "vMin": 0
-                                },
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Input_Test/ao5",
-                        "prec": 0.1,
-                        "uuid": "2bb8f39f-62b9-48c0-87b6-d0ff585375bb",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Input_Test] Input_Test/ao6",
-                        "paths": [
-                            {
-                                "data": {
-                                    "filterInputPathNo": 1,
-                                    "filterInputSource": "c2d1b722-a642-40c7-90cb-ae2100b71db1",
-                                    "name": "Unnamed Excitation Plates [AO]",
-                                    "prec": 0.1,
-                                    "uuid": "3ebe5821-4955-409c-921b-9ed6815a659f",
-                                    "vMax": 10,
-                                    "vMin": 0
-                                },
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Input_Test/ao6",
-                        "prec": 0.1,
-                        "uuid": "c2d1b722-a642-40c7-90cb-ae2100b71db1",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Input_Test] Input_Test/ao7",
+                        "name": "[COM14] COM14/DCB/CH1",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao7",
+                        "physConID": "DCB/1",
                         "prec": 0.1,
-                        "uuid": "05f197a2-60f3-4053-93ac-2a1fe75f8fc0",
-                        "vMax": 10,
-                        "vMin": -10
+                        "uuid": "1e8818ca-d85f-4567-ba49-4c77f963e266",
+                        "vMax": 250.0,
+                        "vMin": -250.0
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao8",
+                        "name": "[COM14] COM14/DCB/CH2",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao8",
+                        "physConID": "DCB/2",
                         "prec": 0.1,
-                        "uuid": "0bc97e21-19da-4644-862a-f7e35388f4ef",
-                        "vMax": 10,
-                        "vMin": -10
+                        "uuid": "e18aa904-5759-44d1-b413-4fdafdeabe51",
+                        "vMax": 250.0,
+                        "vMin": -250.0
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao9",
+                        "name": "[COM14] COM14/DCB/CH3",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao9",
+                        "physConID": "DCB/3",
                         "prec": 0.1,
-                        "uuid": "a5dc919d-94d3-4952-9cd9-ca9fe633c9d6",
-                        "vMax": 10,
-                        "vMin": -10
+                        "uuid": "5061ef35-2d75-410f-a550-ac48ae703f8b",
+                        "vMax": 250.0,
+                        "vMin": -250.0
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao10",
+                        "name": "[COM14] COM14/DCB/CH4",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao10",
+                        "physConID": "DCB/4",
                         "prec": 0.1,
-                        "uuid": "de902d74-0129-467c-ab4d-ee195428541d",
-                        "vMax": 10,
-                        "vMin": -10
+                        "uuid": "3a11e543-0551-4ed2-9a83-ec5e8b030cd7",
+                        "vMax": 250.0,
+                        "vMin": -250.0
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao11",
+                        "name": "[COM14] COM14/DCB/CH5",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao11",
+                        "physConID": "DCB/5",
                         "prec": 0.1,
-                        "uuid": "17a93107-b239-4eae-a77b-18011ec7ab63",
-                        "vMax": 10,
-                        "vMin": -10
+                        "uuid": "5549511a-816c-493a-8ad1-12fa6f495665",
+                        "vMax": 250.0,
+                        "vMin": -250.0
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao12",
+                        "name": "[COM14] COM14/DCB/CH6",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao12",
+                        "physConID": "DCB/6",
                         "prec": 0.1,
-                        "uuid": "be20abef-fb41-44b6-95d8-d8f6c04cb065",
-                        "vMax": 10,
-                        "vMin": -10
+                        "uuid": "6a78e050-6838-4efb-b971-7ee602a90916",
+                        "vMax": 250.0,
+                        "vMin": -250.0
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao13",
+                        "name": "[COM14] COM14/DCB/CH7",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao13",
+                        "physConID": "DCB/7",
                         "prec": 0.1,
-                        "uuid": "e36872c6-0857-4edd-8566-c10576f01b38",
-                        "vMax": 10,
-                        "vMin": -10
+                        "uuid": "345b9067-46c3-45cd-8b79-38e6dda0cb39",
+                        "vMax": 250.0,
+                        "vMin": -250.0
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao14",
+                        "name": "[COM14] COM14/DCB/CH8",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao14",
+                        "physConID": "DCB/8",
                         "prec": 0.1,
-                        "uuid": "385b9d1b-659e-4d5a-8740-bb6155b3dd9b",
-                        "vMax": 10,
-                        "vMin": -10
+                        "uuid": "d8af5cbe-ff79-4e42-877b-e259c47aa438",
+                        "vMax": 250.0,
+                        "vMin": -250.0
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao15",
+                        "name": "[COM14] COM14/DCB/CH9",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao15",
+                        "physConID": "DCB/9",
                         "prec": 0.1,
-                        "uuid": "9a14693d-a3b9-450e-beed-c13d5ca70e04",
-                        "vMax": 10,
-                        "vMin": -10
+                        "uuid": "1e053dd3-0579-4b3b-ad77-a6df5536c16e",
+                        "vMax": 50.0,
+                        "vMin": -50.0
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao16",
+                        "name": "[COM14] COM14/DCB/CH10",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao16",
+                        "physConID": "DCB/10",
                         "prec": 0.1,
-                        "uuid": "001fa742-e606-4890-becd-2e8fd561557a",
-                        "vMax": 10,
-                        "vMin": -10
+                        "uuid": "4e1d6c0c-0820-4850-8177-11b662abd3e9",
+                        "vMax": 50.0,
+                        "vMin": -50.0
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao17",
+                        "name": "[COM14] COM14/DCB/CH11",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao17",
+                        "physConID": "DCB/11",
                         "prec": 0.1,
-                        "uuid": "82a07a33-60cc-447b-b629-819e787fe027",
-                        "vMax": 10,
-                        "vMin": -10
+                        "uuid": "f07d0e40-5bc7-4c36-b423-4165ddfd65d3",
+                        "vMax": 50.0,
+                        "vMin": -50.0
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao18",
+                        "name": "[COM14] COM14/DCB/CH12",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao18",
+                        "physConID": "DCB/12",
                         "prec": 0.1,
-                        "uuid": "ee243d3e-aea8-4cb9-bb4a-7336eab34d55",
-                        "vMax": 10,
-                        "vMin": -10
+                        "uuid": "e6b76a69-60e1-4ebc-a111-c3076a4f50c2",
+                        "vMax": 50.0,
+                        "vMin": -50.0
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao19",
+                        "name": "[COM14] COM14/DCB/CH13",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao19",
+                        "physConID": "DCB/13",
                         "prec": 0.1,
-                        "uuid": "e3d38ea1-ae5d-4c8b-b315-08275df75eed",
-                        "vMax": 10,
-                        "vMin": -10
+                        "uuid": "1384a54f-1cb5-4b7b-86d6-06e35f06466c",
+                        "vMax": 50.0,
+                        "vMin": -50.0
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao20",
+                        "name": "[COM14] COM14/DCB/CH14",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao20",
+                        "physConID": "DCB/14",
                         "prec": 0.1,
-                        "uuid": "a195e098-068b-473f-9bb9-21171628dd39",
-                        "vMax": 10,
-                        "vMin": -10
+                        "uuid": "b18714c0-ff97-49c9-959c-0f5516f37b2a",
+                        "vMax": 50.0,
+                        "vMin": -50.0
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao21",
+                        "name": "[COM14] COM14/DCB/CH15",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao21",
+                        "physConID": "DCB/15",
                         "prec": 0.1,
-                        "uuid": "408169f3-d92f-4e8e-8ce9-6b47b978198c",
-                        "vMax": 10,
-                        "vMin": -10
+                        "uuid": "05935a95-6071-46d2-9f3b-c89c8c0df474",
+                        "vMax": 50.0,
+                        "vMin": -50.0
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao22",
+                        "name": "[COM14] COM14/DCB/CH16",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao22",
+                        "physConID": "DCB/16",
                         "prec": 0.1,
-                        "uuid": "aca52421-f10d-462e-a483-27d3821600ab",
-                        "vMax": 10,
-                        "vMin": -10
+                        "uuid": "1b456d6f-f0a8-4cd8-8e3e-93ec947f11c9",
+                        "vMax": 50.0,
+                        "vMin": -50.0
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao23",
+                        "name": "[COM14] COM14/DIO/A",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao23",
-                        "prec": 0.1,
-                        "uuid": "e0913593-6a83-4cc6-b6aa-63a533db86bd",
-                        "vMax": 10,
-                        "vMin": -10
+                        "physConID": "DIO/A",
+                        "uuid": "5cc79e06-54fb-4b54-828e-c636b5792667"
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao24",
+                        "name": "[COM14] COM14/DIO/B",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao24",
-                        "prec": 0.1,
-                        "uuid": "c9716c02-71ee-4cd7-86ed-61bcaed3eea3",
-                        "vMax": 10,
-                        "vMin": -10
+                        "physConID": "DIO/B",
+                        "uuid": "083a5d7b-f7cd-45fe-a675-ce16191b5596"
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao25",
+                        "name": "[COM14] COM14/DIO/C",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao25",
-                        "prec": 0.1,
-                        "uuid": "3491658d-0a6f-49e6-8176-f4b1b60d93fc",
-                        "vMax": 10,
-                        "vMin": -10
+                        "physConID": "DIO/C",
+                        "uuid": "577f03cd-90d8-4b45-8779-2f307d2c8d81"
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao26",
+                        "name": "[COM14] COM14/DIO/D",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao26",
-                        "prec": 0.1,
-                        "uuid": "e746524f-c3ae-4f7d-b1fe-c531768efa6d",
-                        "vMax": 10,
-                        "vMin": -10
+                        "physConID": "DIO/D",
+                        "uuid": "86740720-a562-4683-8d36-825abb3ae4ec"
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao27",
+                        "name": "[COM14] COM14/DIO/E",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao27",
-                        "prec": 0.1,
-                        "uuid": "55452f1c-1859-46f9-8cfa-5f2ca89b2f8f",
-                        "vMax": 10,
-                        "vMin": -10
+                        "physConID": "DIO/E",
+                        "uuid": "94e3d952-6adc-4041-85cd-65ee055384e7"
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao28",
+                        "name": "[COM14] COM14/DIO/F",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao28",
-                        "prec": 0.1,
-                        "uuid": "c17e2f0b-f91f-434a-9a95-81288e5ad96f",
-                        "vMax": 10,
-                        "vMin": -10
+                        "physConID": "DIO/F",
+                        "uuid": "73c56f31-03ab-45d0-a9ff-82c12f1237ff"
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao29",
+                        "name": "[COM14] COM14/DIO/G",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao29",
-                        "prec": 0.1,
-                        "uuid": "c04309a6-2b52-41fc-9033-6b2f17a60d36",
-                        "vMax": 10,
-                        "vMin": -10
+                        "physConID": "DIO/G",
+                        "uuid": "987e988c-80f2-4908-8064-473adfebcf35"
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao30",
+                        "name": "[COM14] COM14/DIO/H",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao30",
-                        "prec": 0.1,
-                        "uuid": "4a36f887-5d7b-4ced-9e9c-0b250f87fbbc",
-                        "vMax": 10,
-                        "vMin": -10
+                        "physConID": "DIO/H",
+                        "uuid": "c5bb2f7e-545c-4d82-aab7-dcbf00ad83f7"
                     },
                     {
-                        "name": "[Input_Test] Input_Test/ao31",
+                        "name": "[COM14] COM14/DIO/I",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/ao31",
-                        "prec": 0.1,
-                        "uuid": "2cf0d788-5692-4801-afe1-04c4f88b362e",
-                        "vMax": 10,
-                        "vMin": -10
+                        "physConID": "DIO/I",
+                        "uuid": "3bf28a33-cfb1-4d7e-9dd7-dc666b248bdc"
                     },
                     {
-                        "name": "[Input_Test] Input_Test/port0/line0",
-                        "paths": [
-                            {
-                                "data": {
-                                    "filterInputPathNo": 1,
-                                    "filterInputSource": "258cd8b7-3e65-420f-b957-52608379b0fc",
-                                    "name": " [DIO]",
-                                    "uuid": "c89d03b0-f420-4d4e-ab10-a5089038123d"
-                                },
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Input_Test/port0/line0",
-                        "uuid": "258cd8b7-3e65-420f-b957-52608379b0fc"
-                    },
-                    {
-                        "name": "[Input_Test] Input_Test/port0/line1",
-                        "paths": [
-                            {
-                                "data": {
-                                    "filterInputPathNo": 1,
-                                    "filterInputSource": "14287cc5-aa56-4c96-a341-76143fdb47f1",
-                                    "name": " [DIO]",
-                                    "uuid": "9248b817-b430-46f6-a485-b638caaf2d9b"
-                                },
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Input_Test/port0/line1",
-                        "uuid": "14287cc5-aa56-4c96-a341-76143fdb47f1"
-                    },
-                    {
-                        "name": "[Input_Test] Input_Test/port1/line0",
-                        "paths": [
-                            {
-                                "data": {
-                                    "filterInputPathNo": 1,
-                                    "filterInputSource": "3a7b9c6b-6b8f-41ea-bc15-9ff661e23687",
-                                    "name": " [DIO]",
-                                    "uuid": "d237cb89-253b-4e12-90ab-fb0d18b2f963"
-                                },
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Input_Test/port1/line0",
-                        "uuid": "3a7b9c6b-6b8f-41ea-bc15-9ff661e23687"
-                    },
-                    {
-                        "name": "[Input_Test] Input_Test/port1/line1",
-                        "paths": [
-                            {
-                                "data": {
-                                    "filterInputPathNo": 1,
-                                    "filterInputSource": "1b9fa7e1-69cf-4085-97eb-b9ad6e6d87db",
-                                    "name": "[DIGI TRIG]: PXI1Slot2 [DIO]",
-                                    "uuid": "1d5ff1de-181b-4210-8d7d-91edb3b4ff42"
-                                },
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Input_Test/port1/line1",
-                        "uuid": "1b9fa7e1-69cf-4085-97eb-b9ad6e6d87db"
-                    },
-                    {
-                        "name": "[Input_Test] Input_Test/port1/line2",
+                        "name": "[COM14] COM14/DIO/J",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/port1/line2",
-                        "uuid": "3b40df2e-9ee5-4e08-b1e4-37d2ea54d591"
+                        "physConID": "DIO/J",
+                        "uuid": "56b909be-627e-4a34-9bdd-493fb8b4fdc9"
                     },
                     {
-                        "name": "[Input_Test] Input_Test/port1/line3",
+                        "name": "[COM14] COM14/DIO/K",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/port1/line3",
-                        "uuid": "72773114-9e26-4fdb-8a18-727a0d81e740"
+                        "physConID": "DIO/K",
+                        "uuid": "38a1f987-e62a-49eb-8bf1-6a5d4c9c8e2e"
                     },
                     {
-                        "name": "[Input_Test] Input_Test/port1/line4",
+                        "name": "[COM14] COM14/DIO/L",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/port1/line4",
-                        "uuid": "cc2603a8-c8d9-45c8-a8d8-f48b064f2330"
+                        "physConID": "DIO/L",
+                        "uuid": "d11a4520-b561-4715-bc69-aab96975d827"
                     },
                     {
-                        "name": "[Input_Test] Input_Test/port1/line5",
+                        "name": "[COM14] COM14/DIO/M",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/port1/line5",
-                        "uuid": "bcd73b64-f645-4f3e-a74f-be455cba5ca9"
+                        "physConID": "DIO/M",
+                        "uuid": "3172a56e-6d64-4019-a2bd-37b303f2cf6d"
                     },
                     {
-                        "name": "[Input_Test] Input_Test/port1/line6",
+                        "name": "[COM14] COM14/DIO/N",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/port1/line6",
-                        "uuid": "345650e5-c524-40b6-82bd-54eca99e1de4"
+                        "physConID": "DIO/N",
+                        "uuid": "0a352be3-6fb4-4e39-a065-df6fd0fd59b8"
                     },
                     {
-                        "name": "[Input_Test] Input_Test/port1/line7",
+                        "name": "[COM14] COM14/DIO/O",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Input_Test/port1/line7",
-                        "uuid": "7fb8c2c6-6975-4447-bac9-e210ed883e6f"
+                        "physConID": "DIO/O",
+                        "uuid": "a16b7adf-78f6-4aaf-b318-f31e346168e5"
+                    },
+                    {
+                        "name": "[COM14] COM14/DIO/P",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "DIO/P",
+                        "uuid": "d8254570-58ce-4cc5-b808-ad2a9e5a1fd7"
+                    },
+                    {
+                        "name": "[COM14] COM14/DIO/Q",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "DIO/Q",
+                        "uuid": "428b5051-c679-493c-a716-8ab9106c3093"
+                    },
+                    {
+                        "name": "[COM14] COM14/DIO/R",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "DIO/R",
+                        "uuid": "6d0ae051-e7e3-42d1-a80b-215b309c9b2e"
+                    },
+                    {
+                        "name": "[COM14] COM14/DIO/S",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "DIO/S",
+                        "uuid": "f41e8711-6921-4dd6-bbc6-cd6d9aa914c4"
+                    },
+                    {
+                        "name": "[COM14] COM14/DIO/T",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "DIO/T",
+                        "uuid": "9932ec8e-1c86-48f7-be8a-9bb1c887ea2e"
+                    },
+                    {
+                        "name": "[COM14] COM14/DIO/U",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "DIO/U",
+                        "uuid": "c2188ed1-1621-416c-993f-af567fa6b4d9"
+                    },
+                    {
+                        "name": "[COM14] COM14/DIO/V",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "DIO/V",
+                        "uuid": "44c93723-a221-44f3-ba39-bc4226784532"
+                    },
+                    {
+                        "name": "[COM14] COM14/DIO/W",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "DIO/W",
+                        "uuid": "89b528e2-0dfc-491b-9e07-2417db1a015f"
+                    },
+                    {
+                        "name": "[COM14] COM14/DIO/X",
+                        "paths": [
+                            {
+                                "data": null,
+                                "pathNo": 1
+                            }
+                        ],
+                        "physConID": "DIO/X",
+                        "uuid": "cdfb7a3d-4044-472b-8f95-b46be275ab20"
                     }
                 ]
             },
             {
-                "hardwareIdentifier": "NI_DAQmx_MRB",
+                "hardwareIdentifier": "NI_FGen_MRB",
                 "hardwareSettings": {
-                    "deviceName": "Output_Test",
-                    "name": "Output_Test",
+                    "deviceName": "ARB",
+                    "name": "ARB",
                     "physID": "",
                     "triggerCompUUID": "",
                     "triggerMode": "",
-                    "uuid": "f6766746-2c3c-4826-a2f1-759d505ca3da"
+                    "uuid": "1279512b-7333-4079-b375-69c8b6d5c7b6"
                 },
-                "hardwareType": "NI_DAQmx",
+                "hardwareType": "NI_FGen",
                 "sourceList": [
                     {
-                        "name": "[Output_Test] Output_Test/ai0",
+                        "name": "[ARB] Output 0",
                         "paths": [
                             {
-                                "data": {
-                                    "filterInputPathNo": 1,
-                                    "filterInputSource": "2d9fa778-a665-476a-8758-b113ccb04ea3",
-                                    "name": "Unnamed Detection Plates [AI]",
-                                    "prec": 0.1,
-                                    "uuid": "f2dc81bc-7164-4d75-bb82-deba118f8064",
-                                    "vMax": 10,
-                                    "vMin": 0
-                                },
+                                "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Output_Test/ai0",
+                        "physConID": "Output 0",
                         "prec": 0.1,
-                        "uuid": "2d9fa778-a665-476a-8758-b113ccb04ea3",
+                        "uuid": "980b0645-51bd-4b28-94da-1d6c11d27b13",
                         "vMax": 10,
                         "vMin": -10
                     },
                     {
-                        "name": "[Output_Test] Output_Test/ai1",
+                        "name": "[ARB] Output 1",
                         "paths": [
                             {
                                 "data": null,
                                 "pathNo": 1
                             }
                         ],
-                        "physConID": "Output_Test/ai1",
+                        "physConID": "Output 1",
                         "prec": 0.1,
-                        "uuid": "061d3e66-3b41-4496-ba63-dfc93a27e011",
+                        "uuid": "74ea499f-7504-4537-bad6-50d6d7132bf6",
                         "vMax": 10,
                         "vMin": -10
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/ai2",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/ai2",
-                        "prec": 0.1,
-                        "uuid": "b7012dfb-2cf3-4e3f-b3af-832729c2718a",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/ai3",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/ai3",
-                        "prec": 0.1,
-                        "uuid": "ad9b6d0b-6bf7-4950-b2a9-de46821e8237",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/ai4",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/ai4",
-                        "prec": 0.1,
-                        "uuid": "4f8d154c-85f0-464e-9a67-35214746f768",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/ai5",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/ai5",
-                        "prec": 0.1,
-                        "uuid": "e434ee27-82e8-4368-a46c-0d6fb32534bc",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/ai6",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/ai6",
-                        "prec": 0.1,
-                        "uuid": "9e99aadf-1572-47db-a95e-ddfc0581c0fe",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/ai7",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/ai7",
-                        "prec": 0.1,
-                        "uuid": "78b5ccc6-5c1b-433f-93bf-2b3dcd7dc987",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/ai8",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/ai8",
-                        "prec": 0.1,
-                        "uuid": "1e394efd-e1aa-4ac1-92a1-fe3c5bbc3792",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/ai9",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/ai9",
-                        "prec": 0.1,
-                        "uuid": "909977e7-d71e-43a0-ac96-9227b51669dc",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/ai10",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/ai10",
-                        "prec": 0.1,
-                        "uuid": "dc69cc1a-2499-40e7-b749-6965201b100e",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/ai11",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/ai11",
-                        "prec": 0.1,
-                        "uuid": "43f61c75-5170-406c-b53e-d41276cee49e",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/ai12",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/ai12",
-                        "prec": 0.1,
-                        "uuid": "a07e5a8f-ce93-44c0-8271-99a771512692",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/ai13",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/ai13",
-                        "prec": 0.1,
-                        "uuid": "5c3b9538-2857-4846-84f6-816d6473dfda",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/ai14",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/ai14",
-                        "prec": 0.1,
-                        "uuid": "1b816ee1-ebf5-4c3e-99b6-81e0f71ae0f2",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/ai15",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/ai15",
-                        "prec": 0.1,
-                        "uuid": "77820418-4227-43f2-af55-584ea847e562",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/ao0",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/ao0",
-                        "prec": 0.1,
-                        "uuid": "f3fcc7a1-69d2-4ac4-a77e-91f5249d3ca0",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/ao1",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/ao1",
-                        "prec": 0.1,
-                        "uuid": "968b569d-760f-44f6-a1be-cbf469e91d9b",
-                        "vMax": 10,
-                        "vMin": -10
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port0/line0",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port0/line0",
-                        "uuid": "5a0fad14-fa3c-4d01-a458-c42a3e3ce800"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port0/line1",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port0/line1",
-                        "uuid": "ca1e0d2c-4e41-4a5a-9579-c7461228631d"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port0/line2",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port0/line2",
-                        "uuid": "dbdf69b2-371d-4a30-853e-b807ea12df5f"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port0/line3",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port0/line3",
-                        "uuid": "cd15750d-55ce-4ba8-ad80-ec344897c7d0"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port0/line4",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port0/line4",
-                        "uuid": "980bef0b-0324-4337-bfbe-dd3a095b9aa5"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port0/line5",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port0/line5",
-                        "uuid": "d9f1d0fe-634e-4b1f-ba27-63475f62144f"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port0/line6",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port0/line6",
-                        "uuid": "2d668442-4941-4a9c-acbf-31c2e53884c1"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port0/line7",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port0/line7",
-                        "uuid": "63342e84-8c61-42ac-a9ac-d441f210df49"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port1/line0",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port1/line0",
-                        "uuid": "9c03e47e-fc4e-498d-8be9-ad603b512f08"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port1/line1",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port1/line1",
-                        "uuid": "3261a5ae-1026-4a5e-a63a-f0612365500c"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port1/line2",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port1/line2",
-                        "uuid": "92436edd-7751-4c9a-876e-79b70a67652b"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port1/line3",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port1/line3",
-                        "uuid": "41fd7cee-0d8f-4fd0-a2bc-072059b81397"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port1/line4",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port1/line4",
-                        "uuid": "3bb4b845-9cd2-42ca-b137-562dabfc648b"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port1/line5",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port1/line5",
-                        "uuid": "385c1929-fa5a-4ad8-9bb7-961e6d86e115"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port1/line6",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port1/line6",
-                        "uuid": "a249c201-5cf5-487f-acc3-f85b9ecad379"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port1/line7",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port1/line7",
-                        "uuid": "61827ad0-c999-4641-a67f-b63f6eff6bf5"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port2/line0",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port2/line0",
-                        "uuid": "7c849221-3dbd-4adc-a814-db472cd0baaf"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port2/line1",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port2/line1",
-                        "uuid": "e14a97db-4825-430f-a6ee-b78a5552d85d"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port2/line2",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port2/line2",
-                        "uuid": "a59f3ef1-4845-41f1-a958-d8aca56f7c21"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port2/line3",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port2/line3",
-                        "uuid": "023406bd-4e02-4bea-823e-47c8242f92e8"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port2/line4",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port2/line4",
-                        "uuid": "8b7e33a3-7c87-4292-93cf-dadad0ecb69f"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port2/line5",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port2/line5",
-                        "uuid": "7c2c34be-7365-4554-88d0-b91e37e6f1b3"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port2/line6",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port2/line6",
-                        "uuid": "6d0dc574-5b45-46ea-b03d-8b65edaeb0cf"
-                    },
-                    {
-                        "name": "[Output_Test] Output_Test/port2/line7",
-                        "paths": [
-                            {
-                                "data": null,
-                                "pathNo": 1
-                            }
-                        ],
-                        "physConID": "Output_Test/port2/line7",
-                        "uuid": "fbb33757-d433-40b1-b993-91ad51f3b153"
                     }
                 ]
             }
         ]
     },
-    "workspaceURL": "F:/DataStation/User Data/Workspace3.db"
+    "workspaceURL": "D:/InstrPlatform/DataStation/User Data/Workspace3.db"
 }

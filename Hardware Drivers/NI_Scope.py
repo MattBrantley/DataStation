@@ -17,11 +17,9 @@ class Hardware_Driver(Hardware_Object):
     ##### SUPPORT FUNCTIONS #####
     def getDeviceInfo(self):
         if(self.hardwareSettings['deviceName'] in self.getDeviceList()):
-            device = nidaqmx.system.Device(self.hardwareSettings['deviceName'])
-            try:
-                self.maxRate = device.ao_max_rate
-            except nidaqmx.errors.DaqError:
-                self.maxRate = None
+            with niscope.Session(self.hardwareSettings['deviceName']) as session:
+                self.maxRate = session.max_real_time_sampling_rate
+                #print('ao_max_rate: ' + str(device.ao_max_rate))
 
     def updateDevice(self, text):
         self.hardwareSettings['deviceName'] = text
@@ -34,32 +32,7 @@ class Hardware_Driver(Hardware_Object):
         eventData = self.getEvents()
 
         if(len(eventData) != 0):
-            channelList = list()
-            timingBounds = self.getTimingBounds(eventData)
-            gran = self.getGranularity(eventData)
-            if(gran is not None):
-                granularity = round(self.getGranularity(eventData), int(math.log10(self.maxRate)))
-            else:
-                return None
-            freq = 1/granularity
-            xAxis = np.arange(timingBounds['min'], timingBounds['max'] + granularity, granularity)
-            yAxisData = None
-            for dataPacket in eventData:
-                if(dataPacket.waveformData is None):
-                    break
-                channelList.append(dataPacket.physicalConnectorID)
-                yAxis = np.interp(xAxis, dataPacket.waveformData[:,0], dataPacket.waveformData[:,1])
-                if(yAxisData is None):
-                    yAxisData = yAxis
-                else:
-                    yAxisData = np.vstack((yAxisData, yAxis))
-            if(yAxisData is not None):
-                yAxisData = np.transpose(yAxisData)
-            
-            dataOut = dict()
-            dataOut['channelList'] = channelList
-            dataOut['yAxis'] = yAxisData
-            dataOut['freq'] = freq
+            dataOut = True
             return dataOut
         else:
             return None
@@ -110,8 +83,8 @@ class Hardware_Driver(Hardware_Object):
                     self.addSource(source)
             self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
         else:
-            print('Config_Modified.emit()')
-            self.Config_Modified.emit(self)
+            #self.Config_Modified.emit(self)
+            self.hM.configModified(self)
 
     def initHardwareWorker(self):
         self.hardwareWorker = NI_ScopeHardwareWorker()
@@ -127,11 +100,14 @@ class Hardware_Driver(Hardware_Object):
         self.hardwareWorker.outQueues['command'].put(hwm(action='init'))
         self.getDeviceInfo()
         self.genSources()
-        self.hardwareWorker.outQueues['command'].put(hwm(action='config'))
+        self.triggerModes['Software'] = True
+        self.triggerModes['Digital Rise'] = True
+        self.triggerModes['Digital Fall'] = True
 
     def onProgram(self):
         programmingData = self.parseProgramData()
         if(programmingData is not None):
+            self.hardwareWorker.outQueues['command'].put(hwm(action='config'))
             self.hardwareWorker.outQueues['command'].put(hwm(action='program'))
 
     def onRun(self):

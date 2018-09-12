@@ -55,8 +55,8 @@ class settingsDockWidget(QDockWidget):
         container.setLayout(layout)
 
         self.importSettingsWidgetList = []
-        for ext, importers in sorted(self.mW.workspaceManager.userScriptController.registeredImportersList.items()):
-            defaultItem = settingsDefaultImporterListWidget(ext, importers, self.mW.workspaceManager.settings['Default Importers'][ext])
+        for ext, importers in sorted(self.mW.wM.userScriptController.registeredImportersList.items()):
+            defaultItem = settingsDefaultImporterListWidget(ext, importers, self.mW.wM.settings['Default Importers'][ext])
             self.importSettingsWidgetList.append(defaultItem)
             layout.addWidget(defaultItem)
 
@@ -64,5 +64,5 @@ class settingsDockWidget(QDockWidget):
 
     def getNewSettings(self):
         for defaultItem in self.importSettingsWidgetList:
-            self.mW.workspaceManager.settings['Default Importers'][defaultItem.ext.upper()] = defaultItem.getNameOfSelected()
-        self.mW.workspaceManager.updateSettings()
+            self.mW.wM.settings['Default Importers'][defaultItem.ext.upper()] = defaultItem.getNameOfSelected()
+        self.mW.wM.updateSettings()

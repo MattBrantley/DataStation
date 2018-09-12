@@ -61,7 +61,7 @@
             "events": [
                 {
                     "settings": {
-                        "Amplitude": 50.0,
+                        "Amplitude": 1.0,
                         "Duration": 0.5,
                         "End": 10000.0,
                         "Rate": 100000.0,
@@ -72,7 +72,7 @@
                 },
                 {
                     "settings": {
-                        "Amplitude": 20.0,
+                        "Amplitude": 1.0,
                         "Duration": 0.5,
                         "End": 10000.0,
                         "Rate": 100000.0,

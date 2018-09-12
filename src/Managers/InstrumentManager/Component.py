@@ -8,10 +8,12 @@ from decimal import Decimal
 from DSWidgets.controlWidget import readyCheckPacket
 
 class Component(QObject):
-    Component_Modified = pyqtSignal(object)
-    Events_Modified = pyqtSignal(object)
-    Socket_Attached = pyqtSignal(object)
-    Socket_Unattached = pyqtSignal(object)
+    #Component_Modified = pyqtSignal(object)
+
+    #Events_Modified = pyqtSignal(object)
+
+    #Socket_Attached = pyqtSignal(object)
+    #Socket_Unattached = pyqtSignal(object)
 
     indexMe = True
     componentType = 'Default Component'
@@ -33,7 +35,9 @@ class Component(QObject):
         self.compSettings['showSequencer'] = False
         self.compSettings['uuid'] = str(uuid.uuid4())
         self.compSettings['triggerComp'] = False
-        self.mW = mW
+        self.instr = None           #Factory does not write this. IT's in the very next line in Instrument thought.
+        self.mW = mW                #Factory does not write this. It's in the very next line in Instrument though.
+        self.iM = None
         self.name = kwargs.get('name', self.componentType)
         self.socketList = list()
         self.pathDataPackets = list()
@@ -43,186 +47,8 @@ class Component(QObject):
         self.data = None
         self.plotItem = None
         self.sequencerDrawState = False
-        self.doProgramming = True
 
-        self.mW.instrumentManager.Sequence_Loading.connect(self.sequenceLoading)
-        self.mW.instrumentManager.Sequence_Loaded.connect(self.sequenceLoaded)
-
-        self.Component_Modified.connect(self.reprogramSourceTargets)
-        self.Events_Modified.connect(self.reprogramSourceTargets)
-
-    def sequenceLoading(self):
-        self.doProgramming = False
-    
-    def sequenceLoaded(self):
-        self.doProgramming = True
-
-    ##### EVENTS #####
-    def addSequencerEventType(self, sequencerEventType):
-        self.sequencerEventTypes.append(sequencerEventType)
-
-    def clearEvents(self):
-        if(self.sequencerEditWidget is not None):
-            self.sequencerEditWidget.clearEvents()
-
-    ##### CONFIG #####
-
-    ##### OTHER #####
-
-    def registerPlotItem(self, plotItem):
-        self.plotItem = plotItem
-
-    def updatePlot(self):
-        if(self.compSettings['showSequencer'] is not self.sequencerDrawState):
-            self.sequencerDrawState = self.compSettings['showSequencer']
-            self.redrawSequence()
-
-        if(self.plotItem is not None):
-            self.plotItem.updatePlot()
-
-    def reprogramSourceTargets(self):
-        if(self.doProgramming is True):
-            for socket in self.socketList:
-                source = socket.getAttachedSource()
-                if(source is not None):
-                    source.reprogram()
-
-    def addAOSocket(self, name):
-        socket = AOSocket(self, name, 0, 10, 0.1)
-        socket.Socket_Attached.connect(self.Socket_Attached)
-        socket.Socket_Unattached.connect(self.Socket_Unattached)
-        self.socketList.append(socket)
-        return socket
-
-    def addAISocket(self, name):
-        socket = AISocket(self, name, 0, 10, 0.1)
-        socket.Socket_Attached.connect(self.Socket_Attached)
-        socket.Socket_Unattached.connect(self.Socket_Unattached)
-        self.socketList.append(socket)
-        return socket
-
-    def addDOSocket(self, name):
-        socket = DOSocket(self, name)
-        socket.Socket_Attached.connect(self.Socket_Attached)
-        socket.Socket_Unattached.connect(self.Socket_Unattached)
-        self.socketList.append(socket)
-        return socket
-
-    def addDISocket(self, name):
-        socket = DISocket(self, name)
-        socket.Socket_Attached.connect(self.Socket_Attached)
-        socket.Socket_Unattached.connect(self.Socket_Unattached)
-        self.socketList.append(socket)
-        return socket
-
-    def registeriViewComponent(self, component):
-        self.iViewComponent = component
-
-    def onSequencerDoubleClick(self, eventPos):
-        if(self.sequencerEditWidget is None): #Generates this widget the first time it is made.
-            self.sequencerEditWidget = sequenceEditWidget(self)
-            self.sequencerEditWidget.Events_Modified.connect(self.Events_Modified)
-
-        self.sequencerEditWidget.move(eventPos + QPoint(2, 2))
-        if(self.sequencerEditWidget.isHidden()):
-            self.sequencerEditWidget.updateTitle()
-            self.sequencerEditWidget.show()
-        else:
-            self.sequencerEditWidget.hide()
-
-    def redrawSequence(self):
-        self.instrumentManager.mW.sequencerDockWidget.updatePlotList()
-        self.instrumentManager.mW.hardwareWidget.drawScene()
-
-    def onSaveParent(self):
-        savePacket = dict()
-        savePacket['compSettings'] = self.compSettings
-        savePacket['compType'] = self.componentType
-        savePacket['compIdentifier'] = self.componentIdentifier
-        savePacket['triggerComp'] = self.isTriggerComponent
-        if(hasattr(self, 'iViewComponent')):
-            savePacket['iViewSettings'] = self.iViewComponent.onSave()
-        savePacket['sockets'] = self.saveSockets()
-
-        return savePacket
-
-    def loadCompSettings(self, compSettings):
-        for key, value in compSettings.items():
-            self.compSettings[key] = value
-
-        #self.compSettings = compSettings
-
-    def saveSockets(self):
-        sockets = list()
-        for socket in self.socketList:
-            sockets.append(socket.onSave())
-        return sockets
-
-    def loadSockets(self, sockets):
-        if(self.isTriggerComponent is True):
-            self.genTriggerSocket()
-        index = 0
-        for socket in sockets:
-            self.socketList[index].onLoad(socket)
-
-    def getSetting(self, key):
-        return self.compSettings[key]
-
-    def setupWidgets(self):
-        self.mW = self.instrumentManager.mW
-        self.configWidget = ComponentConfigWidget(self)
-        self.sequenceEditWidget = ComponentSequenceEditWidget(self)
-
-    def onCreationParent(self):
-        self.instrumentManager.mW.postLog('Added New Component to Instrument: ' + self.componentType, DSConstants.LOG_PRIORITY_MED)
-        self.onCreation()
-
-    def onCreation(self):
-        pass
-
-    def onCreationFinishedParent(self):
-        #Walks through all appropriate objects and adds the update call.
-        for widget in self.configWidget.findChildren(QLineEdit):
-            widget.textChanged.connect(self.updatePlot)
-
-        for widget in self.configWidget.findChildren(QCheckBox):
-            widget.stateChanged.connect(self.updatePlot)
-
-        for widget in self.configWidget.findChildren(QDoubleSpinBox):
-            widget.valueChanged.connect(self.updatePlot)
-
-    def onRemovalParent(self):
-        self.instrumentManager.mW.postLog('Removing Instrument Component: ' + self.componentType, DSConstants.LOG_PRIORITY_MED)
-        for socket in self.socketList:
-            socket.unattach()
-        self.onRemoval()
-
-    def onRemoval(self):
-        pass
-
-    def hideConfigWindow(self):
-        self.configWidget.hide()
-
-    def updateConfigContent(self):
-        pass
-
-    def onLeftClick(self, eventPos):
-        self.configWidget.move(eventPos + QPoint(2, 2))
-        if(self.configWidget.isHidden()):
-            self.updateConfigContent()
-            self.configWidget.show()
-        else:
-            self.configWidget.hide()
-
-    def ROIRemove(self, eventPos):
-        self.instrumentManager.currentInstrument.removeComponent(self)
-
-    def parentPlotSequencer(self):
-        if(self.sequencerEditWidget is not None):
-            return self.plotSequencer(self.sequencerEditWidget.getEvents())
-
-    def plotSequencer(self, events):
-        return np.array([0,0])
+##### Datastation Interface Functions #####
 
     def readyCheck(self):
         subs = list()
@@ -234,7 +60,10 @@ class Component(QObject):
                 goodToContinue = False
         
         if(goodToContinue is True):
-            runResults = self.onRun()
+            if(self.sequencerEditWidget is not None):
+                runResults = self.onRun(self.sequencerEditWidget.getEvents())
+            else:
+                return readyCheckPacket('User Component [' + self.compSettings['name'] + ']', DSConstants.READY_CHECK_ERROR, subs=subs, msg='User Component Does Not Have SequencerEditWidget!!')
             if(isinstance(runResults, readyCheckPacket)):
                 subs.append(runResults)
                 if(runResults.readyStatus == DSConstants.READY_CHECK_ERROR):
@@ -261,35 +90,211 @@ class Component(QObject):
         else:
             return readyCheckPacket('Component', DSConstants.READY_CHECK_ERROR, subs=subs)
 
+##### Functions Called By Factoried Sockets #####
+
+    def socketAttached(self, socket):
+        self.instr.socketAttached(socket, self)
+
+    def socketDetatched(self, socket):
+        self.instr.socketDetatched(socket, self)
+
+    def program
+
+##### Functions Over-Ridden By Factoried Components #####
+
+    def onCreationParent(self):
+        self.mW.postLog('Added New Component to Instrument: ' + self.componentType, DSConstants.LOG_PRIORITY_MED)
+        self.sequencerEditWidget = sequenceEditWidget(self.mW, self)
+        self.onCreation()
+
+    def onCreation(self): ### OVERRIDE ME!! ####
+        pass
+
+    def onCreationFinishedParent(self):
+        #Walks through all appropriate objects and adds the update call.
+        for widget in self.configWidget.findChildren(QLineEdit):
+            widget.textChanged.connect(self.updatePlot)
+
+        for widget in self.configWidget.findChildren(QCheckBox):
+            widget.stateChanged.connect(self.updatePlot)
+
+        for widget in self.configWidget.findChildren(QDoubleSpinBox):
+            widget.valueChanged.connect(self.updatePlot)
+
+        self.onCreationFinished()
+
+    def onCreationFinished(self): ### OVERRIDE ME!! ####
+        pass
+
+    def onRemovalParent(self):
+        self.mW.postLog('Removing Instrument Component: ' + self.componentType, DSConstants.LOG_PRIORITY_MED)
+        for socket in self.socketList:
+            socket.detatchInputSelf()
+        self.onRemoval()
+
+    def onRemoval(self):  ### OVERRIDE ME!! ####
+        pass
+
+    def parentPlotSequencer(self):
+        if(self.sequencerEditWidget is not None):
+            return self.plotSequencer(self.sequencerEditWidget.getEvents())
+
+    def plotSequencer(self, events): ### OVERRIDE ME!! ####
+        return np.array([0,0])
+
+    def onRunParent(self, events):
+        self.onRun(events)
+
+    def onRun(self, events):  ### OVERRIDE ME!! ####
+        return readyCheckPacket('Component', DSConstants.READY_CHECK_ERROR, msg='User Component Does Not Override onRun()!')
+
+##### Component Modifications ######
+
+    def onSaveParent(self):
+        savePacket = dict()
+        savePacket['compSettings'] = self.compSettings
+        savePacket['compType'] = self.componentType
+        savePacket['compIdentifier'] = self.componentIdentifier
+        savePacket['triggerComp'] = self.isTriggerComponent
+        if(hasattr(self, 'iViewComponent')):
+            savePacket['iViewSettings'] = self.iViewComponent.onSave()
+        savePacket['sockets'] = self.saveSockets()
+
+        return savePacket
+
+    def loadCompSettings(self, compSettings):
+        for key, value in compSettings.items():
+            self.compSettings[key] = value
+
     def setPathDataPacket(self, pathNo, packet):
         self.pathDataPackets[pathNo-1] = packet
 
-    def onRun(self):
-        return readyCheckPacket('Component', DSConstants.READY_CHECK_ERROR, msg='User Component Does Not Override onRun()!')
+    def setupWidgets(self):
+        self.configWidget = ComponentConfigWidget(self)
+        self.sequenceEditWidget = ComponentSequenceEditWidget(self)
+
+##### Event Modifications #####
+
+    def addSequencerEventType(self, sequencerEventType):
+        self.sequencerEventTypes.append(sequencerEventType)
+
+    def clearEvents(self):
+        if(self.sequencerEditWidget is not None):
+            self.sequencerEditWidget.clearEvents()
+
+##### Sequencer Interactions #####
+
+    def registerPlotItem(self, plotItem):
+        self.plotItem = plotItem
+
+    def updatePlot(self):
+        if(self.compSettings['showSequencer'] is not self.sequencerDrawState):
+            self.sequencerDrawState = self.compSettings['showSequencer']
+            self.redrawSequence()
+
+        if(self.plotItem is not None):
+            self.plotItem.updatePlot()
+
+    def redrawSequence(self):
+        self.mW.sequencerDockWidget.updatePlotList()
+        self.mW.hardwareWidget.drawScene()
+
+##### Socket Interactions #####
+
+    def reprogramSourceTargets(self):
+        for socket in self.socketList:
+            source = socket.getAttachedSource()
+            if(source is not None):
+                source.reprogram()
+
+    def addAOSocket(self, name):
+        socket = AOSocket(self, name, 0, 10, 0.1)
+        self.socketList.append(socket)
+        return socket
+
+    def addAISocket(self, name):
+        socket = AISocket(self, name, 0, 10, 0.1)
+        self.socketList.append(socket)
+        return socket
+
+    def addDOSocket(self, name):
+        socket = DOSocket(self, name)
+        self.socketList.append(socket)
+        return socket
+
+    def addDISocket(self, name):
+        socket = DISocket(self, name)
+        self.socketList.append(socket)
+        return socket
+
+    def saveSockets(self):
+        sockets = list()
+        for socket in self.socketList:
+            sockets.append(socket.onSave())
+        return sockets
+
+    def loadSockets(self, sockets):
+        if(self.isTriggerComponent is True):
+            self.genTriggerSocket()
+        index = 0
+        for socket in sockets:
+            self.socketList[index].loadPacket(socket)
+
+##### Hardware Widget Interactions #####
+
+    def registeriViewComponent(self, component):
+        self.iViewComponent = component
+
+    def ROIRemove(self, eventPos):
+        self.iM.currentInstrument.removeComponent(self)
+
+##### Sequence Editor Widget #####
+
+    def onSequencerDoubleClick(self, eventPos):
+        self.sequencerEditWidget.move(eventPos + QPoint(2, 2))
+        if(self.sequencerEditWidget.isHidden()):
+            self.sequencerEditWidget.updateTitle()
+            self.sequencerEditWidget.show()
+        else:
+            self.sequencerEditWidget.hide()
 
     def loadSequenceData(self, events):
         if(self.sequencerEditWidget is None): #Generates this widget the first time it is made.
-            self.sequencerEditWidget = sequenceEditWidget(self)
-            self.sequencerEditWidget.Events_Modified.connect(self.Events_Modified)
+            self.sequencerEditWidget = sequenceEditWidget(self.mW, self)
 
         for event in events:
             self.sequencerEditWidget.addEvent(event)
-            #print(event)
         self.sequencerEditWidget.checkEventOverlaps()
-        #print(events)
 
-        print('Events_Modified.emit()')
-        self.Events_Modified.emit(self)
+        #self.Events_Modified.emit(self)
+        self.iM.eventsMofieid(self)
+
+##### Config Widget #####
+
+    def hideConfigWindow(self):
+        self.configWidget.hide()
+
+    def updateConfigContent(self):
+        pass
+
+    def onLeftClick(self, eventPos):
+        self.configWidget.move(eventPos + QPoint(2, 2))
+        if(self.configWidget.isHidden()):
+            self.updateConfigContent()
+            self.configWidget.show()
+        else:
+            self.configWidget.hide()
 
 class sequenceEditWidget(QDockWidget):
     doNotAutoPopulate = True
-
     Events_Modified = pyqtSignal(object)
 
-    def __init__(self, compParent):
-        super().__init__('Sequencer: ' + compParent.compSettings['name'], parent=compParent.mW.sequencerDockWidget)
+    def __init__(self, mW, compParent):
+        super().__init__('Sequencer: ' + compParent.compSettings['name'], parent=mW.sequencerDockWidget)
         self.compParent = compParent
-        self.sequencerWidget = self.compParent.instrumentManager.mW.sequencerDockWidget
+        self.mW = mW
+        self.iM = mW.iM
+        self.sequencerWidget = self.compParent.mW.sequencerDockWidget
         self.setFeatures(QDockWidget.DockWidgetClosable)
         self.setMinimumSize(QSize(750,450))
         self.setFloating(True)
@@ -311,8 +316,8 @@ class sequenceEditWidget(QDockWidget):
         for row in range(0, self.table.rowCount()):
             self.table.removeRow(0)
 
-        print('Events_Modified.emit()')
-        self.Events_Modified.emit(self)
+        #self.Events_Modified.emit(self)
+        self.iM.eventsModified(self)
 
     def addEvent(self, eventData):
         newRow = self.newEvent()
@@ -325,13 +330,13 @@ class sequenceEditWidget(QDockWidget):
                 if(setting in settingsWidgets):
                     settingsWidgets[setting].setValue(value)
                 else:
-                    self.compParent.instrumentManager.mW.postLog('Event of type (' + eventData['type'] + ') does not have a (' + setting + ') setting type!!!', DSConstants.LOG_PRIORITY_HIGH)
+                    self.compParent.mW.postLog('Event of type (' + eventData['type'] + ') does not have a (' + setting + ') setting type!!!', DSConstants.LOG_PRIORITY_HIGH)
         else:
             self.table.removeRow(newRow)
-            self.compParent.instrumentManager.mW.postLog('Event has unknown type (' + eventData['type'] + ') for object type (' + self.compParent.componentType + ')!!', DSConstants.LOG_PRIORITY_HIGH)
+            self.compParent.mW.postLog('Event has unknown type (' + eventData['type'] + ') for object type (' + self.compParent.componentType + ')!!', DSConstants.LOG_PRIORITY_HIGH)
         
-        print('Events_Modified.emit()')  ### THIS IS PROBABLY HAPPENING TWICE - addEvent calls newEvent
-        self.Events_Modified.emit(self)
+        #self.Events_Modified.emit(self)
+        self.iM.eventsMofieid(self)
 
     def newEvent(self):
         rowCount = self.table.rowCount()
@@ -342,9 +347,9 @@ class sequenceEditWidget(QDockWidget):
         else:
             time = 0
         timeWidget = timeInputEdit(rowCount, time=time)
-        timeWidget.Time_Changed.connect(self.sortEvent)
-        timeWidget.Time_Changed.connect(self.checkEventOverlaps)
-        timeWidget.Time_Changed.connect(self.eventsModified)
+        timeWidget.timeChanged.connect(self.sortEvent)
+        timeWidget.timeChanged.connect(self.checkEventOverlaps)
+        timeWidget.timeChanged.connect(self.eventsModified)
 
         self.table.setCellWidget(rowCount, 0, timeWidget)
         typeWidget = eventTypeComboBox(self.sequencerEventTypes)
@@ -358,14 +363,17 @@ class sequenceEditWidget(QDockWidget):
 
         self.table.setCellWidget(rowCount, 1, typeWidget)
         self.table.setCellWidget(rowCount, 2, settingsWidget)
-        
-        print('Events_Modified.emit()') ### THIS IS PROBABLY HAPPENING TWICE - addEvent calls newEvent
-        self.Events_Modified.emit(self)
+
+        self.compParent.reprogramSourceTargets()
+
+        #self.Events_Modified.emit(self)
+        self.iM.eventsModified(self)
 
         return rowCount
 
     def eventsModified(self):
-        self.Events_Modified.emit(self)
+        #self.Events_Modified.emit(self)
+        self.iM.eventsModified(self)
 
     def getEvents(self):
         eventListOut = list()
@@ -438,7 +446,8 @@ class sequenceEditWidget(QDockWidget):
         rows = self.getTableSelectedRows()
         for row in rows:
             self.table.removeRow(row)
-        self.Events_Modified.emit(self)
+        #self.Events_Modified.emit(self)
+        self.iM.eventsModified(self)
 
     def getTableSelectedRows(self):
         indexes = self.table.selectedIndexes()
@@ -534,7 +543,7 @@ class sequenceEditWidget(QDockWidget):
             self.table.cellWidget(row, 2).row = row
 
 class timeInputEdit(QLineEdit):
-    Time_Changed = pyqtSignal(int)
+    timeChanged = pyqtSignal(int)
 
     def __init__(self, row, decimalPlaces=4, time=0):
         super().__init__()
@@ -549,14 +558,14 @@ class timeInputEdit(QLineEdit):
         self.editingFinished.connect(self.checkValue)
         self.textEdited.connect(self.textHasChanged)
         self.dirty = False
-        self.Time_Changed.emit(self.row)
+        self.timeChanged.emit(self.row)
 
     def textHasChanged(self, value):
         self.dirty = True
 
     def isTextDirty(self):
         if(self.dirty is True):
-            self.Time_Changed.emit()
+            self.timeChanged.emit()
         self.dirty = False
 
     def setBackground(self, color):
@@ -575,7 +584,7 @@ class timeInputEdit(QLineEdit):
         value = self.text()
         self.setText(str(Decimal(value).quantize(self.quant)))
         if(self.dirty is True):
-            self.Time_Changed.emit(self.row)
+            self.timeChanged.emit(self.row)
         self.dirty = False
 
 class eventSettingsEdit(QWidget):
@@ -610,7 +619,7 @@ class eventSettingsEdit(QWidget):
                 layout.addWidget(param)
                 widget.addParam(param)
                 widgetDict[param.name] = param
-                param.Value_Modified.connect(self.settingChanged)
+                param.valueModified.connect(self.settingChanged)
             self.stack.addWidget(widget)
             self.stackList.append(settingsList)
             self.stackWidgetDicts.append(widgetDict)
@@ -668,7 +677,7 @@ class sequencerEventType():
         return 0
 
 class eventParameter(QLineEdit):
-    Value_Modified = pyqtSignal()
+    valueModified = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -682,7 +691,7 @@ class eventParameter(QLineEdit):
 
     def isTextDirty(self):
         if(self.dirty is True):
-            self.Value_Modified.emit()
+            self.valueModified.emit()
         self.dirty = False
 
 class eventParameterDouble(eventParameter):
@@ -764,7 +773,7 @@ class ComponentConfigWidget(QDockWidget):
     doNotAutoPopulate = True
 
     def __init__(self, compParent):
-        super().__init__('Config: ' + compParent.name, parent=compParent.instrumentManager.instrumentWidget)
+        super().__init__('Config: ' + compParent.name, parent=compParent.iM.instrumentWidget)
         self.compParent = compParent
         self.setFeatures(QDockWidget.DockWidgetClosable)
         self.setFloating(True)

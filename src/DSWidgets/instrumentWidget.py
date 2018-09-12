@@ -20,9 +20,9 @@ from shutil import copyfile
 class instrumentWidget(QDockWidget):
     ITEM_GUID = Qt.UserRole
 
-    def __init__(self, mW, instrManager):
+    def __init__(self, mW, iM):
         super().__init__('Instrument View (None)')
-        self.instrumentManager = instrManager
+        self.iM = iM
         self.mW = mW
         self.hide()
         self.resize(1000, 800)
@@ -81,14 +81,14 @@ class instrumentWidget(QDockWidget):
         self.mW.postLog('Creating new instrument', DSConstants.LOG_PRIORITY_HIGH)
         fname, ok = QInputDialog.getText(self.mW, "Virtual Instrument Name", "Virtual Instrument Name")
         if(ok):
-            self.instrumentManager.newInstrument(fname, self.rootPath)
+            self.iM.newInstrument(fname, self.rootPath)
         else:
             return
         self.updateTitle()
 
     def updateTitle(self):
-        if(self.instrumentManager.currentInstrument is not None):
-            self.setWindowTitle('Instrument View (' + self.instrumentManager.currentInstrument.name + ')')
+        if(self.iM.currentInstrument is not None):
+            self.setWindowTitle('Instrument View (' + self.iM.currentInstrument.name + ')')
         else:
             self.setWindowTitle('Instrument View (None)')
 
@@ -100,7 +100,7 @@ class instrumentWidget(QDockWidget):
         else:
             savePath = self.rootPath
 
-        if(self.instrumentManager.currentInstrument.name == 'Default Instrument'):
+        if(self.iM.currentInstrument.name == 'Default Instrument'):
             self.saveAsInstrument(savePath)
         else:
             self.saveInstrument(savePath)
@@ -118,27 +118,26 @@ class instrumentWidget(QDockWidget):
         fname, ok = QInputDialog.getText(self.mW, "Virtual Instrument Name", "Virtual Instrument Name")
         savePath = os.path.join(savePath, fname + '.dsinstrument')
         if(ok):
-            self.instrumentManager.currentInstrument.name = fname
+            self.iM.currentInstrument.name = fname
         else:
             return
 
-        #url = self.instrumentManager.currentInstrument.url
         if(os.path.exists(savePath)):
             reply = QMessageBox.question(self.mW, 'File Warning!', 'File exists - overwrite?', QMessageBox.Yes, QMessageBox.No)
             if(reply == QMessageBox.No):
                 return
-        self.instrumentManager.saveInstrument(savePath)
+        self.iM.saveInstrument(savePath)
 
     def saveInstrument(self, savePath):
-        if(self.instrumentManager.currentInstrument.name == 'Default Instrument'):
+        if(self.iM.currentInstrument.name == 'Default Instrument'):
             fname, ok = QInputDialog.getText(self.mW, "Virtual Instrument Name", "Virtual Instrument Name")
             if(ok):
-                self.instrumentManager.currentInstrument.name = fname
+                self.iM.currentInstrument.name = fname
             else:
                 return
 
-        url = self.instrumentManager.currentInstrument.url
-        self.instrumentManager.saveInstrument(url)
+        url = self.iM.currentInstrument.url
+        self.iM.saveInstrument(url)
 
     def initActions(self):
         self.newAction = QAction('New', self)
@@ -192,7 +191,7 @@ class instrumentWidget(QDockWidget):
             self.openInstrument(filePath)
 
     def openInstrument(self, filePath):
-        self.instrumentManager.loadInstrument(filePath)
+        self.iM.loadInstrument(filePath)
         self.updateTitle()
 
     def updateToolbarState(self):
@@ -231,7 +230,7 @@ class componentsList(QListWidget):
         dropAction = drag.exec_()
 
     def populateList(self):
-        compList = self.mW.instrumentManager.getAvailableComponents()
+        compList = self.mW.iM.componentsAvailable
         for val in compList:
             tempIcon = QIcon(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'User Components\img\\' + val.iconGraphicSrc))
             self.addItem(componentItem(tempIcon, val.componentType))
@@ -387,7 +386,7 @@ class iView(pg.GraphicsWindow):
         self.view.setRange(pg.QtCore.QRectF(0, 0, 2000, 2000))
         self.view.Antialiasing = True
         self.setBackground('w')
-        self.mW.instrumentManager.Instrument_Unloaded.connect(self.clearComps)
+        self.mW.iM.Instrument_Unloaded.connect(self.clearComps)
 
     def dragEnterEvent(self, e):
         if(e.mimeData().text() == "compDrag"):
@@ -412,7 +411,7 @@ class iView(pg.GraphicsWindow):
         text = stream.readQString()
         index = stream2.readInt()
 
-        result = self.mW.instrumentManager.addCompByIndex(index)
+        result = self.mW.iM.addCompByIndex(index)
 
         if result is not None:
             m = iViewComponent(self.mW, result, self, width=1, height=1, pos=(dropX, dropY))

@@ -4,6 +4,7 @@ from multiprocessing import Process, Queue, Pipe
 from Constants import DSConstants as DSConstants
 from Managers.HardwareManager.Sources import *
 from Managers.InstrumentManager.Sockets import *
+from DSWidgets.networkViewWidget import netObject
 
 import numpy as np
 from DSWidgets.controlWidget import readyCheckPacket
@@ -12,9 +13,9 @@ from DSWidgets.controlWidget import readyCheckPacket
 sys.path.append(str(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))) + '\\Hardware Drivers\\')
 
 class Hardware_Object(QObject):
-    Config_Modified = pyqtSignal(object)
-    Reprogrammed = pyqtSignal(object)
-    Trigger_Modified = pyqtSignal(object)
+    #Config_Modified = pyqtSignal(object)
+    #Reprogrammed = pyqtSignal(object)
+    #Trigger_Modified = pyqtSignal(object)
 
     hardwareType = 'Default Hardware Object'
     hardwareIdentifier = 'DefHardObj'
@@ -22,7 +23,7 @@ class Hardware_Object(QObject):
     hardwareCreator = 'Matthew R. Brantley'
     hardwareVersionDate = '8/18/2018'
 
-    def __init__(self, hardwareManager, modelObject=False, **kwargs):
+    def __init__(self, hM, modelObject=False, **kwargs):
         super().__init__()
         self.sourceListWidget = QListWidget()
         self.hardwareSettings = {}
@@ -31,26 +32,48 @@ class Hardware_Object(QObject):
         self.hardwareSettings['uuid'] = str(uuid.uuid4())
         self.hardwareSettings['triggerCompUUID'] = ''
         self.hardwareSettings['triggerMode'] = ''
-        self.hardwareManager = hardwareManager
+        self.hardwareSettings['hardwareType'] = self.hardwareType
+        self.hardwareSettings['hardwareIdentifier'] = self.hardwareIdentifier
+        self.hM = hM
         self.sourceList = list()
         self.managerMessages = list()
         self.initTriggerModes()
         self.onCreationParent()
         self.sourceListData = None
         self.triggerComponent = None
-        self.forceNoUpdatesOnSourceAddToggle = False
-        self.instrumentIsLoaded = False
         
         self.workerReady = False
         self.workerReadyMessage = 'Worker Not Started!'
 
-    def initTriggerModes(self):
+##### DataStation Interface Functions #####
+
+    def readyCheck(self):
+        subs = list()
+        for source in self.sourceList:
+            subs.append(source.readyCheck())
+
+        return readyCheckPacket('Hardware Object', DSConstants.READY_CHECK_READY, subs=subs)
+
+    def getUUID(self):
+        return self.hardwareSettings['uuid']
+
+##### Functions Called By Factoried Sources #####
+
+    def program(self, source):
+        self.hM.program(self, source)
+
+##### Functions Over-Ridden By hardwareObjects #####
+
+    def initHardwareWorker(self): ### OVERRIDE ME!! ####
+        self.hardwareWorker = hardwareWorker()
+
+    def initTriggerModes(self): ### OVERRIDE ME!! ####
         self.triggerModes = dict()
         self.triggerModes['Software'] = True
         self.triggerModes['Digital Rise'] = False
         self.triggerModes['Digital Fall'] = False
 
-    def getDeviceList(self):
+    def getDeviceList(self): ### OVERRIDE ME!! ####
         return list()
 
     def hardwareObjectConfigWidgetParent(self):
@@ -83,7 +106,6 @@ class Hardware_Object(QObject):
             recoverDeviceTemp = self.hardwareSettings['triggerMode'] #Temp fix - updateDevice called at start was whiping deviceName
         triggerSelection = QComboBox()
         index = 0
-        print(self.triggerModes)
         for key, val in self.triggerModes.items():
             if(val is True):
                 index = index + 1
@@ -101,21 +123,46 @@ class Hardware_Object(QObject):
 
         return configWidget
 
-    def updateDevice(self, text):
-        self.hardwareSettings['deviceName'] = text
-        self.hardwareSettings['name'] = self.hardwareSettings['deviceName']
+    def hardwareObjectConfigWidget(self): ### OVERRIDE ME!! ####
+        return 0
+
+    def onCreationParent(self):
+        self.onCreation()
+
+    def onCreation(self): ### OVERRIDE ME!! ####
+        pass
+
+    def loadPacketParent(self, loadPacket):
+        self.hardwareSettings = {**self.hardwareSettings, **loadPacket['hardwareSettings']}
+        if('sourceList' in loadPacket):
+            sourceListData = loadPacket['sourceList']
+            if(sourceListData is not None):
+                for loadPacket in sourceListData:
+                    if('physConID' in loadPacket):                                  # This has to happen AFTER sources are generated
+                        source = self.getSourceByPhysConID(loadPacket['physConID']) # Source generation is dynamic, only load a source if it's physConID matches!
+                        if(source is not None):
+                            source.loadPacket(loadPacket)
+        self.onLoad(loadPacket)
         self.resetDevice()
-        #self.genSources()
+
+    def loadPacket(self, loadPacket): ### OVERRIDE ME!! ####
+        pass
+
+    def onInitialize(self): ### OVERRIDE ME!! ####
+        pass
+
+    def onProgramParent(self):
+        self.onProgram()
+
+    def onProgram(self): ### OVERRIDE ME!! ####
+        pass
 
 ##### INSTRUMENT STATUS ######
 
-    def instrumentLoaded(self):
-        self.instrumentIsLoaded = True
-        self.verifyTriggerComponentExists()
-        self.Trigger_Modified.emit(self)
-
-    def instrumentUnloaded(self):
-        self.instrumentIsLoaded = False
+    #def instrumentLoaded(self):
+    #    self.verifyTriggerComponentExists()                            Move this to hW
+    #    #self.Trigger_Modified.emit(self)
+    #    self.hM.triggerModified(self)
 
 ##### TRIGGER COMPONENT ######
 
@@ -128,7 +175,7 @@ class Hardware_Object(QObject):
         if(self.hardwareSettings['deviceName'] != ''):
             if(text in ('Digital Rise', 'Digital Fall')):
                 #self.triggerSource = DISocket()
-                self.triggerComponent = self.hardwareManager.addDigitalTriggerComp(self)
+                self.triggerComponent = self.hM.addDigitalTriggerComp(self)
                 self.hardwareSettings['triggerCompUUID'] = self.triggerComponent.compSettings['uuid']
                 msg = hwm(msg='[Manager]: Digital Trigger Component Generated')
                 self.managerMessages.append(msg)
@@ -138,56 +185,41 @@ class Hardware_Object(QObject):
                 self.hardwareSettings['triggerCompUUID'] = ''
                 self.managerMessages.append(msg)
 
-        print('Trigger_Modified.emit()')
-        self.Trigger_Modified.emit(self)
+        #self.Trigger_Modified.emit(self)
+        self.hM.triggerModified(self)
 
     def removeTriggerComponent(self):
         print(self.hardwareSettings['triggerCompUUID'])
-        self.hardwareManager.removeCompByUUID(self.hardwareSettings['triggerCompUUID'])
+        self.hM.removeCompByUUID(self.hardwareSettings['triggerCompUUID'])
         self.hardwareSettings['triggerCompUUID'] = ''
 
     def verifyTriggerComponentExists(self):
-        if(self.hardwareManager.getTrigCompsRefUUID(self.hardwareSettings['uuid']) is None):
+        if(self.hM.getTrigCompsRefUUID(self.hardwareSettings['uuid']) is None):
             self.updateTrigger(self.hardwareSettings['triggerMode'])
 
-##### 
+##### Search Functions #####
 
-    def hardwareObjectConfigWidget(self):
-        return 0
-
-    def initHardwareWorker(self):
-        self.hardwareWorker = hardwareWorker()
-
-    def onCreationParent(self):
-        self.onCreation()
-
-    def onCreation(self):
-        pass
-
-    def getSources(self):
-        return self.sourceList
-    
-    def readyCheck(self):
-        #if(self.instrumentIsLoaded is True):
-        #    self.verifyTriggerComponentExists()
-        subs = list()
+    def getSourceByPhysConID(self, physConID):
         for source in self.sourceList:
-            subs.append(source.readyCheck())
+            if(source.physicalConnectorID == physConID):
+                return source
+        return None
 
-        return readyCheckPacket('Hardware Object', DSConstants.READY_CHECK_READY, subs=subs)
-
-    def onSave(self):
-        savePacket = dict()
-        savePacket['hardwareType'] = self.hardwareType
-        savePacket['hardwareIdentifier'] = self.hardwareIdentifier
-        savePacket['hardwareSettings'] = self.hardwareSettings
-        sourceSavePackets = list()
+    def getEvents(self):
+        programDataList = list()
         for source in self.sourceList:
-            sourceSavePackets.append(source.onSave())
+            result = source.getProgramData()
+            if(result is not None):
+                programDataList.append(result)
 
-        savePacket['sourceList'] = sourceSavePackets
-        #savePacket['triggerSocket'] = self.triggerSocket.onSave()
-        return savePacket
+        return programDataList
+
+##### hardwareObject Manipulation Functions #####
+
+    def updateDevice(self, text):
+        self.hardwareSettings['deviceName'] = text
+        self.hardwareSettings['name'] = self.hardwareSettings['deviceName']
+        self.resetDevice()
 
     def resetDevice(self):
         self.newMgrMsg()
@@ -199,68 +231,33 @@ class Hardware_Object(QObject):
         if(self.hardwareSettings['deviceName'] != ''):
             self.onInitialize()
 
-    def onLoadParent(self, loadPacket):
-        self.hardwareSettings = {**self.hardwareSettings, **loadPacket['hardwareSettings']}
-        if('sourceList' in loadPacket):
-            self.sourceListData = loadPacket['sourceList']
-            self.loadSourceListData()
-        self.onLoad(loadPacket)
-        self.resetDevice()
+    def savePacket(self):
+        savePacket = dict()
+        savePacket['hardwareSettings'] = self.hardwareSettings
+        sourceSavePackets = list()
+        for source in self.sourceList:
+            sourceSavePackets.append(source.savePacket())
 
-    def loadSourceListData(self):
-        if(self.sourceListData is not None):
-            for loadPacket in self.sourceListData:
-                if('physConID' in loadPacket):
-                    source = self.getSourceByPhysConID(loadPacket['physConID'])
-                    if(source is not None):
-                        source.onLoad(loadPacket)
-
-    def onInitialize(self):
-        pass
-
-    def onLoad(self, loadPacket):
-        pass
+        savePacket['sourceList'] = sourceSavePackets
+        return savePacket
 
     def clearSourceList(self):
-        for source in self.sourceList:
-            source.detachSockets()
-        self.sourceList.clear()
-        self.updateSourceListWidget()
+        pass
+        #for source in self.sourceList:
+        #    source.detachSockets()
+        #self.sourceList.clear()
+        #self.updateSourceListWidget()
 
     def addSource(self, source):
         self.sourceList.append(source)
         self.mgrMsg('Source added: ' + str(type(source)))
 
-        if(self.forceNoUpdatesOnSourceAddToggle is False):
-            self.loadSourceListData()
-            self.updateSourceListWidget()
-            self.hardwareManager.mW.instrumentManager.reattachSockets()
-            print('Config_Modified.emit()')
-            self.Config_Modified.emit(self)
+        #self.loadSourceListData()
+        #self.updateSourceListWidget()
+        #self.hM.mW.iM.reattachSockets()
+        self.hM.configModified(self)
 
-    def forceNoUpdatesOnSourceAdd(self, toggle): #Improves speed to use this when adding many sockets at once
-        self.forceNoUpdatesOnSourceAddToggle = toggle
-        if(toggle is False): #Turning it off calls these update functions - necessary
-            self.loadSourceListData()
-            self.updateSourceListWidget()
-            self.hardwareManager.mW.instrumentManager.reattachSockets()
-            print('Config_Modified.emit()')
-            self.Config_Modified.emit(self)
-
-    def updateSourceListWidget(self):
-        self.sourceListWidget.clear()
-        for source in self.sourceList:
-            self.sourceListWidget.addItem(source.name)
-
-    def onRemove(self):
-        for source in self.sourceList:
-            source.onRemove()
-
-    def getSourceByPhysConID(self, physConID):
-        for source in self.sourceList:
-            if(source.physicalConnectorID == physConID):
-                return source
-        return None
+##### hardwareWorker Functions #####
 
     def getMessages(self):
         messageList = list()
@@ -274,17 +271,6 @@ class Hardware_Object(QObject):
     def onRun(self):
         self.hardwareWorker.outQueues['command'].put(hwm(action='run'))
 
-    def program(self):
-        self.onProgramParent()
-
-    def onProgramParent(self):
-        self.onProgram()
-        #import traceback
-        #traceback.print_stack()
-        #print(programmingData)
-        print('Reprogrammed.emit(self)')
-        self.Reprogrammed.emit(self)
-
     def mgrMsg(self, text):
         msg = hwm(msg='[Manager]: ' + text)
         self.managerMessages.append(msg)
@@ -292,18 +278,6 @@ class Hardware_Object(QObject):
     def newMgrMsg(self):
         msg = hwm(msg='[Manager]: Device Reset', action='refresh')
         self.managerMessages.append(msg)
-
-    def getEvents(self):
-        programDataList = list()
-        for source in self.sourceList:
-            result = source.getProgramData()
-            if(result is not None):
-                programDataList.append(result)
-
-        return programDataList
-
-    def onProgram(self):
-        pass
 
 class hardwareWorker():
     def __init__(self):
@@ -383,7 +357,7 @@ class hwm():
         self.data = data
 
 class hardwareObjectConfigWidget(QWidget):
-    def __init__(self, hardwareManager, Hardware_Object):
+    def __init__(self, hM, Hardware_Object):
         super().__init__()
-        self.hardwareManager = hardwareManager
+        self.hM = hM
         self.Hardware_Object = Hardware_Object

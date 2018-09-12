@@ -2,8 +2,10 @@
 """
 A quadrupole ion guide
 """
-from Managers.InstrumentManager.Component import Component
+from Managers.InstrumentManager.Component import *
+from Managers.InstrumentManager.Sockets import *
 import os, uuid
+import numpy as np
 
 class Quadrupole(Component):
     componentType = 'Quadrupole'
@@ -21,5 +23,8 @@ class Quadrupole(Component):
         self.compSettings['uuid'] = str(uuid.uuid4())
         self.socket = self.addDISocket(self.compSettings['name'])
 
-    def onRun(self):
+    def onRun(self, events):
+        #update self.data here
+        dataPacket = waveformPacket(self.data)
+        self.setPathDataPacket(1, dataPacket)
         return True

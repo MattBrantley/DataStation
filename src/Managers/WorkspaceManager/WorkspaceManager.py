@@ -61,28 +61,31 @@ class WorkspaceManager():
         self.scriptsDir = os.path.join(self.mW.rootDir, 'User Scripts')
         self.userDataDir = os.path.join(self.mW.rootDir, 'User Data')
         self.hardwareDriversDir = os.path.join(self.mW.rootDir, 'Hardware Drivers')
-        self.readSettings()
         self.workspaceTreeWidget = None #Will be loaded in by mW
-        self.initUserScriptController()
-        self.initDatabaseCommManager()
-        self.initInstrumentManager()
-        self.initHardwareManager()
 
         self.mW.DataStation_Closing_Final.connect(self.updateSettings)
+
+    def connections(self, iM, hM):
+        self.iM = iM
+        self.hM = hM
+        
+        self.iM.Instrument_Loaded.connect(self.)
 
     def connectWidgets(self):
         self.userScriptController.connectWidgets()
         
-    def initHardwareManager(self):
-        pass
-        #self.DSHardwareManager = HardwareManager(self)
-
-    def initInstrumentManager(self):
-        pass
-        #self.DSInstrumentManager = InstrumentManager(self)
-
     def initDatabaseCommManager(self):
         self.DBCommMgr = databaseCommManager(self)
+
+    def loadPreviousInstrument(self):
+        if('instrumentURL' in self.userProfile):
+            if(self.userProfile['instrumentURL'] is not None):
+                self.iM.loadInstrument(self.userProfile['instrumentURL'])
+
+    def loadPreviousSequence(self):
+        if('sequenceURL' in self.userProfile):
+            if(self.userProfile['sequenceURL'] is not None):
+                self.sequencerDockWidget.openSequence(self.userProfile['sequenceURL'])
 
     def readSettings(self):
         self.mW.postLog('Loading Settings... ', DSConstants.LOG_PRIORITY_HIGH)

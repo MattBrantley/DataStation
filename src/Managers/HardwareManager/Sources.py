@@ -9,123 +9,44 @@ from DSWidgets.controlWidget import readyCheckPacket
 import numpy as np
 
 class Source():
-    name = "NULL"
-    numPaths = 1
 
-    def __init__(self, hardware, trigger=False):
-        self.filterInputSource = None
-        self.hardware = hardware
-        self.paths = list()
-        self.uuid = str(uuid.uuid4())
-        self.physicalConnectorID = ''
-        self.trigger = trigger
-        self.programData = None
+    def __init__(self, hWare, name, physConID, trigger=False):
+        self.sourceSettings = dict()
+        self.sourceSettings['name'] = name
+        self.sourceSettings['uuid'] = str(uuid.uuid4())
+        self.sourceSettings['physConID'] = physConID
+        self.sourceSettings['trigger'] = trigger
+        self.sourceSettings['filterInputSource'] = None
+
+        paths = list()
+        paths.append(None)
+        self.sourceSettings['paths'] = paths
+
+        self.hWare = hWare
+        self.hM = hWare.hM
+        self.mW = hWare.hM.mW
         
-    def addFilter(self, pathNo, filterIn):
-        if(self.paths[pathNo-1] is not None):
-            if(issubclass(type(self.paths[pathNo-1]), Socket)):
-                self.paths[pathNo-1].unattach()
-
-        filterIn.filterInputSource = self
-        filterIn.filterInputPathNo = pathNo
-        self.paths[pathNo-1] = filterIn
+##### DataStation Interface Functions #####
     
-    def procReverseParent(self, pathNo, packetIn):
-        #Source got the packet!
-        return self.parsePacket(packetIn)
-
-    def parsePacket(self, packetIn):
-        return readyCheckPacket('Source', DSConstants.READY_CHECK_ERROR, msg='Critical Source Error! Default Source Object Used Somewhere!')
-
-    def attachSocket(self, pathNo, socketIn):
-        socketIn.filterInputSource = self
-        socketIn.filterInputPathNo = pathNo
-        self.paths[pathNo-1] = socketIn
-
-    def unattach(self, pathNo):
-        self.paths[pathNo-1] = None
-
-    def onUnattach(self):
-        self.paths[0] = None
-
-    def detachSockets(self):
-        if(self.paths[0] is not None):
-            if(issubclass(type(self.paths[0]), Socket)):
-                self.paths[0].unattach()
-            self.paths[0] = None
-
-    def getSource(self):
-        return self
-
-    def onSave(self):
-        pass
-
-    def onLoad(self, loadPacket):
-        pass
-        #self.filterInputSource =
-
-    def savePaths(self):
-        pathSaveData = list()
-        index = 1
-        for path in self.paths:
-            pathData = dict()
-            pathData['pathNo'] = index
-            if(path is None):
-                pathData['data'] = None
-            else:
-                pathData['data'] = path.onSave()
-            
-            pathSaveData.append(pathData)
-            index = index + 1
-        
-        return pathSaveData
-
-    def pathListUUIDs(self):
-        pathList = list()
-        for path in self.paths:
-            if(path is None):
-                pathList.append(None)
-            else:
-                pathList.append(path.uuid)
-
-    def reattachSocket(self, socketIn, pathNo):
-        if(self.paths[pathNo-1] is socketIn):
-            return self
-        elif(self.paths[pathNo-1] is not None):
-            return None
-        else:
-            self.paths[pathNo-1] = socketIn
-            return self
-
-    def onLink(self):
-        if('filterInputSource' in self.loadPacket):
-            if(self.loadPacket['filterInputSource'] is not None):
-                self.filterInputSource = self.hardware.hardwareManager.objFromUUID(self.loadPacket['filterInputSource'])
-            else:
-                self.filterInputSource = None
-
     def readyCheck(self):
         drivingSocketCount = 0
         for socket in self.getSockets():
-            if(socket.drivingSocket == True):
+            if(socket.socketSettings['drivingSocket'] == True):
                 drivingSocketCount = drivingSocketCount + 1
 
         if(drivingSocketCount > 1):
-            #self.hardware.hardwareManager.workspace.mW.postLog('READY CHECK FAILED: Socket has more than one driving source!', DSConstants.LOG_PRIORITY_HIGH)
-            #self.hardware.hardwareManager.workspace.mW.controlWidget.addReadyCheckMessage('READY CHECK FAILED: Active Socket Has No Source!')
             return readyCheckPacket('Socket', DSConstants.READY_CHECK_ERROR, msg='Source Has More Than One Driving Socket!')
 
         return readyCheckPacket('Socket', DSConstants.READY_CHECK_READY)
 
-    def onRemove(self):
-        for socket in self.getSockets():
-            socket.unattach()
+    def getUUID(self):
+        return self.sourceSettings['uuid']
 
-        self.filterInputSource = None
+##### Search Functions #####
 
     def getSockets(self):
         sockets = list()
-        for path in self.paths:
+        for path in self.sourceSettings['paths']:
             if(path is not None):
                 if(issubclass(type(path), Socket) is True):
                     sockets.append(path)
@@ -134,29 +55,71 @@ class Source():
                     if(result is not None):
                         for socket in result:
                             sockets.append(socket)
-        
         return sockets
 
-    def getProgramData(self):
-        if(len(self.getSockets()) > 0): #Might have left over program data but not needed if no sockets attached!
-            if(self.programData is not None):
-                return self.programData
+    def getSource(self):
+        return self
 
-    def reprogram(self):
-        self.hardware.program()
+##### Functions Over-Ridden By Factoried Sources #####
+
+    def procReverseParent(self, pathNo, packetIn):
+        #Source got the packet!
+        return self.parsePacket(packetIn)
+
+    def parsePacket(self, packetIn): ### OVERRIDE ME!! ####
+        return readyCheckPacket('Source', DSConstants.READY_CHECK_ERROR, msg='Critical Source Error! Default Source Object Used Somewhere!')
+
+##### Source Manipulation Functions #####
+
+    def attachPathOther(self, uuid):
+        self.sourceSettings['paths'][0] = uuid
+        return True # Sources don't retain their connection information, always returns True
+                    # This means anything that tells the Source it is attached will be.
+
+    def attachPathSelf(self, pathNo, uuid):
+        if(uuid is None):
+            self.mW.postLog('SOURCE ATTACH ERROR: ' + self.sourceSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Path Filter/Socket that is NoneValue!!!' , DSConstants.LOG_PRIORITY_MED)
+            self.sourceSettings['paths'][pathNo-1] = None
+            return False 
+
+        targetFilterOrSocket = self.hM.getFilterOrSourceByUUID(uuid) #Search for Filter
+        if(targetFilterOrSocket is None):
+            targetFilterOrSocket = self.hM.getSocketByUUID(uuid) #If it's not a filter, search for a Socket
+        if(targetFilterOrSocket is None):
+            self.mW.postLog('SOURCE ATTACH ERROR: ' + self.sourceSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Path Filter/Socket that does not exist!!!' , DSConstants.LOG_PRIORITY_MED)
+            self.sourceSettings['paths'][pathNo-1] = None
+            return False
+        
+        self.sourceSettings['paths'][pathNo-1] = uuid
+        return True
+
+    def detatchPathOther(self, uuid):
+        newPaths = list()
+        found = False
+        for path in self.sourceSettings['paths']:
+            if(path == uuid):
+                newPaths.append(None)
+                found = True
+            else:
+                newPaths.append(path)
+
+        return found
+
+    def savePacket(self):
+        return self.sourceSettings
+
+    def loadPacket(self, loadPacket):
+        pass
+
+    def program(self):
+        self.hWare.program(self)
 
 class AISource(Source):
     def __init__(self, hardware, name, vMin, vMax, prec, physConID, trigger=False):
-        super().__init__(hardware)
-        self.hardware = hardware
-        self.name = name
-        self.vMin = vMin
-        self.vMax = vMax
-        self.prec = prec
-        self.paths.clear()
-        self.paths.append(None)
-        self.loadPacket = None
-        self.physicalConnectorID = physConID
+        super().__init__(hardware, name, physConID, trigger=trigger)
+        self.sourceSettings['vMin'] = vMin
+        self.sourceSettings['vMax'] = vMax
+        self.sourceSettings['prec'] = prec
 
     def parsePacket(self, packetIn):
         if(isinstance(packetIn, waveformPacket) is False):
@@ -172,43 +135,12 @@ class AISource(Source):
     def packetInSourceRange(self, packetIn):
         return True
 
-    def onSave(self):
-        savePacket = dict()
-        savePacket['name'] = self.name
-        savePacket['uuid'] = self.uuid
-        savePacket['vMin'] = self.vMin
-        savePacket['vMax'] = self.vMax
-        savePacket['prec'] = self.prec
-        savePacket['physConID'] = self.physicalConnectorID
-        savePacket['paths'] = self.savePaths()
-
-        return savePacket
-
-    def onLoad(self, loadPacket):
-        self.loadPacket = loadPacket
-        if('uuid' in loadPacket):
-            self.uuid = loadPacket['uuid']
-        if('physConID' in loadPacket):
-            self.physicalConnectorID = loadPacket['physConID']
-
-        if('paths' in loadPacket):
-            for path in loadPacket['paths']:
-                if('pathNo' in path and 'data' in path):
-                    if(path['data'] is not None and path['pathNo'] is not None):
-                        self.paths[path['pathNo']-1] = self.hardware.hardwareManager.loadFilterFromData(self, path['data'], path['pathNo'])
-
 class AOSource(Source):
     def __init__(self, hardware, name, vMin, vMax, prec, physConID):
-        super().__init__(hardware)
-        self.hardware = hardware
-        self.name = name
-        self.vMin = vMin
-        self.vMax = vMax
-        self.prec = prec
-        self.paths.clear()
-        self.paths.append(None)
-        self.loadPacket = None
-        self.physicalConnectorID = physConID
+        super().__init__(hardware, name, physConID)
+        self.sourceSettings['vMin'] = vMin
+        self.sourceSettings['vMax'] = vMax
+        self.sourceSettings['prec'] = prec
 
     def parsePacket(self, packetIn):
         if(isinstance(packetIn, waveformPacket) is False):
@@ -232,40 +164,9 @@ class AOSource(Source):
 
         return True
 
-    def onSave(self):
-        savePacket = dict()
-        savePacket['name'] = self.name
-        savePacket['uuid'] = self.uuid
-        savePacket['vMin'] = self.vMin
-        savePacket['vMax'] = self.vMax
-        savePacket['prec'] = self.prec
-        savePacket['physConID'] = self.physicalConnectorID
-        savePacket['paths'] = self.savePaths()
-
-        return savePacket
-
-    def onLoad(self, loadPacket):
-        self.loadPacket = loadPacket
-        if('uuid' in loadPacket):
-            self.uuid = loadPacket['uuid']
-        if('physConID' in loadPacket):
-            self.physicalConnectorID = loadPacket['physConID']
-
-        if('paths' in loadPacket):
-            for path in loadPacket['paths']:
-                if('pathNo' in path and 'data' in path):
-                    if(path['data'] is not None and path['pathNo'] is not None):
-                        self.paths[path['pathNo']-1] = self.hardware.hardwareManager.loadFilterFromData(self, path['data'], path['pathNo'])
-
 class DOSource(Source):
     def __init__(self, hardware, name, physConID):
-        super().__init__(hardware)
-        self.hardware = hardware
-        self.name = name
-        self.paths.clear()
-        self.paths.append(None)
-        self.loadPacket = None
-        self.physicalConnectorID = physConID
+        super().__init__(hardware, name, physConID)
 
     def parsePacket(self, packetIn):
         if(isinstance(packetIn, waveformPacket) is False):
@@ -281,39 +182,9 @@ class DOSource(Source):
     def packetInSourceRange(self, packetIn):
         return True
 
-    def onSave(self):
-        savePacket = dict()
-        savePacket['name'] = self.name
-        savePacket['uuid'] = self.uuid
-        savePacket['physConID'] = self.physicalConnectorID
-        savePacket['paths'] = self.savePaths()
-
-        return savePacket
-
-    def onLoad(self, loadPacket):
-        self.loadPacket = loadPacket
-        if('name' in loadPacket):
-            self.name = loadPacket['name']
-        if('uuid' in loadPacket):
-            self.uuid = loadPacket['uuid']
-        if('physConID' in loadPacket):
-            self.physicalConnectorID = loadPacket['physConID']
-
-        if('paths' in loadPacket):
-            for path in loadPacket['paths']:
-                if('pathNo' in path and 'data' in path):
-                    if(path['data'] is not None and path['pathNo'] is not None):
-                        self.paths[path['pathNo']-1] = self.hardware.hardwareManager.loadFilterFromData(self, path['data'], path['pathNo'])
-
 class DISource(Source):
     def __init__(self, hardware, name, physConID, trigger=False):
-        super().__init__(hardware, trigger)
-        self.hardware = hardware
-        self.name = name
-        self.paths.clear()
-        self.paths.append(None)
-        self.loadPacket = None
-        self.physicalConnectorID = physConID
+        super().__init__(hardware, name, physConID, trigger=trigger)
 
     def parsePacket(self, packetIn):
         if(isinstance(packetIn, waveformPacket) is False):
@@ -328,27 +199,3 @@ class DISource(Source):
 
     def packetInSourceRange(self, packetIn):
         return True
-
-    def onSave(self):
-        savePacket = dict()
-        savePacket['name'] = self.name
-        savePacket['uuid'] = self.uuid
-        savePacket['physConID'] = self.physicalConnectorID
-        savePacket['paths'] = self.savePaths()
-
-        return savePacket
-
-    def onLoad(self, loadPacket):
-        self.loadPacket = loadPacket
-        if('name' in loadPacket):
-            self.name = loadPacket['name']
-        if('uuid' in loadPacket):
-            self.uuid = loadPacket['uuid']
-        if('physConID' in loadPacket):
-            self.physicalConnectorID = loadPacket['physConID']
-
-        if('paths' in loadPacket):
-            for path in loadPacket['paths']:
-                if('pathNo' in path and 'data' in path):
-                    if(path['data'] is not None and path['pathNo'] is not None):
-                        self.paths[path['pathNo']-1] = self.hardware.hardwareManager.loadFilterFromData(self, path['data'], path['pathNo'])
