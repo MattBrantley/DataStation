@@ -3,7 +3,7 @@ from Managers.InstrumentManager.Instrument import *
 from Managers.InstrumentManager.Filter import *
 from Managers.InstrumentManager.Sockets import *
 from Managers.InstrumentManager.Digital_Trigger_Component import Digital_Trigger_Component
-from Managers.HardwareManager.Hardware_Object import Hardware_Object
+from Managers.HardwareManager.hardwareObject import hardwareObject
 from Managers.HardwareManager.Sources import *
 from DataStation_Labview import DataStation_LabviewExtension
 from Constants import DSConstants as DSConstants
@@ -11,39 +11,98 @@ import json as json
 from DSWidgets.controlWidget import readyCheckPacket
 
 class HardwareManager(QObject):
-    Hardware_Modified = pyqtSignal()
-    Hardware_Loaded = pyqtSignal()
-    Trigger_Modified = pyqtSignal()
 
-    hardwareList = list()
-    sourceObjList = list()
-    filterList = list()
-    filtersAvailable = list()
-    driversAvailable = list()
-    hardwareLoaded = list()
+############################################################################################
+##################################### EXTERNAL SIGNALS #####################################
 
+##### Signals: Hardware State #####
+    Hardware_State_Loaded = pyqtSignal()
+    Hardware_State_Saving = pyqtSignal()
+
+##### Signals: Hardware #####
+    Hardware_Added = pyqtSignal(object)
+    Hardware_Removed = pyqtSignal()
+    Hardware_Trigger_Modified = pyqtSignal()
+
+##### Signals: Sequence #####
+    Sequence_Started = pyqtSignal()
+    Sequence_Finished = pyqtSignal()
+
+############################################################################################
+#################################### EXTERNAL FUNCTIONS ####################################
+
+##### Functions: Instrument Manager #####
+    def Do_Ready_Check(self):
+        return self.readyCheck()
+
+    def Ready_Check_Status(self):
+        return self.readyStatus
+
+    def Run_Sequence(self):
+        self.onRun()
+
+##### Functions: Hardware Models #####
+
+    def Get_Hardware_Models_Available(self):
+        return self. driversAvailable
+
+##### Functions: Hardware #####
+    def Get_Hardware(self):
+        return self.hardwareLoaded
+
+    def Add_Hardware(self, hardwareModel):
+        return self.addHardwareObj(hardwareModel)
+
+    def Remove_Hardware(self, hardwareObject):
+        return self.removeHardwareObj(hardwareObject)
+
+    def Get_All_Sources(self):
+        reList = list()
+        for hardware in self.hardwareLoaded:
+            reList += hardware.Get_Sources()
+        return reList
+
+    def Get_All_Sources_By_Type(self, sourceType):
+        reList = list()
+        for hardware in self.hardwareLoaded:
+            reList += hardware.Get_Sources_By_Type(sourceType)
+        return reList
+        
+
+############################################################################################
+#################################### INTERNAL USER ONLY ####################################
     def __init__(self, mW):
         super().__init__()
 
         self.mW = mW
+        self.readyStatus = False
         self.filtersDir = os.path.join(self.mW.rootDir, 'User Filters')
         self.hardwareDriverDir = os.path.join(self.mW.rootDir, 'Hardware Drivers')
+        self.filtersAvailable = list()
+        self.driversAvailable = list()
+        self.hardwareLoaded = list()
+        self.sourceObjList = list()
+        self.filterList = list()
 
         self.mW.DataStation_Closing.connect(self.saveHardwareState)
 
-    def connections(self):
+    def connections(self, iM, wM):
         self.iM = self.mW.iM
         self.wM = self.mW.wM
         #self.iM.Instrument_Loaded.connect(self.instrumentLoaded)
         #self.iM.Sequence_Loaded.connect(self.programAllDevices)
         #self.iM.Instrument_Unloaded.connect(self.instrumentUnloaded)
 
-##### DataStation Interface Functions #####
+##### DataStation Reserved Functions #####
 
     def readyCheck(self):
         subs = list()
+        self.readyStatus = True
         for hardware in self.hardwareLoaded:
-            subs.append(hardware.readyCheck())
+            check = hardware.readyCheck()
+            subs.append(check)
+            if(check.readyStatus is False):
+                self.readyStatus = False
 
         return readyCheckPacket('Hardware Manager', DSConstants.READY_CHECK_READY, subs=subs)
 
@@ -120,7 +179,7 @@ class HardwareManager(QObject):
             if hasattr(py_mod, expected_class):  # verify that Filter is a class in this file
                 loaded = True
                 class_temp = getattr(py_mod, expected_class)(filepath)
-                if isinstance(class_temp, Hardware_Object):  # verify that Filter inherits the correct class
+                if isinstance(class_temp, hardwareObject):  # verify that Filter inherits the correct class
                     class_inst = class_temp
 
         if(loaded):
@@ -222,20 +281,7 @@ class HardwareManager(QObject):
         self.lvInterface = DataStation_LabviewExtension(self.mW)
         self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
-##### Hardware Manipulation Functions #####
-
-    def instrumentLoaded(self):
-        for hardwareObj in self.hardwareLoaded:
-            hardwareObj.verifyTriggerComponentExists()    
-        
-    def programAllDevices(self):
-        for device in self.hardwareLoaded:
-            device.program()
-
-    def addDigitalTriggerComp(self, hardwareObj):
-        triggerComp = self.mW.iM.addCompToInstrument(Digital_Trigger_Component)
-        triggerComp.onConnect(hardwareObj.hardwareSettings['name'], hardwareObj.hardwareSettings['uuid'])
-        return triggerComp
+##### Filter Manipulation Functions #####
 
     def loadFilterFromData(self, filterInputSource, data, pathNo):
         if('filterIdentifier' in data):
@@ -252,41 +298,52 @@ class HardwareManager(QObject):
                 self.mW.postLog('Attempting To Restore Filter With Identifier (' + data['filterIdentifier'] + ') But Could Not Find Matching User_Filter... ', DSConstants.LOG_PRIORITY_HIGH)
         return None
 
-    def addHardwareObj(self, hardwareClass, loadData=None):
-        tempHardware = type(hardwareClass)(self)
+##### Hardware Manipulation Functions #####
+
+    def instrumentLoaded(self):
+        for hardwareObj in self.hardwareLoaded:
+            hardwareObj.verifyTriggerComponentExists()    
+        
+    def programAllDevices(self):
+        for device in self.hardwareLoaded:
+            device.program()
+
+    def addDigitalTriggerComp(self, hardwareObj):
+        triggerComp = self.mW.iM.addCompToInstrument(Digital_Trigger_Component)
+        triggerComp.onConnect(hardwareObj.hardwareSettings['name'], hardwareObj.hardwareSettings['uuid'])
+        return triggerComp
+
+    def addHardwareObj(self, hardwareModel, loadData=None):
+        tempHardware = type(hardwareModel)(self)
         tempHardware.initHardwareWorker()
 
         self.hardwareLoaded.append(tempHardware)
-
-        self.Hardware_Modified.emit()
-        self.Trigger_Modified.emit()
 
         if(loadData is None):
             tempHardware.resetDevice()
         else:
             tempHardware.loadPacketParent(loadData)
+
+        self.Hardware_Added.emit(tempHardware)
         return tempHardware
 
     def removeHardwareObj(self, hardwareObj):
         hardwareObj.onRemove()
         self.hardwareLoaded.remove(hardwareObj)
-        self.Hardware_Modified.emit()
-        self.Trigger_Modified.emit()
 
     def loadHardwareState(self):
         self.mW.postLog('Restoring Hardware State... ', DSConstants.LOG_PRIORITY_HIGH)
-        if('hardwareState' in self.mW.wM.settings):
-            tempHardwareSettings = self.mW.wM.settings['hardwareState']
+        if('hardwareState' in self.wM.settings):
+            tempHardwareSettings = self.wM.settings['hardwareState']
             self.mW.wM.settings['hardwareState'] = None
             if(self.processHardwareData(tempHardwareSettings) is True):
                 self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
             else:
                 self.mW.postLog('Error Loading Hardware State - Aborting!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
-            self.Hardware_Modified.emit()
         else:
             self.mW.postLog('No Hardware State Found - Aborting!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
-        self.Hardware_Loaded.emit()
+        self.Hardware_State_Loaded.emit()
 
     def processHardwareData(self, hardwareData):
         if(hardwareData is not None and 'hardwareStates' in hardwareData):
@@ -294,11 +351,9 @@ class HardwareManager(QObject):
                 if(('hardwareIdentifier') in state):
                     hardwareModel = self.findHardwareModelByIdentifier(state['hardwareIdentifier'])
                     if(hardwareModel is not None):
-                        self.mW.hardwareWidget.hardwareWidget.addHardware(hardwareModel, loadData=state)
-                        #self.addHardwareObj(hardwareModel, loadData=state)
-                        #hardwareObj = self.mW.hardwareWidget.hardwareWidget.addHardware(hardwareModel)
-                        #if('hardwareSettings' in state):
-                        #    hardwareObj.onLoadParent(state)
+                        hardwareObj = self.addHardwareObj(hardwareModel, loadData=state)
+                        if('hardwareSettings' in state):
+                            hardwareObj.loadPacketParent(state)
                     else:
                         self.mW.postLog('Hardware Component State Found (Identifier: ' + state['hardwareIdentifier'] + ') But No Drivers Are Present For This Identifier! Partial Hardware State Import Continuing...', DSConstants.LOG_PRIORITY_HIGH)
                         
@@ -314,12 +369,13 @@ class HardwareManager(QObject):
         savePacket['hardwareStates'] = list()
 
         for hardware in self.hardwareLoaded:
-            savePacket['hardwareStates'].append(hardware.onSave())
+            savePacket['hardwareStates'].append(hardware.savePacket())
 
-        self.mW.workspaceManager.settings['hardwareState'] = savePacket
+        self.wM.settings['hardwareState'] = savePacket
 
         self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     def onRun(self):
+        self.Sequence_Started.emit()
         for hardware in self.hardwareLoaded:
             hardware.onRun()

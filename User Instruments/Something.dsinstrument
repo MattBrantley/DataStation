@@ -1,0 +1,75 @@
+{
+    "compList": [
+        {
+            "compIdentifier": "circLens_mrb",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": -3141.0,
+                        "y": 555.0
+                    }
+                },
+                "granularity": 0.0001,
+                "layoutGraphicSrc": "lens.png",
+                "name": "Unnamed Circular Lens",
+                "showSequencer": true,
+                "triggerComp": false,
+                "uuid": "3547ed83-3f7f-46c3-b492-911652af265b",
+                "vMax": 10.0,
+                "vMin": 0.0
+            },
+            "compType": "Circular Lens",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "filterInputSource": null,
+                    "name": "Unnamed Circular Lens",
+                    "paths": null,
+                    "prec": 0.1,
+                    "tag": "[AO]",
+                    "uuid": "efb4273b-d53c-4eda-b5f9-94154f1c3682",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "circLens_mrb",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": 5332.0,
+                        "y": 538.0
+                    }
+                },
+                "granularity": 0.0001,
+                "layoutGraphicSrc": "lens.png",
+                "name": "Unnamed Circular Lens",
+                "showSequencer": true,
+                "triggerComp": false,
+                "uuid": "e72f2aa3-c019-4158-bde7-ee231cc01f90",
+                "vMax": 10.0,
+                "vMin": 0.0
+            },
+            "compType": "Circular Lens",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "filterInputSource": null,
+                    "name": "Unnamed Circular Lens",
+                    "paths": null,
+                    "prec": 0.1,
+                    "tag": "[AO]",
+                    "uuid": "6af1e1cf-bc81-4b30-8f42-3fb863049622",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        }
+    ],
+    "name": "Something"
+}

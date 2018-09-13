@@ -251,10 +251,8 @@ class sequencerDockWidget(QDockWidget):
         self.mainContainer.setCentralWidget(self.sequencerContainer)
         self.updateToolbarState()
 
-        self.iM.Instrument_Modified.connect(self.redrawSequence)
         self.iM.Instrument_Loaded.connect(self.redrawSequence)
         self.iM.Sequence_Loaded.connect(self.sequenceLoaded)
-        self.iM.After_Sequence_Loaded.connect(self.redrawSequence)
         self.iM.Sequence_Unloaded.connect(self.sequenceUnloaded)
 
         self.redrawSequence()

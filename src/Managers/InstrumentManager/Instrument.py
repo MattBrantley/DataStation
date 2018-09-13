@@ -8,10 +8,36 @@ class Instrument(QObject):
         super().__init__()
         self.iM = iM
         self.mW = self.iM.mW
-        self.name = "Default Instrument"
+        self.name = 'Default Instrument'
         self.url = None
         self.components = list()
         self.fullSocketList = list()
+
+############################################################################################
+#################################### EXTERNAL FUNCTIONS ####################################
+
+    def Get_Name(self):
+        return self.name
+
+    def Set_Name(self, name):
+        self.name = name
+        self.iM.instrumentConfigModified(self)
+
+    def Get_Path(self):
+        return self.url
+
+    def Set_Path(self, path):
+        self.url = path
+
+    def Get_Sockets(self):
+        return self.getSockets()
+
+    def Get_Sockets_By_Type(self, socketType):
+        return self.getSocketsByType(socketType)
+
+
+############################################################################################
+#################################### INTERNAL USER ONLY ####################################
 
 ##### DataStation Interface Functions #####
 
@@ -40,7 +66,7 @@ class Instrument(QObject):
 
 ##### Instrument Manipulations #####
 
-    def saveInstrument(self):
+    def savePacket(self):
         saveData = dict()
         saveData['name'] = self.name
         saveCompList = list()
@@ -92,7 +118,7 @@ class Instrument(QObject):
             self.iM.instrumentModified(self)
 
     def reattachSockets(self):
-        print('reattach')
+        pass
     
     def clearSequenceEvents(self):
         for comp in self.components:
@@ -129,22 +155,11 @@ class Instrument(QObject):
                 return socket
         return None
 
-    def getSocketsByType(self, typeText):
-        typeOut = type(None)
-        if(typeText == 'Sockets: Analog Output'):
-            typeOut = AOSocket
-        elif(typeText == 'Sockets: Analog Input'):
-            typeOut = AISocket
-        elif(typeText == 'Sockets: Digital Output'):
-            typeOut = DOSocket
-        elif(typeText == 'Sockets: Digital Input'):
-            typeOut = DISocket
-
+    def getSocketsByType(self, socketType):
         self.getSockets()
         self.outList = list()
-
         for socket in self.fullSocketList:
-            if(isinstance(socket, typeOut) or typeText == 'All'):
+            if(isinstance(socket, socketType)):
                 self.outList.append(socket)
         return self.outList
 

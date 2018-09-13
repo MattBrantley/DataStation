@@ -12,20 +12,28 @@ from DSWidgets.controlWidget import readyCheckPacket
 # This is so that pickle can pull the correct class
 sys.path.append(str(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))) + '\\Hardware Drivers\\')
 
-class Hardware_Object(QObject):
-    #Config_Modified = pyqtSignal(object)
-    #Reprogrammed = pyqtSignal(object)
-    #Trigger_Modified = pyqtSignal(object)
-
+class hardwareObject(QObject):
     hardwareType = 'Default Hardware Object'
     hardwareIdentifier = 'DefHardObj'
     hardwareVersion = '1.0'
     hardwareCreator = 'Matthew R. Brantley'
     hardwareVersionDate = '8/18/2018'
 
+############################################################################################
+#################################### EXTERNAL FUNCTIONS ####################################
+
+    def Get_Sources(self):
+        return self.sourceList
+
+    def Get_Sources_By_Type(self, sourceType):
+        return [s for s in self.sourceList if isinstance(s, sourceType)]
+
+############################################################################################
+#################################### INTERNAL USER ONLY ####################################
+
     def __init__(self, hM, modelObject=False, **kwargs):
         super().__init__()
-        self.sourceListWidget = QListWidget()
+        self.hM = hM
         self.hardwareSettings = {}
         self.hardwareSettings['name'] = ''
         self.hardwareSettings['physID'] = ''
@@ -33,13 +41,10 @@ class Hardware_Object(QObject):
         self.hardwareSettings['triggerCompUUID'] = ''
         self.hardwareSettings['triggerMode'] = ''
         self.hardwareSettings['hardwareType'] = self.hardwareType
-        self.hardwareSettings['hardwareIdentifier'] = self.hardwareIdentifier
-        self.hM = hM
         self.sourceList = list()
         self.managerMessages = list()
         self.initTriggerModes()
         self.onCreationParent()
-        self.sourceListData = None
         self.triggerComponent = None
         
         self.workerReady = False
@@ -145,7 +150,7 @@ class Hardware_Object(QObject):
         self.onLoad(loadPacket)
         self.resetDevice()
 
-    def loadPacket(self, loadPacket): ### OVERRIDE ME!! ####
+    def onLoad(self, loadPacket): ### OVERRIDE ME!! ####
         pass
 
     def onInitialize(self): ### OVERRIDE ME!! ####
@@ -156,13 +161,6 @@ class Hardware_Object(QObject):
 
     def onProgram(self): ### OVERRIDE ME!! ####
         pass
-
-##### INSTRUMENT STATUS ######
-
-    #def instrumentLoaded(self):
-    #    self.verifyTriggerComponentExists()                            Move this to hW
-    #    #self.Trigger_Modified.emit(self)
-    #    self.hM.triggerModified(self)
 
 ##### TRIGGER COMPONENT ######
 
@@ -201,7 +199,7 @@ class Hardware_Object(QObject):
 
     def getSourceByPhysConID(self, physConID):
         for source in self.sourceList:
-            if(source.physicalConnectorID == physConID):
+            if(source.sourceSettings['physConID'] == physConID):
                 return source
         return None
 
@@ -233,6 +231,7 @@ class Hardware_Object(QObject):
 
     def savePacket(self):
         savePacket = dict()
+        savePacket['hardwareIdentifier'] = self.hardwareIdentifier
         savePacket['hardwareSettings'] = self.hardwareSettings
         sourceSavePackets = list()
         for source in self.sourceList:
@@ -241,20 +240,9 @@ class Hardware_Object(QObject):
         savePacket['sourceList'] = sourceSavePackets
         return savePacket
 
-    def clearSourceList(self):
-        pass
-        #for source in self.sourceList:
-        #    source.detachSockets()
-        #self.sourceList.clear()
-        #self.updateSourceListWidget()
-
     def addSource(self, source):
         self.sourceList.append(source)
         self.mgrMsg('Source added: ' + str(type(source)))
-
-        #self.loadSourceListData()
-        #self.updateSourceListWidget()
-        #self.hM.mW.iM.reattachSockets()
         self.hM.configModified(self)
 
 ##### hardwareWorker Functions #####

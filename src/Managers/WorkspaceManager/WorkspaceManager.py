@@ -63,29 +63,24 @@ class WorkspaceManager():
         self.hardwareDriversDir = os.path.join(self.mW.rootDir, 'Hardware Drivers')
         self.workspaceTreeWidget = None #Will be loaded in by mW
 
+        self.readSettings()
+
         self.mW.DataStation_Closing_Final.connect(self.updateSettings)
 
     def connections(self, iM, hM):
         self.iM = iM
         self.hM = hM
         
-        self.iM.Instrument_Loaded.connect(self.)
+        self.iM.Instrument_Loaded.connect(self.instrumentLoaded)
+
+    def instrumentLoaded(self):
+        self.userProfile['instrumentURL'] = self.iM.currentInstrument.url
 
     def connectWidgets(self):
         self.userScriptController.connectWidgets()
         
     def initDatabaseCommManager(self):
         self.DBCommMgr = databaseCommManager(self)
-
-    def loadPreviousInstrument(self):
-        if('instrumentURL' in self.userProfile):
-            if(self.userProfile['instrumentURL'] is not None):
-                self.iM.loadInstrument(self.userProfile['instrumentURL'])
-
-    def loadPreviousSequence(self):
-        if('sequenceURL' in self.userProfile):
-            if(self.userProfile['sequenceURL'] is not None):
-                self.sequencerDockWidget.openSequence(self.userProfile['sequenceURL'])
 
     def readSettings(self):
         self.mW.postLog('Loading Settings... ', DSConstants.LOG_PRIORITY_HIGH)
@@ -123,7 +118,7 @@ class WorkspaceManager():
         self.settings['workspaceURL'] = URL
 
         self.mW.workspaceTreeDockWidget.setWindowTitle(os.path.basename(URL))
-        self.mW.updateState(DSConstants.MW_STATE_WORKSPACE_LOADED)
+        self.mW.workspaceTreeDockWidget.updateState(DSConstants.MW_STATE_WORKSPACE_LOADED)
 
     def newWorkspace(self):
         fname = QFileDialog.getSaveFileName(self.mW, 'Save File', self.userDataDir, filter='*.db')

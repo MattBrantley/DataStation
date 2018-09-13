@@ -4,42 +4,34 @@ from PyQt5.QtGui import *
 from xml.dom.minidom import *
 from xml.etree.ElementTree import *
 from Managers.WorkspaceManager.UserScript import *
+from Constants import DSConstants as DSConstants
+import os
 
 class workspaceTreeDockWidget(QDockWidget):
 
     def __init__(self, mW):
         super().__init__('No Workspace Loaded')
         self.mW = mW
-        self.setFeatures(QDockWidget.DockWidgetFloatable | QDockWidget.DockWidgetMovable)
+        self.iM = mW.iM
+        self.hM = mW.hM
+        self.wM = mW.wM
 
-        self.workspaceTreeWidget = WorkspaceTreeWidget(mW)
+        self.srcDir = self.mW.srcDir
+        self.rootDir = self.mW.rootDir
+
+        self.setFeatures(QDockWidget.DockWidgetFloatable | QDockWidget.DockWidgetMovable)
+        self.initWidget()
+        self.initActions()
+        self.initToolbar()
+        self.updateState(DSConstants.MW_STATE_NO_WORKSPACE)
+
+    def initWidget(self):
+        self.mainWidget = QMainWindow()
+        self.workspaceTreeWidget = WorkspaceTreeWidget(self.mW)
+        self.mainWidget.setCentralWidget(self.workspaceTreeWidget)
         self.setWidget(self.workspaceTreeWidget)
 
-class WorkspaceTreeWidget(QTreeWidget):
-    ITEM_GUID = Qt.UserRole
-    ITEM_TYPE = Qt.UserRole+1
-    ITEM_NAME = Qt.UserRole+2
-    ITEM_UNITS = Qt.UserRole+3
-
-    def __init__(self, mW):
-        super().__init__()
-        self.mW = mW
-        self.wM = mW.wM
-        self.setDragEnabled(True)
-        self.setHeaderHidden(True)
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.openMenu)
-        self.initMenu()
-        self.initToolbar()
-
-        self.itemSelectionChanged.connect(self.selectionChangedFunc)
-
     def initActions(self):
-
-        self.exitAction = QAction(QIcon(os.path.join(self.mW.srcDir, r'icons2\minimize.png')), 'Exit', self)
-        self.exitAction.setShortcut('Ctrl+Q')
-        self.exitAction.setStatusTip('Exit Application')
-        self.exitAction.triggered.connect(self.close)
 
         self.newAction = QAction(QIcon(os.path.join(self.mW.srcDir, r'icons2\controller.png')), 'New Workspace', self)
         self.newAction.setShortcut('Ctrl+N')
@@ -56,7 +48,7 @@ class WorkspaceTreeWidget(QTreeWidget):
         self.openAction.setStatusTip('Open Workspace')
         self.openAction.triggered.connect(self.wM.loadWSFromSql)
 
-        self.settingsAction = QAction(QIcon(os.path.join(self.mW.srcDir, r'icons2\settings.png')), 'Settings', self)
+        self.settingsAction = QAction(QIcon(os.path.join(self.srcDir, r'icons2\settings.png')), 'Settings', self)
         self.settingsAction.setShortcut('Ctrl+S')
         self.settingsAction.setStatusTip('Adjust Settings')
 
@@ -64,33 +56,31 @@ class WorkspaceTreeWidget(QTreeWidget):
         self.importAction.setStatusTip('Import Data')
         self.importAction.triggered.connect(self.wM.importData)
 
-        self.viewWindowsAction = QAction('Import', self)
-        self.viewWindowsAction.triggered.connect(self.populateViewWindowMenu)
-
-    def initMenu(self):
-        self.menubar = self.menuBar()
-        self.fileMenu = self.menubar.addMenu('&File')
-        self.fileMenu.addAction(self.newAction)
-        self.fileMenu.addAction(self.saveAction)
-        self.fileMenu.addAction(self.openAction)
-        self.fileMenu.addSeparator()
-        self.fileMenu.addAction(self.settingsAction)
-        self.fileMenu.addSeparator()
-        self.fileMenu.addAction(self.importAction)
-        self.fileMenu.addSeparator()
-        self.fileMenu.addAction(self.exitAction)
-
-        self.viewWindowsMenu = QMenu('Windows')
-        self.viewWindowsMenu.aboutToShow.connect(self.populateViewWindowMenu)
-
-        self.viewMenu = self.menubar.addMenu('&View')
-        self.viewMenu.addMenu(self.viewWindowsMenu)
-
-        self.importMenu = self.menubar.addMenu('&Import')
-        self.wM.userScriptController.populateImportMenu(self.importMenu, self)
+    def updateState(self, state):
+        if(state == DSConstants.MW_STATE_NO_WORKSPACE):
+            self.newAction.setEnabled(True)
+            self.saveAction.setEnabled(False)
+            self.openAction.setEnabled(True)
+            self.settingsAction.setEnabled(False)
+            self.importAction.setEnabled(False)
+            self.workspaceTreeWidget.setAcceptDrops(False)
+        elif(state == DSConstants.MW_STATE_WORKSPACE_LOADED):
+            self.newAction.setEnabled(True)
+            self.saveAction.setEnabled(True)
+            self.openAction.setEnabled(True)
+            self.settingsAction.setEnabled(False)
+            self.importAction.setEnabled(True)
+            self.workspaceTreeWidget.setAcceptDrops(True)
+        else:
+            self.newAction.setEnabled(False)
+            self.saveAction.setEnabled(False)
+            self.openAction.setEnabled(False)
+            self.settingsAction.setEnabled(False)
+            self.importAction.setEnabled(False)
+            self.workspaceTreeWidget.setAcceptDrops(False)
 
     def initToolbar(self):
-        self.toolbar = self.addToolBar('Toolbar')
+        self.toolbar = self.mainWidget.addToolBar('Toolbar')
         self.toolbar.setObjectName('toolbar')
         self.toolbar.addAction(self.newAction)
         self.toolbar.addAction(self.saveAction)
@@ -99,13 +89,31 @@ class WorkspaceTreeWidget(QTreeWidget):
         self.toolbar.addAction(self.settingsAction)
         self.toolbar.addSeparator()
         self.toolbar.addAction(self.importAction)
-        self.toolbar.addSeparator()
-        self.toolbar.addAction(self.exitAction)
+
+
+class WorkspaceTreeWidget(QTreeWidget):
+    ITEM_GUID = Qt.UserRole
+    ITEM_TYPE = Qt.UserRole+1
+    ITEM_NAME = Qt.UserRole+2
+    ITEM_UNITS = Qt.UserRole+3
+
+    def __init__(self, mW):
+        super().__init__()
+        self.mW = mW
+        self.wM = mW.wM
+        self.setDragEnabled(True)
+        self.setHeaderHidden(True)
+
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.openMenu)
+        self.itemSelectionChanged.connect(self.selectionChangedFunc)
 
     def selectionChangedFunc(self):
         if(len(self.selectedItems()) > 0):
             if(self.selectedItems()[0].data(0, self.ITEM_TYPE) == 'Data'):
-                self.mW.inspectorDockWidget.drawInspectorWidget(self.selectedItems()[0])
+                pass
+                #Oh lord this was a bad idea. LOL
+                #self.mW.inspectorDockWidget.drawInspectorWidget(self.selectedItems()[0])
 
     def dragEnterEvent(self, event):
         if(event.mimeData().hasUrls()):

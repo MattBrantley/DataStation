@@ -9,21 +9,13 @@ from Constants import DSConstants as DSConstants
 from PyQt5.QtGui import *
 from shutil import copyfile
 
-#import pyqtgraph as pg # This library gives a bunch of FutureWarnings that are unpleasant! Fix for this is in the main .py file header.
-#from PyQt5.Qt import QPixmap, QDataStream, QIODevice, QCursor
-#import os
-#from pyqtgraph import QtGui, QtCore
-#from pyqtgraph import Point
-#import numpy as np
-
-
 class instrumentWidget(QDockWidget):
     ITEM_GUID = Qt.UserRole
 
-    def __init__(self, mW, iM):
+    def __init__(self, mW):
         super().__init__('Instrument View (None)')
-        self.iM = iM
         self.mW = mW
+        self.iM = mW.iM
         self.hide()
         self.resize(1000, 800)
         self.fileSystem = DSEditorFSModel()
@@ -55,7 +47,11 @@ class instrumentWidget(QDockWidget):
         self.setWidget(self.mainContainer) 
         self.mainContainer.setCentralWidget(self.instrumentContainer)
         self.updateToolbarState()
-        
+
+        self.iM.Instrument_Unloaded.connect(self.updateTitle)
+        self.iM.Instrument_Loaded.connect(self.updateTitle)
+        self.iM.Instrument_Config_Changed.connect(self.updateTitle)
+
     def initToolbar(self):
         self.toolbar.addAction(self.newAction)
         self.toolbar.addAction(self.saveAction)
@@ -81,14 +77,14 @@ class instrumentWidget(QDockWidget):
         self.mW.postLog('Creating new instrument', DSConstants.LOG_PRIORITY_HIGH)
         fname, ok = QInputDialog.getText(self.mW, "Virtual Instrument Name", "Virtual Instrument Name")
         if(ok):
-            self.iM.newInstrument(fname, self.rootPath)
+            self.iM.New_Instrument(name=fname, path=self.rootPath)
         else:
             return
         self.updateTitle()
 
     def updateTitle(self):
-        if(self.iM.currentInstrument is not None):
-            self.setWindowTitle('Instrument View (' + self.iM.currentInstrument.name + ')')
+        if(self.iM.Get_Instrument() is not None):
+            self.setWindowTitle('Instrument View (' + self.iM.Get_Instrument().Get_Name() + ')')
         else:
             self.setWindowTitle('Instrument View (None)')
 
@@ -100,7 +96,9 @@ class instrumentWidget(QDockWidget):
         else:
             savePath = self.rootPath
 
-        if(self.iM.currentInstrument.name == 'Default Instrument'):
+        self.iM.Save_Instrument(path=savePath)
+
+        if(self.iM.Get_Instrument().Get_Path is None):
             self.saveAsInstrument(savePath)
         else:
             self.saveInstrument(savePath)
@@ -116,28 +114,28 @@ class instrumentWidget(QDockWidget):
 
     def saveAsInstrument(self, savePath):
         fname, ok = QInputDialog.getText(self.mW, "Virtual Instrument Name", "Virtual Instrument Name")
-        savePath = os.path.join(savePath, fname + '.dsinstrument')
+        checkPath = os.path.join(savePath, fname + '.dsinstrument')
         if(ok):
-            self.iM.currentInstrument.name = fname
+            pass
         else:
             return
 
-        if(os.path.exists(savePath)):
+        if(os.path.exists(checkPath)):
             reply = QMessageBox.question(self.mW, 'File Warning!', 'File exists - overwrite?', QMessageBox.Yes, QMessageBox.No)
             if(reply == QMessageBox.No):
                 return
-        self.iM.saveInstrument(savePath)
+
+        self.iM.Save_Instrument(name=fname, path=savePath)
 
     def saveInstrument(self, savePath):
-        if(self.iM.currentInstrument.name == 'Default Instrument'):
+        if(self.iM.Get_Instrument().Get_Name() == 'Default Instrument'):
             fname, ok = QInputDialog.getText(self.mW, "Virtual Instrument Name", "Virtual Instrument Name")
             if(ok):
-                self.iM.currentInstrument.name = fname
+                self.iM.Get_Instruemnt().Set_Name(fname)
             else:
                 return
 
-        url = self.iM.currentInstrument.url
-        self.iM.saveInstrument(url)
+        self.iM.Save_Instrument()
 
     def initActions(self):
         self.newAction = QAction('New', self)
@@ -191,7 +189,7 @@ class instrumentWidget(QDockWidget):
             self.openInstrument(filePath)
 
     def openInstrument(self, filePath):
-        self.iM.loadInstrument(filePath)
+        self.iM.Load_Instrument(filePath)
         self.updateTitle()
 
     def updateToolbarState(self):
@@ -203,6 +201,7 @@ class componentsList(QListWidget):
         super(componentsList, self).__init__(parent)
 
         self.mW = mW
+        self.iM = mW.iM
         self.setDragEnabled(True)
         self.setViewMode(QListView.ListMode)
         self.setIconSize(QSize(60, 60))
@@ -230,24 +229,14 @@ class componentsList(QListWidget):
         dropAction = drag.exec_()
 
     def populateList(self):
-        compList = self.mW.iM.componentsAvailable
-        for val in compList:
+        for val in self.iM.Get_Component_Models_Available():
             tempIcon = QIcon(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'User Components\img\\' + val.iconGraphicSrc))
             self.addItem(componentItem(tempIcon, val.componentType))
 
 class componentItem(QListWidgetItem):
     def __init__(self, icon, text, parent=None):
-        super(componentItem, self).__init__(parent)
+        super().__init__(parent)
         self.setText(text)
-        self.setToolTip("Example Tooltip")
-        self.setIcon(icon)
-        self.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
-
-class compInstrItem(QListWidgetItem):
-    def __init__(self, icon, text, parent=None):
-        super(compInstrItem, self).__init__(parent)
-        self.setText(text)
-        self.setToolTip("This Item Is In")
         self.setIcon(icon)
         self.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
@@ -376,17 +365,37 @@ class DSTreeView(QTreeView):
         copyfile(item, tempPath)
 
 class iView(pg.GraphicsWindow):
-    def __init__(self, mW, parent=None):
+    def __init__(self, instrumentWidget, parent=None):
         super(iView, self).__init__(parent)
 
-        self.mW = mW
+        self.instrumentWidget = instrumentWidget
+        self.mW = instrumentWidget.mW
+        self.iM = instrumentWidget.mW.iM
         self.setAcceptDrops(True)
         self.view = self.addViewBox()
         self.view.setAspectLocked()
         self.view.setRange(pg.QtCore.QRectF(0, 0, 2000, 2000))
         self.view.Antialiasing = True
         self.setBackground('w')
-        self.mW.iM.Instrument_Unloaded.connect(self.clearComps)
+        self.iM.Instrument_Saving.connect(self.updateiViewState)
+        self.iM.Instrument_Unloaded.connect(self.clearComps)
+        self.iM.Instrument_Loaded.connect(self.loadComps)
+
+        self.iViewCompList = list()
+
+    def updateiViewState(self):
+        for item in self.iViewCompList:
+            item.instrComp.Set_Custom_Field('iViewSettings', item.onSave())
+
+    def loadComps(self):
+        compList = self.iM.Get_Instrument_Components()
+        for comp in compList:
+            if(comp.Get_Standard_Field('triggerComp') is False):
+                try:
+                    ivs = comp.Get_Custom_Field('iViewSettings')
+                    self.addiViewComp(comp, ivs['x'], ivs['y'], ivs['r'])
+                except:
+                    pass
 
     def dragEnterEvent(self, e):
         if(e.mimeData().text() == "compDrag"):
@@ -411,17 +420,18 @@ class iView(pg.GraphicsWindow):
         text = stream.readQString()
         index = stream2.readInt()
 
-        result = self.mW.iM.addCompByIndex(index)
+        comp = self.iM.Add_Component(self.iM.Get_Component_Model_By_Index(index))
 
-        if result is not None:
-            m = iViewComponent(self.mW, result, self, width=1, height=1, pos=(dropX, dropY))
-            self.view.addItem(m)
-            result.registeriViewComponent(m)
+        if comp is not None:
+            m = self.addiViewComp(comp, dropX, dropY, 0)
+            comp.Set_Custom_Field('iViewSettings', m.onSave())
 
-    def addComp(self, comp, x, y, r):
-        m = iViewComponent(self.mW, comp, self, width=1, height=1, pos=(x, y), angle=r)
+
+    def addiViewComp(self, comp, x, y, r):
+        m = iViewComponent(self.instrumentWidget, comp, self, width=1, height=1, pos=(x, y), angle=r)
         self.view.addItem(m)
-        comp.registeriViewComponent(m)
+        self.iViewCompList.append(m)
+        return m
 
     def clearComps(self):
         self.view.clear()

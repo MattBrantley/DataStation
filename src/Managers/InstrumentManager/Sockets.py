@@ -24,10 +24,10 @@ class Socket(QObject):
 ##### DataStation Interface Functions #####
 
     def readyCheck(self):
-        if(self.getAttachedSource() is not None):
-            return readyCheckPacket('Socket [' + self.name + ']', DSConstants.READY_CHECK_READY)
+        if(self.getSource() is not None):
+            return readyCheckPacket('Socket [' + self.socketSettings['name'] + ']', DSConstants.READY_CHECK_READY)
         else:
-            return readyCheckPacket('Socket [' + self.name + ']', DSConstants.READY_CHECK_ERROR, msg='Socket Has No Source!')
+            return readyCheckPacket('Socket [' + self.socketSettings['name'] + ']', DSConstants.READY_CHECK_ERROR, msg='Socket Has No Source!')
 
     def getUUID(self):
         return self.socketSettings['uuid']

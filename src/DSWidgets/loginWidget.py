@@ -121,10 +121,10 @@ class loginDockWidget(QDockWidget):
         event.accept()
 
     def updateUserProfile(self):
-        if(any(self.mW.workspaceManager.userProfile) and ('url' in self.mW.workspaceManager.userProfile)):
-            self.mW.postLog('Updating User Profile... (' + self.mW.workspaceManager.userProfile['url'] + ').. ', DSConstants.LOG_PRIORITY_HIGH)        
-            with open(self.mW.workspaceManager.userProfile['url'], 'w') as file:
-                json.dump(self.mW.workspaceManager.userProfile, file)
+        if(any(self.mW.wM.userProfile) and ('url' in self.mW.wM.userProfile)):
+            self.mW.postLog('Updating User Profile... (' + self.mW.wM.userProfile['url'] + ').. ', DSConstants.LOG_PRIORITY_HIGH)        
+            with open(self.mW.wM.userProfile['url'], 'w') as file:
+                json.dump(self.mW.wM.userProfile, file)
                 time.sleep(1) #NOT ELEGANT - NEED CROSS PLATFORM SOLUTION
         else:
             self.mW.postLog('Error Updating User Profile or No Profile Loaded.', DSConstants.LOG_PRIORITY_HIGH)        

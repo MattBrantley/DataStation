@@ -10,8 +10,8 @@ class controlWidget(QDockWidget):
     def __init__(self, mW):
         super().__init__("Instrument Control")
         self.mW = mW
-        self.instrumentManager = None
-        self.hardwareManager = None
+        self.iM = mW.iM
+        self.hM = mW.hM
         self.readyCheckMessages = list()
 
         self.mainLayout = QHBoxLayout()
@@ -33,16 +33,9 @@ class controlWidget(QDockWidget):
 
         self.setStatus(DSConstants.STATUS_NOT_READY)
 
-    def registerManagers(self, instrumentManager, hardwareManager):
-        self.instrumentManager = instrumentManager
-        self.hardwareManager = hardwareManager
-
-        self.instrumentManager.Sequence_Loaded.connect(self.readyChecks)
-        self.instrumentManager.Instrument_Loaded.connect(self.readyChecks)
-        self.instrumentManager.Instrument_Modified.connect(self.readyChecks)
-        self.instrumentManager.Events_Modified.connect(self.readyChecks)
-        self.instrumentManager.Socket_Attached.connect(self.readyChecks)
-        self.hardwareManager.Hardware_Modified.connect(self.readyChecks)
+        self.iM.Sequence_Loaded.connect(self.readyChecks)
+        self.iM.Instrument_Loaded.connect(self.readyChecks)
+        self.iM.Socket_Attached.connect(self.readyChecks)
 
     def initButtons(self):
         dir = os.path.dirname(os.path.dirname(__file__))
@@ -86,7 +79,7 @@ class controlWidget(QDockWidget):
 
     def runOncePressed(self):
         if(self.readyChecks()):
-            self.runInstrumentLoop()
+            self.hM.Run_Sequence()
 
     def addReadyCheckMessage(self, message):
         self.readyCheckMessages.append(message)
@@ -124,27 +117,26 @@ class controlWidget(QDockWidget):
 
     def configChanged(self):
         self.setStatus(DSConstants.STATUS_READY_CHECKING)
-        if(self.instrumentManager is not None and self.hardwareManager is not None):
-            if(self.statusDisplayWidget.status == DSConstants.STATUS_READY or self.statusDisplayWidget.status == DSConstants.STATUS_NOT_READY or self.statusDisplayWidget.status == DSConstants.STATUS_READY_CHECKING):
-                if(self.readyChecks() is True):
-                    self.setStatus(DSConstants.STATUS_READY)
-                else:
-                    self.setStatus(DSConstants.STATUS_NOT_READY)
+        if(self.statusDisplayWidget.status == DSConstants.STATUS_READY or self.statusDisplayWidget.status == DSConstants.STATUS_NOT_READY or self.statusDisplayWidget.status == DSConstants.STATUS_READY_CHECKING):
+            if(self.readyChecks() is True):
+                self.setStatus(DSConstants.STATUS_READY)
+            else:
+                self.setStatus(DSConstants.STATUS_NOT_READY)
 
     def readyChecks(self):
         self.readyCheckMessages.clear()
         ready = True
 
-        instrumentManagerResults = self.instrumentManager.readyCheck()
-        if(instrumentManagerResults.readyStatus is DSConstants.READY_CHECK_ERROR):
+        iMResults = self.iM.Do_Ready_Check()
+        if(iMResults.readyStatus is DSConstants.READY_CHECK_ERROR):
             ready = False
-        for msg in instrumentManagerResults.generateMessages(-1):
+        for msg in iMResults.generateMessages(-1):
             self.addReadyCheckMessage(msg)
 
-        hardwareManagerResults = self.hardwareManager.readyCheck()
-        if(hardwareManagerResults.readyStatus is DSConstants.READY_CHECK_ERROR):
+        hMResults = self.hM.Do_Ready_Check()
+        if(hMResults.readyStatus is DSConstants.READY_CHECK_ERROR):
             ready = False
-        for msg in hardwareManagerResults.generateMessages(-1):
+        for msg in hMResults.generateMessages(-1):
             self.addReadyCheckMessage(msg)
 
         return ready
@@ -204,9 +196,6 @@ class controlWidget(QDockWidget):
             self.readyCheckInfoButton.setToInfo()
 
         self.readyCheckInfoButton.setMessageCount(len(self.readyCheckMessages))
-
-    def runInstrumentLoop(self):
-        self.hardwareManager.onRun()
 
 class readyCheckPacket():
 

@@ -8,13 +8,6 @@ from decimal import Decimal
 from DSWidgets.controlWidget import readyCheckPacket
 
 class Component(QObject):
-    #Component_Modified = pyqtSignal(object)
-
-    #Events_Modified = pyqtSignal(object)
-
-    #Socket_Attached = pyqtSignal(object)
-    #Socket_Unattached = pyqtSignal(object)
-
     indexMe = True
     componentType = 'Default Component'
     componentIdentifier = 'DefComp'
@@ -26,6 +19,28 @@ class Component(QObject):
     valid = False
     isTriggerComponent = False
 
+############################################################################################
+#################################### EXTERNAL FUNCTIONS ####################################
+
+    def Get_Standard_Field(self, field):
+        if(field in self.compSettings):
+            return self.compSettings[field]
+        else:
+            return None
+
+    def Get_Custom_Field(self, field):
+        if(field in self.compSettings['customFields']):
+            return self.compSettings['customFields'][field]
+        else:
+            return None
+
+    def Set_Custom_Field(self, field, data):
+        self.compSettings['customFields'][field] = data
+        return True
+
+############################################################################################
+#################################### INTERNAL USER ONLY ####################################
+
     def __init__(self, mW, **kwargs):
         super().__init__()
         self.allowOverlappingEvents = False
@@ -35,9 +50,10 @@ class Component(QObject):
         self.compSettings['showSequencer'] = False
         self.compSettings['uuid'] = str(uuid.uuid4())
         self.compSettings['triggerComp'] = False
+        self.compSettings['customFields'] = dict()
         self.instr = None           #Factory does not write this. IT's in the very next line in Instrument thought.
         self.mW = mW                #Factory does not write this. It's in the very next line in Instrument though.
-        self.iM = None
+        self.iM = None              #Factory does not write this. It's in the very next line in Instrument though.
         self.name = kwargs.get('name', self.componentType)
         self.socketList = list()
         self.pathDataPackets = list()
@@ -48,7 +64,7 @@ class Component(QObject):
         self.plotItem = None
         self.sequencerDrawState = False
 
-##### Datastation Interface Functions #####
+##### Datastation Reserved Functions #####
 
     def readyCheck(self):
         subs = list()
@@ -97,8 +113,6 @@ class Component(QObject):
 
     def socketDetatched(self, socket):
         self.instr.socketDetatched(socket, self)
-
-    def program
 
 ##### Functions Over-Ridden By Factoried Components #####
 
@@ -156,8 +170,8 @@ class Component(QObject):
         savePacket['compType'] = self.componentType
         savePacket['compIdentifier'] = self.componentIdentifier
         savePacket['triggerComp'] = self.isTriggerComponent
-        if(hasattr(self, 'iViewComponent')):
-            savePacket['iViewSettings'] = self.iViewComponent.onSave()
+        #if(hasattr(self, 'iViewComponent')):
+        #    savePacket['iViewSettings'] = self.iViewComponent.onSave()
         savePacket['sockets'] = self.saveSockets()
 
         return savePacket
@@ -203,7 +217,7 @@ class Component(QObject):
 
     def reprogramSourceTargets(self):
         for socket in self.socketList:
-            source = socket.getAttachedSource()
+            source = socket.getSource()
             if(source is not None):
                 source.reprogram()
 
@@ -230,7 +244,7 @@ class Component(QObject):
     def saveSockets(self):
         sockets = list()
         for socket in self.socketList:
-            sockets.append(socket.onSave())
+            sockets.append(socket.savePacket())
         return sockets
 
     def loadSockets(self, sockets):
@@ -267,7 +281,7 @@ class Component(QObject):
         self.sequencerEditWidget.checkEventOverlaps()
 
         #self.Events_Modified.emit(self)
-        self.iM.eventsMofieid(self)
+        self.iM.eventsModified(self)
 
 ##### Config Widget #####
 
@@ -336,7 +350,7 @@ class sequenceEditWidget(QDockWidget):
             self.compParent.mW.postLog('Event has unknown type (' + eventData['type'] + ') for object type (' + self.compParent.componentType + ')!!', DSConstants.LOG_PRIORITY_HIGH)
         
         #self.Events_Modified.emit(self)
-        self.iM.eventsMofieid(self)
+        self.iM.eventsModified(self)
 
     def newEvent(self):
         rowCount = self.table.rowCount()
@@ -773,7 +787,7 @@ class ComponentConfigWidget(QDockWidget):
     doNotAutoPopulate = True
 
     def __init__(self, compParent):
-        super().__init__('Config: ' + compParent.name, parent=compParent.iM.instrumentWidget)
+        super().__init__('Config: ' + compParent.name)
         self.compParent = compParent
         self.setFeatures(QDockWidget.DockWidgetClosable)
         self.setFloating(True)

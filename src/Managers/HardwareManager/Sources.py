@@ -9,6 +9,17 @@ from DSWidgets.controlWidget import readyCheckPacket
 import numpy as np
 
 class Source():
+############################################################################################
+#################################### EXTERNAL FUNCTIONS ####################################
+
+    def Get_Source_Name(self):
+        return self.sourceSettings['name']
+
+    def Get_Source_Connector_ID(self):
+        return self.sourceSettings['physConID']
+
+############################################################################################
+#################################### INTERNAL USER ONLY ####################################
 
     def __init__(self, hWare, name, physConID, trigger=False):
         self.sourceSettings = dict()
@@ -17,6 +28,7 @@ class Source():
         self.sourceSettings['physConID'] = physConID
         self.sourceSettings['trigger'] = trigger
         self.sourceSettings['filterInputSource'] = None
+        self.sourceSettings['enabled'] = False
 
         paths = list()
         paths.append(None)

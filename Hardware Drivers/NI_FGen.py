@@ -1,4 +1,4 @@
-from Managers.HardwareManager.Hardware_Object import Hardware_Object, hardwareWorker, hwm
+from Managers.HardwareManager.hardwareObject import hardwareObject, hardwareWorker, hwm
 from PyQt5.Qt import *
 from Managers.HardwareManager.Sources import *
 import os, traceback, math
@@ -7,7 +7,7 @@ import nidaqmx.system
 import nifgen
 from multiprocessing import Process, Queue, Pipe
 
-class Hardware_Driver(Hardware_Object):
+class Hardware_Driver(hardwareObject):
     hardwareType = 'NI_FGen'
     hardwareIdentifier = 'NI_FGen_MRB'
     hardwareVersion = '1.0'

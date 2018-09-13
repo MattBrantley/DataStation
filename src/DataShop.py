@@ -122,17 +122,17 @@ class mainWindow(QMainWindow):
         app.processEvents()
 
     def initManagers(self):
-        self.wM = WorkspaceManager(self)
-        self.wM.initUserScriptController()
-        self.wM.initDatabaseCommManager()
+        self.wM = WorkspaceManager(self)        # WORKSPACE CONTROLLER
+        self.wM.initUserScriptController()          # USER SCRIPTS
+        self.wM.initDatabaseCommManager()           # DATABASE COMM
 
-        self.iM = InstrumentManager(self)
-        self.iM.loadComponents()
+        self.iM = InstrumentManager(self)       # INSTRUMENT MANAGER
+        self.iM.loadComponents()                    # USER COMPONENTS
 
-        self.hM = HardwareManager(self)
-        self.hM.loadFilters()
-        self.hM.loadHardwareDrivers()
-        self.hM.loadLabviewInterface()
+        self.hM = HardwareManager(self)         # HARDWARE MANAGER
+        self.hM.loadFilters()                       # USER FILTERS
+        self.hM.loadHardwareDrivers()               # HARDWARE DRIVERS
+        self.hM.loadLabviewInterface()              # LABVIEW INTERFACE
 
         self.wM.connections(self.iM, self.hM)
         self.iM.connections(self.wM, self.hM)
@@ -150,32 +150,37 @@ class mainWindow(QMainWindow):
 
         self.workspaceTreeDockWidget = workspaceTreeDockWidget(self)
         self.workspaceTreeDockWidget.setObjectName('workspaceTreeDockWidget')
+
         self.settingsDockWidget = settingsDockWidget(self)
         self.settingsDockWidget.setObjectName('settingsDockWidget')
+
         self.inspectorDockWidget = inspectorDockWidget(self)
         self.inspectorDockWidget.setObjectName('inspectorDockWidget')
+
         self.editorWidget = editorWidget(self)
         self.editorWidget.setObjectName('editorWidget')
+
         self.sequencerDockWidget = sequencerDockWidget(self)
         self.sequencerDockWidget.setObjectName('sequencerDockWidget')
-        self.instrumentWidget = instrumentWidget(self, self.iM)
+
+        self.instrumentWidget = instrumentWidget(self)
         self.instrumentWidget.setObjectName('instrumentWidget')
-        self.iM.instrumentWidget = self.instrumentWidget #HOTFIX - Order of Execution Issue... NOT PRETTY
+
         self.newsWidget = newsWidget(self)
         self.newsWidget.setObjectName('newsWidget')
-        self.hardwareWidget = hardwareWidget(self, self.iM, self.hM)
+
+        self.hardwareWidget = hardwareWidget(self)
         self.hardwareWidget.setObjectName('hardwareWidget')
 
         self.wM.workspaceTreeWidget = self.workspaceTreeDockWidget.workspaceTreeWidget
         self.wM.workspaceTreeWidget.setObjectName('workspaceTreeWidget')
 
-        self.controlWidget.registerManagers(self.instrumentWidget.iM, self.hardwareWidget.hM)
 
     def finishInitWithUser(self, userData):
         self.postLog('User Profile Selected: ' + userData['First Name'] + ' ' + userData['Last Name'], DSConstants.LOG_PRIORITY_HIGH)
         self.wM.userProfile = userData
-        self.updateState(DSConstants.MW_STATE_NO_WORKSPACE)
         
+        self.initMenu()
         self.statusBar()
 
         self.logDockWidget.setFeatures(QDockWidget.AllDockWidgetFeatures)
@@ -222,35 +227,39 @@ class mainWindow(QMainWindow):
         self.DataStation_Loaded.emit()
         self.postLog('Data Station Finished Loading!', DSConstants.LOG_PRIORITY_HIGH)
 
+    def initActions(self):
+        self.exitAction = QAction(QIcon(os.path.join(self.srcDir, r'icons2\minimize.png')), 'Exit', self)
+        self.exitAction.setShortcut('Ctrl+Q')
+        self.exitAction.setStatusTip('Exit Application')
+        self.exitAction.triggered.connect(self.close)
 
-    def updateState(self, state):
-        if(state == DSConstants.MW_STATE_NO_WORKSPACE):
-            self.exitAction.setEnabled(True)
-            self.newAction.setEnabled(True)
-            self.saveAction.setEnabled(False)
-            self.openAction.setEnabled(True)
-            self.settingsAction.setEnabled(False)
-            self.importAction.setEnabled(False)
-            self.importMenu.setEnabled(False)
-            self.workspaceTreeDockWidget.workspaceTreeWidget.setAcceptDrops(False)
-        elif(state == DSConstants.MW_STATE_WORKSPACE_LOADED):
-            self.exitAction.setEnabled(True)
-            self.newAction.setEnabled(True)
-            self.saveAction.setEnabled(True)
-            self.openAction.setEnabled(True)
-            self.settingsAction.setEnabled(False)
-            self.importAction.setEnabled(True)
-            self.importMenu.setEnabled(True)
-            self.workspaceTreeDockWidget.workspaceTreeWidget.setAcceptDrops(True)
-        else:
-            self.exitAction.setEnabled(False)
-            self.newAction.setEnabled(False)
-            self.saveAction.setEnabled(False)
-            self.openAction.setEnabled(False)
-            self.settingsAction.setEnabled(False)
-            self.importAction.setEnabled(False)
-            self.importMenu.setEnabled(False)
-            self.workspaceTreeDockWidget.workspaceTreeWidget.setAcceptDrops(False)
+    def initMenu(self):
+        self.menubar = self.menuBar()
+        self.fileMenu = self.menubar.addMenu('&File')
+        self.fileMenu.addSeparator()
+        self.fileMenu.addAction(self.exitAction)
+
+        self.viewWindowsMenu = QMenu('Windows')
+        self.viewWindowsMenu.aboutToShow.connect(self.populateViewWindowMenu)
+
+        self.viewMenu = self.menubar.addMenu('&View')
+        self.viewMenu.addMenu(self.viewWindowsMenu)
+
+    def populateViewWindowMenu(self):
+        windows = self.findChildren(QDockWidget)
+        self.viewWindowsMenu.clear()
+        for window in windows:
+            if(hasattr(window, 'doNotAutoPopulate') is False):
+                action = QAction(str(window.windowTitle()), self)
+                action.setCheckable(True)
+                action.setChecked(window.isVisible())
+
+                if(window.isVisible()):
+                    action.triggered.connect(window.hide)
+                else:
+                    action.triggered.connect(window.show)
+
+                self.viewWindowsMenu.addAction(action)
 
     def postLog(self, key, level, **kwargs):
         useKey = kwargs.get('textKey', False)
@@ -261,7 +270,7 @@ class mainWindow(QMainWindow):
 
         if(self.logDetail >= level):
             self.logDockWidget.postLog(text, **kwargs)
-            print(text)
+            #print(text)
             app.processEvents()
 
     def updateWindowStates(self):
@@ -281,26 +290,9 @@ class mainWindow(QMainWindow):
         #These can be restored to show but shouldn't be.
         self.hardwareWidget.filterStackWidget.hide()
 
-    def populateViewWindowMenu(self):
-        windows = self.findChildren(QDockWidget)
-        self.viewWindowsMenu.clear()
-        for window in windows:
-            if(hasattr(window, 'doNotAutoPopulate') is False):
-                action = QAction(str(window.windowTitle()), self)
-                action.setCheckable(True)
-                action.setChecked(window.isVisible())
-
-                if(window.isVisible()):
-                    action.triggered.connect(window.hide)
-                else:
-                    action.triggered.connect(window.show)
-
-                self.viewWindowsMenu.addAction(action)
-
     def softExit(self):
         self.postLog('Shutting down Datastation!', DSConstants.LOG_PRIORITY_HIGH)
-        self.trayIcon.hide()
-        print('DataStation_Closing.emit()')
+        #self.trayIcon.hide()
         self.DataStation_Closing.emit()
         self.DataStation_Closing_Final.emit()
 
