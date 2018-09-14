@@ -7,6 +7,23 @@ from Constants import DSConstants as DSConstants
 from DSWidgets.controlWidget import readyCheckPacket
 
 class Socket(QObject):
+############################################################################################
+#################################### EXTERNAL FUNCTIONS ####################################
+
+    def Get_Name(self):
+        return self.sourceSettings['name']
+
+    def Get_Source(self):
+        return self.getSource()
+
+    def Get_UUID(self):
+        return self.sourceSettings['uuid']
+
+    def Get_Input_UUID(self):
+        return self.sourceSettings['filterInputSource']
+
+############################################################################################
+#################################### INTERNAL USER ONLY ####################################
 
     def __init__(self, cP, name):
         super().__init__()
@@ -15,7 +32,6 @@ class Socket(QObject):
         self.socketSettings['name'] = name
         self.socketSettings['filterInputSource'] = None
         self.socketSettings['uuid'] = str(uuid.uuid4())
-        self.socketSettings['paths'] = None
         self.socketSettings['drivingSocket'] = True
         self.cP = cP
         self.iM = cP.iM

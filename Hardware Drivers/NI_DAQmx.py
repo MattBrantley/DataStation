@@ -1,6 +1,5 @@
 from Managers.HardwareManager.hardwareObject import hardwareObject, hardwareWorker, hwm
 from PyQt5.Qt import *
-from Managers.HardwareManager.Sources import *
 import os, traceback, math
 import numpy as np
 import nidaqmx.system
@@ -94,23 +93,15 @@ class Hardware_Driver(hardwareObject):
         self.clearSourceList()
         if(self.hardwareSettings['deviceName'] in self.getDeviceList()):
             device = nidaqmx.system.Device(self.hardwareSettings['deviceName'])
-            self.forceNoUpdatesOnSourceAdd(True) #FOR SPEED!
             for chan in device.ai_physical_chans:
-                source = AISource(self, '['+self.hardwareSettings['deviceName']+'] '+chan.name, -10, 10, 0.1, chan.name)
-                self.addSource(source)
+                self.Add_AISource(chan.name, -10, 10, 0.1)
             for chan in device.ao_physical_chans:
-                source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] '+chan.name, -10, 10, 0.1, chan.name)
-                self.addSource(source)
+                self.Add_AOSource(chan.name, -10, 10, 0.1)
             for chan in device.di_lines:
-                source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+chan.name, chan.name, trigger=True)
-                self.addSource(source)
+                self.Add_DISource(chan.name, trigger=True)
             for chan in device.do_lines:
-                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+chan.name, chan.name)
-                #self.addSource(source)
-
-            self.forceNoUpdatesOnSourceAdd(False) #Have to turn it off or things go awry!
+                self.Add_DOSource(chan.name)
         else:
-            #self.Config_Modified.emit(self)
             self.hM.configModified(self)
 
     def getDeviceList(self):

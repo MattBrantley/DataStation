@@ -12,11 +12,17 @@ class Source():
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
 
-    def Get_Source_Name(self):
+    def Get_Name(self):
         return self.sourceSettings['name']
 
-    def Get_Source_Connector_ID(self):
+    def Get_Connector_ID(self):
         return self.sourceSettings['physConID']
+
+    def Get_Sockets(self):
+        return self.getSocket()
+
+    def Get_UUID(self):
+        return self.sourceSettings['uuid']
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -27,16 +33,12 @@ class Source():
         self.sourceSettings['uuid'] = str(uuid.uuid4())
         self.sourceSettings['physConID'] = physConID
         self.sourceSettings['trigger'] = trigger
-        self.sourceSettings['filterInputSource'] = None
         self.sourceSettings['enabled'] = False
 
-        paths = list()
-        paths.append(None)
-        self.sourceSettings['paths'] = paths
-
         self.hWare = hWare
-        self.hM = hWare.hM
-        self.mW = hWare.hM.mW
+        self.mW = hWare.mW
+        self.iM = hWare.mW.iM
+        self.hM = hWare.mW.hM
         
 ##### DataStation Interface Functions #####
     
@@ -57,24 +59,24 @@ class Source():
 ##### Search Functions #####
 
     def getSockets(self):
-        sockets = list()
-        for path in self.sourceSettings['paths']:
-            if(path is not None):
-                if(issubclass(type(path), Socket) is True):
-                    sockets.append(path)
-                else:
-                    result = path.getSockets()
-                    if(result is not None):
-                        for socket in result:
-                            sockets.append(socket)
-        return sockets
 
-    def getSource(self):
-        return self
+        
+
+        #sockets = list()
+        #for path in self.sourceSettings['paths']:
+        #    if(path is not None):
+        #        if(issubclass(type(path), Socket) is True):
+        #            sockets.append(path)
+        #        else:
+        #            result = path.getSockets()
+        #            if(result is not None):
+        #                for socket in result:
+        #                    sockets.append(socket)
+        #return sockets
 
 ##### Functions Over-Ridden By Factoried Sources #####
 
-    def procReverseParent(self, pathNo, packetIn):
+    def procReverseParent(self, packetIn):
         #Source got the packet!
         return self.parsePacket(packetIn)
 

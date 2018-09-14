@@ -70,7 +70,7 @@ class filterView(QGraphicsView):
         self.rowDrawOffset = QPoint(0, 0)
         self.columnDrawOffset = QPoint(0, 0)
         self.rootSource = rootSource
-        self.rootObject = filterWidgetObject(rootSource, self, self.mainScene, QColor(239, 154, 154), topRound=True)
+        self.rootObject = sourceWidgetObject(rootSource, self, self.mainScene)
         self.filterObjList.append(self.rootObject)
 
         self.drawOffset = self.drawOffset + QPoint(0, self.rowBuffer)
@@ -87,10 +87,11 @@ class filterView(QGraphicsView):
 
     def addFilterObject(self, filterObj, branchRoot, curColumn):
         if(issubclass(type(filterObj), Filter)):
-            filterObject = filterWidgetObject(filterObj, self, self.mainScene, QColor(165, 214, 167), topRound=False)
+            filterObject = filterWidgetObject(filterObj, self, self.mainScene)
+            self.filterObjList.append(filterObject)
         if(issubclass(type(filterObj), Socket)):
-            filterObject = filterWidgetObject(filterObj, self, self.mainScene, QColor(129, 212, 250), botRound=True)
-        self.filterObjList.append(filterObject)
+            socketObject = socketWidgetObject(filterObj, self, self.mainScene)
+            self.filterObjList.append(socketObject)
 
         if(branchRoot is True):
             newCol = filterViewColumn(filterObject, self)
@@ -158,7 +159,7 @@ class filterScene(QGraphicsScene):
             vbar = self.widget.filterView.verticalScrollBar()
             vbar.setValue(vbar.value() + deltaPoint.y())
 
-class filterWidgetObject():
+class widgetObject():
 
     def __init__(self, sourceObject, view, scene, color, topRound=False, botRound=False, topRadius=5, botRadius=5):
         self.sourceObject = sourceObject
@@ -173,19 +174,7 @@ class filterWidgetObject():
         self.botRadius = botRadius
         self.arrowSize = 16
         self.pos = QPointF(0, 0)
-        self.rect = QRectF(0, 0, 250, 80 + self.arrowGap*(len(self.sourceObject.paths)-1))
         self.arrowList = list()
-
-        self.type = "Unknown"
-        if(issubclass(type(self.sourceObject), Filter)):
-            self.type = "Filter"
-            self.descString = 'Filter: ' + self.sourceObject.filterType
-        if(issubclass(type(self.sourceObject), Source)):
-            self.type = "Source"
-            self.descString = str(type(self.sourceObject).__name__) + ': ' + self.sourceObject.name
-        if(issubclass(type(self.sourceObject), Socket)):
-            self.type = "Socket"
-            self.descString = "Socket: " + self.sourceObject.name
 
     def pointOfPathArrow(self, pathNum):
         for arrow in self.arrowList:
@@ -198,6 +187,29 @@ class filterWidgetObject():
         self.pos = pos
 
     def drawObject(self, colOffset):
+        pass
+
+    def closeButton(self):
+        self.sourceObject.callRemove()
+        self.view.drawScene(self.view.rootSource)
+
+    def mousePressed(self, pos):
+        pass
+
+    def checkColliders(self, pos):
+        if(self.rect.contains(pos)):
+            return True
+        else:
+            return False
+
+class filterWidgetObject(widgetObject):
+    def __init__(self, sourceObject, view, scene):
+        super().__init__(sourceObject, view, scene, QColor(165, 214, 167))
+        self.rect = QRectF(0, 0, 250, 80 + self.arrowGap*(len(self.sourceObject.paths)-1))
+        self.type = "Filter"
+        self.descString = 'Filter: ' + self.sourceObject.filterType
+    
+    def drawObject(self, colOffset):
         self.pos = self.pos + colOffset
         self.rect.translate(self.pos)
         self.boxOutline = roundedRectObject(self, self.rect, 20, self.topRound, self.botRound, self.backgroundBrush)
@@ -206,11 +218,10 @@ class filterWidgetObject():
         self.descStringObject.setPos(self.pos + QPoint(10, 10))
         self.scene.addItem(self.descStringObject)
 
-        if(self.type != "Source"):
-            buttonSize = 12
-            self.xButton = closeObject(self, buttonSize, self.pos + QPoint(self.rect.width()-buttonSize-10, 10))
-            self.xButton.setZValue(10)
-            self.scene.addItem(self.xButton)
+        buttonSize = 12
+        self.xButton = closeObject(self, buttonSize, self.pos + QPoint(self.rect.width()-buttonSize-10, 10))
+        self.xButton.setZValue(10)
+        self.scene.addItem(self.xButton)
 
         rightArrowPos = QPointF(self.rect.width()-self.arrowSize, self.rect.height()-self.arrowSize-15)
         pathNo = 1
@@ -229,9 +240,16 @@ class filterWidgetObject():
 
         self.scene.addItem(self.boxOutline)
 
-    def closeButton(self):
-        self.sourceObject.callRemove()
-        self.view.drawScene(self.view.rootSource)
+    def arrowPressed(self, pathNo, pos):
+        menu = QMenu()
+
+        addFilterMenu = menu.addMenu('Add Filter')
+        filterMenuAction = filterSelectionWidget(self, menu, pathNo)
+        addSocketMenu = menu.addMenu("Add Socket")
+        socketMenuAction = socketSelectionWidget(self, menu, pathNo)
+        addFilterMenu.addAction(filterMenuAction)
+        addSocketMenu.addAction(socketMenuAction)
+        action = menu.exec_(pos)
 
     def addFilter(self, Filter, pathNo):
         tempFilter = type(Filter)(self.view.parent.hM)
@@ -246,6 +264,30 @@ class filterWidgetObject():
         self.view.drawScene(self.view.rootSource)
         self.view.parent.mW.hardwareWidget.iScene.connectPlugsAndSockets()
 
+class sourceWidgetObject(widgetObject):
+    def __init__(self, sourceObject, view, scene):
+        super().__init__(sourceObject, view, scene, QColor(239, 154, 154), topRound=True)
+        self.rect = QRectF(0, 0, 250, 80)
+        self.type = "Source"
+        self.descString = str(type(self.sourceObject).__name__) + ': ' + self.sourceObject.name
+    
+    def drawObject(self, colOffset):
+        self.pos = self.pos + colOffset
+        self.rect.translate(self.pos)
+        self.boxOutline = roundedRectObject(self, self.rect, 20, self.topRound, self.botRound, self.backgroundBrush)
+
+        self.descStringObject = QGraphicsSimpleTextItem(self.descString)
+        self.descStringObject.setPos(self.pos + QPoint(10, 10))
+        self.scene.addItem(self.descStringObject)
+
+        botArrowPos = QPointF(self.rect.width()/2 - self.arrowSize/2, self.rect.height() - self.arrowSize)
+        arrow = triangleObject(self, self.arrowSize, 'down', self.pos + botArrowPos, pathNo)
+        arrow.setZValue(5)
+        self.scene.addItem(arrow)
+        self.arrowList.append(arrow)
+
+        self.scene.addItem(self.boxOutline)
+    
     def arrowPressed(self, pathNo, pos):
         menu = QMenu()
 
@@ -257,14 +299,41 @@ class filterWidgetObject():
         addSocketMenu.addAction(socketMenuAction)
         action = menu.exec_(pos)
 
-    def mousePressed(self, pos):
-        pass
+    def addFilter(self, Filter, pathNo):
+        tempFilter = type(Filter)(self.view.parent.hM)
+        tempFilter.onCreationParent()
+        self.sourceObject.addFilter(pathNo, tempFilter)
+        self.view.drawScene(self.view.rootSource)
 
-    def checkColliders(self, pos):
-        if(self.rect.contains(pos)):
-            return True
-        else:
-            return False
+    def addSocket(self, socket, pathNo):
+        socket.socket.unattach()
+        self.sourceObject.attachSocket(pathNo, socket.socket)
+        socket.socket.onAttach(self.sourceObject)
+        self.view.drawScene(self.view.rootSource)
+        self.view.parent.mW.hardwareWidget.iScene.connectPlugsAndSockets()
+        
+class socketWidgetObject(widgetObject):
+    def __init__(self, sourceObject, view, scene):
+        super().__init__(sourceObject, view, scene, QColor(129, 212, 250), botRound=True)
+        self.rect = QRectF(0, 0, 250, 80)
+        self.type = "Socket"
+        self.descString = "Socket: " + self.sourceObject.name
+    
+    def drawObject(self, colOffset):
+        self.pos = self.pos + colOffset
+        self.rect.translate(self.pos)
+        self.boxOutline = roundedRectObject(self, self.rect, 20, self.topRound, self.botRound, self.backgroundBrush)
+
+        self.descStringObject = QGraphicsSimpleTextItem(self.descString)
+        self.descStringObject.setPos(self.pos + QPoint(10, 10))
+        self.scene.addItem(self.descStringObject)
+
+        buttonSize = 12
+        self.xButton = closeObject(self, buttonSize, self.pos + QPoint(self.rect.width()-buttonSize-10, 10))
+        self.xButton.setZValue(10)
+        self.scene.addItem(self.xButton)
+
+        self.scene.addItem(self.boxOutline)
 
 class filterSelectionWidget(QWidgetAction):
     def __init__(self, parent, menu, pathNo):
@@ -274,8 +343,6 @@ class filterSelectionWidget(QWidgetAction):
         self.pathNo = pathNo
         self.pWidget = QWidget()
         self.pLayout = QVBoxLayout()
-        #self.pLabel = QLabel("Filters:")
-        #self.pLayout.addWidget(self.pLabel)
         self.pSpinBox = QListWidget()
         self.pSpinBox.itemClicked.connect(self.itemClicked)
         self.pLayout.addWidget(self.pSpinBox)

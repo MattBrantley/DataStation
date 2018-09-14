@@ -20,13 +20,16 @@ class HardwareManager(QObject):
     Hardware_State_Saving = pyqtSignal()
 
 ##### Signals: Hardware #####
-    Hardware_Added = pyqtSignal(object)
+    Hardware_Added = pyqtSignal(object) # hardwareObj
     Hardware_Removed = pyqtSignal()
     Hardware_Trigger_Modified = pyqtSignal()
 
 ##### Signals: Sequence #####
     Sequence_Started = pyqtSignal()
     Sequence_Finished = pyqtSignal()
+
+##### Signals: Sources #####
+    Source_Added = pyqtSignal(object, object) # hardwareObj, sourceObj
 
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
@@ -117,6 +120,9 @@ class HardwareManager(QObject):
     def triggerModified(self, hWare):
         pass
 
+    def sourceAdded(self, hardwareObj, sourceObj): # Source_Added
+        self.Source_Added.emit(hardwareObj, sourceObj)
+
 ##### Search Function ######
 
     def getFilterOrSourceByUUID(self, uuid):
@@ -129,6 +135,11 @@ class HardwareManager(QObject):
 
         return None
             
+    def getFiltersWithUUIDAsInput(self, uuid):
+        for Filter in self.filterList:
+            if(Filter.uuid == uuid):
+                return Filter
+
     def loadFilterFromFile(self, filepath):
         class_inst = None
         expected_class = 'User_Filter'

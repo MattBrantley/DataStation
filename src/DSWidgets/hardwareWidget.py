@@ -17,6 +17,7 @@ class hardwareWidget(QDockWidget):
         self.mW = mW
         self.iM = mW.iM
         self.hM = mW.hM
+        self.wM = mW.wM
 
         self.hide()
         self.resize(800, 800)
@@ -29,7 +30,7 @@ class hardwareWidget(QDockWidget):
 
         self.filtersWidget = QWidget()
 
-        self.hardwareWidget = hardwareListWidget(self, self.hM)
+        self.hardwareWidget = hardwareListWidget(self, self.mW)
 
         self.filterStackWidget = filterStackWidget(self, self.mW)
         self.filterStackWidget.setObjectName('filterStackWidget')
@@ -53,7 +54,7 @@ class hardwareWidget(QDockWidget):
         self.gridWidget = QGraphicsView()
         self.gridTransform = QTransform()
         self.gridWidget.setTransform(self.gridTransform)
-        self.iScene = iScene(self, self.gridTransform)
+        self.iScene = iScene(self, self.gridTransform, self.mW)
         gridRect = QRectF(0, 0, 1600, 1600)
         self.tabWidget = QTabWidget()
         self.gridWidget.setSceneRect(gridRect)
@@ -144,15 +145,20 @@ class hardwareWidget(QDockWidget):
 
         self.iScene.connectPlugsAndSockets()
 
+##### Hardware List Widget #####
+
 class hardwareListWidget(QWidget):
 
-    def __init__(self, hardwareWidget, hM):
+    def __init__(self, hardwareWidget, mW):
         super().__init__()
         self.hardwareWidget = hardwareWidget
-        self.hM = hM
+        self.mW = mW
+        self.hM = mW.hM
+        self.iM = mW.iM
+        self.wM = mW.wM
 
         self.mainLayout = QVBoxLayout()
-        self.hardwareList = hardwareListView(self, self.hM)
+        self.hardwareList = hardwareListView(self, self.mW)
         self.setLayout(self.mainLayout)
 
         self.scroll = QScrollArea(self)
@@ -171,52 +177,24 @@ class hardwareListWidget(QWidget):
     def newButtonPressed(self):
         menu = QMenu()
 
-        hardwareMenuAction = hardwareSelectionWidget(self, menu)
+        hardwareMenuAction = hardwareSelectionWidget(self, menu, self.mW)
         menu.addAction(hardwareMenuAction)
         action = menu.exec_(QCursor().pos())
 
     def addHardware(self, hardwareObj):
-        widgetItem = hardwareListItem(self.hardwareList, self.hM, hardwareObj)
+        widgetItem = hardwareListItem(self.hardwareList, self.mW, hardwareObj)
         
         self.hardwareList.addWidget(widgetItem)
 
-class hardwareSelectionWidget(QWidgetAction):
-    def __init__(self, parent, menu):
-        super().__init__(None)
-        self.parent = parent
-        self.menu = menu
-        self.pWidget = QWidget()
-        self.pLayout = QVBoxLayout()
-        self.pSpinBox = QListWidget()
-        self.pSpinBox.itemClicked.connect(self.itemClicked)
-        self.pLayout.addWidget(self.pSpinBox)
-        self.pWidget.setLayout(self.pLayout)
-
-        self.setDefaultWidget(self.pWidget)
-
-        self.populateBox()
-
-    def itemClicked(self):
-        curItem = self.pSpinBox.currentItem()
-        self.parent.hM.Add_Hardware(curItem.hardwareModel)
-        self.menu.close()
-
-    def populateBox(self):
-        for hardwareModel in self.parent.hM.Get_Hardware_Models_Available():
-            self.pSpinBox.addItem(hardwareSelectionItem(hardwareModel.hardwareType, hardwareModel))
-
-class hardwareSelectionItem(QListWidgetItem):
-    def __init__(self, name, hardwareModel):
-        super().__init__(name)
-        self.name = name
-        self.hardwareModel = hardwareModel
-
 class hardwareListView(QWidget):
 
-    def __init__(self, parent, hM):
+    def __init__(self, parent, mW):
         super().__init__()
+        self.mW = mW
+        self.iM = mW.iM
+        self.hM = mW.hM
+        self.wM = mW.wM
         self.parent = parent
-        self.hM = hM
         self.hardwareItemList = list()
         self.mainLayout = QVBoxLayout()
         self.setLayout(self.mainLayout)
@@ -234,12 +212,15 @@ class hardwareListItem(QWidget):
     heightMaximized = 400
     state = 'min'
 
-    def __init__(self, hardwareListView, hM, hardwareObj):
+    def __init__(self, hardwareListView, mW, hardwareObj):
         super().__init__()
+        self.mW = mW
+        self.iM = mW.iM
+        self.hM = mW.hM
+        self.wM = mW.wM
         self.hardwareListView = hardwareListView
-        self.hM = hM
         self.hardwareObj = hardwareObj
-        self.msgWidget = driverMessageWidget()
+        self.msgWidget = driverMessageWidget(self.mW)
 
         self.configButton = QPushButton()
         self.configIcon = QIcon(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'icons5\settings.png'))
@@ -270,6 +251,7 @@ class hardwareListItem(QWidget):
         self.botPortionLayout = QVBoxLayout()
         self.botPortion.setLayout(self.botPortionLayout)
         self.sourceLabel = QLabel("Sources:")
+        self.sourceListWidget = sourceListWidget(self.hardwareObj, self.mW)
         self.botPortionLayout.addWidget(self.sourceLabel)
         self.botPortionLayout.addWidget(self.sourceListWidget)
 
@@ -367,28 +349,83 @@ class hardwareListItem(QWidget):
             self.closeButton()
             return
 
-class sourceListWidget(QListWidget):
-    def __init__(self):
-        super().__init__()
+class hardwareSelectionWidget(QWidgetAction):
+    def __init__(self, parent, menu, mW):
+        super().__init__(None)
+        self.parent = parent
+        self.menu = menu
+        self.mW = mW
+        self.iM = mW.iM
+        self.hM = mW.hM
+        self.wM = mW.wM
+        self.pWidget = QWidget()
+        self.pLayout = QVBoxLayout()
+        self.pSpinBox = QListWidget()
+        self.pSpinBox.itemClicked.connect(self.itemClicked)
+        self.pLayout.addWidget(self.pSpinBox)
+        self.pWidget.setLayout(self.pLayout)
 
-    def addSource(self, source):
-        self.addItem(sourceListItem(source))
+        self.setDefaultWidget(self.pWidget)
+
+        self.populateBox()
+
+    def itemClicked(self):
+        curItem = self.pSpinBox.currentItem()
+        self.parent.hM.Add_Hardware(curItem.hardwareModel)
+        self.menu.close()
+
+    def populateBox(self):
+        for hardwareModel in self.parent.hM.Get_Hardware_Models_Available():
+            self.pSpinBox.addItem(hardwareSelectionItem(hardwareModel.hardwareType, hardwareModel))
+
+class hardwareSelectionItem(QListWidgetItem):
+    def __init__(self, name, hardwareModel):
+        super().__init__(name)
+        self.name = name
+        self.hardwareModel = hardwareModel
+
+##### Source List View Widget #####
+
+class sourceListWidget(QListWidget):
+    def __init__(self, hardwareObj, mW):
+        super().__init__()
+        self.hardwareObj = hardwareObj
+        self.mW = mW
+        self.iM = mW.iM
+        self.hM = mW.hM
+        self.wM = mW.wM
+
+        self.hM.Source_Added.connect(self.addSource)
+
+    def addSource(self, hardwareObj, source):
+        if(hardwareObj is self.hardwareObj):
+            self.addItem(sourceListItem(source, self.mW))
 
     def clearSources(self):
         self.clear()
 
-class sourceListItem(QListTreeItem):
-    def __init__(self, source):
+class sourceListItem(QListWidgetItem):
+    def __init__(self, source, mW):
         super().__init__()
+        self.mW = mW
+        self.iM = mW.iM
+        self.hM = mW.hM
+        self.wM = mW.wM
         self.source = source
         self.setText(self.source.Get_Source_Name())
-        self.setFlags(self.flags() | QtCore.Qt.ItemISUserCheckable)
+        self.setFlags(self.flags() | Qt.ItemIsUserCheckable)
         self.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
 class driverMessageWidget(QListWidget):
-    def __init__(self):
+    def __init__(self, mW):
         super().__init__()
+        self.mW = mW
+        self.iM = mW.iM
+        self.hM = mW.hM
+        self.wM = mW.wM
         self.maximumHeight = 150
+
+##### Connection Grid Widget #####
 
 class iScene(QGraphicsScene):
     marginLeft = 150
@@ -400,8 +437,12 @@ class iScene(QGraphicsScene):
     itemList = list()
     highlightList = list()
 
-    def __init__(self, widget, transform):
+    def __init__(self, widget, transform, mW):
         super().__init__()
+        self.mW = mW
+        self.iM = mW.iM
+        self.hM = mW.hM
+        self.wM = mW.wM
         self.widget = widget
         self.transform = transform
 
@@ -485,12 +526,12 @@ class iScene(QGraphicsScene):
             self.drawColHighlight(col, QColor(255, 255, 117))
 
     def drawRowHighlight(self, row, color):
-        rowObj = iSceneRowHighlight(self, row, color)
+        rowObj = iSceneRowHighlight(self, row, color, self.mW)
         self.addItem(rowObj)
         self.highlightList.append(rowObj)
 
     def drawColHighlight(self, col, color):
-        colObj = iSceneColHighlight(self, col, color)
+        colObj = iSceneColHighlight(self, col, color, self.mW)
         self.addItem(colObj)
         self.highlightList.append(colObj)
 
@@ -544,7 +585,7 @@ class iScene(QGraphicsScene):
             self.clearCol(col)
         if(self.multiConnectSockets is False):
             self.clearRow(row)
-        item = iSceneItem(self, row, col, None, color)
+        item = iSceneItem(self, row, col, None, color, self.mW)
         self.addItem(item)
         self.itemList.append(item)
 
@@ -586,10 +627,14 @@ class iScene(QGraphicsScene):
         return QPointF(tempX, tempY)
 
 class iSceneItem(QGraphicsRectItem):
-    def __init__(self, scene, row, col, status, color):
+    def __init__(self, scene, row, col, status, color, mW):
         self.row = row
         self.col = col
         self.iScene = scene
+        self.mW = mW
+        self.iM = mW.iM
+        self.hM = mW.hM
+        self.wM = mW.wM
         point = self.iScene.getPointAtGrid(row, col)
         super().__init__(point.x()+2, point.y()+2, iScene.cellWidth-4, iScene.cellHeight-4)
         if(color == 'red'):
@@ -598,10 +643,14 @@ class iSceneItem(QGraphicsRectItem):
             self.setBrush(QColor(100, 100, 100))
 
 class iSceneRowHighlight(QGraphicsRectItem):
-    def __init__(self, scene, row, color):
+    def __init__(self, scene, row, color, mW):
         self.row = row
         self.color = color
         self.iScene = scene
+        self.mW = mW
+        self.iM = mW.iM
+        self.hM = mW.hM
+        self.wM = mW.wM
         point = self.iScene.getPointAtGrid(row,0)
         super().__init__(0, point.y(), self.iScene.sceneWidth(), self.iScene.cellHeight)
         self.setBrush(color)
@@ -611,10 +660,14 @@ class iSceneRowHighlight(QGraphicsRectItem):
         self.setZValue(-50)
 
 class iSceneColHighlight(QGraphicsRectItem):
-    def __init__(self, scene, col, color):
+    def __init__(self, scene, col, color, mW):
         self.col = col
         self.color = color
         self.iScene = scene
+        self.mW = mW
+        self.iM = mW.iM
+        self.hM = mW.hM
+        self.wM = mW.wM
         point = self.iScene.getPointAtGrid(0, col)
         super().__init__(point.x(), 0, self.iScene.cellWidth, self.iScene.sceneHeight())
         self.setBrush(color)

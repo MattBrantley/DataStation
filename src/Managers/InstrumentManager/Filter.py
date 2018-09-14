@@ -14,6 +14,29 @@ class Filter():
     iconGraphicSrc = 'default.png'
     numPaths = 1
     valid = False
+############################################################################################
+#################################### EXTERNAL FUNCTIONS ####################################
+
+    def Get_Name(self):
+        return self.filterSettings['name']
+
+    def Get_Source(self):
+        return self.getSource()
+
+    def Get_Sockets(self):
+        return self.getSockets()
+
+    def Get_UUID(self):
+        return self.filterSettings['uuid']
+
+    def Get_Input_UUID(self):
+        return self.filterSettings['filterInputSource']
+
+    def Get_Type(self):
+        return self.filterSettings['filterType']
+
+############################################################################################
+#################################### INTERNAL USER ONLY ####################################
 
     def __init__(self, hM):
         self.filterSettings = dict()

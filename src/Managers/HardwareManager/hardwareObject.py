@@ -28,6 +28,29 @@ class hardwareObject(QObject):
     def Get_Sources_By_Type(self, sourceType):
         return [s for s in self.sourceList if isinstance(s, sourceType)]
 
+    def Clear_Sources(self):
+        self.clearsourceList()
+
+    def Add_AISource(self, name, vMin, vMax, prec):
+        source = AISource(self, '['+self.hardwareSettings['deviceName']+'] '+name, vMin, vMax, prec, name)
+        self.addSource(source)
+        self.hM.sourceAdded(self, source)
+
+    def Add_AOSource(self, name, vMin, vMax, prec):
+        source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] '+name, vMin, vMax, prec, name)
+        self.addSource(source)
+        self.hM.sourceAdded(self, source)
+
+    def Add_DISource(self, name, trigger=True):
+        source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+name, name, trigger=True)
+        self.addSource(source)
+        self.hM.sourceAdded(self, source)
+
+    def Add_DOSource(self, name):
+        source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+name, name)
+        self.addSource(source)
+        self.hM.sourceAdded(self, source)
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
 
@@ -66,6 +89,9 @@ class hardwareObject(QObject):
 
     def program(self, source):
         self.hM.program(self, source)
+
+    def clearSourceList(self):
+        self.sourceList = list()
 
 ##### Functions Over-Ridden By hardwareObjects #####
 
