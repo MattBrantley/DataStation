@@ -2,18 +2,18 @@ from PyQt5.Qt import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import os, sys, imp, math, copy
+from decimal import Decimal
 from src.Constants import DSConstants as DSConstants
 
 class eventListWidget(QDockWidget):
     doNotAutoPopulate = True
-    Events_Modified = pyqtSignal(object)
 
-    def __init__(self, mW, compParent):
-        super().__init__('Sequencer: ' + compParent.compSettings['name'], parent=mW.sequencerDockWidget)
-        self.compParent = compParent
+    def __init__(self, mW, sequencerWidget, comp):
+        super().__init__('Sequencer: ' + comp.Get_Standard_Field('name'), parent=mW.sequencerDockWidget)
+        self.comp = comp
         self.mW = mW
         self.iM = mW.iM
-        self.sequencerWidget = self.compParent.mW.sequencerDockWidget
+        self.sequencerWidget = sequencerWidget
         self.setFeatures(QDockWidget.DockWidgetClosable)
         self.setMinimumSize(QSize(750,450))
         self.setFloating(True)
@@ -21,23 +21,17 @@ class eventListWidget(QDockWidget):
         self.mainWidget = QWidget()
         self.layout = QVBoxLayout()
         self.mainWidget.setLayout(self.layout)
-        self.sequencerEventTypes = compParent.sequencerEventTypes
+        self.eventTypes = comp.Get_Event_Types()
 
         self.layout.addWidget(self.initTableWidget())
         self.layout.addWidget(self.initButtonsWidget())
         self.setWidget(self.mainWidget)
 
     def updateTitle(self):
-        self.setWindowTitle('Sequence: ' + self.compParent.compSettings['name'])
+        self.setWindowTitle('Sequence: ' + self.comp.Get_Standard_Field('name'))
 
-    def clearEvents(self):
-        #self.table.clear()
-        for row in range(0, self.table.rowCount()):
-            self.table.removeRow(0)
 
-        #self.Events_Modified.emit(self)
-        self.iM.eventsModified(self)
-
+    ######## THIS IS THE OLD IMPORT FUNCTION - NEED TO ADAPT
     def addEvent(self, eventData):
         newRow = self.newEvent()
         index = self.table.cellWidget(newRow, 1).findText(eventData['type'])
@@ -49,12 +43,11 @@ class eventListWidget(QDockWidget):
                 if(setting in settingsWidgets):
                     settingsWidgets[setting].setValue(value)
                 else:
-                    self.compParent.mW.postLog('Event of type (' + eventData['type'] + ') does not have a (' + setting + ') setting type!!!', DSConstants.LOG_PRIORITY_HIGH)
+                    self.mW.postLog('Event of type (' + eventData['type'] + ') does not have a (' + setting + ') setting type!!!', DSConstants.LOG_PRIORITY_HIGH)
         else:
             self.table.removeRow(newRow)
-            self.compParent.mW.postLog('Event has unknown type (' + eventData['type'] + ') for object type (' + self.compParent.componentType + ')!!', DSConstants.LOG_PRIORITY_HIGH)
+            self.mW.postLog('Event has unknown type (' + eventData['type'] + ') for object type (' + type(self.comp) + ')!!', DSConstants.LOG_PRIORITY_HIGH)
         
-        #self.Events_Modified.emit(self)
         self.iM.eventsModified(self)
 
     def newEvent(self):
@@ -71,8 +64,8 @@ class eventListWidget(QDockWidget):
         timeWidget.timeChanged.connect(self.eventsModified)
 
         self.table.setCellWidget(rowCount, 0, timeWidget)
-        typeWidget = eventTypeComboBox(self.sequencerEventTypes)
-        settingsWidget = eventSettingsEdit(self.sequencerEventTypes, rowCount)
+        typeWidget = eventTypeComboBox(self.eventTypes)
+        settingsWidget = eventSettingsEdit(self.eventTypes, rowCount)
         settingsWidget.parameterChanged.connect(self.checkEventOverlaps)
         settingsWidget.parameterChanged.connect(self.eventsModified)
 
@@ -83,31 +76,13 @@ class eventListWidget(QDockWidget):
         self.table.setCellWidget(rowCount, 1, typeWidget)
         self.table.setCellWidget(rowCount, 2, settingsWidget)
 
-        self.compParent.reprogramSourceTargets()
+        self.comp.reprogramSourceTargets()
 
-        #self.Events_Modified.emit(self)
         self.iM.eventsModified(self)
 
         return rowCount
 
-    def eventsModified(self):
-        #self.Events_Modified.emit(self)
-        self.iM.eventsModified(self)
-
-    def getEvents(self):
-        eventListOut = list()
-        for row in range(0, self.table.rowCount()):
-            if(self.table.cellWidget(row, 0).valid is True):
-                item = dict()
-                item['time'] = self.table.cellWidget(row, 0).value()
-                item['type'] = self.table.cellWidget(row, 1).value()
-                item['settings'] = dict()
-                for setting in self.table.cellWidget(row, 2).value():
-                    item['settings'][setting.name] = setting.value()
-                eventListOut.append(item)
-        return eventListOut
-
-    def getEventsSerializable(self):
+    def savePacket(self):
         eventListOut = list()
         for row in range(0, self.table.rowCount()):
             item = dict()
@@ -142,15 +117,11 @@ class eventListWidget(QDockWidget):
 
         self.addButton = QPushButton('New')
         self.addButton.pressed.connect(self.newButtonPressed)
-        self.editButton = QPushButton('Edit')
-        self.editButton.setEnabled(False)
-        self.editButton.pressed.connect(self.editButtonPressed)
         self.removeButton = QPushButton('Remove')
         self.removeButton.setEnabled(False)
         self.removeButton.pressed.connect(self.removeButtonPressed)
 
         self.buttonWidgetLayout.addWidget(self.addButton)
-        self.buttonWidgetLayout.addWidget(self.editButton)
         self.buttonWidgetLayout.addWidget(self.removeButton)
 
         return self.buttonWidget
@@ -158,14 +129,10 @@ class eventListWidget(QDockWidget):
     def newButtonPressed(self):
         self.newEvent()
 
-    def editButtonPressed(self):
-        pass
-
     def removeButtonPressed(self):
         rows = self.getTableSelectedRows()
         for row in rows:
             self.table.removeRow(row)
-        #self.Events_Modified.emit(self)
         self.iM.eventsModified(self)
 
     def getTableSelectedRows(self):
@@ -176,56 +143,10 @@ class eventListWidget(QDockWidget):
 
         return rowList
 
-    def getEventStartEnd(self, row):
-        sequenceType = self.sequencerEventTypes[self.table.cellWidget(row, 2).stack.currentIndex()]
-        params = self.table.cellWidget(row, 2).stack.currentWidget().paramList
-        length = sequenceType.getLength(params)
-        start = self.table.cellWidget(row, 0).value()
-        end = start + length
-        return start, end
-
-    def checkEventOverlaps(self):
-        for row in range(0, self.table.rowCount()):
-            start, end = self.getEventStartEnd(row)
-            result = self.checkIfTimeIsValid(row, start, end)
-            if(result is False):
-                self.table.cellWidget(row, 0).setBackground(QColor(Qt.red))
-                self.table.cellWidget(row, 0).valid = False
-                #widget = self.table.verticalHeaderItem(row)
-                #widget.setBackground(QColor(255, 0, 0))
-                #self.table.setVerticalHeaderItem(row, widget)
-                #self.table.verticalHeaderItem(row).setBackground(QBrush(Qt.red))
-            else:
-                self.table.cellWidget(row, 0).setBackground(QColor(Qt.white))
-                self.table.cellWidget(row, 0).valid = True
-                #self.table.verticalHeaderItem(row).setBackground(QBrush(Qt.white))
-        
-        self.compParent.updatePlot()
-
-    def setRowColor(self, row, color):
-        self.table.cellWidget(row, 0).setBackground(color)
-        #self.table.cellWidget(row, 2).setBackground(color)
-
-    def checkIfTimeIsValid(self, index, startIn, endIn):
-        for row in range(0, self.table.rowCount()):
-            if(row != index):
-                start, end = self.getEventStartEnd(row)
-                if(start > startIn and start < endIn):
-                    return False
-                if(end > startIn and start < endIn):
-                    return False
-                if(startIn > start and startIn < end):
-                    return False
-                if(endIn > start and endIn < end):
-                    return False
-        return True
-
     def tableSelectionChanged(self):
-        if(len(self.getTableSelectedRows()) > 0):
-            self.editButton.setEnabled(True)
+        if(self.getTableSelectedRows()):
             self.removeButton.setEnabled(True)
         else:
-            self.editButton.setEnabled(False)
             self.removeButton.setEnabled(False)
 
     def sortEvent(self, rowIn):
@@ -309,9 +230,9 @@ class timeInputEdit(QLineEdit):
 class eventSettingsEdit(QWidget):
     parameterChanged = pyqtSignal(int)
 
-    def __init__(self, settingsType, row):
+    def __init__(self, eventTypes, row):
         super().__init__()
-        self.settingsType = settingsType
+        self.settingsType = eventTypes
         self.row = row
         self.index = 0
         self.stackList = list()
@@ -386,16 +307,6 @@ class eventTypeComboBox(QComboBox):
 
     def value(self):
         return self.eventTypes[self.currentIndex()]
-
-class ComponentConfigWidget(QDockWidget):
-    doNotAutoPopulate = True
-
-    def __init__(self, compParent):
-        super().__init__('Config: ' + compParent.name)
-        self.compParent = compParent
-        self.setFeatures(QDockWidget.DockWidgetClosable)
-        self.setFloating(True)
-        self.hide()
 
 class ComponentSequenceEditWidget(QWidget):
     doNotAutoPopulate = True

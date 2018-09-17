@@ -16,6 +16,7 @@ class filterStackWidget(QDockWidget):
         self.hM = mW.hM
         self.iM = mW.iM
         self.wM = mW.wM
+        self.rootSource = None
         self.hide()
         self.setAllowedAreas(Qt.NoDockWidgetArea)
 
@@ -81,7 +82,8 @@ class filterView(QGraphicsView):
 
         self.columnDrawOffset = QPoint(0,0)
         self.mainScene.clear()
-        self.walkColumn(source, QPoint(0,0))
+        if(source is not None):
+            self.walkColumn(source, QPoint(0,0))
 
         self.setSceneRect(self.calcViewQRectF())
         self.scene().update(self.calcViewQRectF())

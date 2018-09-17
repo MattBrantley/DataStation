@@ -1,7 +1,6 @@
 from PyQt5.Qt import *
 from PyQt5.QtGui import QStandardItemModel
 import os, random, uuid, numpy as np
-from decimal import Decimal
 from src.Constants import DSConstants as DSConstants, readyCheckPacket
 from src.Managers.InstrumentManager.Sockets import *
 
@@ -13,9 +12,6 @@ class Component(QObject):
     componentCreator = 'Matthew R. Brantley'
     componentVersionDate = '7/13/2018'
     iconGraphicSrc = 'default.png' # Not adjustable like layoutGraphicSrc is.
-    mW = None
-    valid = False
-    isTriggerComponent = False
 
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
@@ -36,8 +32,14 @@ class Component(QObject):
         self.compSettings['customFields'][field] = data
         return True
 
+    def Remove_Component(self):
+        self.instr.Remove_Component(self)
+
     def Get_Sockets(self):
         return self.socketList
+
+    def Get_Event_Types(self):
+        return self.eventTypeList
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -54,6 +56,8 @@ class Component(QObject):
         self.instr = None           #Factory does not write this. It's in the very next line in Instrument though.
         self.mW = mW                #Factory does not write this. It's in the very next line in Instrument though.
         self.iM = None              #Factory does not write this. It's in the very next line in Instrument though.
+        self.valid = False
+        self.isTriggerComponent = False
         self.name = kwargs.get('name', self.componentType)
         self.socketList = list()
         self.pathDataPackets = list()
@@ -77,10 +81,6 @@ class Component(QObject):
                 goodToContinue = False
         
         if(goodToContinue is True):
-            if(self.sequencerEditWidget is not None):
-                runResults = self.onRun(self.sequencerEditWidget.getEvents())
-            else:
-                return readyCheckPacket('User Component [' + self.compSettings['name'] + ']', DSConstants.READY_CHECK_ERROR, subs=subs, msg='User Component Does Not Have SequencerEditWidget!!')
             if(isinstance(runResults, readyCheckPacket)):
                 subs.append(runResults)
                 if(runResults.readyStatus == DSConstants.READY_CHECK_ERROR):
@@ -123,7 +123,6 @@ class Component(QObject):
 
     def onCreationParent(self):
         self.mW.postLog('Added New Component to Instrument: ' + self.componentType, DSConstants.LOG_PRIORITY_MED)
-        self.sequencerEditWidget = sequenceEditWidget(self.mW, self)
         self.onCreation()
 
     def onCreation(self): ### OVERRIDE ME!! ####
@@ -131,14 +130,14 @@ class Component(QObject):
 
     def onCreationFinishedParent(self):
         #Walks through all appropriate objects and adds the update call.
-        for widget in self.configWidget.findChildren(QLineEdit):
-            widget.textChanged.connect(self.updatePlot)
+        #for widget in self.configWidget.findChildren(QLineEdit):
+        #    widget.textChanged.connect(self.updatePlot)
 
-        for widget in self.configWidget.findChildren(QCheckBox):
-            widget.stateChanged.connect(self.updatePlot)
+        #for widget in self.configWidget.findChildren(QCheckBox):
+        #    widget.stateChanged.connect(self.updatePlot)
 
-        for widget in self.configWidget.findChildren(QDoubleSpinBox):
-            widget.valueChanged.connect(self.updatePlot)
+        #for widget in self.configWidget.findChildren(QDoubleSpinBox):
+        #    widget.valueChanged.connect(self.updatePlot)
 
         self.onCreationFinished()
 
@@ -148,18 +147,11 @@ class Component(QObject):
     def onRemovalParent(self):
         self.mW.postLog('Removing Instrument Component: ' + self.componentType, DSConstants.LOG_PRIORITY_MED)
         for socket in self.socketList:
-            socket.detatchInputSelf()
+            socket.Detatch_Input()
         self.onRemoval()
 
     def onRemoval(self):  ### OVERRIDE ME!! ####
         pass
-
-    def parentPlotSequencer(self):
-        if(self.sequencerEditWidget is not None):
-            return self.plotSequencer(self.sequencerEditWidget.getEvents())
-
-    def plotSequencer(self, events): ### OVERRIDE ME!! ####
-        return np.array([0,0])
 
     def onRunParent(self, events):
         self.onRun(events)
@@ -191,15 +183,53 @@ class Component(QObject):
 
     def setupWidgets(self):
         self.configWidget = ComponentConfigWidget(self)
-        self.sequenceEditWidget = ComponentSequenceEditWidget(self)
 
 ##### Event Type Modifications #####
 
     def addEventType(self, eventType):
         self.eventTypeList.append(eventType)
 
-
 ##### Event Modifications #####
+
+    def getEventStartEnd(self, row): ### UNCORRECTED FROM EVENTLISTWIDGET
+        sequenceType = self.eventTypes[self.table.cellWidget(row, 2).stack.currentIndex()]
+        params = self.table.cellWidget(row, 2).stack.currentWidget().paramList
+        length = sequenceType.getLength(params)
+        start = self.table.cellWidget(row, 0).value()
+        end = start + length
+        return start, end
+
+    def checkEventOverlaps(self): ### UNCORRECTED FROM EVENTLISTWIDGET
+        for row in range(0, self.table.rowCount()):
+            start, end = self.getEventStartEnd(row)
+            result = self.checkIfTimeIsValid(row, start, end)
+            if(result is False):
+                self.table.cellWidget(row, 0).setBackground(QColor(Qt.red))
+                self.table.cellWidget(row, 0).valid = False
+                #widget = self.table.verticalHeaderItem(row)
+                #widget.setBackground(QColor(255, 0, 0))
+                #self.table.setVerticalHeaderItem(row, widget)
+                #self.table.verticalHeaderItem(row).setBackground(QBrush(Qt.red))
+            else:
+                self.table.cellWidget(row, 0).setBackground(QColor(Qt.white))
+                self.table.cellWidget(row, 0).valid = True
+                #self.table.verticalHeaderItem(row).setBackground(QBrush(Qt.white))
+        
+        self.comp.updatePlot()
+
+    def checkIfTimeIsValid(self, index, startIn, endIn): ### UNCORRECTED FROM EVENTLISTWIDGET
+        for row in range(0, self.table.rowCount()):
+            if(row != index):
+                start, end = self.getEventStartEnd(row)
+                if(start > startIn and start < endIn):
+                    return False
+                if(end > startIn and start < endIn):
+                    return False
+                if(startIn > start and startIn < end):
+                    return False
+                if(endIn > start and endIn < end):
+                    return False
+        return True
 
     def clearEvents(self):
         if(self.sequencerEditWidget is not None):
@@ -268,24 +298,6 @@ class Component(QObject):
         for socket in sockets:
             self.socketList[index].loadPacket(socket)
 
-##### Hardware Widget Interactions #####
-
-    def registeriViewComponent(self, component):
-        self.iViewComponent = component
-
-    def ROIRemove(self, eventPos):
-        self.iM.currentInstrument.removeComponent(self)
-
-##### Sequence Editor Widget #####
-
-    def onSequencerDoubleClick(self, eventPos):
-        self.sequencerEditWidget.move(eventPos + QPoint(2, 2))
-        if(self.sequencerEditWidget.isHidden()):
-            self.sequencerEditWidget.updateTitle()
-            self.sequencerEditWidget.show()
-        else:
-            self.sequencerEditWidget.hide()
-
 ##### Config Widget #####
 
     def hideConfigWindow(self):
@@ -302,3 +314,12 @@ class Component(QObject):
         else:
             self.configWidget.hide()
 
+class ComponentConfigWidget(QDockWidget):
+    doNotAutoPopulate = True
+
+    def __init__(self, compParent):
+        super().__init__('Config: ' + compParent.name)
+        self.compParent = compParent
+        self.setFeatures(QDockWidget.DockWidgetClosable)
+        self.setFloating(True)
+        self.hide()

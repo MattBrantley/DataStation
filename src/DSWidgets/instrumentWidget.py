@@ -30,7 +30,7 @@ class instrumentWidget(QDockWidget):
         self.toolWidgets = QTabWidget()
         
         self.instrumentNavigator = DSTreeView(self, self.fileSystem)
-        self.componentList = componentsList(self)
+        self.componentList = componentsList(self, self.mW)
 
         self.instrumentView = iView(self)
 
@@ -197,8 +197,8 @@ class instrumentWidget(QDockWidget):
         self.saveAsAction.setEnabled(True)
 
 class componentsList(QListWidget):
-    def __init__(self, mW, parent=None):
-        super(componentsList, self).__init__(parent)
+    def __init__(self, widget, mW, parent=None):
+        super(componentsList, self).__init__(None)
 
         self.mW = mW
         self.iM = mW.iM
@@ -230,12 +230,12 @@ class componentsList(QListWidget):
 
     def populateList(self):
         for val in self.iM.Get_Component_Models_Available():
-            tempIcon = QIcon(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'User Components\img\\' + val.iconGraphicSrc))
+            tempIcon = QIcon(os.path.join(self.mW.rootDir, 'Components\img\\' + val.iconGraphicSrc))
             self.addItem(componentItem(tempIcon, val.componentType))
 
 class componentItem(QListWidgetItem):
-    def __init__(self, icon, text, parent=None):
-        super().__init__(parent)
+    def __init__(self, icon, text):
+        super().__init__(None)
         self.setText(text)
         self.setIcon(icon)
         self.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -378,25 +378,15 @@ class iView(pg.GraphicsWindow):
         self.view.Antialiasing = True
         self.setBackground('w')
         self.iM.Instrument_Saving.connect(self.updateiViewState)
-        self.iM.Instrument_Unloaded.connect(self.clearComps)
-        self.iM.Instrument_Loaded.connect(self.loadComps)
 
         self.iViewCompList = list()
+
+        self.iM.Component_Added.connect(self.addiViewComp)
+        self.iM.Component_Removed.connect(self.removeiViewComp)
 
     def updateiViewState(self):
         for item in self.iViewCompList:
             item.instrComp.Set_Custom_Field('iViewSettings', item.onSave())
-
-    def loadComps(self):
-        if(self.iM.Get_Instrument() is not None):
-            compList = self.iM.Get_Instrument().Get_Components()
-            for comp in compList:
-                if(comp.Get_Standard_Field('triggerComp') is False):
-                    try:
-                        ivs = comp.Get_Custom_Field('iViewSettings')
-                        self.addiViewComp(comp, ivs['x'], ivs['y'], ivs['r'])
-                    except:
-                        pass
 
     def dragEnterEvent(self, e):
         if(e.mimeData().text() == "compDrag"):
@@ -422,20 +412,22 @@ class iView(pg.GraphicsWindow):
         index = stream2.readInt()
 
         comp = self.iM.Add_Component(self.iM.Get_Component_Model_By_Index(index))
+        comp.Set_Custom_Field('iViewSettings', {'x': dropX, 'y': dropY, 'r': 0})
 
-        if comp is not None:
-            m = self.addiViewComp(comp, dropX, dropY, 0)
-            comp.Set_Custom_Field('iViewSettings', m.onSave())
+    def addiViewComp(self, instrument, component):
+        if(component.Get_Standard_Field('triggerComp') is False):
+            try:
+                ivs = component.Get_Custom_Field('iViewSettings')
+                m = iViewComponent(self.mW, component, self, width=1, height=1, pos=(ivs['x'], ivs['y']), angle=ivs['r'])
+                self.view.addItem(m)
+                self.iViewCompList.append(m)
+            except:
+                pass
 
-
-    def addiViewComp(self, comp, x, y, r):
-        m = iViewComponent(self.instrumentWidget, comp, self, width=1, height=1, pos=(x, y), angle=r)
-        self.view.addItem(m)
-        self.iViewCompList.append(m)
-        return m
-
-    def clearComps(self):
-        self.view.clear()
+    def removeiViewComp(self, instrument, component):
+        for icomp in self.iViewCompList:
+            if(icomp.instrComp is component):
+                self.view.removeItem(icomp)
 
 class ParamObj:
     # Just a helper for tracking parameters and responding to changes
@@ -463,13 +455,14 @@ class ParamObj:
         return self.__params[param]
 
 class iViewGraphic(pg.GraphicsObject, ParamObj):
-    def __init__(self, src, pen=None, brush=None, **opts):
+    def __init__(self, mW, src, pen=None, brush=None, **opts):
         defaults = dict(width=2, height=2)
+        self.mW = mW
         defaults.update(opts)
         ParamObj.__init__(self)
         pg.GraphicsObject.__init__(self)
         
-        self.pxm = QPixmap(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'User Components\img\\' + src))
+        self.pxm = QPixmap(os.path.join(self.mW.rootDir, 'Components\img\\' + src))
         self.surfaces = [iViewGraphicBound(self.pxm.width(), self.pxm.height())]
         
         if pen is None:
@@ -568,8 +561,7 @@ class iViewObject(pg.GraphicsObject, ParamObj):
     
     def removed(self):
         if(self.instrComp is not None):
-            self.instrComp.ROIRemove(QCursor.pos())
-            self.iView.view.removeItem(self)
+            self.instrComp.Remove_Component()
 
     def clicked(self):
         if(self.instrComp is not None):
@@ -632,7 +624,7 @@ class iViewComponent(iViewObject):
         defaults.update(params)
         src = instrComp.compSettings['layoutGraphicSrc']
 
-        self.gitem = iViewGraphic(src, brush=(100,100,100,255), **defaults)
+        self.gitem = iViewGraphic(self.mW, src, brush=(100,100,100,255), **defaults)
         iViewObject.__init__(self, self.gitem, iView, **defaults)
 
     def onSave(self):

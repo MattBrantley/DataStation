@@ -343,8 +343,9 @@ class HardwareManager(QObject):
         tempHardware.wM = self.wM
         tempHardware.initHardwareWorker()
 
-        if('hardwareSettings' in loadData):
-            tempHardware.loadPacketParent(loadData)
+        if(loadData is not None):
+            if('hardwareSettings' in loadData):
+                tempHardware.loadPacketParent(loadData)
 
         self.hardwareLoaded.append(tempHardware)
         self.Hardware_Added.emit(tempHardware)

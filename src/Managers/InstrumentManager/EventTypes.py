@@ -1,7 +1,13 @@
+from PyQt5.Qt import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+import os, sys, imp, math, uuid
+from src.Constants import DSConstants as DSConstants, readyCheckPacket
+from src.Managers.HardwareManager.Sources import Source
 
 class eventType():
+    name = 'Default Event'
     def __init__(self):
-        self.name = 'DefaultEvent'
         self.parameters = list()
 
     def getLength(self, params):

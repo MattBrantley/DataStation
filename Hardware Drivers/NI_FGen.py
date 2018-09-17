@@ -1,10 +1,7 @@
-from Managers.HardwareManager.hardwareObject import hardwareObject, hardwareWorker, hwm
+from src.Managers.HardwareManager.hardwareObject import hardwareObject, hardwareWorker, hwm
+from src.Managers.HardwareManager.Sources import *
 from PyQt5.Qt import *
-from Managers.HardwareManager.Sources import *
-import os, traceback, math
-import numpy as np
-import nidaqmx.system
-import nifgen
+import os, traceback, math, numpy as np, nifgen
 from multiprocessing import Process, Queue, Pipe
 
 class Hardware_Driver(hardwareObject):

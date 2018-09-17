@@ -11,8 +11,6 @@ from src.DSWidgets.sequencerWidget.eventListWidget import eventListWidget
 
 class sequencerDockWidget(QDockWidget):
     ITEM_GUID = Qt.UserRole
-    plots = []
-    plotPaddingPercent = 1
 
     def __init__(self, mW):
         super().__init__('Sequencer (None)')
@@ -20,28 +18,23 @@ class sequencerDockWidget(QDockWidget):
         self.iM = mW.iM
         self.hM = mW.hM
         self.wM = mW.wM
+        self.plotPaddingPercent = 1
+        self.plotList = list()
         self.hide()
         self.resize(1000, 800)
-        self.fileSystem = DSEditorFSModel()
-        self.fsRoot = self.mW.iM.sequencesDir
-        self.fsRoot = os.path.join(self.mW.rootDir, 'sequences')
-        self.fsIndex = self.fileSystem.setRootPath(self.fsRoot)  #This is a placeholder - will need updating.
 
         self.xMin = 0
         self.xMax = 1
 
-        self.sequenceNavigator = DSTreeView(self, self.fileSystem, self.fsIndex)
-        self.sequenceView = DSGraphicsLayout(self.mW, self)
+        self.sequenceNavigator = DSTreeView(self.mW, self)
+        self.sequenceView = DSGraphicsLayoutWidget(self.mW, self)
         self.initActionsAndToolbar()
         self.initLayout()
-
-        pg.setConfigOptions(antialias=True)
 
         self.updateToolbarState()
 
         self.iM.Sequence_Loaded.connect(self.sequenceLoaded)
         self.iM.Sequence_Unloaded.connect(self.sequenceUnloaded)
-        self.iM.Component_Added.connect(self.addPlot)
 
     def initActionsAndToolbar(self):
         self.newAction = QAction('New', self)
@@ -80,7 +73,7 @@ class sequencerDockWidget(QDockWidget):
         self.sequencerContainer = QSplitter()
         
         self.sequencerContainer.addWidget(self.sequenceNavigator)
-        self.sequencerContainer.addWidget(self.sequenceView.plotLayoutWidget)
+        self.sequencerContainer.addWidget(self.sequenceView)
 
         self.sequencerContainer.setStretchFactor(1, 3)
         self.setWidget(self.mainContainer)
@@ -91,19 +84,209 @@ class sequencerDockWidget(QDockWidget):
 
     def sequenceUnloaded(self):
         self.setWindowTitle('Sequencer (None)')
-        self.redrawSequence()
 
-    def addPlot(self, instrument, component):
+    def treeToggled(self, checked):
+        if(checked):
+            self.sequenceNavigator.show()
+        else:
+            self.sequenceNavigator.hide()
+
+    def updateToolbarState(self):
+        self.saveAction.setEnabled(True)
+        self.saveAsAction.setEnabled(True)
+
+class DSGraphicsLayoutWidget(pg.GraphicsLayoutWidget):
+
+    def __init__(self, mW, dockWidget):
+        super().__init__()
+        self.mW = mW
+        self.iM = mW.iM
+        self.hM = mW.hM
+        self.wM = mW.hM
+
+        pg.setConfigOptions(antialias=True)
+        self.dockWidget = dockWidget
+        self.referencePlot = None
+        self.plotList = list()
+        self.setBackground(QColor(255, 255, 255))
+
+        self.iM.Component_Added.connect(self.addNewPlot) #addPlot is reserved by pyqtgraph!
+        self.iM.Component_Removed.connect(self.removePlot)
+
+    def addNewPlot(self, instrument, component):
         if(component.Get_Custom_Field('sequencerSettings') is None):
             component.Set_Custom_Field('sequencerSettings', {'show': True})
 
         settings = component.Get_Custom_Field('sequencerSettings')
         if(settings['show'] is True):
-            plotHolder = self.sequenceView.addPlot(component.Get_Standard_Field('name'), component)
-            self.plots.append(plotHolder)
+            self.nextRow()
+            plot = DSPlotItem(self.mW, self, component)
+            self.plotList.append(plot)
 
+            if(len(self.plotList) == 1):
+                self.referencePlot = plot
+            else:
+                plot.plotItem.setXLink(self.referencePlot.plotItem)
+            self.plotList.append(plot)
 
-        self.redrawSequence()
+    def removePlot(self, instrument, component):
+        for plot in self.plotList:
+            if(plot.component is component):
+                print('found the one to remove')
+        print('could not find the one to remove')
+
+    def findPlotByMousePos(self, pos):
+        plotsInRange = list()
+        for plot in self.plotList:
+            # Okay - so there is a glitch in pyqtgraph that adjustes the offset for other widgets in the scene by offsetting the bounding QRect
+            # into the plot area (it seems to do this TWICE). Because the sequencer browser is causing this - we are adjusting the QRect collision
+            # area to account for this. It's not pretty but it works.
+            sequenceNavigatorWidth = self.dockWidget.sequenceNavigator.width()
+            adjViewGeometry = plot.plotItem.getViewBox().screenGeometry().adjusted(-sequenceNavigatorWidth, 0, sequenceNavigatorWidth, 0)
+            if(adjViewGeometry.contains(pos)):
+                plotsInRange.append(plot)
+        return plotsInRange
+
+    def mouseDoubleClickEvent(self, event):
+        if(event.buttons() == Qt.LeftButton):
+            super().mouseDoubleClickEvent(event)
+            event.accept()
+        else:
+            super().mouseDoubleClickEvent(event)
+        selectedPlots = self.findPlotByMousePos(event.globalPos())
+        if selectedPlots:
+            selectedPlots[0].toggleEditWidget(event.globalPos())
+
+    def mousePressEvent(self, event):
+        
+        if(event.buttons() == Qt.RightButton):
+            event.accept()
+            selectedPlots = self.findPlotByMousePos(event.globalPos())
+            if (len(selectedPlots) > 0):
+                selectedPlots[0].toggleEditWidget(event.globalPos())
+        else:
+            super().mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        if(event.button() == 2):
+            event.accept()
+        else:
+            super().mouseReleaseEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if(event.buttons() & Qt.RightButton):
+            event.accept()
+        else:
+            super().mouseMoveEvent(event)
+
+class DSPlotItem(QObject):
+    plotPaddingPercent = 1
+
+    def __init__(self, mW, plotLayout, comp):
+        super().__init__()
+
+        self.mW = mW
+        self.component = comp
+        self.plotLayout = plotLayout
+        self.plotItem = plotLayout.addPlot()
+
+        self.sequencerEditWidget = eventListWidget(mW, plotLayout.dockWidget, comp)
+    
+    def toggleEditWidget(self, eventPos):
+        self.sequencerEditWidget.move(eventPos + QPoint(2, 2))
+        if(self.sequencerEditWidget.isHidden()):
+            self.sequencerEditWidget.updateTitle()
+            self.sequencerEditWidget.show()
+        else:
+            self.sequencerEditWidget.hide()
+
+    def updatePlot(self):
+        data = self.component.parentPlotSequencer()
+        self.xMin, self.xMax = self.component.iM.mW.sequencerDockWidget.getSequenceXRange()
+        if(data is not None):
+            self.plotItem.clear()
+            if(data.ndim < 2):
+                startHub = np.array([-900000, data[1]])
+                endHub = np.array([900000, data[1]])
+                data = np.vstack((startHub, data))
+                data = np.vstack((data, endHub))
+                xMin = 0
+                xMax = 1
+                
+            data = self.formatData(data, self.xMin, self.xMax)
+
+            yDelta = data[:,1].max() - data[:,1].min()
+            yPadding = yDelta*self.plotPaddingPercent/100
+
+            self.plotItem.clear()
+            self.plotItem.plot(x=data[:,0], y=data[:,1], pen = QColor(0, 0, 0))
+
+            self.plotItem.autoRange()
+            self.component.iM.mW.sequencerDockWidget.redrawSequence()
+
+    def plot(self, showXAxis, xMinIn, xMaxIn):
+        data = self.component.parentPlotSequencer()
+        if(data is None):
+            data = np.array([[0,0], [1,0]])
+
+        if(data is not None):
+            data2 = self.formatData(data, xMinIn, xMaxIn)
+            data = data2
+
+            yDelta = data[:,1].max() - data[:,1].min()
+            if(yDelta < 1):
+                yDelta = 1
+            yPadding = yDelta*self.plotPaddingPercent/100
+
+            yMin = data[:,1].min()
+            if(yMin > 0):
+                yMin = 0 - yPadding
+            else:
+                yMin = yMin - yPadding
+
+            yMax = data[:, 1].max()
+            if(yMax < 1):
+                yMax = 1 + yPadding
+            else:
+                yMax = yMax + yPadding
+
+            self.plotItem.clear()
+            self.plotItem.plot(x=data[:,0], y=data[:,1], pen = self.plotLayout.sequencePLT1Color)
+            self.plotItem.setLimits(xMin=xMinIn, xMax=xMaxIn, yMin=yMin, yMax=yMax)
+
+        self.plotItem.setMouseEnabled(x=True, y=False)
+        self.plotItem.setLabels(bottom='Time (s)', left='voltage')
+        if(showXAxis):
+            self.plotItem.showAxis('bottom', True)
+            self.plotItem.showLabel('bottom', True)
+        else:
+            self.plotItem.showAxis('bottom', False)
+            self.plotItem.showLabel('bottom', False)
+        self.plotItem.setLabel('left', self.comp.Get_Standard_Field('name'))
+        #self.plotItem.setDownsampling(ds=True, auto=True, mode='peak') #mode='peak' produces strange results with large gaps in data
+        #self.plotItem.setClipToView(True)
+        axis = self.plotItem.getAxis('bottom')
+        
+    def formatData(self, data, xMin, xMax):
+        #print('START')
+        #print(data)
+        if(data[:,0].min() > xMin):
+            dataStart = data[:,0].min()
+            gapX = np.arange(xMin, dataStart, 0.001)
+            gapY = np.add(np.zeros(len(gapX)), data[0, 1])
+            minStump = np.vstack((gapX, gapY)).transpose()
+            #minStump = [xMin, data[0, 1]]
+            data = np.vstack((minStump, data))
+        if(data[:,0].max() < xMax):
+            dataEnd = data[:,0].max()
+            gapX = np.arange(dataEnd, xMax, 0.001)
+            gapY = np.add(np.zeros(len(gapX)), data[-1, 1])
+            maxStump = np.vstack((gapX, gapY)).transpose()
+            #maxStump = [xMax, data[-1, 1]]
+            data = np.vstack((data, maxStump))
+        #print('RESULT')
+        #print(data)
+        return data
 
     def xRangeUpdate(self, xMinTest, xMaxTest):
         if(xMinTest < self.xMin):
@@ -146,218 +329,14 @@ class sequencerDockWidget(QDockWidget):
         xMinPad, xMaxPad = self.padSequenceXRange(self.xMin, self.xMax) 
         plotCounter = len(self.plots)
         for plotTemp in self.plots:
-            print('counter')
             plotCounter = plotCounter - 1
             if(plotCounter == 0):
                 plotTemp.plot(True, self.xMin, self.xMax)
             else:
                 plotTemp.plot(False, self.xMin, self.xMax)
 
-    def treeToggled(self, checked):
-        if(checked):
-            self.sequenceNavigator.show()
-        else:
-            self.sequenceNavigator.hide()
-
-    def doubleClicked(self, index):
-        item = self.fileSystem.fileInfo(index)
-        filePath = item.filePath()
-        fileExt = os.path.splitext(item.fileName())[1]
-        if(fileExt == '.sqpy'):
-            self.openSequence(filePath)
-
-    def updateToolbarState(self):
-        self.saveAction.setEnabled(True)
-        self.saveAsAction.setEnabled(True)
-
-class DSGraphicsLayout():
-    sequenceBGColor = QColor(255, 255, 255) #Intended to be user-editable at a future date.
-    sequencePLT1Color = QColor(0, 0, 0) #Intended to be user-editable at a future date. This is the programming plot
-    sequencePLT2Color = QColor(255, 0, 0) #Intended to be user-editable at a future date. This is the readback plot
-
-    def __init__(self, mW, dockWidget):
-        self.dockWidget = dockWidget
-        self.plots = list()
-        self.referencePlot = None
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
-        self.wM = mW.wM
-        self.plotLayoutWidget = DSGraphicsLayoutWidget(self)
-        self.plotLayoutWidget.setBackground(self.sequenceBGColor)
-
-    def addPlot(self, name, comp):
-        self.plotLayoutWidget.nextRow()
-        plot = DSPlotItem(self.mW, self, self.dockWidget, name, comp)
-        self.plots.append(plot)
-
-        if(len(self.plots) == 1):
-            self.referencePlot = plot
-        else:
-            plot.plotItem.setXLink(self.referencePlot.plotItem)
-
-        return plot
-
-    def clearPlots(self):
-        self.plots.clear()
-        self.plotLayoutWidget.clear()
-
-class DSGraphicsLayoutWidget(pg.GraphicsLayoutWidget):
-
-    def __init__(self, parent):
-        super().__init__()
-        self.parent = parent
-
-    def findPlotByMousePos(self, pos):
-        plotsInRange = []
-        for plot in self.parent.plots:
-            # Okay - so there is a glitch in pyqtgraph that adjustes the offset for other widgets in the scene by offsetting the bounding QRect
-            # into the plot area (it seems to do this TWICE). Because the sequencer browser is causing this - we are adjusting the QRect collision
-            # area to account for this. It's not pretty but it works.
-            sequenceNavigatorWidth = self.parent.dockWidget.sequenceNavigator.width()
-            adjViewGeometry = plot.plotItem.getViewBox().screenGeometry().adjusted(-sequenceNavigatorWidth, 0, sequenceNavigatorWidth, 0)
-            if(adjViewGeometry.contains(pos)):
-                plotsInRange.append(plot)
-        return plotsInRange
-
-    def mouseDoubleClickEvent(self, event):
-        if(event.buttons() == Qt.LeftButton):
-            super().mouseDoubleClickEvent(event)
-            event.accept()
-        else:
-            super().mouseDoubleClickEvent(event)
-        selectedPlots = self.findPlotByMousePos(event.globalPos())
-        if (len(selectedPlots) > 0):
-            selectedPlots[0].component.onSequencerDoubleClick(event.globalPos())
-
-    def mousePressEvent(self, event):
-        
-        if(event.buttons() == Qt.RightButton):
-            event.accept()
-            selectedPlots = self.findPlotByMousePos(event.globalPos())
-            if (len(selectedPlots) > 0):
-                selectedPlots[0].component.onSequencerDoubleClick(event.globalPos())
-        else:
-            super().mousePressEvent(event)
-
-    def mouseReleaseEvent(self, event):
-        if(event.button() == 2):
-            event.accept()
-        else:
-            super().mouseReleaseEvent(event)
-
-    def mouseMoveEvent(self, event):
-        if(event.buttons() & Qt.RightButton):
-            event.accept()
-        else:
-            super().mouseMoveEvent(event)
-
-class DSPlotItem(QObject):
-    plotPaddingPercent = 1
-
-    def __init__(self, mW, plotLayout, sequencerWidget, name, comp):
-        super().__init__()
-
-        self.mW = mW
-        self.component = comp
-        self.sequencerWidget = sequencerWidget
-        self.component.registerPlotItem(self)
-        self.plotLayout = plotLayout
-        self.plotItem = plotLayout.plotLayoutWidget.addPlot()
-        self.name = name
-        self.LODs = []
-        self.data = []
-        self.pen = []
-    
-    def updatePlot(self):
-        data = self.component.parentPlotSequencer()
-        self.xMin, self.xMax = self.component.iM.mW.sequencerDockWidget.getSequenceXRange()
-        if(data is not None):
-            self.plotItem.clear()
-            if(data.ndim < 2):
-                startHub = np.array([-900000, data[1]])
-                endHub = np.array([900000, data[1]])
-                data = np.vstack((startHub, data))
-                data = np.vstack((data, endHub))
-                self.data = data
-                xMin = 0
-                xMax = 1
-                
-            data = self.formatData(data, self.xMin, self.xMax)
-            self.data = data
-
-            yDelta = self.data[:,1].max() - self.data[:,1].min()
-            yPadding = yDelta*self.plotPaddingPercent/100
-
-            self.plotItem.clear()
-            self.plotItem.plot(x=self.data[:,0], y=self.data[:,1], pen = self.plotLayout.sequencePLT1Color)
-
-            self.plotItem.autoRange()
-            self.component.iM.mW.sequencerDockWidget.redrawSequence()
-
-    def plot(self, showXAxis, xMinIn, xMaxIn):
-        data = self.component.parentPlotSequencer()
-        if(data is None):
-            data = np.array([[0,0], [1,0]])
-
-        if(data is not None):
-            data2 = self.formatData(data, xMinIn, xMaxIn)
-            self.data = data2
-
-            yDelta = self.data[:,1].max() - self.data[:,1].min()
-            if(yDelta < 1):
-                yDelta = 1
-            yPadding = yDelta*self.plotPaddingPercent/100
-
-            yMin = self.data[:,1].min()
-            if(yMin > 0):
-                yMin = 0 - yPadding
-            else:
-                yMin = yMin - yPadding
-
-            yMax = self.data[:, 1].max()
-            if(yMax < 1):
-                yMax = 1 + yPadding
-            else:
-                yMax = yMax + yPadding
-
-            self.plotItem.clear()
-            self.plotItem.plot(x=self.data[:,0], y=self.data[:,1], pen = self.plotLayout.sequencePLT1Color)
-            self.plotItem.setLimits(xMin=xMinIn, xMax=xMaxIn, yMin=yMin, yMax=yMax)
-
-        self.plotItem.setMouseEnabled(x=True, y=False)
-        self.plotItem.setLabels(bottom='Time (s)', left='voltage')
-        if(showXAxis):
-            self.plotItem.showAxis('bottom', True)
-            self.plotItem.showLabel('bottom', True)
-        else:
-            self.plotItem.showAxis('bottom', False)
-            self.plotItem.showLabel('bottom', False)
-        self.plotItem.setLabel('left', self.name)
-        #self.plotItem.setDownsampling(ds=True, auto=True, mode='peak') #mode='peak' produces strange results with large gaps in data
-        #self.plotItem.setClipToView(True)
-        axis = self.plotItem.getAxis('bottom')
-        
-    def formatData(self, data, xMin, xMax):
-        #print('START')
-        #print(data)
-        if(data[:,0].min() > xMin):
-            dataStart = data[:,0].min()
-            gapX = np.arange(xMin, dataStart, 0.001)
-            gapY = np.add(np.zeros(len(gapX)), data[0, 1])
-            minStump = np.vstack((gapX, gapY)).transpose()
-            #minStump = [xMin, data[0, 1]]
-            data = np.vstack((minStump, data))
-        if(data[:,0].max() < xMax):
-            dataEnd = data[:,0].max()
-            gapX = np.arange(dataEnd, xMax, 0.001)
-            gapY = np.add(np.zeros(len(gapX)), data[-1, 1])
-            maxStump = np.vstack((gapX, gapY)).transpose()
-            #maxStump = [xMax, data[-1, 1]]
-            data = np.vstack((data, maxStump))
-        #print('RESULT')
-        #print(data)
-        return data
+############################################################################################
+##################################### TREE VIEW WIDGET #####################################
 
 class DSNewFileDialog(QDialog):
     def __init__(self):
@@ -397,19 +376,26 @@ class DSEditorFSModel(QFileSystemModel):
             return super(QFileSystemModel, self).headerData(section, orientation, role)
 
 class DSTreeView(QTreeView):
-    def __init__(self, parent, model, fsIndex):
+    def __init__(self, dockWidget, mW):
         super().__init__()
-        self.parent = parent
-        self.model = model
+        self.dockWidget = dockWidget
+        self.mW = mW
+        self.iM = mW.iM
+        self.hM = mW.hM
+        self.wM = mW.wM
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.rightClick)
 
-        self.setModel(model)
+        self.fileSystem = DSEditorFSModel()
+        self.fsRoot = self.iM.sequencesDir
+        self.fsIndex = self.fileSystem.setRootPath(self.fsRoot)  #This is a placeholder - will need updating.
+
+        self.setModel(self.fileSystem)
         self.setDragEnabled(True)
         self.setAcceptDrops(True)
         self.setDefaultDropAction(Qt.MoveAction)
-        self.setRootIndex(fsIndex)
-        self.doubleClicked.connect(self.doubleClicked)
+        self.setRootIndex(self.fsIndex)
+        self.doubleClicked.connect(self.doubleClickedAction)
         self.hideColumn(1)
         self.hideColumn(2)
         self.hideColumn(3)
@@ -418,23 +404,30 @@ class DSTreeView(QTreeView):
         idx = self.mapToGlobal(point)
 
         item = self.selectionModel().selectedIndexes()
-        if(os.path.isdir(self.model.filePath(item[0]))):        #Don't show menu on folders
+        if(os.path.isdir(self.fileSystem.filePath(item[0]))):        #Don't show menu on folders
             return
 
         openAction = QAction('Open', self)
-        openAction.triggered.connect(lambda: self.open(self.model.filePath(item[0])))
+        openAction.triggered.connect(lambda: self.open(self.fileSystem.filePath(item[0])))
 
         deleteAction = QAction('Delete', self)
-        deleteAction.triggered.connect(lambda: self.delete(self.model.filePath(item[0])))
+        deleteAction.triggered.connect(lambda: self.delete(self.fileSystem.filePath(item[0])))
 
         duplicateAction = QAction('Duplicate', self)
-        duplicateAction.triggered.connect(lambda: self.duplicate(self.model.filePath(item[0])))
+        duplicateAction.triggered.connect(lambda: self.duplicate(self.fileSystem.filePath(item[0])))
 
         menu = QMenu(self)
         menu.addAction(openAction)
         menu.addAction(deleteAction)
         menu.addAction(duplicateAction)
         menu.exec(idx)
+
+    def doubleClickedAction(self, index):
+        item = self.fileSystem.fileInfo(index)
+        filePath = item.filePath()
+        fileExt = os.path.splitext(item.fileName())[1]
+        if(fileExt == '.sqpy'):
+            self.openSequence(filePath)
 
     def open(self, item):
         self.iM.Load_Sequence(item)

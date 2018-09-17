@@ -90,11 +90,20 @@ class InstrumentManager(QObject):
         return self.addCompToInstrument(model)
 
 ##### Functions: Sequence Management #####
-    def Load_Sequence(self, path):
-        self.openSequence(path)
+    #def Load_Sequence(self, path):
+    #    if(self.currentInstrument is None):
+    #        msg = QMessageBox()
+    #        msg.setIcon(QMessageBox.Critical)
+    #        msg.setText("No instrument is loaded - cannot load sequence!")
+    #        msg.setWindowTitle("Sequence/Instrument Compatibability Error")
+    #        msg.setStandardButtons(QMessageBox.Ok)
 
-    def Save_Sequence(self, name=None, path=None):
-        pass
+    #        retval = msg.exec_()
+    #    else:
+    #        self.openSequence(path)
+
+    #def Save_Sequence(self, name=None, path=None):
+    #    pass
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -172,15 +181,8 @@ class InstrumentManager(QObject):
 
 ##### Search Functions ######
 
-    def getComponentByUUID(self, uuid):
-        if(self.currentInstrument is not None):
-            return self.currentInstrument.getComponentByUUID(uuid) # Search Components
-        else:
-            return None
-
     def removeCompByUUID(self, uuid):
         if(self.currentInstrument is not None):
-            print(self.getComponentByUUID(uuid))
             self.currentInstrument.removeComponent(self.getComponentByUUID(uuid))
         return True
 
@@ -292,6 +294,38 @@ class InstrumentManager(QObject):
 
 ##### Sequence Manipulation #####
 
+    def openSequenceFile(self, filePath):
+        self.mW.postLog('Opening Sequence File (' + filePath + ')... ', DSConstants.LOG_PRIORITY_HIGH)
+        sequenceData = None
+
+        if(os.path.isfile(filePath) is True):
+            with open(filePath, 'r') as file:
+                try:
+                    sequenceData = json.load(file)
+                except ValueError as e:
+                    self.mW.postLog('Corrupted sequence file - aborting!', DSConstants.LOG_PRIORITY_HIGH)
+                    return None
+        else:
+            self.mW.postLog('Sequence Path was invalid - aborting!', DSConstants.LOG_PRIORITY_HIGH)
+            return None
+
+        return sequenceData
+
+        if(self.instrument.processSequenceData(sequenceData) is False):
+            self.mW.postLog('Sequence at (' + filePath + ') not loaded - aborting! ', DSConstants.LOG_PRIORITY_HIGH)
+        else:
+            self.currentSequenceURL = filePath
+
+        self.wM.userProfile['sequenceURL'] = filePath
+        self.mW.postLog('Finished Loading Sequence!', DSConstants.LOG_PRIORITY_HIGH)
+
+        if(self.currentSequenceURL is not None):
+            self.Sequence_Loaded.emit()
+            return True
+        else:
+            self.Sequence_Unloaded.emit()
+            return False
+
     def saveSequence(self):
         if(self.currentSequenceURL is None):
             self.saveAs()
@@ -337,86 +371,10 @@ class InstrumentManager(QObject):
     def newSequence(self):
         result = DSNewFileDialog.newFile()
 
-    def getSequenceSaveData(self):
-        saveDataPacket = dict()
-        saveDataPacket['instrument'] = self.currentInstrument.name
-
-        saveData = list()
-        for plot in self.mW.sequencerDockWidget.plots:
-            if(plot.component.sequencerEditWidget is not None):
-                packetItem = dict()
-                packetItem['name'] = plot.component.compSettings['name']
-                packetItem['type'] = plot.component.componentType
-                packetItem['compID'] = plot.component.componentIdentifier
-                packetItem['uuid'] = plot.component.compSettings['uuid']
-                packetItem['events'] = plot.component.sequencerEditWidget.getEventsSerializable()
-                saveData.append(packetItem)
-
-        saveDataPacket['saveData'] = saveData
-        return saveDataPacket
-
-    def openSequence(self, filePath):
-        if(self.currentInstrument is None):
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Critical)
-            msg.setText("No instrument is loaded - cannot load sequence!")
-            msg.setWindowTitle("Sequence/Instrument Compatibability Error")
-            msg.setStandardButtons(QMessageBox.Ok)
-
-            retval = msg.exec_()
-            return
-
-        self.mW.postLog('Loading Sequence (' + filePath + ')... ', DSConstants.LOG_PRIORITY_HIGH)
-
-        if(os.path.isfile(filePath) is True):
-            with open(filePath, 'r') as file:
-                try:
-                    sequenceData = json.load(file)
-                    if(self.processSequenceData(sequenceData) is False):
-                        self.mW.postLog('Sequence at (' + filePath + ') not loaded - aborting! ', DSConstants.LOG_PRIORITY_HIGH)
-                    else:
-                        self.currentSequenceURL = filePath
-                except ValueError as e:
-                    self.mW.postLog('Corrupted sequence at (' + filePath + ') - aborting! ', DSConstants.LOG_PRIORITY_HIGH)
-                    return
-
-        self.wM.userProfile['sequenceURL'] = filePath
-
-        if(self.currentSequenceURL is not None):
-            self.Sequence_Loaded.emit()
-        else:
-            self.Sequence_Unloaded.emit()
-
-        self.mW.postLog('Finished Loading Sequence!', DSConstants.LOG_PRIORITY_HIGH)
-
-    def processSequenceData(self, data):
-        instrument = data['instrument']
-        self.currentInstrument.clearSequenceEvents()
-        if(instrument != self.currentInstrument.name):
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Warning)
-            msg.setText("The sequence is for a different instrument (" + instrument + ") than what is currently loaded (" + self.currentInstrument.name + "). It is unlikely this sequence will load.. Continue?")
-            msg.setWindowTitle("Sequence/Instrument Compatibability Warning")
-            msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-
-            retval = msg.exec_()
-            if(retval == QMessageBox.No):
-                return False
-
-        dataSet = data['saveData']
-        for datum in dataSet:
-            comp = self.currentInstrument.getComponentByUUID(datum['uuid'])
-            if(comp is None):
-                self.mW.postLog('Sequence data for comp with uuid (' + datum['uuid'] + ') cannot be assigned! Possibly from different instrument.', DSConstants.LOG_PRIORITY_HIGH)
-            else:
-                comp.loadSequenceData(datum['events'])
-        
-        return True
-
-##### User Components #####
+##### Components #####
 
     def loadComponents(self):
-        self.mW.postLog('Loading User Components... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.mW.postLog('Loading Component Models... ', DSConstants.LOG_PRIORITY_HIGH)
 
         for root, dirs, files in os.walk(self.componentsDir):
             for name in files:
@@ -425,7 +383,7 @@ class InstrumentManager(QObject):
                 if (compHolder != None):
                     self.componentsAvailable.append(compHolder)
 
-        self.mW.postLog('Finished Loading User Components!', DSConstants.LOG_PRIORITY_HIGH)
+        self.mW.postLog('Finished Loading Component Models!', DSConstants.LOG_PRIORITY_HIGH)
 
     def loadComponentFromFile(self, filepath): # I think this is only for the models
         class_inst = None
@@ -449,7 +407,6 @@ class InstrumentManager(QObject):
 
         if(loaded):
             class_inst.iM = self
-            #class_inst.setupWidgets()
             self.mW.postLog('  (Success!)', DSConstants.LOG_PRIORITY_MED, newline=False)
         else:
             self.mW.postLog(' (Failed!)', DSConstants.LOG_PRIORITY_MED, newline=False)

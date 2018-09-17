@@ -27,7 +27,7 @@
                 {
                     "drivingSocket": true,
                     "filterInputSource": null,
-                    "inputSource": "d77bb156-5452-4c9d-97ec-22921ee0effd",
+                    "inputSource": "fbe5bb5c-7510-41ed-9417-4abe01fc33eb",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "paths": null,
@@ -67,8 +67,8 @@
                 {
                     "drivingSocket": true,
                     "filterInputSource": null,
-                    "inputSource": null,
-                    "inputSourcePathNo": null,
+                    "inputSource": "8d034fa3-d7cc-4f4b-8fff-8397d027cdf4",
+                    "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "paths": null,
                     "prec": 0.1,

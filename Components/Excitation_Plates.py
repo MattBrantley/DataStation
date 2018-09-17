@@ -1,6 +1,6 @@
-from Managers.InstrumentManager.Component import *
-from Managers.InstrumentManager.Sockets import *
-from Managers.InstrumentManager.EventTypes import *
+from src.Managers.InstrumentManager.Component import *
+from src.Managers.InstrumentManager.Sockets import *
+from src.Managers.InstrumentManager.EventTypes import *
 import os, uuid
 import numpy as np
 import scipy.signal

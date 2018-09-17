@@ -6,8 +6,383 @@
         ".THING": "CSV Importer Fails"
     },
     "hardwareState": {
-        "filters": [],
-        "hardwareStates": []
+        "filters": [
+            {
+                "filterIdentifier": "SimpAmp_MRB",
+                "filterType": "Simple Amplifier",
+                "gain": 1,
+                "iconGraphicSrc": "default.png",
+                "inputSource": "b7854bc7-e2c5-4d3a-b327-05a37a185248",
+                "inputSourcePathNo": 1,
+                "name": "Unnamed Simple Amplifier",
+                "offset": 0,
+                "uuid": "8d034fa3-d7cc-4f4b-8fff-8397d027cdf4"
+            }
+        ],
+        "hardwareStates": [
+            {
+                "hardwareIdentifier": "NI_DAQmx_MRB",
+                "hardwareSettings": {
+                    "deviceName": "Output_Test",
+                    "hardwareType": "NI_DAQmx",
+                    "name": "Output_Test",
+                    "physID": "",
+                    "triggerCompUUID": "",
+                    "triggerMode": "",
+                    "uuid": "2fa2287c-d60d-4e96-a9a5-97dcf22fcdd4"
+                },
+                "sourceList": [
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/ai0",
+                        "physConID": "Output_Test/ai0",
+                        "prec": 0.1,
+                        "trigger": false,
+                        "uuid": "39b0c442-97fe-41db-b9ea-237882aa6347",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/ai1",
+                        "physConID": "Output_Test/ai1",
+                        "prec": 0.1,
+                        "trigger": false,
+                        "uuid": "aeadb993-a4b9-43c2-9366-2dd240ba7c2f",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/ai2",
+                        "physConID": "Output_Test/ai2",
+                        "prec": 0.1,
+                        "trigger": false,
+                        "uuid": "0f0df98b-3108-4493-867c-2f70761646f6",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/ai3",
+                        "physConID": "Output_Test/ai3",
+                        "prec": 0.1,
+                        "trigger": false,
+                        "uuid": "26452afe-32ba-49ae-a0ce-36b6bc5216b2",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/ai4",
+                        "physConID": "Output_Test/ai4",
+                        "prec": 0.1,
+                        "trigger": false,
+                        "uuid": "cf278fae-5421-4af2-809d-67abef7a2703",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/ai5",
+                        "physConID": "Output_Test/ai5",
+                        "prec": 0.1,
+                        "trigger": false,
+                        "uuid": "a0c8b681-382f-44dc-a091-e1ac822863e5",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/ai6",
+                        "physConID": "Output_Test/ai6",
+                        "prec": 0.1,
+                        "trigger": false,
+                        "uuid": "4cd09e20-b416-46e3-af4f-ec1a8f091567",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/ai7",
+                        "physConID": "Output_Test/ai7",
+                        "prec": 0.1,
+                        "trigger": false,
+                        "uuid": "4c38ce9e-7d64-4704-a5d1-af24ce3cdce1",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/ai8",
+                        "physConID": "Output_Test/ai8",
+                        "prec": 0.1,
+                        "trigger": false,
+                        "uuid": "6421f9e5-20df-4d30-9bb6-b395c2740579",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/ai9",
+                        "physConID": "Output_Test/ai9",
+                        "prec": 0.1,
+                        "trigger": false,
+                        "uuid": "cfc512e2-8321-4482-b96f-f785afe4baaa",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/ai10",
+                        "physConID": "Output_Test/ai10",
+                        "prec": 0.1,
+                        "trigger": false,
+                        "uuid": "7af4af03-f619-40fc-a1a7-713b76e6da16",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/ai11",
+                        "physConID": "Output_Test/ai11",
+                        "prec": 0.1,
+                        "trigger": false,
+                        "uuid": "4a5dfd81-cb52-4c3f-8661-45989e08222f",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/ai12",
+                        "physConID": "Output_Test/ai12",
+                        "prec": 0.1,
+                        "trigger": false,
+                        "uuid": "32104c86-a457-4e2c-b8df-ee76ec04a043",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/ai13",
+                        "physConID": "Output_Test/ai13",
+                        "prec": 0.1,
+                        "trigger": false,
+                        "uuid": "4ef05cf0-05b9-4440-a367-7d4e683d8ed3",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/ai14",
+                        "physConID": "Output_Test/ai14",
+                        "prec": 0.1,
+                        "trigger": false,
+                        "uuid": "a189d032-d24f-46f1-b777-0f8b862c5225",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/ai15",
+                        "physConID": "Output_Test/ai15",
+                        "prec": 0.1,
+                        "trigger": false,
+                        "uuid": "6d939d65-2a23-497f-8f98-d07c4f9dcf6a",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/ao0",
+                        "physConID": "Output_Test/ao0",
+                        "prec": 0.1,
+                        "trigger": false,
+                        "uuid": "fbe5bb5c-7510-41ed-9417-4abe01fc33eb",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/ao1",
+                        "physConID": "Output_Test/ao1",
+                        "prec": 0.1,
+                        "trigger": false,
+                        "uuid": "b7854bc7-e2c5-4d3a-b327-05a37a185248",
+                        "vMax": 10,
+                        "vMin": -10
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port0/line0",
+                        "physConID": "Output_Test/port0/line0",
+                        "trigger": true,
+                        "uuid": "c98d5ae8-c48b-49a7-9d0a-dff8c8bb3c82"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port0/line1",
+                        "physConID": "Output_Test/port0/line1",
+                        "trigger": true,
+                        "uuid": "34dd82bc-f8f7-46f4-b11e-ba2f2cb02b53"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port0/line2",
+                        "physConID": "Output_Test/port0/line2",
+                        "trigger": true,
+                        "uuid": "87b6d2eb-88b1-4216-821a-bfdccc8f68da"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port0/line3",
+                        "physConID": "Output_Test/port0/line3",
+                        "trigger": true,
+                        "uuid": "594cd50b-1587-47e9-b127-97d650c3b061"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port0/line4",
+                        "physConID": "Output_Test/port0/line4",
+                        "trigger": true,
+                        "uuid": "3835adbc-5402-4961-84c4-0390002836a0"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port0/line5",
+                        "physConID": "Output_Test/port0/line5",
+                        "trigger": true,
+                        "uuid": "adc1942a-66b0-4c06-9642-7497814326f3"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port0/line6",
+                        "physConID": "Output_Test/port0/line6",
+                        "trigger": true,
+                        "uuid": "bfb273ba-4ddc-43bb-be9c-061c6d7ef36e"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port0/line7",
+                        "physConID": "Output_Test/port0/line7",
+                        "trigger": true,
+                        "uuid": "734478a5-1877-4ccf-910e-8bbf69883936"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port1/line0",
+                        "physConID": "Output_Test/port1/line0",
+                        "trigger": true,
+                        "uuid": "35e80ec7-eb78-4b6c-b2ad-e0f386fff0f5"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port1/line1",
+                        "physConID": "Output_Test/port1/line1",
+                        "trigger": true,
+                        "uuid": "343daf7a-2a14-4b28-8a94-542057228ca4"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port1/line2",
+                        "physConID": "Output_Test/port1/line2",
+                        "trigger": true,
+                        "uuid": "89e80c2b-6623-40f3-ab1b-f74b02109fb4"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port1/line3",
+                        "physConID": "Output_Test/port1/line3",
+                        "trigger": true,
+                        "uuid": "a8cdd3ce-156f-4ecf-a601-36e341363471"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port1/line4",
+                        "physConID": "Output_Test/port1/line4",
+                        "trigger": true,
+                        "uuid": "177f96fb-731d-4a86-a89a-56cdb9e321f0"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port1/line5",
+                        "physConID": "Output_Test/port1/line5",
+                        "trigger": true,
+                        "uuid": "95802eb7-9651-45c0-b410-aa522212a2f3"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port1/line6",
+                        "physConID": "Output_Test/port1/line6",
+                        "trigger": true,
+                        "uuid": "22948e21-79af-4309-9565-ccb1bb0deb33"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port1/line7",
+                        "physConID": "Output_Test/port1/line7",
+                        "trigger": true,
+                        "uuid": "f4469c17-c205-4ae9-9a6f-c7b21a95c07f"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port2/line0",
+                        "physConID": "Output_Test/port2/line0",
+                        "trigger": true,
+                        "uuid": "e3cbecce-6336-4758-8625-79d36425ca57"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port2/line1",
+                        "physConID": "Output_Test/port2/line1",
+                        "trigger": true,
+                        "uuid": "485a9862-a0db-4327-90fc-50612a8e6462"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port2/line2",
+                        "physConID": "Output_Test/port2/line2",
+                        "trigger": true,
+                        "uuid": "16076bfa-c137-462e-9687-fbe831b2ed82"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port2/line3",
+                        "physConID": "Output_Test/port2/line3",
+                        "trigger": true,
+                        "uuid": "ababa8c0-cc8f-4961-a5df-4e8817d31799"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port2/line4",
+                        "physConID": "Output_Test/port2/line4",
+                        "trigger": true,
+                        "uuid": "acd07155-52c8-42c1-b2b3-6ee29df1fb76"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port2/line5",
+                        "physConID": "Output_Test/port2/line5",
+                        "trigger": true,
+                        "uuid": "680ce3a8-e149-415f-af0e-fc9570b5209d"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port2/line6",
+                        "physConID": "Output_Test/port2/line6",
+                        "trigger": true,
+                        "uuid": "6460cf4d-08cd-4eba-9e4d-f04f78a19ad8"
+                    },
+                    {
+                        "enabled": false,
+                        "name": "[Output_Test] Output_Test/port2/line7",
+                        "physConID": "Output_Test/port2/line7",
+                        "trigger": true,
+                        "uuid": "e7ac953e-39ad-4949-becc-ef4cd7ee10eb"
+                    }
+                ]
+            }
+        ]
     },
     "workspaceURL": "D:/InstrPlatform/DataStation/User Data/Workspace3.db"
 }

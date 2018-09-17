@@ -2,9 +2,9 @@
 """
 A quadrupole ion guide
 """
-from Managers.InstrumentManager.Component import *
-from Managers.InstrumentManager.Sockets import *
-from MAnagers.InstrumentManager.EventTypes import *
+from src.Managers.InstrumentManager.Component import *
+from src.Managers.InstrumentManager.Sockets import *
+from src.Managers.InstrumentManager.EventTypes import *
 import os, uuid
 import numpy as np
 

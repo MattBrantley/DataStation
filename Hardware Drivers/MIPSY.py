@@ -1,9 +1,7 @@
-from Managers.HardwareManager.hardwareObject import hardwareObject, hardwareWorker, hwm
+from src.Managers.HardwareManager.hardwareObject import hardwareObject, hardwareWorker, hwm
+from src.Managers.HardwareManager.Sources import *
+import os, traceback, sys, glob, serial, re, numpy as np
 from PyQt5.Qt import *
-from Managers.HardwareManager.Sources import *
-import os, traceback, sys, glob, serial, re
-import numpy as np
-import nidaqmx.system
 from multiprocessing import Process, Queue, Pipe
 
 class Hardware_Driver(hardwareObject):

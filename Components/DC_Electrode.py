@@ -151,9 +151,10 @@ class DC_Electrode(Component):
             self.minVBox.setStyleSheet("QDoubleSpinBox {background-color: white;}")
 
 class stepEvent(eventType):
+    name = 'Step'
+
     def __init__(self, gran):
         super().__init__()
-        self.name = 'Step'
         self.gran = gran
 
     def genParameters(self):
@@ -165,9 +166,9 @@ class stepEvent(eventType):
         return self.gran
 
 class pulseEvent(eventType):
+    name = 'Pulse'
     def __init__(self):
         super().__init__()
-        self.name = 'Pulse'
 
     def genParameters(self):
         paramList = list()
@@ -179,9 +180,10 @@ class pulseEvent(eventType):
         return params[1].value()
 
 class linearRampEvent(eventType):
+    name = 'Linear Ramp'
+
     def __init__(self):
         super().__init__()
-        self.name = 'Linear Ramp'
 
     def genParameters(self):
         paramList = list()
@@ -193,9 +195,10 @@ class linearRampEvent(eventType):
         return params[1].value()
 
 class pulseTrainEvent(eventType):
+    name = 'Pulse Train'
+    
     def __init__(self):
         super().__init__()
-        self.name = 'Pulse Train'
 
     def genParameters(self):
         paramList = list()

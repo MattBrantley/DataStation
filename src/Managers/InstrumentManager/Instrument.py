@@ -21,12 +21,14 @@ class Instrument(QObject):
     def Set_Name(self, name):
         self.name = name
         self.iM.instrumentConfigModified(self)
+        return True
 
     def Get_Path(self):
         return self.url
 
     def Set_Path(self, path):
         self.url = path
+        return True
 
     def Get_Sockets(self, uuid=-1, inputUUID=-1, pathNo=-1, socketType=None):
         return self.getSockets(uuid, inputUUID, pathNo, socketType)
@@ -34,8 +36,17 @@ class Instrument(QObject):
     def Get_Components(self):
         return self.componentList
 
+    def Remove_Component(self, component):
+        return self.removeComponent(component)
+
     def Add_Component(self, compModel, loadData=None):
         return self.addComponent(compModel, loadData)
+
+    def Load_Sequence(self, path, showWarning=True):
+        return self.loadSequence(path, showWarning)
+
+    def Save_Sequence(self, name=None, path=None):
+        pass
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -106,7 +117,7 @@ class Instrument(QObject):
     def removeComponent(self, comp):
         if(comp is not None):
             comp.onRemovalParent()
-            self.components.remove(comp)
+            self.componentList.remove(comp)
             self.iM.componentRemoved(self, comp)
 
     def reattachSockets(self):
@@ -119,15 +130,23 @@ class Instrument(QObject):
 ##### Search Functions #####
 
     def getComponentByUUID(self, uuid):
-        for comp in self.components:
+        for comp in self.componentList:
             if('uuid' in comp.compSettings):
                 if(comp.compSettings['uuid'] == uuid):
                     return comp
         return None
 
+    def getComponents(self, uuid=-1):
+        outList = list()
+        for component in self.componentList:
+            if(component.compSettings['uuid'] != uuid and uuid != -1):
+                continue
+            outList.append(component)
+        return outList
+
     def getSockets(self, uuid=-1, inputUUID=-1, pathNo=-1, socketType=None):
         outList = list()
-        for socket in self.getSocketObjs():
+        for socket in self.getAllSockets():
             if(socket.socketSettings['uuid'] != uuid and uuid != -1):
                 continue
             if(socket.socketSettings['inputSource'] != inputUUID and inputUUID != -1):
@@ -140,10 +159,44 @@ class Instrument(QObject):
             outList.append(socket)
         return outList
         
-    def getSocketObjs(self):
+    def getAllSockets(self):
         socketList = list()
         for component in self.componentList:
             socketList += component.Get_Sockets()
-
         return socketList
-#####
+
+##### Event Functions #####
+
+    def clearEvents(self):
+        pass
+
+    def loadSequence(self, path, showWarning=True):
+        data = self.iM.openSequenceFile(self, path)
+        self.mW.postLog('Applying sequence to instrument... ', DSConstants.LOG_PRIORITY_HIGH)
+
+        if(data is None):
+            self.mW.postLog('Sequence data was empty - aborting!', DSConstants.LOG_PRIORITY_HIGH)
+            return False
+
+        if(data['instrument'] != self.Get_Name() and showWarning is True):
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setText("The sequence is for a different instrument (" + data['instrument'] + ") than what is currently loaded (" + self.Get_Name() + "). It is unlikely this sequence will load.. Continue?")
+            msg.setWindowTitle("Sequence/Instrument Compatibability Warning")
+            msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+
+            retval = msg.exec_()
+            if(retval == QMessageBox.No):
+                return False
+
+        self.clearEvents()
+
+        for datum in data['saveData']:
+            comp = self.getComponent(uuid=datum['uuid'])
+            if(not comp):
+                self.mW.postLog('Sequence data for comp with uuid (' + datum['uuid'] + ') cannot be assigned! Possibly from different instrument.', DSConstants.LOG_PRIORITY_HIGH)
+            else:
+                comp[0].loadSequenceData(datum['events'])
+
+        self.mW.postLog('Sequence applied to instrument!', DSConstants.LOG_PRIORITY_HIGH)
+        return True
