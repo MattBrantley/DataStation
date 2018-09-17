@@ -99,8 +99,8 @@ class Hardware_Driver(hardwareObject):
                 self.Add_AOSource(chan.name, -10, 10, 0.1)
             for chan in device.di_lines:
                 self.Add_DISource(chan.name, trigger=True)
-            for chan in device.do_lines:
-                self.Add_DOSource(chan.name)
+            #for chan in device.do_lines:                                   #This is duplicating the di_lines!!!
+            #    self.Add_DOSource(chan.name)
         else:
             self.hM.configModified(self)
 

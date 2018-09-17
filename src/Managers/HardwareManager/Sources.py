@@ -1,12 +1,9 @@
 from PyQt5.Qt import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-import os, sys, imp, math
-from Constants import DSConstants as DSConstants
-from Managers.InstrumentManager.Sockets import *
-import uuid
-from DSWidgets.controlWidget import readyCheckPacket
-import numpy as np
+import os, sys, imp, math, uuid, numpy as np
+from src.Constants import DSConstants as DSConstants, readyCheckPacket
+from src.Managers.InstrumentManager.Sockets import *
 
 class Source():
 ############################################################################################
@@ -19,11 +16,16 @@ class Source():
         return self.sourceSettings['physConID']
 
     def Get_Sockets(self):
-        return self.getSocket()
+        return self.getSockets()
+
+    def Get_Source(self):
+        return self
 
     def Get_UUID(self):
         return self.sourceSettings['uuid']
 
+    def Get_Number_Of_Paths(self):
+        return 1
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
 
@@ -59,20 +61,15 @@ class Source():
 ##### Search Functions #####
 
     def getSockets(self):
+        if(self.iM.Get_Instrument() is None):
+            return list()
+        outputFilters = self.hM.Get_Filters(inputUUID = self.sourceSettings['uuid'])
+        outputSockets = self.iM.Get_Instrument().Get_Sockets(inputUUID = self.sourceSettings['uuid'])
 
-        
+        for Filter in outputFilters:
+            outputSockets += Filter.Get_Sockets()
 
-        #sockets = list()
-        #for path in self.sourceSettings['paths']:
-        #    if(path is not None):
-        #        if(issubclass(type(path), Socket) is True):
-        #            sockets.append(path)
-        #        else:
-        #            result = path.getSockets()
-        #            if(result is not None):
-        #                for socket in result:
-        #                    sockets.append(socket)
-        #return sockets
+        return outputSockets
 
 ##### Functions Over-Ridden By Factoried Sources #####
 
@@ -123,7 +120,7 @@ class Source():
         return self.sourceSettings
 
     def loadPacket(self, loadPacket):
-        pass
+        self.sourceSettings = loadPacket
 
     def program(self):
         self.hWare.program(self)

@@ -1,14 +1,13 @@
 import os, sys, imp
-from Managers.InstrumentManager.Instrument import *
-from Managers.InstrumentManager.Filter import *
-from Managers.InstrumentManager.Sockets import *
-from Managers.InstrumentManager.Digital_Trigger_Component import Digital_Trigger_Component
-from Managers.HardwareManager.hardwareObject import hardwareObject
-from Managers.HardwareManager.Sources import *
-from DataStation_Labview import DataStation_LabviewExtension
-from Constants import DSConstants as DSConstants
+from src.Managers.InstrumentManager.Instrument import *
+from src.Managers.InstrumentManager.Filter import *
+from src.Managers.InstrumentManager.Sockets import *
+from src.Managers.InstrumentManager.Digital_Trigger_Component import Digital_Trigger_Component
+from src.Managers.HardwareManager.hardwareObject import hardwareObject
+from src.Managers.HardwareManager.Sources import *
+from src.Managers.HardwareManager.DataStation_Labview import DataStation_LabviewExtension
+from src.Constants import DSConstants as DSConstants, readyCheckPacket
 import json as json
-from DSWidgets.controlWidget import readyCheckPacket
 
 class HardwareManager(QObject):
 
@@ -20,7 +19,7 @@ class HardwareManager(QObject):
     Hardware_State_Saving = pyqtSignal()
 
 ##### Signals: Hardware #####
-    Hardware_Added = pyqtSignal(object) # hardwareObj
+    Hardware_Added = pyqtSignal(object) # hardware
     Hardware_Removed = pyqtSignal()
     Hardware_Trigger_Modified = pyqtSignal()
 
@@ -29,7 +28,14 @@ class HardwareManager(QObject):
     Sequence_Finished = pyqtSignal()
 
 ##### Signals: Sources #####
-    Source_Added = pyqtSignal(object, object) # hardwareObj, sourceObj
+    Source_Added = pyqtSignal(object, object) # hardware, source
+
+##### Signals: Filters #####
+    Filter_Added = pyqtSignal(object) # Filter
+    Filter_Attached = pyqtSignal(object) # Filter
+    Filter_Detatched = pyqtSignal(object) # Filter
+    Filter_Removing = pyqtSignal(object) # Filter - Right before removal
+    Filter_Removed = pyqtSignal()
 
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
@@ -49,6 +55,11 @@ class HardwareManager(QObject):
     def Get_Hardware_Models_Available(self):
         return self. driversAvailable
 
+##### Functions: Filter Models #####
+
+    def Get_Filter_Models_Available(self):
+        return self.filtersAvailable
+
 ##### Functions: Hardware #####
     def Get_Hardware(self):
         return self.hardwareLoaded
@@ -59,18 +70,14 @@ class HardwareManager(QObject):
     def Remove_Hardware(self, hardwareObject):
         return self.removeHardwareObj(hardwareObject)
 
-    def Get_All_Sources(self):
-        reList = list()
-        for hardware in self.hardwareLoaded:
-            reList += hardware.Get_Sources()
-        return reList
+    def Add_Filter(self, filterModel):
+        return self.addFilter(filterModel)
 
-    def Get_All_Sources_By_Type(self, sourceType):
-        reList = list()
-        for hardware in self.hardwareLoaded:
-            reList += hardware.Get_Sources_By_Type(sourceType)
-        return reList
-        
+    def Get_Filters(self, uuid=-1, inputUUID=-1, pathNo=-1, filterType=None):
+        return self.getFilters(uuid, inputUUID, pathNo, filterType)
+
+    def Get_Sources(self, uuid=-1, sourceType=None):
+        return self.getSources(uuid, sourceType)
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -79,7 +86,7 @@ class HardwareManager(QObject):
 
         self.mW = mW
         self.readyStatus = False
-        self.filtersDir = os.path.join(self.mW.rootDir, 'User Filters')
+        self.filtersDir = os.path.join(self.mW.rootDir, 'Filters')
         self.hardwareDriverDir = os.path.join(self.mW.rootDir, 'Hardware Drivers')
         self.filtersAvailable = list()
         self.driversAvailable = list()
@@ -92,9 +99,6 @@ class HardwareManager(QObject):
     def connections(self, iM, wM):
         self.iM = self.mW.iM
         self.wM = self.mW.wM
-        #self.iM.Instrument_Loaded.connect(self.instrumentLoaded)
-        #self.iM.Sequence_Loaded.connect(self.programAllDevices)
-        #self.iM.Instrument_Unloaded.connect(self.instrumentUnloaded)
 
 ##### DataStation Reserved Functions #####
 
@@ -123,22 +127,109 @@ class HardwareManager(QObject):
     def sourceAdded(self, hardwareObj, sourceObj): # Source_Added
         self.Source_Added.emit(hardwareObj, sourceObj)
 
+##### Functions Called By Factoried Filter Objects #####
+
+    def removeFilter(self, Filter): # Filter_Removing, Filter_Removed
+        self.Filter_Removing.emit(Filter)
+        self.filterList.remove(Filter)
+        self.Filter_Removed.emit()
+
+    def filterAttached(self, Filter): # Filter_Attached
+        self.Filter_Attached.emit(Filter)
+
+    def filterDetatched(self, Filter): # Filter_Detatched
+        self.Filter_Detatched.emit(Filter)
+
 ##### Search Function ######
-
-    def getFilterOrSourceByUUID(self, uuid):
-        for Filter in self.filterList:
-            if(Filter.uuid == uuid):
-                return Filter
-        for source in self.getSourceObjs('All'):
-            if(source.getUUID() == uuid):
-                return source
-
-        return None
             
-    def getFiltersWithUUIDAsInput(self, uuid):
+    def getFilters(self, uuid=-1, inputUUID=-1, pathNo=-1, filterType=None):
+        outList = list()
         for Filter in self.filterList:
-            if(Filter.uuid == uuid):
-                return Filter
+            if(Filter.filterSettings['uuid'] != uuid and uuid != -1):
+                continue
+            if(Filter.filterSettings['inputSource'] != inputUUID and inputUUID != -1):
+                continue
+            if(Filter.filterSettings['inputSourcePathNo'] != pathNo and pathNo != -1):
+                continue
+            if(filterType is not None):
+                if(issubclass(filterType, Filter) is False): #AnalogFilter or DigitalFilter
+                    continue
+            outList.append(Filter)
+        return outList
+
+    def getSources(self, uuid=-1, sourceType=None):
+        outList = list()
+        for source in self.getSourceObjs():
+            if(source.sourceSettings['uuid'] != uuid and uuid != -1):
+                continue
+            if(sourceType is not None):
+                if(isinstance(source, sourceType) is False):
+                    continue
+            outList.append(source)
+        return outList
+
+    def getTrigCompsRefUUID(self, uuid):
+        return self.mW.iM.getTrigCompsRefUUID(uuid)
+    
+    def removeCompByUUID(self, uuid):
+        return self.mW.iM.removeCompByUUID(uuid)
+
+    def getHardwareObjectByUUID(self, uuid):
+        for hardware in self.hardwareLoaded:
+            if(hardware.hardwareSettings['uuid'] == uuid):
+                return hardware
+        return None        
+
+    def getSourceObjs(self):
+        sourceList = list()
+        for hardware in self.hardwareLoaded:
+            sourceList += hardware.sourceList
+
+        return sourceList
+
+    def getFilterModelFromIdentifier(self, identifier):
+        for filter in self.filtersAvailable:
+            if(filter.filterIdentifier == identifier):
+                return filter
+        
+        return None
+
+    def findHardwareModelByIdentifier(self, identifier):
+        for hardwareModel in self.driversAvailable:
+            if(hardwareModel.hardwareIdentifier == identifier):
+                return hardwareModel
+        return None
+
+##### Initialization Functions #####
+
+    def loadFilters(self):
+        self.mW.postLog('Loading User Filters... ', DSConstants.LOG_PRIORITY_HIGH)
+
+        for root, dirs, files in os.walk(self.filtersDir):
+            for name in files:
+                url = os.path.join(root, name)
+                filterHolder = self.loadFilterFromFile(url)
+                if (filterHolder != None):
+                    self.filtersAvailable.append(filterHolder)
+
+        self.mW.postLog('Finished Loading User Filters!', DSConstants.LOG_PRIORITY_HIGH)
+
+    def loadHardwareDrivers(self):
+        self.mW.postLog('Loading Hardware Drivers... ', DSConstants.LOG_PRIORITY_HIGH)
+
+        for root, dirs, files in os.walk(self.hardwareDriverDir):
+            for name in files:
+                url = os.path.join(root, name)
+                driverHolder = self.loadDriverFromFile(url)
+                if (driverHolder != None):
+                    self.driversAvailable.append(driverHolder)
+
+        self.mW.postLog('Finished Loading Hardware Drivers!', DSConstants.LOG_PRIORITY_HIGH)
+
+    def loadLabviewInterface(self):
+        self.mW.postLog('Initializing DataStation Labview Interface... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.lvInterface = DataStation_LabviewExtension(self.mW)
+        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     def loadFilterFromFile(self, filepath):
         class_inst = None
@@ -201,120 +292,40 @@ class HardwareManager(QObject):
         class_inst.hM = self
         return class_inst
 
-    def getFiltersByType(self, typeText):
-        typeOut = type(None)
-        if(typeText == 'Sockets: Analog Output'):
-            typeOut = AnalogFilter
-        elif(typeText == 'Sockets: Analog Input'):
-            typeOut = AnalogFilter
-        elif(typeText == 'Sockets: Digital Output'):
-            typeOut = DigitalFilter
-        elif(typeText == 'Sockets: Digital Input'):
-            typeOut = DigitalFilter
-
-        filterList = list()
-        for filterClass in self.filtersAvailable:
-            if(issubclass(filterClass, typeOut) or typeText == 'All'):
-                filterList.append()
-
-    def getTrigCompsRefUUID(self, uuid):
-        return self.mW.iM.getTrigCompsRefUUID(uuid)
-    
-    def removeCompByUUID(self, uuid):
-        return self.mW.iM.removeCompByUUID(uuid)
-
-    def getHardwareObjectByUUID(self, uuid):
-        for hardware in self.hardwareLoaded:
-            if(hardware.hardwareSettings['uuid'] == uuid):
-                return hardware
-        return None        
-
-    def getSourceObjs(self, typeText):
-        typeOut = type(None)
-        if(typeText == 'Sockets: Analog Output'):
-            typeOut = AOSource
-        elif(typeText == 'Sockets: Analog Input'):
-            typeOut = AISource
-        elif(typeText == 'Sockets: Digital Output'):
-            typeOut = DOSource
-        elif(typeText == 'Sockets: Digital Input'):
-            typeOut = DISource
-
-        self.sourceObjList.clear()
-        for hardware in self.hardwareLoaded:
-            for source in hardware.sourceList:
-                if(isinstance(source, typeOut) or typeText == 'All'):
-                    self.sourceObjList.append(source)
-
-        return self.sourceObjList
-
-    def getFilterModelFromIdentifier(self, identifier):
-        for filter in self.filtersAvailable:
-            if(filter.filterIdentifier == identifier):
-                return filter
-        
-        return None
-
-    def findHardwareModelByIdentifier(self, identifier):
-        for hardwareModel in self.driversAvailable:
-            if(hardwareModel.hardwareIdentifier == identifier):
-                return hardwareModel
-        return None
-
-##### Initialization Functions #####
-
-    def loadFilters(self):
-        self.mW.postLog('Loading User Filters... ', DSConstants.LOG_PRIORITY_HIGH)
-
-        for root, dirs, files in os.walk(self.filtersDir):
-            for name in files:
-                url = os.path.join(root, name)
-                filterHolder = self.loadFilterFromFile(url)
-                if (filterHolder != None):
-                    self.filtersAvailable.append(filterHolder)
-
-        self.mW.postLog('Finished Loading User Filters!', DSConstants.LOG_PRIORITY_HIGH)
-
-    def loadHardwareDrivers(self):
-        self.mW.postLog('Loading Hardware Drivers... ', DSConstants.LOG_PRIORITY_HIGH)
-
-        for root, dirs, files in os.walk(self.hardwareDriverDir):
-            for name in files:
-                url = os.path.join(root, name)
-                driverHolder = self.loadDriverFromFile(url)
-                if (driverHolder != None):
-                    self.driversAvailable.append(driverHolder)
-
-        self.mW.postLog('Finished Loading Hardware Drivers!', DSConstants.LOG_PRIORITY_HIGH)
-
-    def loadLabviewInterface(self):
-        self.mW.postLog('Initializing DataStation Labview Interface... ', DSConstants.LOG_PRIORITY_HIGH)
-        self.lvInterface = DataStation_LabviewExtension(self.mW)
-        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
-
 ##### Filter Manipulation Functions #####
 
     def loadFilterFromData(self, filterInputSource, data, pathNo):
         if('filterIdentifier' in data):
             model = self.getFilterModelFromIdentifier(data['filterIdentifier'])
-            if(model is not None):
-                newFilter = type(model)(self)
-                newFilter.onCreationParent()
+            newFilter = self.addFilter(model)
+            if(newFilter is not None):
                 newFilter.onLoad(data)
-                newFilter.filterInputSource = filterInputSource
-                newFilter.filterInputPathNo = pathNo
-                self.filterList.append(newFilter)
-                return newFilter
+                #newFilter.Attach_Input(filterInputSource, pathNo)
             else:
                 self.mW.postLog('Attempting To Restore Filter With Identifier (' + data['filterIdentifier'] + ') But Could Not Find Matching User_Filter... ', DSConstants.LOG_PRIORITY_HIGH)
+            return newFilter
+        return None
+
+    def addFilter(self, filterModel, loadData=None):
+        if(filterModel is not None):
+            newFilter = type(filterModel)(self)
+            newFilter.mW = self.mW
+            newFilter.iM = self.iM
+            newFilter.hM = self
+            newFilter.wM = self.wM
+            newFilter.onCreationParent()
+            self.filterList.append(newFilter)
+
+            if(loadData is not None):
+                newFilter.loadPacket(loadData)
+
+            self.mW.postLog('Added Filter: ' + newFilter.Get_Type(), DSConstants.LOG_PRIORITY_MED)
+            self.Filter_Added.emit(newFilter)
+            return newFilter
         return None
 
 ##### Hardware Manipulation Functions #####
 
-    def instrumentLoaded(self):
-        for hardwareObj in self.hardwareLoaded:
-            hardwareObj.verifyTriggerComponentExists()    
-        
     def programAllDevices(self):
         for device in self.hardwareLoaded:
             device.program()
@@ -326,15 +337,16 @@ class HardwareManager(QObject):
 
     def addHardwareObj(self, hardwareModel, loadData=None):
         tempHardware = type(hardwareModel)(self)
+        tempHardware.mW = self.mW
+        tempHardware.iM = self.iM
+        tempHardware.hM = self
+        tempHardware.wM = self.wM
         tempHardware.initHardwareWorker()
 
-        self.hardwareLoaded.append(tempHardware)
-
-        if(loadData is None):
-            tempHardware.resetDevice()
-        else:
+        if('hardwareSettings' in loadData):
             tempHardware.loadPacketParent(loadData)
 
+        self.hardwareLoaded.append(tempHardware)
         self.Hardware_Added.emit(tempHardware)
         return tempHardware
 
@@ -362,14 +374,25 @@ class HardwareManager(QObject):
                 if(('hardwareIdentifier') in state):
                     hardwareModel = self.findHardwareModelByIdentifier(state['hardwareIdentifier'])
                     if(hardwareModel is not None):
-                        hardwareObj = self.addHardwareObj(hardwareModel, loadData=state)
-                        if('hardwareSettings' in state):
-                            hardwareObj.loadPacketParent(state)
+                        self.addHardwareObj(hardwareModel, loadData=state)
                     else:
                         self.mW.postLog('Hardware Component State Found (Identifier: ' + state['hardwareIdentifier'] + ') But No Drivers Are Present For This Identifier! Partial Hardware State Import Continuing...', DSConstants.LOG_PRIORITY_HIGH)
                         
                 else:
                     self.mW.postLog('Hardware Component State Data Corrupted! Partial Hardware State Import Continuing...', DSConstants.LOG_PRIORITY_HIGH)
+
+            for filterState in hardwareData['filters']:
+                if(('filterIdentifier') in filterState):
+                    filterModel = self.getFilterModelFromIdentifier(filterState['filterIdentifier'])
+                    if(filterModel is not None):
+                        self.addFilter(filterModel, loadData=filterState)
+                    else:
+                        self.mW.postLog('Filter State Found (Identifier: ' + filterState['filterIdentifier'] + ') But No Filter Models Are Present For This Identifier! Partial Hardware State Import Continuing...', DSConstants.LOG_PRIORITY_HIGH)
+                        
+                else:
+                    self.mW.postLog('Filter State Data Corrupted! Partial Hardware State Import Continuing...', DSConstants.LOG_PRIORITY_HIGH)
+                        
+
             return True
         else:
             return False
@@ -378,9 +401,14 @@ class HardwareManager(QObject):
         self.mW.postLog('Recording Hardware State... ', DSConstants.LOG_PRIORITY_HIGH)
         savePacket = dict()
         savePacket['hardwareStates'] = list()
+        savePacket['filters'] = list()
 
         for hardware in self.hardwareLoaded:
             savePacket['hardwareStates'].append(hardware.savePacket())
+
+        for Filter in self.filterList:
+            savePacket['filters'].append(Filter.savePacket())
+
 
         self.wM.settings['hardwareState'] = savePacket
 

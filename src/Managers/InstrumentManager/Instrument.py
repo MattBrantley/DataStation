@@ -1,6 +1,6 @@
-from Managers.InstrumentManager.Component import *
+from src.Managers.InstrumentManager.Component import *
+from src.Constants import readyCheckPacket
 from copy import deepcopy
-from DSWidgets.controlWidget import readyCheckPacket
 
 class Instrument(QObject):
 
@@ -10,8 +10,7 @@ class Instrument(QObject):
         self.mW = self.iM.mW
         self.name = 'Default Instrument'
         self.url = None
-        self.components = list()
-        self.fullSocketList = list()
+        self.componentList = list()
 
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
@@ -29,12 +28,14 @@ class Instrument(QObject):
     def Set_Path(self, path):
         self.url = path
 
-    def Get_Sockets(self):
-        return self.getSockets()
+    def Get_Sockets(self, uuid=-1, inputUUID=-1, pathNo=-1, socketType=None):
+        return self.getSockets(uuid, inputUUID, pathNo, socketType)
 
-    def Get_Sockets_By_Type(self, socketType):
-        return self.getSocketsByType(socketType)
+    def Get_Components(self):
+        return self.componentList
 
+    def Add_Component(self, compModel, loadData=None):
+        return self.addComponent(compModel, loadData)
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -43,20 +44,26 @@ class Instrument(QObject):
 
     def readyCheck(self):
         subs = list()
-        if(len(self.components) == 0):
+        if(len(self.componentList) == 0):
             return readyCheckPacket('Active Instrument', DSConstants.READY_CHECK_ERROR, msg='Instrument has no components!')
-        for component in self.components:
+        for component in self.componentList:
             subs.append(component.readyCheck())
 
         return readyCheckPacket('Active Instrument', DSConstants.READY_CHECK_READY, subs=subs)
 
 ##### Functions Called By Factoried Components #####
 
-    def componentModified(self, component):
-        pass
+    def eventAdded(self, component, event):
+        self.iM.eventAdded(self, component, event)
 
-    def eventsModified(self, component):
-        pass
+    def eventRemoved(self, component, event):
+        self.iM.eventRemoved(self, component, event)
+
+    def eventModified(self, component, event):
+        self.iM.eventModified(self, component, event)
+
+    def socketAdded(self, component, socket):
+        self.iM.socketAdded(self, component, socket)
 
     def socketAttached(self, component, socket):
         self.iM.socketAttached(self, component, socket)
@@ -70,7 +77,7 @@ class Instrument(QObject):
         saveData = dict()
         saveData['name'] = self.name
         saveCompList = list()
-        for component in self.components:
+        for component in self.componentList:
             saveCompList.append(component.onSaveParent())
         saveData['compList'] = saveCompList
 
@@ -78,24 +85,10 @@ class Instrument(QObject):
 
     def loadPacket(self):
         pass
-        #make all components and filters
-        #then call restoreState on each - AFTER creating everything
 
 ##### Component Manipulations #####
 
-    def checkTriggerComponents(self):
-        removeList = list()
-
-        for component in self.components:
-            if(component.isTriggerComponent is True):
-                obj = self.iM.getHardwareObjectByUUID(component.compSettings['hardwareObjectUUID'])
-                if(obj is None):
-                    removeList.append(component)
-
-        for component in removeList:
-            self.removeComponent(component)
-
-    def addComponent(self, compModel):
+    def addComponent(self, compModel, loadData=None):
         newComp = type(compModel)(self.mW)
         self.iM.componentModified(self)
         newComp.instr = self
@@ -103,25 +96,24 @@ class Instrument(QObject):
         newComp.mW = self.mW
         newComp.setupWidgets()
         newComp.name = 'Unnamed Component'
+        newComp.loadCompSettings(loadData)
         newComp.onCreationParent()
         newComp.onCreationFinishedParent()
-        self.components.append(newComp)
-        self.iM.instrumentModified(self)
+        self.componentList.append(newComp)
+        self.iM.componentAdded(self, newComp)
         return newComp
 
     def removeComponent(self, comp):
         if(comp is not None):
             comp.onRemovalParent()
             self.components.remove(comp)
-            self.iM.mW.sequencerDockWidget.updatePlotList()
-            self.iM.mW.hardwareWidget.drawScene()
-            self.iM.instrumentModified(self)
+            self.iM.componentRemoved(self, comp)
 
     def reattachSockets(self):
         pass
     
-    def clearSequenceEvents(self):
-        for comp in self.components:
+    def clearEvents(self):
+        for comp in self.componentList:
             comp.clearEvents()
         
 ##### Search Functions #####
@@ -133,34 +125,25 @@ class Instrument(QObject):
                     return comp
         return None
 
-    def getTrigCompsRefUUID(self, uuid):
-        for comp in self.components:
-            if('uuid' in comp.compSettings and comp.isTriggerComponent is True):
-                if(comp.compSettings['hardwareObjectUUID'] == uuid):
-                    return comp
-        return None
-            
-    def getSockets(self):
-        self.fullSocketList.clear()
-        for component in self.components:
-            for socket in component.socketList:
-                self.fullSocketList.append(socket)
+    def getSockets(self, uuid=-1, inputUUID=-1, pathNo=-1, socketType=None):
+        outList = list()
+        for socket in self.getSocketObjs():
+            if(socket.socketSettings['uuid'] != uuid and uuid != -1):
+                continue
+            if(socket.socketSettings['inputSource'] != inputUUID and inputUUID != -1):
+                continue
+            if(socket.socketSettings['inputSourcePathNo'] != pathNo and pathNo != -1):
+                continue
+            if(socketType is not None):
+                if(isinstance(socket, socketType) is False):
+                    continue
+            outList.append(socket)
+        return outList
+        
+    def getSocketObjs(self):
+        socketList = list()
+        for component in self.componentList:
+            socketList += component.Get_Sockets()
 
-        return self.fullSocketList
-
-    def getSocketByUUID(self, uuid):
-        socketList = self.getSockets()
-        for socket in socketList:
-            if(socket.socketSettings['uuid'] == uuid):
-                return socket
-        return None
-
-    def getSocketsByType(self, socketType):
-        self.getSockets()
-        self.outList = list()
-        for socket in self.fullSocketList:
-            if(isinstance(socket, socketType)):
-                self.outList.append(socket)
-        return self.outList
-
+        return socketList
 #####

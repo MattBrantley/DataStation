@@ -2,7 +2,7 @@ from PyQt5.Qt import *
 import PyQt5.QtCore as QtCore
 import json as json
 import os
-from Constants import DSConstants as DSConstants
+from src.Constants import DSConstants as DSConstants
 from pathlib import Path
 import time
 
@@ -11,7 +11,8 @@ class loginDockWidget(QDockWidget):
         super().__init__("Select User Profile")
         self.userProfiles = []
         self.mW = mW
-        self.profilePathFolder = os.path.join(str(Path(os.path.dirname(os.path.realpath(__file__))).parent.parent), 'User Profiles')
+        self.profilePathFolder = os.path.join(self.mW.rootDir, 'Profiles')
+        print(self.profilePathFolder)
 
         self.setWindowFlags(self.windowFlags() & QtCore.Qt.CustomizeWindowHint)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowMinMaxButtonsHint)

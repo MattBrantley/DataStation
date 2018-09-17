@@ -1,10 +1,10 @@
 import os, sys, imp, time, inspect
-from Managers.InstrumentManager.Instrument import *
-from Managers.InstrumentManager.Digital_Trigger_Component import Digital_Trigger_Component
-from Constants import DSConstants as DSConstants
+from src.Managers.InstrumentManager.Instrument import *
+from src.Managers.InstrumentManager.Digital_Trigger_Component import Digital_Trigger_Component
+from src.Constants import DSConstants as DSConstants
+from src.Constants import readyCheckPacket
 import json as json
 from PyQt5.Qt import *
-from DSWidgets.controlWidget import readyCheckPacket
 
 class InstrumentManager(QObject):
 
@@ -19,8 +19,8 @@ class InstrumentManager(QObject):
     Instrument_Config_Changed = pyqtSignal()
     
 ##### Signals: Components #####
-    Component_Added = pyqtSignal()
-    Component_Removed = pyqtSignal()
+    Component_Added = pyqtSignal(object, object) # Instrument, Component
+    Component_Removed = pyqtSignal(object, object) # Instrument, Component
     Component_Config_Changed = pyqtSignal()
 
 ##### Signals: Sequence #####
@@ -29,11 +29,16 @@ class InstrumentManager(QObject):
     Sequence_Config_Changed = pyqtSignal()
     Sequence_Name_Changed = pyqtSignal()
 
+##### Signals: Events #####
+    Event_Added = pyqtSignal(object, object, object) # Instrument, Component, Event
+    Event_Removed = pyqtSignal(object, object, object) # Instrument, Component, Event
+    Event_Modified = pyqtSignal(object, object, object) # Instrument, Component, Event
+
 ##### Signals: Sockets #####
-    Socket_Added = pyqtSignal()
+    Socket_Added = pyqtSignal(object, object, object) # Instrument, Component, Socket
     Socket_Removed = pyqtSignal()
-    Socket_Attached = pyqtSignal()
-    Socket_Unattached = pyqtSignal()
+    Socket_Attached = pyqtSignal(object, object, object) # Instrument, Component, Socket
+    Socket_Detatched = pyqtSignal(object, object, object) # Instrument, Component, Socket
     Socket_Config_Changed = pyqtSignal()
 
 ############################################################################################
@@ -79,17 +84,18 @@ class InstrumentManager(QObject):
     def Get_Instrument(self):
         return self.currentInstrument
 
-    def Get_Instrument_Components(self):
-        if(self.currentInstrument is not None):
-            return self.currentInstrument.components
-        else:
-            return list()
-
     def Add_Component(self, model):
         if(model is None):
             return False
         return self.addCompToInstrument(model)
-        
+
+##### Functions: Sequence Management #####
+    def Load_Sequence(self, path):
+        self.openSequence(path)
+
+    def Save_Sequence(self, name=None, path=None):
+        pass
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
 
@@ -97,15 +103,14 @@ class InstrumentManager(QObject):
         super().__init__()
         self.mW = mW
         self.readyStatus = False
-        self.instrumentDir = os.path.join(self.mW.rootDir, 'User Instruments')
-        self.componentsDir = os.path.join(self.mW.rootDir, 'User Components')
+        self.instrumentDir = os.path.join(self.mW.rootDir, 'Instruments')
+        self.componentsDir = os.path.join(self.mW.rootDir, 'Components')
         self.sequencesDir = os.path.join(self.mW.rootDir, 'Sequences')
         self.currentInstrument = None
         self.currentSequenceURL = None
         self.componentsAvailable = list()
 
         self.mW.DataStation_Closing.connect(self.unsavedChangesCheck)
-        self.Instrument_Loaded.connect(self.checkTriggerComponents)
 
 ##### DataStation Reserved Functions #####
 
@@ -141,30 +146,33 @@ class InstrumentManager(QObject):
     def componentModified(self, instrument):
         pass
 
-    def eventsModified(self, instrument):
-        pass
+    def componentAdded(self, instrument, component):
+        self.Component_Added.emit(instrument, component)
+
+    def componentRemoved(self, instrument, component):
+        self.Component_Removed.emit(instrument, component)
 
     def socketAttached(self, instrument, component, socket):
-        pass
+        self.Socket_Attached.emit(instrument, component, socket)
 
     def socketDetatched(self, instrument, component, socket):
-        pass
+        self.Socket_Detatched.emit(instrument, component, socket)
+
+    def socketAdded(self, instrument, component, socket):
+        self.Socket_Added.emit(instrument, component, socket)
+
+    def eventAdded(self, instrument, component, event):
+        self.Event_Added.emit(instrument, component, event)
+
+    def eventRemoved(self, instrument, component, event):
+        self.Event_Removed.emit(instrument, component, event)
+
+    def eventModified(self, instrument, component, event):
+        self.Event_Modified.emit(instrument, component, event)
 
 ##### Search Functions ######
 
-    def getHardwareObjectByUUID(self, uuid):
-        return self.mW.hM.getHardwareObjectByUUID(uuid)
-
-    def getFilterOrSourceByUUID(self, uuid):
-        return self.mW.hM.getFilterOrSourceByUUID(uuid)
-
     def getComponentByUUID(self, uuid):
-        if(self.currentInstrument is not None):
-            return self.currentInstrument.getComponentByUUID(uuid) # Search Components
-        else:
-            return None
-
-    def getSocketByUUID(self, uuid):
         if(self.currentInstrument is not None):
             return self.currentInstrument.getComponentByUUID(uuid) # Search Components
         else:
@@ -197,11 +205,6 @@ class InstrumentManager(QObject):
         if('instrumentURL' in self.wM.userProfile):
             if(self.wM.userProfile['instrumentURL'] is not None):
                 self.loadInstrument(self.wM.userProfile['instrumentURL'])
-
-    def loadPreviousSequence(self):
-        if('sequenceURL' in self.wM.userProfile):
-            if(self.wM.userProfile['sequenceURL'] is not None):
-                self.mW.sequencerDockWidget.openSequence(self.wM.userProfile['sequenceURL'])
 
     def newInstrument(self, name, rootPath): # Instrument_Unloaded // Instrument_New
         self.Instrument_Unloaded.emit()
@@ -269,20 +272,15 @@ class InstrumentManager(QObject):
                     if(compModel is None):
                         self.mW.postLog('Instrument contains component (' + comp['compType'] + ':' + comp['compIdentifier'] + ') that is not in the available component modules. Ignoring this component!', DSConstants.LOG_PRIORITY_MED)
                     else:
-                        result = self.tempInstrument.addComponent(compModel)
-                        if('compSettings' in comp):
-                            result.loadCompSettings(comp['compSettings'])
+                        result = self.tempInstrument.Add_Component(compModel, loadData=comp['compSettings'])
+                        #if('compSettings' in comp):
+                        #    result.loadCompSettings(comp['compSettings'])
                         if('sockets' in comp):
                             if(isinstance(comp['sockets'], list)):
                                 result.loadSockets(comp['sockets'])
 
         self.currentInstrument = self.tempInstrument
         self.currentInstrument.reattachSockets()
-
-
-    def checkTriggerComponents(self):
-        if(self.currentInstrument is not None):
-            self.currentInstrument.checkTriggerComponents()
 
     def addCompToInstrument(self, compModel):
         if (self.currentInstrument is None):

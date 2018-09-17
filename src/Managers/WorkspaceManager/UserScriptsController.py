@@ -3,9 +3,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'Use
 from PyQt5.QtCore import Qt, QVariant, QTimer, QSize
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QFont
-from Managers.WorkspaceManager.UserScript import *
-from Managers.WorkspaceManager.WorkerObjects import *
-from Constants import DSConstants as DSConstants
+from src.Managers.WorkspaceManager.UserScript import *
+from src.Managers.WorkspaceManager.WorkerObjects import *
+from src.Constants import DSConstants as DSConstants
 
 class scriptProcessManager():
     numWorkers = 1

@@ -1,26 +1,43 @@
 from PyQt5.Qt import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-import uuid
-import os, sys, imp, math
-from Constants import DSConstants as DSConstants
-from DSWidgets.controlWidget import readyCheckPacket
+import os, sys, imp, math, uuid
+from src.Constants import DSConstants as DSConstants, readyCheckPacket
+from src.Managers.HardwareManager.Sources import Source
 
 class Socket(QObject):
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
 
     def Get_Name(self):
-        return self.sourceSettings['name']
+        return self.socketSettings['name']
 
     def Get_Source(self):
         return self.getSource()
 
+    def Get_Sockets(self):
+        return self
+
     def Get_UUID(self):
-        return self.sourceSettings['uuid']
+        return self.socketSettings['uuid']
 
     def Get_Input_UUID(self):
-        return self.sourceSettings['filterInputSource']
+        if(self.socketSettings['inputSourcePathNo'] is None):
+            return None
+        else:
+            return self.socketSettings['inputSource']
+
+    def Get_Input_Path_Number(self):
+        if(self.socketSettings['inputSource'] is None):
+            return None
+        else:
+            return self.socketSettings['inputSourcePathNo']
+
+    def Attach_Input(self, uuid, pathNo):
+        self.attach(uuid, pathNo)
+
+    def Detatch_Input(self):
+        self.detatch()
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -30,11 +47,13 @@ class Socket(QObject):
         self.socketSettings = dict()
         self.socketSettings['tag'] = '[??]'
         self.socketSettings['name'] = name
-        self.socketSettings['filterInputSource'] = None
+        self.socketSettings['inputSource'] = None
+        self.socketSettings['inputSourcePathNo'] = None
         self.socketSettings['uuid'] = str(uuid.uuid4())
         self.socketSettings['drivingSocket'] = True
         self.cP = cP
         self.iM = cP.iM
+        self.hM = cP.iM.hM
         self.mW = cP.iM.mW
 
 ##### DataStation Interface Functions #####
@@ -50,14 +69,19 @@ class Socket(QObject):
 
 ##### Search Functions #####
 
-    def getSockets(self):
-        return self
-
     def getSource(self):
-        if(self.socketSettings['filterInputSource'] is not None):
-            return self.socketSettings['filterInputSource'].getSource()
-        else:
+        if(self.socketSettings['inputSource'] is None or self.socketSettings['inputSourcePathNo'] is None):
             return None
+        else:
+            inputObj = self.hM.Get_Filters(uuid=self.socketSettings['inputSource'])
+            if not inputObj:
+                inputObj = self.hM.Get_Sources(uuid=self.socketSettings['inputSource'])
+            if not inputObj:
+                return None
+            if(issubclass(Source, type(inputObj[0])) is True):
+                return inputObj[0]
+            else:
+                return inputObj[0].Get_Source()
 
 ##### Socket Manipulation Functions #####
 
@@ -74,52 +98,46 @@ class Socket(QObject):
         self.restoreState()
 
     def restoreState(self):
-        if(self.socketSettings['filterInputSource'] is None):
+        if(self.socketSettings['inputSource'] is None):
+            self.socketSettings['inputSourcePathNo'] = None
             return # Previous socket state was not connected to anything
+        if(self.socketSettings['inputSourcePathNo'] is None):
+            self.socketSettings['inputSource'] = None
+            return # Previous socket state was not connected to anything; even if it was, we don't know to what path.
 
-        targetFilterOrSource = self.iM.getFilterOrSourceByUUID(self.socketSettings['filterInputSource'])
+        target = self.hM.Get_Sources(uuid=self.socketSettings['inputSource'])
+        if(len(target) == 0):
+            target = self.hM.Get_Filters(uuid=self.socketSettings['inputSource'])
 
-        if(targetFilterOrSource is None):
-            self.socketSettings['filterInputSource'] = None
+        if(len(target) == 0):
+            self.socketSettings['inputSource'] = None
+            self.socketSettings['inputSourcePathNo'] = None
             self.mW.postLog('SOCKET RESTORE ERROR: ' + self.socketSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Filter/Source that does not exist!!!' , DSConstants.LOG_PRIORITY_MED)
             return # No Filter or Source found at that uuid - clear this socket's reference.
-
-        if(targetFilterOrSource.reattachPath(self, self.socketSettings['uuid']) is False):
-            self.socketSettings['filterInputSource'] = None 
-            self.mW.postLog('SOCKET RESTORE ERROR: ' + self.socketSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Filter/Source that does not recognize it!!!' , DSConstants.LOG_PRIORITY_MED)
-            return # The target Filter or Source did not recognize this Socket - clear this socket's reference.
         
-    def attachInputOther(self, uuid):
-        self.socketSettings['filterInputSource'] = uuid
-        self.cP.socketAttached(self)
-
-    def detatchInputSelf(self):
-        if(self.socketSettings['filterInputSource'] is None):
-            return # This socket isn't attached - so no need to detatch it
-
-        # Since this is a self detatchment, it looks for the other side of the linkage to notify it
-        targetFilterOrSource = self.iM.getFilterOrSourceByUUID(self.socketSettings['filterInputSource'])
-        self.socketSettings['filterInputSource'] = None
-        if(targetFilterOrSource is None):
-            self.mW.postLog('SOCKET DETATCH WARNING: ' + self.socketSettings['name'] + ' (' + type(self).__name__ + ') Detatched Socket from Filter/Source that does not exist!!!' , DSConstants.LOG_PRIORITY_MED)
-            return # Our reference was for an object that doesn't exist
-
-        if(targetFilterOrSource.detatchPathOther(self.socketSettings['uuid']) is False):
-            self.mW.postLog('SOCKET DETATCH WARNING: ' + self.socketSettings['name'] + ' (' + type(self).__name__ + ') Detatched Socket from Filter/Source that does not recognize it!!' , DSConstants.LOG_PRIORITY_MED)
-            return # Our reference doesn't have a linkage to this socket
-
+    def detatch(self):
+        self.socketSettings['inputSource'] = None
+        self.socketSettings['inputSourcePathNo'] = None
         self.cP.socketDetatched(self)
 
-    def detatchInputOther(self, uuid):
-        if(self.socketSettings['filterInputSource'] != uuid):
-            return False
-        else:
-            self.socketSettings['filterInputSource'] = None # Socket recognizes this uuid as being it's input source and acknowledges the detatchment
+    def attach(self, uuid, pathNumber):
+        # Remove anything else that has a connection to what this is connecting to
+        filtersAttached = self.hM.Get_Filters(inputUUID = uuid, pathNo=pathNumber)
+        for Filter in filtersAttached:
+            Filter.Detatch_Input()
+        if(self.iM.Get_Instrument() is not None):
+            socketsAttached = self.iM.Get_Instrument().Get_Sockets(inputUUID = uuid, pathNo=pathNumber)
+            for Socket in socketsAttached:
+                Socket.Detatch_Input()
+
+        self.socketSettings['inputSource'] = uuid
+        self.socketSettings['inputSourcePathNo'] = pathNumber
+        self.cP.socketAttached(self)
             
-    def sendData(self, packet):
+    def sendData(self, packet): ### STILL NEEDS ADDRESSING
         # There used to be some RadyCheck Syntax here - I couldn't understand it so I cut it out.
         # I will need to add it back in at some point
-        self.filterInputSource.procReverseParent(self.getUUID(), packet)
+        self.inputSource.procReverseParent(self.getUUID(), packet)
 
 class AOSocket(Socket):
     def __init__(self, cP, name, vMin, vMax, prec):

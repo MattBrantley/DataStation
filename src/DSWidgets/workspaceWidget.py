@@ -3,8 +3,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from xml.dom.minidom import *
 from xml.etree.ElementTree import *
-from Managers.WorkspaceManager.UserScript import *
-from Constants import DSConstants as DSConstants
+from src.Managers.WorkspaceManager.UserScript import *
+from src.Constants import DSConstants as DSConstants
 import os
 
 class workspaceTreeDockWidget(QDockWidget):

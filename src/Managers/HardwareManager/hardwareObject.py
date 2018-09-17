@@ -1,18 +1,15 @@
 from PyQt5.Qt import *
-import os, uuid, time, sys
+import os, uuid, time, sys, numpy as np
 from multiprocessing import Process, Queue, Pipe
-from Constants import DSConstants as DSConstants
-from Managers.HardwareManager.Sources import *
-from Managers.InstrumentManager.Sockets import *
-from DSWidgets.networkViewWidget import netObject
-
-import numpy as np
-from DSWidgets.controlWidget import readyCheckPacket
+from src.Constants import DSConstants as DSConstants, readyCheckPacket
+from src.Managers.HardwareManager.Sources import *
+from src.Managers.InstrumentManager.Sockets import *
+from src.DSWidgets.networkViewWidget import netObject
 
 # This is so that pickle can pull the correct class
 sys.path.append(str(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))) + '\\Hardware Drivers\\')
 
-class hardwareObject(QObject):
+class hardwareObject():
     hardwareType = 'Default Hardware Object'
     hardwareIdentifier = 'DefHardObj'
     hardwareVersion = '1.0'
@@ -51,12 +48,17 @@ class hardwareObject(QObject):
         self.addSource(source)
         self.hM.sourceAdded(self, source)
 
+    def Show_Config_Widget(self, pos):
+        self.showConfigWidget(pos)
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
 
     def __init__(self, hM, modelObject=False, **kwargs):
-        super().__init__()
-        self.hM = hM
+        self.mW = None                #Factory does not write this. Hardware manager writes it immediately after init.
+        self.iM = None                #Factory does not write this. Hardware manager writes it immediately after init.
+        self.wM = None                #Factory does not write this. Hardware manager writes it immediately after init.
+        self.hM = None                #Factory does not write this. Hardware manager writes it immediately after init.
         self.hardwareSettings = {}
         self.hardwareSettings['name'] = ''
         self.hardwareSettings['physID'] = ''
@@ -92,6 +94,9 @@ class hardwareObject(QObject):
 
     def clearSourceList(self):
         self.sourceList = list()
+
+    def sourceAdded(self, source):
+        self.hM.sourceAdded(self, source)
 
 ##### Functions Over-Ridden By hardwareObjects #####
 
@@ -165,6 +170,8 @@ class hardwareObject(QObject):
 
     def loadPacketParent(self, loadPacket):
         self.hardwareSettings = {**self.hardwareSettings, **loadPacket['hardwareSettings']}
+        self.resetDevice()
+        self.onLoad(loadPacket)
         if('sourceList' in loadPacket):
             sourceListData = loadPacket['sourceList']
             if(sourceListData is not None):
@@ -173,8 +180,6 @@ class hardwareObject(QObject):
                         source = self.getSourceByPhysConID(loadPacket['physConID']) # Source generation is dynamic, only load a source if it's physConID matches!
                         if(source is not None):
                             source.loadPacket(loadPacket)
-        self.onLoad(loadPacket)
-        self.resetDevice()
 
     def onLoad(self, loadPacket): ### OVERRIDE ME!! ####
         pass
@@ -239,6 +244,14 @@ class hardwareObject(QObject):
         return programDataList
 
 ##### hardwareObject Manipulation Functions #####
+
+    def showConfigWidget(self, pos):
+        menu = QMenu()
+        hardwareConfig = QWidgetAction(self.mW)
+        hardwareConfig.setDefaultWidget(self.hardwareObjectConfigWidgetParent())
+        menu.addAction(hardwareConfig)
+
+        action = menu.exec_(pos)
 
     def updateDevice(self, text):
         self.hardwareSettings['deviceName'] = text

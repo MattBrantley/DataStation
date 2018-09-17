@@ -10,11 +10,12 @@ import multiprocessing
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from Managers.WorkspaceManager.UserScriptsController import userScriptsController
-from Managers.WorkspaceManager.UserScript import *
-from Managers.InstrumentManager.InstrumentManager import InstrumentManager
-from Managers.HardwareManager.HardwareManager import HardwareManager
-from Constants import DSConstants as DSConstants
+
+from src.Managers.WorkspaceManager.UserScriptsController import userScriptsController
+from src.Managers.WorkspaceManager.UserScript import *
+from src.Managers.InstrumentManager.InstrumentManager import InstrumentManager
+from src.Managers.HardwareManager.HardwareManager import HardwareManager
+from src.Constants import DSConstants as DSConstants
 
 class databaseCommManager():
     killMgr = False

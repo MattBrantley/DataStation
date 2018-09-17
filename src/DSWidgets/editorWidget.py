@@ -2,7 +2,6 @@ from PyQt5.Qt import *
 from pyqode.core import api, modes, panels
 import os
 from shutil import copyfile
-from DSWidgets.networkViewWidget import netObject
 
 class editorWidget(QDockWidget):
     ITEM_GUID = Qt.UserRole

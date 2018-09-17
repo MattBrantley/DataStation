@@ -1,4 +1,4 @@
-from Managers.WorkspaceManager.UserScript import *
+from src.Managers.WorkspaceManager.UserScript import *
 
 class SettingsObject():
     type = 'Setting'

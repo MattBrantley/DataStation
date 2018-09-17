@@ -5,7 +5,7 @@ import os
 from shutil import copyfileobj
 import numpy as np
 import random
-from Constants import DSConstants as DSConstants
+from src.Constants import DSConstants as DSConstants
 from PyQt5.QtGui import *
 from shutil import copyfile
 
@@ -19,7 +19,7 @@ class instrumentWidget(QDockWidget):
         self.hide()
         self.resize(1000, 800)
         self.fileSystem = DSEditorFSModel()
-        self.rootPath = os.path.abspath(os.path.join(os.path.join(os.path.dirname(os.path.dirname(__file__)), os.path.pardir), 'User Instruments'))
+        self.rootPath = os.path.join(self.mW.rootDir, 'Instruments')
         self.fsIndex = self.fileSystem.setRootPath(self.rootPath)
 
         self.toolbar = QToolBar()
@@ -388,14 +388,15 @@ class iView(pg.GraphicsWindow):
             item.instrComp.Set_Custom_Field('iViewSettings', item.onSave())
 
     def loadComps(self):
-        compList = self.iM.Get_Instrument_Components()
-        for comp in compList:
-            if(comp.Get_Standard_Field('triggerComp') is False):
-                try:
-                    ivs = comp.Get_Custom_Field('iViewSettings')
-                    self.addiViewComp(comp, ivs['x'], ivs['y'], ivs['r'])
-                except:
-                    pass
+        if(self.iM.Get_Instrument() is not None):
+            compList = self.iM.Get_Instrument().Get_Components()
+            for comp in compList:
+                if(comp.Get_Standard_Field('triggerComp') is False):
+                    try:
+                        ivs = comp.Get_Custom_Field('iViewSettings')
+                        self.addiViewComp(comp, ivs['x'], ivs['y'], ivs['r'])
+                    except:
+                        pass
 
     def dragEnterEvent(self, e):
         if(e.mimeData().text() == "compDrag"):

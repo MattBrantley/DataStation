@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from Managers.InstrumentManager.Component import *
-from Managers.InstrumentManager.Sockets import *
-import os, uuid
-import numpy as np
+from src.Managers.InstrumentManager.Component import *
+from src.Managers.InstrumentManager.Sockets import *
+import os, uuid, numpy as np
 
 class Digital_Trigger_Component(Component):
     componentType = 'Digital Trigger Component'

@@ -1,9 +1,9 @@
 from PyQt5.Qt import *
 import os, uuid
-from Constants import DSConstants as DSConstants
+from src.Constants import DSConstants as DSConstants, readyCheckPacket
 import numpy as np
-from Managers.InstrumentManager.Sockets import Socket
-from DSWidgets.controlWidget import readyCheckPacket
+from src.Managers.InstrumentManager.Sockets import Socket
+from src.Managers.HardwareManager.Sources import Source
 
 class Filter():
     filterType = 'Default Filter'
@@ -14,6 +14,7 @@ class Filter():
     iconGraphicSrc = 'default.png'
     numPaths = 1
     valid = False
+
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
 
@@ -30,10 +31,25 @@ class Filter():
         return self.filterSettings['uuid']
 
     def Get_Input_UUID(self):
-        return self.filterSettings['filterInputSource']
+        return self.filterSettings['inputSource']
+
+    def Get_Input_Path_Number(self):
+        return self.filterSettings['inputSourcePathNo']
+
+    def Get_Number_Of_Paths(self):
+        return self.numPaths
+
+    def Attach_Input(self, uuid, pathNo):
+        return self.attachInput(uuid, pathNo)
+
+    def Detatch_Input(self):
+        self.detatch()
 
     def Get_Type(self):
         return self.filterSettings['filterType']
+
+    def Remove(self):
+        self.removeFilter()
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -45,16 +61,13 @@ class Filter():
         self.filterSettings['filterType'] = self.filterType
         self.filterSettings['filterIdentifier'] = self.filterIdentifier
         self.filterSettings['iconGraphicSrc'] = self.iconGraphicSrc
-        self.filterSettings['filterInputSource'] = None
+        self.filterSettings['inputSource'] = None
+        self.filterSettings['inputSourcePathNo'] = None
 
-        self.iM = None
-        self.mW = None #These are declared by the calling class
-        self.hW = None
-
-        paths = list()
-        for i in range(self.numPaths):
-            paths.append(None)
-        self.filterSettings['paths'] = paths
+        self.iM = None # These are defined by hardwareManager immediately after generation
+        self.mW = None # These are defined by hardwareManager immediately after generation
+        self.hM = None # These are defined by hardwareManager immediately after generation
+        self.hW = None # These are defined by hardwareManager immediately after generation
 
 ##### DataStation Interface Functions #####
 
@@ -91,10 +104,10 @@ class Filter():
         if(packetOut is None):
             packetOut = packetIn
 
-        if(self.filterInputSource is None or self.filterInputPathNo is None):
+        if(self.filterSettings['inputSource'] is None or self.filterSettings['inputSourcePathNo'] is None):
             return readyCheckPacket('Filter', DSConstants.READY_CHECK_ERROR, msg='Filter Is Not Attached!')
         else:
-            subs.append(self.filterInputSource.procReverseParent(self.filterInputPathNo, packetOut))
+            subs.append(self.filterSettings['inputSource'].procReverseParent(self.filterInputPathNo, packetOut))
         
         #return readyCheckPacket('Filter', DSConstants.READY_CHECK_READY)
         return readyCheckPacket('Filter', DSConstants.READY_CHECK_READY, subs=subs)
@@ -103,8 +116,6 @@ class Filter():
         return None
 
     def onCreationParent(self):
-        self.hM.mW.postLog('Added Filter: ' + self.filterType, DSConstants.LOG_PRIORITY_MED)
-
         self.onCreation()
 
     def onCreation(self): ### OVERRIDE ME!! ####
@@ -112,32 +123,30 @@ class Filter():
 
 ##### Search Functions ######
 
-    def getPathNumber(self, uuid):
-        index = 1
-        for path in self.filterSettings['paths']:
-            if(path == uuid):
-                return index
-            index += 1
-
     def getSockets(self):
-        sockets = list()
-        for path in self.filterSettings['paths']:
-            if(path is not None):
-                if(issubclass(type(path), Socket) is True):
-                    sockets.append(path)
-                else:
-                    result = path.getSockets()
-                    if(result is not None):
-                        for socket in result:
-                            sockets.append(socket)
-        return sockets
+        if(self.iM.Get_Instrument() is None):
+            return list()
+        outputFilters = self.hM.Get_Filters(inputUUID = self.filterSettings['uuid'])
+        outputSockets = self.iM.Get_Instrument().Get_Sockets(inputUUID = self.filterSettings['uuid'])
+
+        for Filter in outputFilters:
+            outputSockets += Filter.Get_Sockets()
+
+        return outputSockets
 
     def getSource(self):
-        if(self.filterSettings['filterInputSource'] is not None):
-            return self.filterSettings['filterInputSource'].getSource()
+        if(self.filterSettings['inputSource'] is None or self.filterSettings['inputSourcePathNo'] is None):
+            return None
         else:
-            self.mW.postLog('ERROR: Filter called during getSource that has no root parent!', DSConstants.LOG_PRIORITY_HIGH)
-            return None #This is bad - Filter needs to be removed in this case.
+            inputObj = self.hM.Get_Filters(uuid=self.filterSettings['inputSource'])
+            if not inputObj:
+                inputObj = self.hM.Get_Sources(uuid=self.filterSettings['inputSource'])
+            if not inputObj:
+                return None
+            if(issubclass(Source, type(inputObj[0])) is True):
+                return inputObj[0]
+            else:
+                return inputObj[0].Get_Source()
 
 ##### Filter Manipulation Functions #####
 
@@ -150,71 +159,58 @@ class Filter():
         
         for key, value in loadPacket.items():
             self.filterSettings[key] = value
-        # restoreState is called directly by the instrumentManager
+
+        self.restoreState()
 
     def restoreState(self):
-        newPaths = list()
-        for path in self.filterSettings['paths']:
-            if(path is None):
-                newPaths.append(None) # This wasn't attached in this state, so just return None
-            else:
-                targetFilterOrSocket = self.hM.getFilterOrSourceByUUID(uuid) #Search for Filter
-                if(targetFilterOrSocket is None):
-                    targetFilterOrSocket = self.iM.getSocketByUUID(uuid) #If it's not a filter, search for a Socket
-                if(targetFilterOrSocket is None):
-                    self.mW.postLog('FILTER RESTORE ERROR: ' + self.filterSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Path Filter/Socket that does not exist!!!' , DSConstants.LOG_PRIORITY_MED)
-                    newPaths.append(None)
-                else:
-                    newPaths.append(path)
-                
-        self.filterSettings['paths'] = newPaths
+        if(self.filterSettings['inputSource'] is None):
+            self.filterSettings['inputSourcePathNo'] = None
+            return # Previous filter state was not connected to anything
+        if(self.filterSettings['inputSourcePathNo'] is None):
+            self.filterSettings['inputSource'] = None
+            return # Previous filter state was not connected to anything; even if it was, we don't know to what path.
 
-        targetFilterOrSource = self.hM.getFilterOrSourceByUUID(self.filterSettings['filterInputSource'])
-        if(targetFilterOrSource is None):
-            self.mW.postLog('FILTER RESTORE ERROR: ' + self.filterSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Input Filter/Source that does not exist!!!' , DSConstants.LOG_PRIORITY_MED)
-            self.filterSettings['filterInputSource'] = None
-            #This is bad - Filter needs to be removed in this case.
+        target = self.hM.Get_Sources(uuid=self.filterSettings['inputSource'])
+        if(len(target) == 0):
+            target = self.hM.Get_Filters(uuid=self.filterSettings['inputSource'])
 
-    def detatchPathOther(self, uuid):
-        newPaths = list()
-        found = False
-        for path in self.filterSettings['paths']:
-            if(path == uuid):
-                newPaths.append(None)
-                found = True
-            else:
-                newPaths.append(path)
+        if(len(target) == 0):
+            self.filterSettings['inputSource'] = None
+            self.filterSettings['inputSourcePathNo'] = None
+            self.mW.postLog('FILTER RESTORE ERROR: ' + self.filterSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Filter/Source that does not exist!!!' , DSConstants.LOG_PRIORITY_MED)
+            return # No Filter or Source found at that uuid - clear this filter's reference.
 
-        return found
+    def attachInput(self, uuid, pathNumber):
 
-    def reattachPath(self, uuid):
-        for path in self.filterSettings['paths']:
-            if(path == uuid):
-                return True
-            else:
-                return False
+        # Remove anything else that has a connection to what this is connecting to
+        filtersAttached = self.hM.Get_Filters(inputUUID = uuid, pathNo=pathNumber)
+        for Filter in filtersAttached:
+            Filter.Detatch_Input()
+        if(self.iM.Get_Instrument() is not None):
+            socketsAttached = self.iM.Get_Instrument().Get_Sockets(inputUUID = uuid, pathNo=pathNumber)
+            for Socket in socketsAttached:
+                Socket.Detatch_Input()
 
-    def attachPathOther(self, pathNo, uuid):
-        self.filterSettings['paths'][pathNo-1] = uuid
+        self.filterSettings['inputSource'] = uuid
+        self.filterSettings['inputSourcePathNo'] = pathNumber
+        self.hM.filterAttached(self)
         return True
 
-    def attachPathSelf(self, pathNo, uuid):
-        if(uuid is None):
-            self.mW.postLog('FILTER ATTACH ERROR: ' + self.filterSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Path Filter/Socket that is NoneValue!!!' , DSConstants.LOG_PRIORITY_MED)
-            self.filterSettings['paths'][pathNo-1] = None
-            return False 
+    def detatch(self):
+        self.filterSettings['inputSource'] = None
+        self.filterSettings['inputSourcePathNo'] = None
+        self.hM.filterDetatched(self)
 
-        targetFilterOrSocket = self.hM.getFilterOrSourceByUUID(uuid) #Search for Filter
-        if(targetFilterOrSocket is None):
-            targetFilterOrSocket = self.iM.getSocketByUUID(uuid) #If it's not a filter, search for a Socket
-        if(targetFilterOrSocket is None):
-            self.mW.postLog('FILTER ATTACH ERROR: ' + self.filterSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Path Filter/Socket that does not exist!!!' , DSConstants.LOG_PRIORITY_MED)
-            self.filterSettings['paths'][pathNo-1] = None
-            return False
-        
-        self.filterSettings['paths'][pathNo-1] = uuid
-        return True
-            
+    def removeFilter(self):
+        self.detatch()
+        outputFilters = self.hM.Get_Filters(inputUUID = self.filterSettings['uuid'])
+        for Filter in outputFilters:
+            Filter.Remove()
+        outputSockets = self.iM.Get_Instrument().Get_Sockets(inputUUID = self.filterSettings['uuid'])
+        for Socket in outputSockets:
+            Socket.Detatch_Input()
+        self.hM.removeFilter(self)
+
 class AnalogFilter(Filter):
     def __init__(self, hM, **kwargs):
         super().__init__(hM, **kwargs)

@@ -159,110 +159,34 @@ class Hardware_Driver(hardwareObject):
                     minTemp = self.MIPSYResponseToFloat(ser.readline())
                     ser.write(b'GDCMAX,' + chOut.encode('ascii') + b'\r\n')
                     maxTemp = self.MIPSYResponseToFloat(ser.readline())
-                    source = AOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, minTemp, maxTemp, 0.1, 'DCB/'+chOut)
-                    self.addSource(source)
+                    self.Add_AOSource('DCB/'+chOut, minTemp, maxTemp, 0.1)
 
                 # MIPS has no way to poll Digital Out and Digital In channel counts seperately
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/A'
-                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/A')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/B'
-                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/B')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/C'
-                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/C')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/D'
-                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/D')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/E'
-                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/E')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/F'
-                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/F')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/G'
-                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/G')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/H'
-                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/H')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/I'
-                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/I')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/J'
-                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/J')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/K'
-                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/K')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/L'
-                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/L')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/M'
-                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/M')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/N'
-                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/N')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/O'
-                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/O')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/P'
-                source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/P')
-                self.addSource(source)
+                self.Add_DOSource('DIO/A')
+                self.Add_DOSource('DIO/B')
+                self.Add_DOSource('DIO/C')
+                self.Add_DOSource('DIO/D')
+                self.Add_DOSource('DIO/E')
+                self.Add_DOSource('DIO/F')
+                self.Add_DOSource('DIO/G')
+                self.Add_DOSource('DIO/H')
+                self.Add_DOSource('DIO/I')
+                self.Add_DOSource('DIO/J')
+                self.Add_DOSource('DIO/K')
+                self.Add_DOSource('DIO/L')
+                self.Add_DOSource('DIO/M')
+                self.Add_DOSource('DIO/N')
+                self.Add_DOSource('DIO/O')
+                self.Add_DOSource('DIO/P')
 
-
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/Q'
-                source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/Q')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/R'
-                source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/R', trigger=True)
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/S'
-                source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/S')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/T'
-                source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/T')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/U'
-                source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/U')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/V'
-                source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/V')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/W'
-                source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/W')
-                self.addSource(source)
-                nameTemp = self.hardwareSettings['deviceName'] + '/DIO/X'
-                source = DISource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DIO/X')
-                self.addSource(source)
-
-                '''
-                ser.write(b'GCHAN,DIO\r\n')
-                response = ser.readline()
-                if(response is not None):
-                    numDCB = self.MIPSYResponseToInt(response)
-                else:
-                    numDCB = 0
-                self.forceNoUpdatesOnSourceAdd(True) #FOR SPEED!
-                for channel in range(numDCB):
-                    charChannel = chr((ord('a') + channel) % 123).upper()
-                    #print('--------------' + charChannel + ':')
-                    stringSer = b'SDIO,' + charChannel.encode('utf-8') + b',0\r\n'
-                    #print(stringSer.decode('utf-8'))
-                    ser.write(b'SDIO,' + charChannel.encode('utf-8') + b',0\r\n')
-                    response = ser.readline()
-                    if(response is not None):
-                        print(response)
-                    else:
-                        print('no response')
-
-                    nameTemp = self.hardwareSettings['deviceName'] + '/DO/' + charChannel
-                    source = DOSource(self, '['+self.hardwareSettings['deviceName']+'] '+nameTemp, 'DO/'+charChannel)
-                    self.addSource(source)
-                '''
-
+                self.Add_DISource('DIO/Q')
+                self.Add_DISource('DIO/R', trigger=True)
+                self.Add_DISource('DIO/S')
+                self.Add_DISource('DIO/T')
+                self.Add_DISource('DIO/U')
+                self.Add_DISource('DIO/V')
+                self.Add_DISource('DIO/W')
+                self.Add_DISource('DIO/X')
 
     def initHardwareWorker(self):
         self.hardwareWorker = MIPSYHardwareWorker()

@@ -50,3 +50,42 @@ class DSLogTexts():
     def __init__(self, language):
         self.language = language
         self.text = dict()
+
+class readyCheckPacket():
+
+    def __init__(self, name, readyStatus, subs=None, msg=''):
+        self.name = name
+        self.readyStatus = readyStatus
+        self.subs = subs
+        self.msg = msg
+        self.areSubsReady()
+
+    def areSubsReady(self):
+        if(self.subs is not None):
+            for sub in self.subs:
+                if(sub is not None):
+                    sub.areSubsReady()
+                    if(sub.readyStatus is not DSConstants.READY_CHECK_READY):
+                        self.readyStatus = sub.readyStatus
+
+    def generateMessages(self, indent):
+        msgList = list()
+        indent = indent + 1
+        if(self.readyStatus is not DSConstants.READY_CHECK_READY):
+            indentStr = ''
+            for i in range(0,indent):
+                indentStr = indentStr + '    '
+            if(indent > 0 ):
+                indentStr = indentStr + u'\u21B3'
+            msg = readyCheckMsg(indentStr + self.name + ': ' + self.msg, self.readyStatus)
+            msgList.append(msg)
+            if(self.subs is not None):
+                for sub in self.subs:
+                    msgList.extend(sub.generateMessages(indent))
+        
+        return msgList
+
+class readyCheckMsg():
+    def __init__(self, msg, status):
+        self.msg = msg
+        self.status = status
