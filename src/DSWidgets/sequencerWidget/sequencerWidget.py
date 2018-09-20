@@ -8,6 +8,7 @@ import random
 from shutil import copyfile
 from src.Constants import DSConstants as DSConstants
 from src.DSWidgets.sequencerWidget.eventListWidget import eventListWidget
+from src.Managers.HardwareManager.PacketCommands import *
 
 class sequencerDockWidget(QDockWidget):
     ITEM_GUID = Qt.UserRole
@@ -34,6 +35,7 @@ class sequencerDockWidget(QDockWidget):
         self.updateToolbarState()
 
         self.iM.Sequence_Loaded.connect(self.sequenceLoaded)
+        self.iM.Sequence_Saved.connect(self.sequenceLoaded)
         self.iM.Sequence_Unloaded.connect(self.sequenceUnloaded)
 
     def initActionsAndToolbar(self):
@@ -51,7 +53,7 @@ class sequencerDockWidget(QDockWidget):
         self.saveAsAction.triggered.connect(self.iM.saveSequenceAs)
 
         self.toggleTree = QToolButton(self)
-        self.toggleTree.setIcon(QIcon(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'icons3\css.png')))
+        self.toggleTree.setIcon(QIcon(os.path.join(self.mW.srcDir, 'icons3\css.png')))
         self.toggleTree.setCheckable(True)
         self.toggleTree.setStatusTip('Show/Hide The Sequence Browser')
         self.toggleTree.toggled.connect(self.treeToggled)
@@ -79,10 +81,11 @@ class sequencerDockWidget(QDockWidget):
         self.setWidget(self.mainContainer)
         self.mainContainer.setCentralWidget(self.sequencerContainer)
 
-    def sequenceLoaded(self): #Update when Sequence has been fixed in iM
-        self.setWindowTitle('Sequencer (' + os.path.basename(self.iM.currentSequenceURL) + ')')
+    def sequenceLoaded(self, instrument): #Update when Sequence has been fixed in iM
+        seqInfo = instrument.Get_Sequence_Info()
+        self.setWindowTitle('Sequencer (' + seqInfo[1] + ')')
 
-    def sequenceUnloaded(self):
+    def sequenceUnloaded(self, instrument):
         self.setWindowTitle('Sequencer (None)')
 
     def treeToggled(self, checked):
@@ -102,7 +105,11 @@ class DSGraphicsLayoutWidget(pg.GraphicsLayoutWidget):
         self.mW = mW
         self.iM = mW.iM
         self.hM = mW.hM
-        self.wM = mW.hM
+        self.wM = mW.wM
+
+        self.xMin = 0
+        self.xMax = 1
+        self.xPadding = 2 # Percentage
 
         pg.setConfigOptions(antialias=True)
         self.dockWidget = dockWidget
@@ -129,11 +136,21 @@ class DSGraphicsLayoutWidget(pg.GraphicsLayoutWidget):
                 plot.plotItem.setXLink(self.referencePlot.plotItem)
             self.plotList.append(plot)
 
+        self.setBottomAxis()
+
     def removePlot(self, instrument, component):
         for plot in self.plotList:
             if(plot.component is component):
                 print('found the one to remove')
         print('could not find the one to remove')
+
+        self.setBottomAxis()
+
+    def setBottomAxis(self):
+        for plot in self.plotList:
+            plotTemp = plot
+            plotTemp.setShowXAxis(False)
+        plotTemp.setShowXAxis(True)
 
     def findPlotByMousePos(self, pos):
         plotsInRange = list()
@@ -179,19 +196,99 @@ class DSGraphicsLayoutWidget(pg.GraphicsLayoutWidget):
         else:
             super().mouseMoveEvent(event)
 
-class DSPlotItem(QObject):
+    def updateBounds(self):
+        self.xMin = 9000
+        self.xMax = -9000
+        for plot in self.plotList:
+            plot.getYBounds()
+            xMin, xMax = plot.getXBounds()
+            if(xMin < self.xMin):
+                self.xMin = xMin
+                for plot in self.plotList:
+                    plot.plotItem.setLimits(xMin = self.xMin)
+
+            if(xMax > self.xMax):
+                self.xMax = xMax
+                for plot in self.plotList:
+                    plot.plotItem.setLimits(xMax = self.xMax)
+
+class DSPlotItem():
     plotPaddingPercent = 1
 
     def __init__(self, mW, plotLayout, comp):
         super().__init__()
 
         self.mW = mW
+        self.iM = mW.iM
         self.component = comp
         self.plotLayout = plotLayout
         self.plotItem = plotLayout.addPlot()
+        self.pen = pg.mkPen(QColor(0,0,0), width=2)
+        self.showXAxis = True
+        self.plotDataList = list()
 
         self.sequencerEditWidget = eventListWidget(mW, plotLayout.dockWidget, comp)
+        self.iM.Component_Programming_Modified.connect(self.plot)
+        self.plotItem.plot(x=[-9000, 9000], y=[0, 0], pen = self.pen)
     
+    def setShowXAxis(self, toggle):
+        self.showXAxis = toggle
+        if(toggle is True):
+            self.plotItem.showAxis('bottom', True)
+            self.plotItem.showLabel('bottom', True)
+        else:
+            self.plotItem.showAxis('bottom', False)
+            self.plotItem.showLabel('bottom', False)
+
+    def plot(self, instrument, component):
+        if(component is self.component):
+            self.plotItem.clear()
+            for socket in component.Get_Sockets():
+                packet = socket.Get_Programming_Packet()
+                if(packet is not None):
+                    data = list()
+                    for cmd in packet.Get_Commands(commandType=AnalogSparseCommand):
+                        data.append(cmd.pairs)
+                    plotData = np.vstack(data)
+                else:
+                    plotData = np.array([[0,0], [0,1]])
+                self.plotDataList.append(plotData)
+                plotExpanded = np.vstack([[-9000, plotData[0,1]], plotData, [9000, plotData[-1,1]]])
+                self.plotItem.plot(x=np.append([0], plotExpanded[:,0]), y=plotExpanded[:,1], pen=self.pen, stepMode=True)
+
+        self.plotItem.setLimits(xMin = 0, xMax = 1)
+        self.plotLayout.updateBounds()
+        self.plotItem.setMouseEnabled(x=True, y=False)
+        self.plotItem.setLabels(bottom='Time (s)', left='voltage')
+        self.setShowXAxis(self.showXAxis)
+        self.plotItem.setLabel('left', self.component.Get_Standard_Field('name'))
+        #self.plotItem.setDownsampling(ds=True, auto=True, mode='peak') #mode='peak' produces strange results with large gaps in data
+        #self.plotItem.setClipToView(True)
+
+    def getXBounds(self):
+        xMin = 0
+        xMax = 0
+        for plotData in self.plotDataList:
+            xMinT = plotData[:,0].min()
+            if(xMinT < xMin):
+                xMin = xMinT
+            xMaxT = plotData[:,0].max()
+            if(xMaxT > xMax):
+                xMax = xMaxT
+        return xMin, xMax
+
+    def getYBounds(self):
+        yMin = 0
+        yMax = 1
+        for plotData in self.plotDataList:
+            yMinT = plotData[:,1].min()
+            if(yMinT < yMin):
+                yMin = yMinT
+            yMaxT = plotData[:,1].max()
+            if(yMaxT > yMax):
+                yMax = yMaxT
+        self.plotItem.setLimits(yMin=yMin, yMax=yMax)
+       
     def toggleEditWidget(self, eventPos):
         self.sequencerEditWidget.move(eventPos + QPoint(2, 2))
         if(self.sequencerEditWidget.isHidden()):
@@ -199,142 +296,7 @@ class DSPlotItem(QObject):
             self.sequencerEditWidget.show()
         else:
             self.sequencerEditWidget.hide()
-
-    def updatePlot(self):
-        data = self.component.parentPlotSequencer()
-        self.xMin, self.xMax = self.component.iM.mW.sequencerDockWidget.getSequenceXRange()
-        if(data is not None):
-            self.plotItem.clear()
-            if(data.ndim < 2):
-                startHub = np.array([-900000, data[1]])
-                endHub = np.array([900000, data[1]])
-                data = np.vstack((startHub, data))
-                data = np.vstack((data, endHub))
-                xMin = 0
-                xMax = 1
-                
-            data = self.formatData(data, self.xMin, self.xMax)
-
-            yDelta = data[:,1].max() - data[:,1].min()
-            yPadding = yDelta*self.plotPaddingPercent/100
-
-            self.plotItem.clear()
-            self.plotItem.plot(x=data[:,0], y=data[:,1], pen = QColor(0, 0, 0))
-
-            self.plotItem.autoRange()
-            self.component.iM.mW.sequencerDockWidget.redrawSequence()
-
-    def plot(self, showXAxis, xMinIn, xMaxIn):
-        data = self.component.parentPlotSequencer()
-        if(data is None):
-            data = np.array([[0,0], [1,0]])
-
-        if(data is not None):
-            data2 = self.formatData(data, xMinIn, xMaxIn)
-            data = data2
-
-            yDelta = data[:,1].max() - data[:,1].min()
-            if(yDelta < 1):
-                yDelta = 1
-            yPadding = yDelta*self.plotPaddingPercent/100
-
-            yMin = data[:,1].min()
-            if(yMin > 0):
-                yMin = 0 - yPadding
-            else:
-                yMin = yMin - yPadding
-
-            yMax = data[:, 1].max()
-            if(yMax < 1):
-                yMax = 1 + yPadding
-            else:
-                yMax = yMax + yPadding
-
-            self.plotItem.clear()
-            self.plotItem.plot(x=data[:,0], y=data[:,1], pen = self.plotLayout.sequencePLT1Color)
-            self.plotItem.setLimits(xMin=xMinIn, xMax=xMaxIn, yMin=yMin, yMax=yMax)
-
-        self.plotItem.setMouseEnabled(x=True, y=False)
-        self.plotItem.setLabels(bottom='Time (s)', left='voltage')
-        if(showXAxis):
-            self.plotItem.showAxis('bottom', True)
-            self.plotItem.showLabel('bottom', True)
-        else:
-            self.plotItem.showAxis('bottom', False)
-            self.plotItem.showLabel('bottom', False)
-        self.plotItem.setLabel('left', self.comp.Get_Standard_Field('name'))
-        #self.plotItem.setDownsampling(ds=True, auto=True, mode='peak') #mode='peak' produces strange results with large gaps in data
-        #self.plotItem.setClipToView(True)
-        axis = self.plotItem.getAxis('bottom')
-        
-    def formatData(self, data, xMin, xMax):
-        #print('START')
-        #print(data)
-        if(data[:,0].min() > xMin):
-            dataStart = data[:,0].min()
-            gapX = np.arange(xMin, dataStart, 0.001)
-            gapY = np.add(np.zeros(len(gapX)), data[0, 1])
-            minStump = np.vstack((gapX, gapY)).transpose()
-            #minStump = [xMin, data[0, 1]]
-            data = np.vstack((minStump, data))
-        if(data[:,0].max() < xMax):
-            dataEnd = data[:,0].max()
-            gapX = np.arange(dataEnd, xMax, 0.001)
-            gapY = np.add(np.zeros(len(gapX)), data[-1, 1])
-            maxStump = np.vstack((gapX, gapY)).transpose()
-            #maxStump = [xMax, data[-1, 1]]
-            data = np.vstack((data, maxStump))
-        #print('RESULT')
-        #print(data)
-        return data
-
-    def xRangeUpdate(self, xMinTest, xMaxTest):
-        if(xMinTest < self.xMin):
-            xMinOut = xMinTest
-            self.xMin = xMinOut
-        else:
-            xMinOut = self.xMin
-
-        if(xMaxTest > self.xMax):
-            xMaxOut = xMaxTest
-            self.xMax = xMaxOut
-        else:
-            xMaxOut = self.xMax
-
-        return self.padSequenceXRange(xMinOut, xMaxOut)
-
-    def getSequenceXRange(self):
-        globalxMax = 0
-        globalxMin = 1
-        for plotTemp in self.plots:
-            data = plotTemp.component.parentPlotSequencer()
-            if(data is not None):
-                xMax = data[:, 0].max()
-                if(xMax > globalxMax):
-                    globalxMax = xMax
-                xMin = data[:, 0].min()
-                if(xMin < globalxMin):
-                    globalxMin = xMin
-
-        return globalxMin, globalxMax
-
-    def padSequenceXRange(self, xMin, xMax):
-        distance = xMax-xMin
-        xMinOut = xMin - (self.plotPaddingPercent*distance/100)
-        xMaxOut = xMax + (self.plotPaddingPercent*distance/100)
-        return xMinOut, xMaxOut
-
-    def redrawSequence(self):
-        self.xMin, self.xMax = self.getSequenceXRange()
-        xMinPad, xMaxPad = self.padSequenceXRange(self.xMin, self.xMax) 
-        plotCounter = len(self.plots)
-        for plotTemp in self.plots:
-            plotCounter = plotCounter - 1
-            if(plotCounter == 0):
-                plotTemp.plot(True, self.xMin, self.xMax)
-            else:
-                plotTemp.plot(False, self.xMin, self.xMax)
-
+ 
 ############################################################################################
 ##################################### TREE VIEW WIDGET #####################################
 
@@ -430,7 +392,8 @@ class DSTreeView(QTreeView):
             self.openSequence(filePath)
 
     def open(self, item):
-        self.iM.Load_Sequence(item)
+        if(self.iM.Get_Instrument() is not None):
+            self.iM.Get_Instrument().Load_Sequence(item)
 
     def delete(self, item):
         os.remove(item)

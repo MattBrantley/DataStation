@@ -41,6 +41,27 @@ class Component(QObject):
     def Get_Event_Types(self):
         return self.eventTypeList
 
+    def Add_Events(self, events):
+        self.addEvents(events)
+        return True
+
+    def Remove_Events(self, events):
+        self.removeEvents(events)
+        return True
+
+    def Combined_Add_Remove_Events(self, addEvents, removeEvents):
+        self.combineAddRemoveEvents(addEvents, removeEvents)
+        return True
+
+    def Get_Data(self):
+        return self.data
+
+    def Get_Events(self):
+        return self.eventList
+
+    def Get_Instrument(self):
+        return self.instr
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
 
@@ -65,9 +86,7 @@ class Component(QObject):
         self.sequencerEditWidget = None
         self.eventTypeList = list()
         self.eventList = list()
-        self.data = None
-        self.plotItem = None
-        self.sequencerDrawState = False
+        self.data = list()
 
 ##### Datastation Reserved Functions #####
 
@@ -80,15 +99,15 @@ class Component(QObject):
             if(newSub.readyStatus == DSConstants.READY_CHECK_ERROR):
                 goodToContinue = False
         
-        if(goodToContinue is True):
-            if(isinstance(runResults, readyCheckPacket)):
-                subs.append(runResults)
-                if(runResults.readyStatus == DSConstants.READY_CHECK_ERROR):
-                    goodToContinue = False
-            else:
-                if(runResults is not True):
-                    subs.append(readyCheckPacket('User Component [' + self.compSettings['name'] + ']', DSConstants.READY_CHECK_ERROR, msg='User Component onRun() Did Not Return readyCheckPacket or True!'))
-                    goodToContinue = False
+        #if(goodToContinue is True):
+        #    if(isinstance(runResults, readyCheckPacket)):
+        #        subs.append(runResults)
+        #        if(runResults.readyStatus == DSConstants.READY_CHECK_ERROR):
+        #            goodToContinue = False
+        #    else:
+        #        if(runResults is not True):
+        #            subs.append(readyCheckPacket('User Component [' + self.compSettings['name'] + ']', DSConstants.READY_CHECK_ERROR, msg='User Component onRun() Did Not Return readyCheckPacket or True!'))
+        #            goodToContinue = False
         
         if(goodToContinue is True):
             pass
@@ -153,13 +172,22 @@ class Component(QObject):
     def onRemoval(self):  ### OVERRIDE ME!! ####
         pass
 
-    def onRunParent(self, events):
-        self.onRun(events)
+    def onProgramParent(self):
+        self.eventList.sort(key=lambda x: x.time)
+        self.onProgram()
+        self.pushProgramming()
+        self.instr.programmingModified(self)
 
-    def onRun(self, events):  ### OVERRIDE ME!! ####
+    def onRun(self):  ### OVERRIDE ME!! ####
         return readyCheckPacket('Component', DSConstants.READY_CHECK_ERROR, msg='User Component Does Not Override onRun()!')
 
-##### Component Modifications ######
+##### Component Programming #####
+
+    def pushProgramming(self):
+        for socket in self.socketList:
+            socket.pushProgramming()
+
+##### Component Modifications #####
 
     def onSaveParent(self):
         savePacket = dict()
@@ -232,26 +260,79 @@ class Component(QObject):
         return True
 
     def clearEvents(self):
-        if(self.sequencerEditWidget is not None):
-            self.sequencerEditWidget.clearEvents()
+        for event in reversed(self.eventList):
+            self.removeEvent(event)
 
-    def addEvent(self, event):
-        self.eventList.append(event)
-        self.iM.eventAdded(self, event)
+    # At the moment, addEvents and removeEvents both force a recalculation. For
+    # the sequencer widget, this means that a modify event (add and remove) will
+    # force two updates. It's a minor performance loss. This can be bypassed by
+    # calling combineAddRemoveEvents()
+    def combineAddRemoveEvents(self, addEvents, removeEvents):
+        for event in addEvents:
+            self.eventList.append(event)
+            self.instr.eventAdded(self, event)
+        for event in removeEvents:
+            self.instr.eventRemoved(self, event)
+            self.eventList.remove(event)
+        self.onProgramParent()
 
-    def removeEvent(self, event):
-        self.iM.eventRemoved(self, event)
-        self.eventList.remove(event)
+    def addEvents(self, events):
+        if isinstance(events, (list,)):
+            if(not events):
+                return
+            for event in events:
+                self.eventList.append(event)
+                self.instr.eventAdded(self, event)
+            self.onProgramParent()
+        else:
+            self.eventList.append(event)
+            self.instr.eventAdded(self, event)
+            self.onProgramParent()
 
-    def loadSequenceData(self, events):
-        for event in events:
-            self.addEvent(event)
+    def removeEvents(self, events):
+        if isinstance(events, (list,)):
+            for event in events:
+                if(not events):
+                    return
+                self.instr.eventRemoved(self, event)
+                self.eventList.remove(event)
+            self.onProgramParent()
+        else:
+            self.instr.eventRemoved(self, event)
+            self.eventList.remove(event)
+            self.onProgramParent()
 
-        #if(self.sequencerEditWidget is None): #Generates this widget the first time it is made.
-        #    self.sequencerEditWidget = sequenceEditWidget(self.mW, self)
+    def loadSequenceData(self, eventData):
+        self.clearEvents()
+        eventListIn = list()
+        for datum in eventData:
+            datumType = self.getEventTypeByName(datum)
+            if(datumType is None):
+                self.mW.postLog('Sequence File had an unknown event type (' + datum['type'] + ') for component type (' + self.componentType + ')... ', DSConstants.LOG_PRIORITY_HIGH)
+                continue
+            eventTemp = datumType()
+            eventTemp.loadPacket(datum)
+            eventListIn.append(eventTemp)
 
-            #self.sequencerEditWidget.addEvent(event)
-        #self.sequencerEditWidget.checkEventOverlaps()
+        self.addEvents(eventListIn)
+
+    def saveEventsPacket(self):
+        savePacket = dict()
+        savePacket['compID'] = self.componentIdentifier
+        savePacket['uuid'] = self.compSettings['uuid']
+        savePacket['name'] = self.compSettings['name']
+        savePacket['type'] = self.componentType
+        eventData = list()
+        for event in self.eventList:
+            eventData.append(event.savePacket())
+        savePacket['events'] = eventData
+        return savePacket
+
+    def getEventTypeByName(self, eventData):
+        for eventType in self.eventTypeList:
+            if(eventType.name == eventData['type']):
+                return eventType
+        return None
 
 ##### Socket Interactions #####
 

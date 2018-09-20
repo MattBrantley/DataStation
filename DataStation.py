@@ -46,6 +46,7 @@ from src.DSWidgets.loginWidget import loginDockWidget
 from src.DSWidgets.hardwareWidget.hardwareWidget import hardwareWidget
 from src.DSWidgets.controlWidget import controlWidget
 from src.DSWidgets.logoWidget import logoDockWidget
+from src.DSWidgets.consoleWidget import consoleDockWidget
 
 sys._excepthook = sys.excepthook
 
@@ -68,6 +69,11 @@ class mainWindow(QMainWindow):
         self.DSC = DSConstants()
         self.rootDir = os.path.dirname(__file__)
         self.srcDir = os.path.join(self.rootDir, 'src')
+        self.ssDir = os.path.join(self.rootDir, 'Stylesheets')
+
+        with open(os.path.join(self.ssDir, 'darkstyle.stylesheet')) as file:
+            ssTxt = file.read()
+            #self.setStyleSheet(ssTxt)
 
         self.loadWindowIcons()
         self.loadingScreenWidgets()
@@ -173,6 +179,9 @@ class mainWindow(QMainWindow):
         self.wM.workspaceTreeWidget = self.workspaceTreeDockWidget.workspaceTreeWidget
         self.wM.workspaceTreeWidget.setObjectName('workspaceTreeWidget')
 
+        self.consoleDockWidget = consoleDockWidget(self)
+        self.consoleDockWidget.setObjectName('consoleWidget')
+
     def finishInitWithUser(self, userData):
         self.postLog('User Profile Selected: ' + userData['First Name'] + ' ' + userData['Last Name'], DSConstants.LOG_PRIORITY_HIGH)
         self.wM.userProfile = userData
@@ -210,6 +219,9 @@ class mainWindow(QMainWindow):
         self.addDockWidget(Qt.BottomDockWidgetArea, self.controlWidget)
         self.controlWidget.setFloating(True)
 
+        self.addDockWidget(Qt.BottomDockWidgetArea, self.consoleDockWidget)
+        self.consoleDockWidget.setFloating(True)
+
         self.AnimatedDocks = True
         self.setDockNestingEnabled(True)
 
@@ -219,7 +231,7 @@ class mainWindow(QMainWindow):
         self.restoreWindowStates()
         self.wM.loadPreviousWS()
         self.iM.loadPreviousInstrument()
-        #self.iM.loadPreviousSequence()
+        self.iM.loadPreviousSequence()
 
         self.DataStation_Loaded.emit()
         self.postLog('Data Station Finished Loading!', DSConstants.LOG_PRIORITY_HIGH)

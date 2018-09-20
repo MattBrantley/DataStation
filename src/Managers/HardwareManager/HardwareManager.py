@@ -1,10 +1,10 @@
 import os, sys, imp
 from src.Managers.InstrumentManager.Instrument import *
-from src.Managers.InstrumentManager.Filter import *
 from src.Managers.InstrumentManager.Sockets import *
 from src.Managers.InstrumentManager.Digital_Trigger_Component import Digital_Trigger_Component
-from src.Managers.HardwareManager.hardwareObject import hardwareObject
+from src.Managers.HardwareManager.HardwareDevice import HardwareDeviceHandler, HardwareDevice
 from src.Managers.HardwareManager.Sources import *
+from src.Managers.HardwareManager.Filter import *
 from src.Managers.HardwareManager.DataStation_Labview import DataStation_LabviewExtension
 from src.Constants import DSConstants as DSConstants, readyCheckPacket
 import json as json
@@ -22,6 +22,12 @@ class HardwareManager(QObject):
     Hardware_Added = pyqtSignal(object) # hardware
     Hardware_Removed = pyqtSignal()
     Hardware_Trigger_Modified = pyqtSignal()
+    Hardware_Programming_Modified = pyqtSignal(object, object) # hardware, source
+    Hardware_Device_Reset = pyqtSignal(object) # hardware
+    Hardware_Handler_Initializing = pyqtSignal(object) # hardware
+    Hardware_Handler_Initialized = pyqtSignal(object) # hardware
+    Hardware_Device_Changed = pyqtSignal(object, str) # hardware, device name
+    Hardware_Device_Removed = pyqtSignal(object) # hardware
 
 ##### Signals: Sequence #####
     Sequence_Started = pyqtSignal()
@@ -29,13 +35,13 @@ class HardwareManager(QObject):
 
 ##### Signals: Sources #####
     Source_Added = pyqtSignal(object, object) # hardware, source
+    Source_Removed = pyqtSignal(object, object) # hardware, source
 
 ##### Signals: Filters #####
     Filter_Added = pyqtSignal(object) # Filter
     Filter_Attached = pyqtSignal(object) # Filter
     Filter_Detatched = pyqtSignal(object) # Filter
-    Filter_Removing = pyqtSignal(object) # Filter - Right before removal
-    Filter_Removed = pyqtSignal()
+    Filter_Removed = pyqtSignal(object) # Filter
 
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
@@ -48,12 +54,12 @@ class HardwareManager(QObject):
         return self.readyStatus
 
     def Run_Sequence(self):
-        self.onRun()
+        pass
 
 ##### Functions: Hardware Models #####
 
     def Get_Hardware_Models_Available(self):
-        return self. driversAvailable
+        return self.driversAvailable
 
 ##### Functions: Filter Models #####
 
@@ -62,7 +68,7 @@ class HardwareManager(QObject):
 
 ##### Functions: Hardware #####
     def Get_Hardware(self):
-        return self.hardwareLoaded
+        return self.deviceHandlerList
 
     def Add_Hardware(self, hardwareModel):
         return self.addHardwareObj(hardwareModel)
@@ -90,7 +96,7 @@ class HardwareManager(QObject):
         self.hardwareDriverDir = os.path.join(self.mW.rootDir, 'Hardware Drivers')
         self.filtersAvailable = list()
         self.driversAvailable = list()
-        self.hardwareLoaded = list()
+        self.deviceHandlerList = list()
         self.sourceObjList = list()
         self.filterList = list()
 
@@ -105,21 +111,24 @@ class HardwareManager(QObject):
     def readyCheck(self):
         subs = list()
         self.readyStatus = True
-        for hardware in self.hardwareLoaded:
-            check = hardware.readyCheck()
+        for deviceHandler in self.deviceHandlerList:
+            check = deviceHandler.readyCheck()
             subs.append(check)
             if(check.readyStatus is False):
                 self.readyStatus = False
 
         return readyCheckPacket('Hardware Manager', DSConstants.READY_CHECK_READY, subs=subs)
 
-##### Functions Called By Factoried Hardware_Objects #####
+##### Functions Called By Factoried Hardware Device Handlers #####
 
-    def configModified(self, hWare):
-        pass
+    def programmingModified(self, hWare, source):
+        self.Hardware_Programming_Modified.emit(hWare,source)
 
-    def program(self, hWare, source):
-        pass
+    def deviceInitialized(self, hWare):
+        self.Hardware_Handler_Initialized.emit(hWare)
+
+    def deviceReset(self, hWare):
+        self.Hardware_Device_Reset.emit(hWare)
 
     def triggerModified(self, hWare):
         pass
@@ -127,12 +136,20 @@ class HardwareManager(QObject):
     def sourceAdded(self, hardwareObj, sourceObj): # Source_Added
         self.Source_Added.emit(hardwareObj, sourceObj)
 
+    def sourceRemoved(self, hardwareObj, sourceObj): # Source_Removed
+        self.Source_Removed.emit(hardwareObj, sourceObj)
+
+    def deviceSelectionChanged(self, hardwareObj, deviceName):
+        self.Hardware_Device_Changed.emit(hardwareObj, deviceName)
+
+    def deviceSelectionRemoved(self, hardwareObj):
+        self.Hardware_Device_Removed.emit(hardwareObj)
+
 ##### Functions Called By Factoried Filter Objects #####
 
-    def removeFilter(self, Filter): # Filter_Removing, Filter_Removed
-        self.Filter_Removing.emit(Filter)
+    def removeFilter(self, Filter): # Filter_Removed
+        self.Filter_Removed.emit(Filter)
         self.filterList.remove(Filter)
-        self.Filter_Removed.emit()
 
     def filterAttached(self, Filter): # Filter_Attached
         self.Filter_Attached.emit(Filter)
@@ -175,15 +192,15 @@ class HardwareManager(QObject):
         return self.mW.iM.removeCompByUUID(uuid)
 
     def getHardwareObjectByUUID(self, uuid):
-        for hardware in self.hardwareLoaded:
-            if(hardware.hardwareSettings['uuid'] == uuid):
-                return hardware
+        for deviceHandler in self.devoceHandlerList:
+            if(deviceHandler.Get_Standard_Field('uuid') == uuid):
+                return deviceHandler
         return None        
 
     def getSourceObjs(self):
         sourceList = list()
-        for hardware in self.hardwareLoaded:
-            sourceList += hardware.sourceList
+        for deviceHandler in self.deviceHandlerList:
+            sourceList += deviceHandler.Get_Sources()
 
         return sourceList
 
@@ -266,7 +283,6 @@ class HardwareManager(QObject):
 
     def loadDriverFromFile(self, filepath):
         class_inst = None
-        expected_class = 'Hardware_Driver'
         py_mod = None
         mod_name, file_ext = os.path.splitext(os.path.split(filepath)[-1])
         loaded = False
@@ -278,18 +294,17 @@ class HardwareManager(QObject):
             return
 
         if (py_mod != None):
-            if hasattr(py_mod, expected_class):  # verify that Filter is a class in this file
-                loaded = True
-                class_temp = getattr(py_mod, expected_class)(filepath)
-                if isinstance(class_temp, hardwareObject):  # verify that Filter inherits the correct class
+            if(hasattr(py_mod, mod_name) is True):
+                class_temp = getattr(py_mod, mod_name)(dict(), dict(), list(), list())
+                if issubclass(type(class_temp), HardwareDevice):  # verify that driver inherits the correct class
                     class_inst = class_temp
-
+                    loaded = True
+                
         if(loaded):
             self.mW.postLog('  (Success!)', DSConstants.LOG_PRIORITY_MED, newline=False)
         else:
             self.mW.postLog(' (Failed!)', DSConstants.LOG_PRIORITY_MED, newline=False)
 
-        class_inst.hM = self
         return class_inst
 
 ##### Filter Manipulation Functions #####
@@ -327,33 +342,26 @@ class HardwareManager(QObject):
 ##### Hardware Manipulation Functions #####
 
     def programAllDevices(self):
-        for device in self.hardwareLoaded:
-            device.program()
+        pass
 
     def addDigitalTriggerComp(self, hardwareObj):
         triggerComp = self.mW.iM.addCompToInstrument(Digital_Trigger_Component)
         triggerComp.onConnect(hardwareObj.hardwareSettings['name'], hardwareObj.hardwareSettings['uuid'])
         return triggerComp
 
-    def addHardwareObj(self, hardwareModel, loadData=None):
-        tempHardware = type(hardwareModel)(self)
-        tempHardware.mW = self.mW
-        tempHardware.iM = self.iM
-        tempHardware.hM = self
-        tempHardware.wM = self.wM
-        tempHardware.initHardwareWorker()
+    def addHardwareObj(self, deviceModel, loadData=None):
+        #tempHardware = type(hardwareModel)(self)
+        newHandler = HardwareDeviceHandler(self.mW, type(deviceModel))
+        self.deviceHandlerList.append(newHandler)
+        self.Hardware_Added.emit(newHandler)
+        self.Hardware_Handler_Initializing.emit(newHandler)
+        newHandler.initDeviceThread(self.lvInterface.devices)
 
-        if(loadData is not None):
-            if('hardwareSettings' in loadData):
-                tempHardware.loadPacketParent(loadData)
+        return True
 
-        self.hardwareLoaded.append(tempHardware)
-        self.Hardware_Added.emit(tempHardware)
-        return tempHardware
-
-    def removeHardwareObj(self, hardwareObj):
-        hardwareObj.onRemove()
-        self.hardwareLoaded.remove(hardwareObj)
+    def removeHardwareObj(self, deviceHandler):
+        deviceHandler.onRemove()
+        self.deviceHandlerList.remove(deviceHandler)
 
     def loadHardwareState(self):
         self.mW.postLog('Restoring Hardware State... ', DSConstants.LOG_PRIORITY_HIGH)
@@ -404,8 +412,8 @@ class HardwareManager(QObject):
         savePacket['hardwareStates'] = list()
         savePacket['filters'] = list()
 
-        for hardware in self.hardwareLoaded:
-            savePacket['hardwareStates'].append(hardware.savePacket())
+        for deviceHandler in self.deviceHandlerList:
+            savePacket['hardwareStates'].append(deviceHandler.savePacket())
 
         for Filter in self.filterList:
             savePacket['filters'].append(Filter.savePacket())
@@ -413,9 +421,4 @@ class HardwareManager(QObject):
 
         self.wM.settings['hardwareState'] = savePacket
 
-        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
-
-    def onRun(self):
-        self.Sequence_Started.emit()
-        for hardware in self.hardwareLoaded:
-            hardware.onRun()
+        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH)

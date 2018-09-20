@@ -5,6 +5,7 @@ A simple DC Lens.
 from src.Managers.InstrumentManager.Component import *
 from src.Managers.InstrumentManager.EventTypes import *
 from src.Managers.InstrumentManager.Sockets import *
+from src.Managers.HardwareManager.PacketCommands import *
 from PyQt5.Qt import *
 from PyQt5.QtGui import *
 import os, random, numpy as np
@@ -29,19 +30,20 @@ class DC_Electrode(Component):
         self.containerWidget = self.configWidgetContent()
         self.configWidget.setWidget(self.containerWidget)
         self.socket = self.addAOSocket(self.compSettings['name'])
-        self.checkValidity()
-        self.data = None
 
         self.addEventType(stepEvent)
         self.addEventType(pulseEvent)
         self.addEventType(pulseTrainEvent)
         self.addEventType(linearRampEvent)
 
-    def onRun(self, events):
-        self.prepSequencerData(events)
-        dataPacket = waveformPacket(self.data)
-        self.setPathDataPacket(1, dataPacket)
-        return True
+    def onProgram(self):
+        self.packet = commandPacket()
+        v0 = 0
+        for event in self.eventList:
+            command = event.toCommand(v0)
+            self.packet.Add_Command(command)
+            v0 = command.pairs[-1,1]
+        self.socket.Set_Programming_Packet(self.packet)
 
     def updateConfigContent(self):
         self.showSequenceBox.setChecked(self.compSettings['showSequencer'])
@@ -77,60 +79,6 @@ class DC_Electrode(Component):
         self.container.setLayout(self.fbox)
         return self.container
 
-    def prepSequencerData(self, events):
-        self.data = None
-        lastEventVoltage = 0
-        for event in events:
-            newEventData = None
-
-            if(isinstance(event['type'], stepEvent) is True):
-                newEventData = np.array([[event['time'], lastEventVoltage],
-                [event['time']+self.compSettings['granularity'], event['settings']['Voltage']]])
-
-                lastEventVoltage = event['settings']['Voltage']
-
-            if(isinstance(event['type'], pulseEvent) is True):
-                newEventData = np.array([[event['time'], lastEventVoltage],
-                [event['time']+self.compSettings['granularity'], event['settings']['Voltage']],
-                [event['time']+event['settings']['Duration'], event['settings']['Voltage']],
-                [event['time']+event['settings']['Duration']+self.compSettings['granularity'], lastEventVoltage]])
-
-                lastEventVoltage = lastEventVoltage            
-                
-            if(isinstance(event['type'], pulseTrainEvent) is True):
-                newEventData = None
-                for n in range(0, event['settings']['Count']):
-                    offset = n*event['settings']['offDuration'] + n*event['settings']['onDuration']
-                    newEventStep = np.array([[event['time']+offset, lastEventVoltage],
-                    [event['time']+offset+self.compSettings['granularity'], event['settings']['Voltage']],
-                    [event['time']+event['settings']['onDuration']+offset, event['settings']['Voltage']],
-                    [event['time']+event['settings']['onDuration']+offset+self.compSettings['granularity'], lastEventVoltage]])
-                    if(newEventData is None):
-                        newEventData = newEventStep
-                    else:
-                        newEventData = np.vstack((newEventData, newEventStep))
-
-                lastEventVoltage = lastEventVoltage
-
-            if(isinstance(event['type'], linearRampEvent) is True):
-                duration = event['settings']['Duration']
-
-                newEventData = np.array([[event['time'], lastEventVoltage],
-                [event['time']+duration, event['settings']['Voltage']]])
-
-                lastEventVoltage = event['settings']['Voltage']
-
-            if(newEventData is not None):
-                if(self.data is None):
-                    self.data = newEventData
-                else:
-                    self.data = np.vstack((self.data, newEventData))
-        #print(data)
-        return self.data
-
-    def plotSequencer(self, events):
-        return self.data
-
     def saveWidgetValues(self):
         self.compSettings['showSequencer'] = self.showSequenceBox.isChecked()
         self.compSettings['name'] = self.nameBox.text()
@@ -140,83 +88,77 @@ class DC_Electrode(Component):
         self.checkValidity()
         self.Component_Modified.emit(self)
 
-    def checkValidity(self):
-        if(self.compSettings['vMax'] <= self.compSettings['vMin']):
-            self.valid = False
-            self.maxVBox.setStyleSheet("QDoubleSpinBox {background-color: red;}")
-            self.minVBox.setStyleSheet("QDoubleSpinBox {background-color: red;}")
-        else:
-            self.valid = True
-            self.maxVBox.setStyleSheet("QDoubleSpinBox {background-color: white;}")
-            self.minVBox.setStyleSheet("QDoubleSpinBox {background-color: white;}")
-
 class stepEvent(eventType):
     name = 'Step'
 
-    def __init__(self, gran):
+    def __init__(self):
         super().__init__()
-        self.gran = gran
-
-    def genParameters(self):
-        paramList = list()
-        paramList.append(eventParameterDouble('Voltage'))
-        return paramList
+        self.Add_Parameter(eventParameterDouble('Voltage'))
 
     def getLength(self, params):
         return self.gran
+
+    def toCommand(self, v0):
+        pairs = np.array([[self.time, v0], [self.time, self.eventParams['Voltage'].v()]])
+        command = AnalogSparseCommand(pairs)
+        return command
 
 class pulseEvent(eventType):
     name = 'Pulse'
     def __init__(self):
         super().__init__()
-
-    def genParameters(self):
-        paramList = list()
-        paramList.append(eventParameterDouble('Voltage'))
-        paramList.append(eventParameterDouble('Duration', allowZero=False, allowNegative=False))
-        return paramList
+        self.Add_Parameter(eventParameterDouble('Voltage'))
+        self.Add_Parameter(eventParameterDouble('Duration', allowZero=False, allowNegative=False))
 
     def getLength(self, params):
         return params[1].value()
+
+    def toCommand(self, v0):
+        pairs = np.arange(self.time, self.time+self.eventParams['Duration']) 
+        command = AnalogSparseCommand(pairs)
+        return command
 
 class linearRampEvent(eventType):
     name = 'Linear Ramp'
 
     def __init__(self):
         super().__init__()
-
-    def genParameters(self):
-        paramList = list()
-        paramList.append(eventParameterDouble('Voltage'))
-        paramList.append(eventParameterDouble('Duration', allowZero=False))
-        return paramList
+        self.Add_Parameter(eventParameterDouble('Voltage'))
+        self.Add_Parameter(eventParameterDouble('Duration', allowZero=False))
 
     def getLength(self, params):
         return params[1].value()
+
+    def toCommand(self, v0):
+        pairs = np.array([[self.time, v0],
+        [self.time + self.eventParams['Duration'].v(), self.eventParams['Voltage'].v()]])
+        command = AnalogSparseCommand(pairs)
+        return command
 
 class pulseTrainEvent(eventType):
     name = 'Pulse Train'
     
     def __init__(self):
         super().__init__()
-
-    def genParameters(self):
-        paramList = list()
-        paramList.append(eventParameterDouble('Voltage'))
-        paramList.append(eventParameterInt('Count', allowZero=False, allowNegative=False))
-        paramList.append(eventParameterDouble('onDuration', allowZero=False, allowNegative=False))
-        paramList.append(eventParameterDouble('offDuration', allowZero=False, allowNegative=False))
-        return paramList
+        self.Add_Parameter(eventParameterDouble('Voltage'))
+        self.Add_Parameter(eventParameterInt('Count', allowZero=False, allowNegative=False))
+        self.Add_Parameter(eventParameterDouble('onDuration', allowZero=False, allowNegative=False))
+        self.Add_Parameter(eventParameterDouble('offDuration', allowZero=False, allowNegative=False))
 
     def getLength(self, params):
         return params[1].value()*params[2].value() + (params[1].value()-1)*params[3].value()
 
-#def randData(self):
-#    count = random.randint(1,100)
-#    var = random.randint(-5,10)
-#    newData = np.array([var-1,var])
-#    for i in range(count):
-#        data = np.array([var, random.randint(1,10)])
-#        var = var + 1
-#        newData = np.vstack((newData, data))
-#    return newData
+    def toCommand(self, v0):
+        pairs = None
+        for n in range(0, self.eventParams['Count'].v()):
+            offset = n * (self.eventParams['offDuration'].v() + self.eventParams['onDuration'].v())
+            newEventStep = np.array([[self.time + offset, v0],
+            [self.time + offset, self.eventParams['Voltage'].v()],
+            [self.time + self.eventParams['onDuration'].v() + offset, self.eventParams['Voltage'].v()],
+            [self.time + self.eventParams['onDuration'].v() + offset, v0]])
+            if(pairs is None):
+                pairs = newEventStep
+            else:
+                pairs = np.vstack((pairs, newEventStep))
+        command = AnalogSparseCommand(pairs)
+        return command

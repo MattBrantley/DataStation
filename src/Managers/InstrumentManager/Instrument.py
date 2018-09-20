@@ -10,6 +10,8 @@ class Instrument(QObject):
         self.mW = self.iM.mW
         self.name = 'Default Instrument'
         self.url = None
+        self.sequencePath = ''
+        self.sequenceName = ''
         self.componentList = list()
 
 ############################################################################################
@@ -35,6 +37,9 @@ class Instrument(QObject):
 
     def Get_Components(self):
         return self.componentList
+
+    def Get_Sequence_Info(self):
+        return self.sequencePath, self.sequenceName
 
     def Remove_Component(self, component):
         return self.removeComponent(component)
@@ -82,6 +87,9 @@ class Instrument(QObject):
     def socketDetatched(self, component, socket):
         self.iM.socketDetatched(self, component, socket)
 
+    def programmingModified(self, component):
+        self.iM.programmingModified(self, component)
+
 ##### Instrument Manipulations #####
 
     def savePacket(self):
@@ -123,10 +131,6 @@ class Instrument(QObject):
     def reattachSockets(self):
         pass
     
-    def clearEvents(self):
-        for comp in self.componentList:
-            comp.clearEvents()
-        
 ##### Search Functions #####
 
     def getComponentByUUID(self, uuid):
@@ -167,11 +171,25 @@ class Instrument(QObject):
 
 ##### Event Functions #####
 
+    def sequenceInfoUpdate(self, path, name):
+        self.sequencePath = path
+        self.sequenceName = name
+
     def clearEvents(self):
-        pass
+        for comp in self.componentList:
+            comp.clearEvents()
+        
+    def getSequenceSaveData(self):
+        savePacket = dict()
+        savePacket['instrument'] = self.Get_Name()
+        compSaveData = list()
+        for comp in self.componentList:
+            compSaveData.append(comp.saveEventsPacket())
+        savePacket['eventData'] = compSaveData
+        return savePacket
 
     def loadSequence(self, path, showWarning=True):
-        data = self.iM.openSequenceFile(self, path)
+        data = self.iM.openSequenceFile(path)
         self.mW.postLog('Applying sequence to instrument... ', DSConstants.LOG_PRIORITY_HIGH)
 
         if(data is None):
@@ -191,12 +209,13 @@ class Instrument(QObject):
 
         self.clearEvents()
 
-        for datum in data['saveData']:
-            comp = self.getComponent(uuid=datum['uuid'])
+        for datum in data['eventData']:
+            comp = self.getComponents(uuid=datum['uuid'])
             if(not comp):
                 self.mW.postLog('Sequence data for comp with uuid (' + datum['uuid'] + ') cannot be assigned! Possibly from different instrument.', DSConstants.LOG_PRIORITY_HIGH)
             else:
                 comp[0].loadSequenceData(datum['events'])
 
         self.mW.postLog('Sequence applied to instrument!', DSConstants.LOG_PRIORITY_HIGH)
+        self.iM.sequenceLoaded(self)
         return True

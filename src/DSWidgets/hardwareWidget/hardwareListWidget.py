@@ -89,7 +89,7 @@ class hardwareListItem(QWidget):
 
         self.infoSection = QWidget()
         self.infoSectionLayout = QVBoxLayout()
-        self.infoSectionLayout.addWidget(QLabel(hardwareObj.hardwareType))
+        self.infoSectionLayout.addWidget(QLabel(hardwareObj.Get_Standard_Field('hardwareType')))
         self.infoSectionLayout.addWidget(self.configButton)
         self.infoSectionLayout.addStretch()
 
@@ -124,17 +124,57 @@ class hardwareListItem(QWidget):
 
         self.layout.addWidget(self.topPortion)
 
-        self.messageUpdateTimer = QTimer()
-        self.messageUpdateTimer.timeout.connect(self.updateMessages)
-        self.messageUpdateTimer.start(20)
+        self.hM.Hardware_Programming_Modified.connect(self.programModified)
+        self.hM.Hardware_Device_Reset.connect(self.deviceReset)
+        self.hM.Hardware_Handler_Initializing.connect(self.deviceIniting)
+        self.hM.Hardware_Handler_Initialized.connect(self.deviceInit)
+        self.hM.Hardware_Device_Changed.connect(self.deviceSelectionChanged)
+        self.hM.Hardware_Device_Removed.connect(self.deviceSelectionRemoved)
+        self.hM.Source_Added.connect(self.sourceAdded)
 
-    def updateMessages(self):
-        newMsgs = self.hardwareObj.getMessages()
-        for msg in newMsgs:
-            if(msg.action=='refresh'):
-                self.msgWidget.clear()
-            self.msgWidget.addItem(time.strftime('[%m/%d/%Y %H:%M:%S] ') + msg.msg)
-            self.msgWidget.setCurrentRow(self.msgWidget.count()-1)
+        self.getPreloadInformation()
+
+    def getPreloadInformation(self):
+        self.addMsg('[Manager] Manager started.')
+        for source in self.hardwareObj.Get_Sources():
+            self.sourceAdded(self.hardwareObj, source)
+
+    def sourceRemoved(self, hWare, source):
+        if(hWare is self.hardwareObj):
+            self.addMsg('[Manager] Source removed: ' + str(source.Get_Name()))
+
+    def sourceAdded(self, hWare, source):
+        if(hWare is self.hardwareObj):
+            self.addMsg('[Manager] Source added: ' + str(source.Get_Name()))
+
+    def deviceIniting(self, hWare):
+        if(hWare is self.hardwareObj):
+            self.addMsg('Device Handler Initializing..')
+
+    def deviceInit(self, hWare):
+        if(hWare is self.hardwareObj):
+            self.addMsg('Device Handler Initialization Finished.')
+
+    def deviceReset(self, hWare):
+        if(hWare is self.hardwareObj):
+            self.addMsg('[Manager] Device Handler Reset.')
+            self.msgWidget.clear()
+
+    def deviceSelectionChanged(self, hWare, deviceName):
+        if(hWare is self.hardwareObj):
+            self.addMsg('[Manager] Device selected: ' + deviceName)
+        
+    def deviceSelectionRemoved(self, hWare):
+        if(hWare is self.hardwareObj):
+            self.addMsg('[Manager] Device selection removed.')
+
+    def programModified(self, hWare, Source):
+        if(hWare is self.hardwareObj):
+            self.addMsg('[Manager] New programming recieved.')
+
+    def addMsg(self, msg):
+        self.msgWidget.addItem(time.strftime('[%m/%d/%Y %H:%M:%S] ') + msg)
+        self.msgWidget.setCurrentRow(self.msgWidget.count()-1)
 
     def setHeight(self):
         if(self.state == 'min'):
@@ -188,8 +228,13 @@ class hardwareListItem(QWidget):
         super().paintEvent(e)
 
     def showConfigWidget(self):
-        cursor = QCursor()
-        self.hardwareObj.showConfigWidget(cursor.pos())
+        menu = QMenu()
+        hardwareConfig = QWidgetAction(self.mW)
+        hardwareConfig.setDefaultWidget(hardwareConfigWidget(self.hardwareObj))
+        menu.addAction(hardwareConfig)
+
+        action = menu.exec_(QCursor().pos())
+        #self.hardwareObj.Show_Config_Widget(cursor.pos())
 
     def mousePressEvent(self, e):
         #check if min/max pressed
@@ -247,13 +292,25 @@ class sourceListWidget(QListWidget):
         self.wM = mW.wM
 
         self.hM.Source_Added.connect(self.addSource)
+        self.hM.Source_Removed.connect(self.removeSource)
+        self.getPreLoadedSources()
+
+    def getPreLoadedSources(self):
+        for source in self.hardwareObj.Get_Sources():
+            self.addSource(self.hardwareObj, source)
 
     def addSource(self, hardwareObj, source):
         if(hardwareObj is self.hardwareObj):
             self.addItem(sourceListItem(source, self.mW))
 
-    def clearSources(self):
-        self.clear()
+    def removeSource(self, hardwareObj, source):
+        removeRow = None
+        for i in range(self.count()):
+            rowItem = self.item(i)
+            if(rowItem.source is source):
+                removeRow = i
+        if(removeRow is not None):
+            self.takeItem(removeRow)
 
 class sourceListItem(QListWidgetItem):
     def __init__(self, source, mW):
@@ -275,3 +332,34 @@ class driverMessageWidget(QListWidget):
         self.hM = mW.hM
         self.wM = mW.wM
         self.maximumHeight = 150
+
+class hardwareConfigWidget(QWidget):
+    def __init__(self, deviceHandler):
+        super().__init__()
+        self.deviceHandler = deviceHandler
+        configLayout = QVBoxLayout()
+        self.setLayout(configLayout)
+        self.setMinimumWidth(200)
+
+        hardwareConfig = QWidget()
+
+        layout = QFormLayout()
+        hardwareConfig.setLayout(layout)
+
+        deviceSelection = QComboBox()
+        deviceSelection.addItem('')
+        index = 0
+        for item in self.deviceHandler.Get_Available_Devices():
+            index = index + 1
+            deviceSelection.addItem(item)
+            if(item == deviceHandler.Get_Standard_Field('device')):
+                deviceSelection.setCurrentIndex(index)
+        #Doing this after solved the issue of rebuilding the instrument every time widget was shown
+        deviceSelection.currentTextChanged.connect(self.deviceSelectionChanged)
+        layout.addRow("Device:", deviceSelection)
+
+        configLayout.addWidget(hardwareConfig)
+
+    def deviceSelectionChanged(self, newSelection):
+        self.deviceHandler.Load_Device(newSelection)
+

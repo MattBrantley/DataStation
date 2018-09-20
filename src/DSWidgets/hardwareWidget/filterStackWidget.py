@@ -3,7 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import os, sys, imp, math, copy
 from src.Constants import DSConstants as DSConstants
-from src.Managers.InstrumentManager.Filter import Filter
+from src.Managers.HardwareManager.Filter import Filter
 from src.Managers.InstrumentManager.Sockets import Socket
 from src.Managers.HardwareManager.Sources import Source
 

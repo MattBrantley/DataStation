@@ -2,7 +2,7 @@
 """
 Splits an incoming signal to three outputs
 """
-from src.Managers.InstrumentManager.Filter import *
+from src.Managers.HardwareManager.Filter import *
 from PyQt5.Qt import *
 from PyQt5.QtGui import *
 import os

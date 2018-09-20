@@ -22,10 +22,12 @@ class InstrumentManager(QObject):
     Component_Added = pyqtSignal(object, object) # Instrument, Component
     Component_Removed = pyqtSignal(object, object) # Instrument, Component
     Component_Config_Changed = pyqtSignal()
+    Component_Programming_Modified = pyqtSignal(object, object) # Instrument, Component
 
 ##### Signals: Sequence #####
-    Sequence_Loaded = pyqtSignal()
-    Sequence_Unloaded = pyqtSignal()
+    Sequence_Loaded = pyqtSignal(object) # Path, Name, Instrument
+    Sequence_Unloaded = pyqtSignal(object) # Instrument
+    Sequence_Saved = pyqtSignal(object) # Path, Name, Instrument
     Sequence_Config_Changed = pyqtSignal()
     Sequence_Name_Changed = pyqtSignal()
 
@@ -88,22 +90,6 @@ class InstrumentManager(QObject):
         if(model is None):
             return False
         return self.addCompToInstrument(model)
-
-##### Functions: Sequence Management #####
-    #def Load_Sequence(self, path):
-    #    if(self.currentInstrument is None):
-    #        msg = QMessageBox()
-    #        msg.setIcon(QMessageBox.Critical)
-    #        msg.setText("No instrument is loaded - cannot load sequence!")
-    #        msg.setWindowTitle("Sequence/Instrument Compatibability Error")
-    #        msg.setStandardButtons(QMessageBox.Ok)
-
-    #        retval = msg.exec_()
-    #    else:
-    #        self.openSequence(path)
-
-    #def Save_Sequence(self, name=None, path=None):
-    #    pass
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -176,8 +162,14 @@ class InstrumentManager(QObject):
     def eventRemoved(self, instrument, component, event):
         self.Event_Removed.emit(instrument, component, event)
 
-    def eventModified(self, instrument, component, event):
+    def eventModified(self, instrument, component, event): ## Not used?
         self.Event_Modified.emit(instrument, component, event)
+
+    def sequenceLoaded(self, instrument):
+        self.Sequence_Loaded.emit(instrument)
+
+    def programmingModified(self, instrument, component):
+        self.Component_Programming_Modified.emit(instrument, component)
 
 ##### Search Functions ######
 
@@ -186,16 +178,7 @@ class InstrumentManager(QObject):
             self.currentInstrument.removeComponent(self.getComponentByUUID(uuid))
         return True
 
-    def getTrigCompsRefUUID(self, uuid):
-        if(self.currentInstrument is not None):
-            return self.currentInstrument.getTrigCompsRefUUID(uuid)
-        else:
-            return None
-
     def findCompModelByIdentifier(self, identifier):
-        if(identifier == 'DigiTrigComp_mrb'):
-            return Digital_Trigger_Component(self.mW)
-
         for comp in self.componentsAvailable:
             if(comp.componentIdentifier == identifier):
                 return comp
@@ -207,6 +190,11 @@ class InstrumentManager(QObject):
         if('instrumentURL' in self.wM.userProfile):
             if(self.wM.userProfile['instrumentURL'] is not None):
                 self.loadInstrument(self.wM.userProfile['instrumentURL'])
+
+    def loadPreviousSequence(self):
+        if('sequenceURL' in self.wM.userProfile):
+            if(self.wM.userProfile['sequenceURL'] is not None):
+                self.currentInstrument.loadSequence(self.wM.userProfile['sequenceURL'])
 
     def newInstrument(self, name, rootPath): # Instrument_Unloaded // Instrument_New
         self.Instrument_Unloaded.emit()
@@ -309,6 +297,8 @@ class InstrumentManager(QObject):
             self.mW.postLog('Sequence Path was invalid - aborting!', DSConstants.LOG_PRIORITY_HIGH)
             return None
 
+        self.currentInstrument.sequenceInfoUpdate(filePath, os.path.basename(filePath))
+        self.wM.userProfile['sequenceURL'] = filePath
         return sequenceData
 
         if(self.instrument.processSequenceData(sequenceData) is False):
@@ -316,19 +306,17 @@ class InstrumentManager(QObject):
         else:
             self.currentSequenceURL = filePath
 
-        self.wM.userProfile['sequenceURL'] = filePath
         self.mW.postLog('Finished Loading Sequence!', DSConstants.LOG_PRIORITY_HIGH)
 
-        if(self.currentSequenceURL is not None):
-            self.Sequence_Loaded.emit()
-            return True
+    def getSequenceSaveData(self):
+        if(self.currentInstrument is not None):
+            return self.currentInstrument.getSequenceSaveData()
         else:
-            self.Sequence_Unloaded.emit()
-            return False
+            return None
 
     def saveSequence(self):
         if(self.currentSequenceURL is None):
-            self.saveAs()
+            self.saveSequenceAs()
             return
 
         fileName = os.path.basename(self.currentSequenceURL)
@@ -342,6 +330,10 @@ class InstrumentManager(QObject):
             os.remove(saveURL)
         with open(saveURL, 'w') as file:
             json.dump(saveData, file, sort_keys=True, indent=4)
+            
+        self.currentInstrument.sequenceInfoUpdate(saveURL, fileName)
+        self.wM.userProfile['sequenceURL'] = saveURL
+        self.Sequence_Saved.emit(self.currentInstrument) 
         self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     def saveSequenceAs(self):
@@ -366,6 +358,10 @@ class InstrumentManager(QObject):
         with open(saveURL, 'w') as file:
             json.dump(saveData, file, sort_keys=True, indent=4)
         self.currentSequenceURL = saveURL
+
+        self.currentInstrument.sequenceInfoUpdate(saveURL, fname+'.dssequence')
+        self.wM.userProfile['sequenceURL'] = saveURL
+        self.Sequence_Saved.emit(self.currentInstrument) 
         self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     def newSequence(self):
@@ -387,7 +383,6 @@ class InstrumentManager(QObject):
 
     def loadComponentFromFile(self, filepath): # I think this is only for the models
         class_inst = None
-        expected_class = 'User_Component'
         py_mod = None
         mod_name, file_ext = os.path.splitext(os.path.split(filepath)[-1])
         loaded = False

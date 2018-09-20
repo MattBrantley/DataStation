@@ -26,10 +26,11 @@ class Source():
 
     def Get_Number_Of_Paths(self):
         return 1
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
 
-    def __init__(self, hWare, name, physConID, trigger=False):
+    def __init__(self, name, physConID, trigger=False):
         self.sourceSettings = dict()
         self.sourceSettings['name'] = name
         self.sourceSettings['uuid'] = str(uuid.uuid4())
@@ -37,10 +38,6 @@ class Source():
         self.sourceSettings['trigger'] = trigger
         self.sourceSettings['enabled'] = False
 
-        self.hWare = hWare
-        self.mW = hWare.mW
-        self.iM = hWare.mW.iM
-        self.hM = hWare.mW.hM
         
 ##### DataStation Interface Functions #####
     
@@ -57,6 +54,16 @@ class Source():
 
     def getUUID(self):
         return self.sourceSettings['uuid']
+
+    def registerHWare(self, hWare):
+        self.hWare = hWare
+        self.mW = hWare.mW
+        self.iM = hWare.mW.iM
+        self.hM = hWare.mW.hM
+
+    def getProgrammingPacket(self, programmingPacket):
+        self.programmingPacket = programmingPacket
+        self.hWare.programDataReceived(self)
 
 ##### Search Functions #####
 
@@ -126,8 +133,8 @@ class Source():
         self.hWare.program(self)
 
 class AISource(Source):
-    def __init__(self, hardware, name, vMin, vMax, prec, physConID, trigger=False):
-        super().__init__(hardware, name, physConID, trigger=trigger)
+    def __init__(self, name, vMin, vMax, prec, physConID, trigger=False):
+        super().__init__(name, physConID, trigger=trigger)
         self.sourceSettings['vMin'] = vMin
         self.sourceSettings['vMax'] = vMax
         self.sourceSettings['prec'] = prec
@@ -147,8 +154,8 @@ class AISource(Source):
         return True
 
 class AOSource(Source):
-    def __init__(self, hardware, name, vMin, vMax, prec, physConID):
-        super().__init__(hardware, name, physConID)
+    def __init__(self, name, vMin, vMax, prec, physConID):
+        super().__init__(name, physConID)
         self.sourceSettings['vMin'] = vMin
         self.sourceSettings['vMax'] = vMax
         self.sourceSettings['prec'] = prec
@@ -176,8 +183,8 @@ class AOSource(Source):
         return True
 
 class DOSource(Source):
-    def __init__(self, hardware, name, physConID):
-        super().__init__(hardware, name, physConID)
+    def __init__(self, name, physConID):
+        super().__init__(name, physConID)
 
     def parsePacket(self, packetIn):
         if(isinstance(packetIn, waveformPacket) is False):
@@ -194,8 +201,8 @@ class DOSource(Source):
         return True
 
 class DISource(Source):
-    def __init__(self, hardware, name, physConID, trigger=False):
-        super().__init__(hardware, name, physConID, trigger=trigger)
+    def __init__(self, name, physConID, trigger=False):
+        super().__init__(name, physConID, trigger=trigger)
 
     def parsePacket(self, packetIn):
         if(isinstance(packetIn, waveformPacket) is False):

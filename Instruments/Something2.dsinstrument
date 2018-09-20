@@ -27,7 +27,7 @@
                 {
                     "drivingSocket": true,
                     "filterInputSource": null,
-                    "inputSource": "fbe5bb5c-7510-41ed-9417-4abe01fc33eb",
+                    "inputSource": "e92a5e82-a2b6-41da-9017-91a51eb68c1e",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "paths": null,
@@ -67,7 +67,7 @@
                 {
                     "drivingSocket": true,
                     "filterInputSource": null,
-                    "inputSource": "8d034fa3-d7cc-4f4b-8fff-8397d027cdf4",
+                    "inputSource": "48224c33-6d2e-49b0-a812-10c9eed04533",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "paths": null,
@@ -106,8 +106,8 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": null,
-                    "inputSourcePathNo": null,
+                    "inputSource": "0990e083-4dcf-4604-a0b9-7ca2a2316a18",
+                    "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "prec": 0.1,
                     "tag": "[AO]",
@@ -144,8 +144,8 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": null,
-                    "inputSourcePathNo": null,
+                    "inputSource": "d9e51ac4-58ce-4475-a985-38aee8fbd93e",
+                    "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "prec": 0.1,
                     "tag": "[AO]",

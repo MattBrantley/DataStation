@@ -2,7 +2,7 @@
 """
 A simple DC Amplifier.
 """
-from src.Managers.InstrumentManager.Filter import *
+from src.Managers.HardwareManager.Filter import *
 from src.Managers.InstrumentManager.Sockets import *
 from PyQt5.Qt import *
 from PyQt5.QtGui import *
@@ -36,7 +36,6 @@ class User_Filter(AnalogFilter):
         if(self.isDCWaveformPacket(packetIn)):
             ampedValues = packetIn.waveformData
             ampedValues[:,1] = packetIn.waveformData[:,1] * self.filterSettings['gain']
-            packetOut = DCWaveformPacket(ampedValues)
-            return packetOut
+            return None
         
         return None

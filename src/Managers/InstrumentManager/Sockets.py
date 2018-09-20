@@ -5,7 +5,7 @@ import os, sys, imp, math, uuid
 from src.Constants import DSConstants as DSConstants, readyCheckPacket
 from src.Managers.HardwareManager.Sources import Source
 
-class Socket(QObject):
+class Socket():
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
 
@@ -39,6 +39,12 @@ class Socket(QObject):
     def Detatch_Input(self):
         self.detatch()
 
+    def Get_Programming_Packet(self):
+        return self.programmingPacket
+
+    def Set_Programming_Packet(self, packet):
+        self.programmingPacket = packet
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
 
@@ -56,6 +62,8 @@ class Socket(QObject):
         self.hM = cP.iM.hM
         self.mW = cP.iM.mW
 
+        self.programmingPacket = None
+
 ##### DataStation Interface Functions #####
 
     def readyCheck(self):
@@ -67,9 +75,14 @@ class Socket(QObject):
     def getUUID(self):
         return self.socketSettings['uuid']
 
+    def pushProgramming(self):
+        target = self.getInputObject()
+        if(target is not None):
+            target[0].getProgrammingPacket(self.programmingPacket)
+
 ##### Search Functions #####
 
-    def getSource(self):
+    def getInputObject(self):
         if(self.socketSettings['inputSource'] is None or self.socketSettings['inputSourcePathNo'] is None):
             return None
         else:
@@ -78,10 +91,16 @@ class Socket(QObject):
                 inputObj = self.hM.Get_Sources(uuid=self.socketSettings['inputSource'])
             if not inputObj:
                 return None
-            if(issubclass(Source, type(inputObj[0])) is True):
-                return inputObj[0]
-            else:
-                return inputObj[0].Get_Source()
+        return inputObj
+
+    def getSource(self):
+        inputObj = self.getInputObject()
+        if(inputObj is None):
+            return None
+        if(issubclass(Source, type(inputObj[0])) is True):
+            return inputObj[0]
+        else:
+            return inputObj[0].Get_Source()
 
 ##### Socket Manipulation Functions #####
 
@@ -95,7 +114,7 @@ class Socket(QObject):
         for key, value in loadPacket.items():
             self.socketSettings[key] = value
 
-        self.restoreState()
+        #self.restoreState()
 
     def restoreState(self):
         if(self.socketSettings['inputSource'] is None):
@@ -137,7 +156,7 @@ class Socket(QObject):
     def sendData(self, packet): ### STILL NEEDS ADDRESSING
         # There used to be some RadyCheck Syntax here - I couldn't understand it so I cut it out.
         # I will need to add it back in at some point
-        self.inputSource.procReverseParent(self.getUUID(), packet)
+        pass
 
 class AOSocket(Socket):
     def __init__(self, cP, name, vMin, vMax, prec):
@@ -164,9 +183,3 @@ class DISocket(Socket):
     def __init__(self, cP, name):
         super().__init__(cP, name)
         self.socketSettings['tag'] = '[DI]'
-
-class waveformPacket():
-    def __init__(self, waveformData, rate=None):
-        self.waveformData = waveformData
-        self.physicalConnectorID = ''
-        self.rate = rate

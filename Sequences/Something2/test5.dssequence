@@ -1,0 +1,45 @@
+[
+    {
+        "compID": "circLens_mrb",
+        "events": [],
+        "name": "Unnamed Circular Lens",
+        "type": "Circular Lens",
+        "uuid": "3547ed83-3f7f-46c3-b492-911652af265b"
+    },
+    {
+        "compID": "circLens_mrb",
+        "events": [],
+        "name": "Unnamed Circular Lens",
+        "type": "Circular Lens",
+        "uuid": "e72f2aa3-c019-4158-bde7-ee231cc01f90"
+    },
+    {
+        "compID": "circLens_mrb",
+        "events": [
+            {
+                "params": {
+                    "Voltage": 0.0
+                },
+                "time": 0.0,
+                "type": "Step"
+            },
+            {
+                "params": {
+                    "Voltage": 0.0
+                },
+                "time": 1.0,
+                "type": "Step"
+            }
+        ],
+        "name": "Unnamed Circular Lens",
+        "type": "Circular Lens",
+        "uuid": "be5fc275-166c-491a-8aa6-23b444893f78"
+    },
+    {
+        "compID": "circLens_mrb",
+        "events": [],
+        "name": "Unnamed Circular Lens",
+        "type": "Circular Lens",
+        "uuid": "f96ab44e-c178-4d59-b18d-97fad84a56f3"
+    }
+]

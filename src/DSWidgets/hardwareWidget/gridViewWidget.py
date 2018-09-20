@@ -4,7 +4,6 @@ from PyQt5.QtGui import *
 import os, sys, imp, math, copy
 from src.Constants import DSConstants as DSConstants
 from src.DSWidgets.hardwareWidget.filterStackWidget import filterStackWidget
-from src.Managers.InstrumentManager.Filter import Filter
 from src.Managers.InstrumentManager.Sockets import AOSocket, AISocket, DOSocket, DISocket
 from src.Managers.HardwareManager.Sources import AOSource, AISource, DOSource, DISource
 
