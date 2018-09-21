@@ -37,6 +37,13 @@ class controlWidget(QDockWidget):
         self.iM.Instrument_Loaded.connect(self.readyChecks)
         self.iM.Socket_Attached.connect(self.readyChecks)
 
+        self.mW.DataStation_Loaded.connect(self.startReadyCheckTimer)
+
+    def startReadyCheckTimer(self):
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.configChanged)
+        self.timer.start(10)
+
     def initButtons(self):
         dir = os.path.dirname(os.path.dirname(__file__))
         self.runOnceButton = QPushButton()

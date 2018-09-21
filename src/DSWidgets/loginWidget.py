@@ -12,7 +12,6 @@ class loginDockWidget(QDockWidget):
         self.userProfiles = []
         self.mW = mW
         self.profilePathFolder = os.path.join(self.mW.rootDir, 'Profiles')
-        print(self.profilePathFolder)
 
         self.setWindowFlags(self.windowFlags() & QtCore.Qt.CustomizeWindowHint)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowMinMaxButtonsHint)
@@ -46,7 +45,6 @@ class loginDockWidget(QDockWidget):
         self.loginContainer.setLayout(self.loginLayout)
         self.setWidget(self.loginContainer)
 
-        #self.userList.currentRowChanged.connect(self.profileSelectionChanged)
         self.userList.itemClicked.connect(self.profileSelectionChanged)
         self.userList.itemDoubleClicked.connect(self.profileDoubleClicked)
 

@@ -8,7 +8,6 @@ from src.Managers.InstrumentManager.Sockets import *
 class Source():
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
-
     def Get_Name(self):
         return self.sourceSettings['name']
 
@@ -29,7 +28,6 @@ class Source():
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
-
     def __init__(self, name, physConID, trigger=False):
         self.sourceSettings = dict()
         self.sourceSettings['name'] = name
@@ -37,10 +35,9 @@ class Source():
         self.sourceSettings['physConID'] = physConID
         self.sourceSettings['trigger'] = trigger
         self.sourceSettings['enabled'] = False
-
-        
+        self.programmingPacket = None
+ 
 ##### DataStation Interface Functions #####
-    
     def readyCheck(self):
         drivingSocketCount = 0
         for socket in self.getSockets():
@@ -66,7 +63,6 @@ class Source():
         self.hWare.programDataReceived(self)
 
 ##### Search Functions #####
-
     def getSockets(self):
         if(self.iM.Get_Instrument() is None):
             return list()
@@ -79,7 +75,6 @@ class Source():
         return outputSockets
 
 ##### Functions Over-Ridden By Factoried Sources #####
-
     def procReverseParent(self, packetIn):
         #Source got the packet!
         return self.parsePacket(packetIn)
@@ -88,7 +83,6 @@ class Source():
         return readyCheckPacket('Source', DSConstants.READY_CHECK_ERROR, msg='Critical Source Error! Default Source Object Used Somewhere!')
 
 ##### Source Manipulation Functions #####
-
     def attachPathOther(self, uuid):
         self.sourceSettings['paths'][0] = uuid
         return True # Sources don't retain their connection information, always returns True

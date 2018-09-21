@@ -13,78 +13,6 @@ class Hardware_Driver(hardwareObject):
 
     ##### SUPPORT FUNCTIONS #####
 
-    def updateTableClockIndex(self, index):
-        self.hardwareSettings['tableClockIndex'] = index
-
-    def updateTableClock(self, rate):
-        self.hardwareSettings['tableClockSpeed'] = int(rate)
-        self.program()
-
-    def MIPSYResponseToInt(self, bytes):
-        return int(bytes[1:-2].decode("utf-8"))
-
-    def MIPSYResponseToFloat(self, bytes):
-        return float(bytes[1:-2].decode("utf-8"))
-
-    def MIPSToString(self, array):
-        strOut = 'STBLDAT;'
-        if(array is None):
-            return None
-        uniques = np.unique(array[:,0])
-
-        for val in uniques:
-            strOut += str(int(val))
-            lines = array[np.where(array[:,0] == val)]
-            lines = np.split(lines, lines.shape[0])
-
-            for line in lines:
-                if(line[0,2] == 0):
-                    token = str(int(line[0,3]))
-                else:
-                    token = chr(line[0,3])
-                
-                strOut += (':' + token + ':' + str(round(line[0,1], 2)))
-            
-            strOut += ','
-
-        strOut = strOut[:-1] + ';'
-        return strOut
-
-        
-        #length = array.shape[0]
-
-        #for i in range(0, length)
-
-    def parseProgramData(self):
-        eventData = self.getEvents()
-
-        cD = None
-
-        for programData in eventData:
-            if(programData.waveformData is not None):
-                if(programData.physicalConnectorID[:3] == 'DCB'):
-                    channelTag = 0 #This lets us unsort it to know it's an integer
-                    channelToken = int(programData.physicalConnectorID[4:])
-                if(programData.physicalConnectorID[:3] == 'DIO'):
-                    channelTag = 1 #This lets us unsort it to know it's a char
-                    channelToken = ord(programData.physicalConnectorID[4:])
-                data = self.waveformToClockCount(programData.waveformData)
-                length = programData.waveformData.shape[0]
-                channelColumns = np.zeros((length,2))
-                channelColumns[:,0] = channelColumns[:,0] + channelTag
-                channelColumns[:,1] = channelColumns[:,1] + channelToken
-
-                wfm = np.hstack((data, channelColumns))
-
-                if(cD is None):
-                    cD = wfm
-                else:
-                    cD = np.vstack((cD, wfm))
-
-        out = self.MIPSToString(cD)
-
-        return out
-
     def waveformToClockCount(self, waveform):
         waveOut = np.copy(waveform)
         waveOut[:,0] = np.vectorize(self.getClockCountAtTimePoint)(waveform[:,0])
@@ -112,79 +40,10 @@ class Hardware_Driver(hardwareObject):
     ##### REQUIRED FUNCTINONS #####
 
     def getDeviceList(self):
-        """ Lists serial port names
-
-            :raises EnvironmentError:
-                On unsupported or unknown platforms
-            :returns:
-                A list of the serial ports available on the system
-        """
-        if sys.platform.startswith('win'):
-            ports = ['COM%s' % (i + 1) for i in range(256)]
-        elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
-            # this excludes your current terminal "/dev/tty"
-            ports = glob.glob('/dev/tty[A-Za-z]*')
-        elif sys.platform.startswith('darwin'):
-            ports = glob.glob('/dev/tty.*')
-        else:
-            raise EnvironmentError('Unsupported platform')
-
-        result = []
-        for port in ports:
-            try:
-                s = serial.Serial(port)
-                s.close()
-                result.append(port)
-            except (OSError, serial.SerialException):
-                pass
-        return result
+        pass
 
     def genSources(self):
-        self.clearSourceList()
-        if(self.hardwareSettings['deviceName'] != ''):
-            with serial.Serial(self.hardwareSettings['deviceName'], 115200, timeout=1) as ser:
-                ser.write(b'GCHAN,DCB\r\n')
-                response = ser.readline()
-                if(response is not None):
-                    numDCB = self.MIPSYResponseToInt(response)
-                else:
-                    numDCB = 0
-
-                for channel in range(numDCB):
-                    chOut = str(channel+1)
-                    nameTemp = self.hardwareSettings['deviceName'] + '/DCB/CH' + chOut
-                    ser.write(b'GDCMIN,' + chOut.encode('ascii') + b'\r\n')
-                    minTemp = self.MIPSYResponseToFloat(ser.readline())
-                    ser.write(b'GDCMAX,' + chOut.encode('ascii') + b'\r\n')
-                    maxTemp = self.MIPSYResponseToFloat(ser.readline())
-                    self.Add_AOSource('DCB/'+chOut, minTemp, maxTemp, 0.1)
-
-                # MIPS has no way to poll Digital Out and Digital In channel counts seperately
-                self.Add_DOSource('DIO/A')
-                self.Add_DOSource('DIO/B')
-                self.Add_DOSource('DIO/C')
-                self.Add_DOSource('DIO/D')
-                self.Add_DOSource('DIO/E')
-                self.Add_DOSource('DIO/F')
-                self.Add_DOSource('DIO/G')
-                self.Add_DOSource('DIO/H')
-                self.Add_DOSource('DIO/I')
-                self.Add_DOSource('DIO/J')
-                self.Add_DOSource('DIO/K')
-                self.Add_DOSource('DIO/L')
-                self.Add_DOSource('DIO/M')
-                self.Add_DOSource('DIO/N')
-                self.Add_DOSource('DIO/O')
-                self.Add_DOSource('DIO/P')
-
-                self.Add_DISource('DIO/Q')
-                self.Add_DISource('DIO/R', trigger=True)
-                self.Add_DISource('DIO/S')
-                self.Add_DISource('DIO/T')
-                self.Add_DISource('DIO/U')
-                self.Add_DISource('DIO/V')
-                self.Add_DISource('DIO/W')
-                self.Add_DISource('DIO/X')
+        pass
 
     def initHardwareWorker(self):
         self.hardwareWorker = MIPSYHardwareWorker()

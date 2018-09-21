@@ -47,6 +47,7 @@ from src.DSWidgets.hardwareWidget.hardwareWidget import hardwareWidget
 from src.DSWidgets.controlWidget import controlWidget
 from src.DSWidgets.logoWidget import logoDockWidget
 from src.DSWidgets.consoleWidget import consoleDockWidget
+from src.DSWidgets.progressBarWidget import progressBarDockWidget
 
 sys._excepthook = sys.excepthook
 
@@ -182,6 +183,9 @@ class mainWindow(QMainWindow):
         self.consoleDockWidget = consoleDockWidget(self)
         self.consoleDockWidget.setObjectName('consoleWidget')
 
+        self.progressBarDockWidget = progressBarDockWidget(self)
+        self.progressBarDockWidget.setObjectName('progressBarWidget')
+
     def finishInitWithUser(self, userData):
         self.postLog('User Profile Selected: ' + userData['First Name'] + ' ' + userData['Last Name'], DSConstants.LOG_PRIORITY_HIGH)
         self.wM.userProfile = userData
@@ -221,6 +225,9 @@ class mainWindow(QMainWindow):
 
         self.addDockWidget(Qt.BottomDockWidgetArea, self.consoleDockWidget)
         self.consoleDockWidget.setFloating(True)
+
+        self.addDockWidget(Qt.BottomDockWidgetArea, self.progressBarDockWidget)
+        self.progressBarDockWidget.setFloating(True)
 
         self.AnimatedDocks = True
         self.setDockNestingEnabled(True)

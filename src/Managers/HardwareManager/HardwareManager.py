@@ -19,15 +19,25 @@ class HardwareManager(QObject):
     Hardware_State_Saving = pyqtSignal()
 
 ##### Signals: Hardware #####
+    Hardware_Handler_Soft_Trigger_Sent = pyqtSignal(object) # hardware
+
+    Hardware_Scanned = pyqtSignal(object) # hardware
+    Hardware_Initialized = pyqtSignal(object) # hardware
+    Hardware_Configured = pyqtSignal(object) # hardware
+    Hardware_Programmed = pyqtSignal(object) # hardware
+    Hardware_Soft_Triggered = pyqtSignal(object) # hardware
+
+    Hardware_Status_Message = pyqtSignal(object, str) # hardware, message
+    Hardware_Ready_Status_Changed = pyqtSignal(object, bool) # hardware, readyStatus
+
     Hardware_Added = pyqtSignal(object) # hardware
     Hardware_Removed = pyqtSignal()
     Hardware_Trigger_Modified = pyqtSignal()
     Hardware_Programming_Modified = pyqtSignal(object, object) # hardware, source
     Hardware_Device_Reset = pyqtSignal(object) # hardware
-    Hardware_Handler_Initializing = pyqtSignal(object) # hardware
-    Hardware_Handler_Initialized = pyqtSignal(object) # hardware
     Hardware_Device_Changed = pyqtSignal(object, str) # hardware, device name
     Hardware_Device_Removed = pyqtSignal(object) # hardware
+    Hardware_Device_Found = pyqtSignal(object, str) # hardware, device name
 
 ##### Signals: Sequence #####
     Sequence_Started = pyqtSignal()
@@ -54,7 +64,8 @@ class HardwareManager(QObject):
         return self.readyStatus
 
     def Run_Sequence(self):
-        pass
+        for handler in self.deviceHandlerList:
+            handler.onRun()
 
 ##### Functions: Hardware Models #####
 
@@ -120,12 +131,35 @@ class HardwareManager(QObject):
         return readyCheckPacket('Hardware Manager', DSConstants.READY_CHECK_READY, subs=subs)
 
 ##### Functions Called By Factoried Hardware Device Handlers #####
+    def handlerSoftTriggerSent(self, hWare):
+        self.Hardware_Handler_Soft_Trigger_Sent.emit(hWare)
+
+    def hardwareScanned(self, hWare):
+        self.Hardware_Scanned.emit(hWare)
+
+    def hardwareInitialized(self, hWare):
+        self.Hardware_Initialized.emit(hWare)
+
+    def hardwareConfigured(self, hWare):
+        self.Hardware_Configured.emit(hWare)
+
+    def hardwareProgrammed(self, hWare):
+        self.Hardware_Programmed.emit(hWare)
+
+    def hardwareSoftTriggered(self, hWare):
+        self.Hardware_Soft_Triggered.emit(hWare)
+
+    def hardwareDeviceFound(self, hWare, deviceName):
+        self.Hardware_Device_Found.emit(hWare, deviceName)
+
+    def hardwareStatusMessage(self, hWare, msg):
+        self.Hardware_Status_Message.emit(hWare, msg)
+
+    def hardwareReadyStatusChanged(self, hWare, status):
+        self.Hardware_Ready_Status_Changed.emit(hWare, status)
 
     def programmingModified(self, hWare, source):
         self.Hardware_Programming_Modified.emit(hWare,source)
-
-    def deviceInitialized(self, hWare):
-        self.Hardware_Handler_Initialized.emit(hWare)
 
     def deviceReset(self, hWare):
         self.Hardware_Device_Reset.emit(hWare)
@@ -351,10 +385,9 @@ class HardwareManager(QObject):
 
     def addHardwareObj(self, deviceModel, loadData=None):
         #tempHardware = type(hardwareModel)(self)
-        newHandler = HardwareDeviceHandler(self.mW, type(deviceModel))
+        newHandler = HardwareDeviceHandler(self.mW, type(deviceModel), loadData)
         self.deviceHandlerList.append(newHandler)
         self.Hardware_Added.emit(newHandler)
-        self.Hardware_Handler_Initializing.emit(newHandler)
         newHandler.initDeviceThread(self.lvInterface.devices)
 
         return True

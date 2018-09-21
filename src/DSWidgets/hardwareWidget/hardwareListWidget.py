@@ -87,10 +87,18 @@ class hardwareListItem(QWidget):
         self.configButton.setIconSize(QSize(16,16))
         self.configButton.pressed.connect(self.showConfigWidget)
 
+        self.statusButton = QPushButton()
+        self.statusIconNotReady = QIcon(os.path.join(self.mW.srcDir, 'icons5\warning.png'))
+        self.statusIconReady = QIcon(os.path.join(self.mW.srcDir, r'icons5\rotate.png'))
+        self.statusButton.setIcon(self.statusIconNotReady)
+        self.statusButton.setIconSize(QSize(16,16))
+        #self.configButton.pressed.connect(self.showConfigWidget)
+
         self.infoSection = QWidget()
         self.infoSectionLayout = QVBoxLayout()
         self.infoSectionLayout.addWidget(QLabel(hardwareObj.Get_Standard_Field('hardwareType')))
         self.infoSectionLayout.addWidget(self.configButton)
+        self.infoSectionLayout.addWidget(self.statusButton)
         self.infoSectionLayout.addStretch()
 
         self.infoSection.setLayout(self.infoSectionLayout)
@@ -124,13 +132,23 @@ class hardwareListItem(QWidget):
 
         self.layout.addWidget(self.topPortion)
 
+        self.hM.Hardware_Scanned.connect(self.hardwareScanned)
+        self.hM.Hardware_Initialized.connect(self.hardwareInitialized)
+        self.hM.Hardware_Configured.connect(self.hardwareConfigured)
+        self.hM.Hardware_Programmed.connect(self.hardwareProgrammed)
+        self.hM.Hardware_Soft_Triggered.connect(self.hardwareSoftTriggered)
+
+        self.hM.Hardware_Status_Message.connect(self.hardwareStatusMessage)
+        self.hM.Hardware_Ready_Status_Changed.connect(self.hardwareReadyStatusChanged)
+
         self.hM.Hardware_Programming_Modified.connect(self.programModified)
         self.hM.Hardware_Device_Reset.connect(self.deviceReset)
-        self.hM.Hardware_Handler_Initializing.connect(self.deviceIniting)
-        self.hM.Hardware_Handler_Initialized.connect(self.deviceInit)
         self.hM.Hardware_Device_Changed.connect(self.deviceSelectionChanged)
         self.hM.Hardware_Device_Removed.connect(self.deviceSelectionRemoved)
+        self.hM.Hardware_Device_Found.connect(self.hardwareDeviceFound)
         self.hM.Source_Added.connect(self.sourceAdded)
+
+        self.hM.Hardware_Handler_Soft_Trigger_Sent.connect(self.hardwareHandlerSoftTriggerSent)
 
         self.getPreloadInformation()
 
@@ -147,13 +165,45 @@ class hardwareListItem(QWidget):
         if(hWare is self.hardwareObj):
             self.addMsg('[Manager] Source added: ' + str(source.Get_Name()))
 
-    def deviceIniting(self, hWare):
+    def hardwareHandlerSoftTriggerSent(self, hWare):
         if(hWare is self.hardwareObj):
-            self.addMsg('Device Handler Initializing..')
+            pass
+            #self.addMsg('[Manager] Sent Software Trigger.')
 
-    def deviceInit(self, hWare):
+    def hardwareScanned(self, hWare):
         if(hWare is self.hardwareObj):
-            self.addMsg('Device Handler Initialization Finished.')
+            self.addMsg('[Hardware] Finished Scanning For Devices.')
+
+    def hardwareInitialized(self, hWare):
+        if(hWare is self.hardwareObj):
+            self.addMsg('[Hardware] Initialization Finished.')
+
+    def hardwareConfigured(self, hWare):
+        if(hWare is self.hardwareObj):
+            self.addMsg('[Hardware] Configuration Complete.')
+
+    def hardwareProgrammed(self, hWare):
+        if(hWare is self.hardwareObj):
+            self.addMsg('[Hardware] Hardware Reprogrammed.')
+
+    def hardwareSoftTriggered(self, hWare):
+        if(hWare is self.hardwareObj):
+            self.addMsg('[Hardware] Software Triggered.')
+
+    def hardwareStatusMessage(self, hWare, msg):
+        if(hWare is self.hardwareObj):
+            self.addMsg('[Hardware] Status: ' + msg)
+
+    def hardwareReadyStatusChanged(self, hWare, status):
+        if(hWare is self.hardwareObj):
+            if(status is True):
+                self.statusButton.setIcon(self.statusIconReady)
+            else:
+                self.statusButton.setIcon(self.statusIconNotReady)
+                
+    def hardwareDeviceFound(self, hWare, deviceName):
+        if(hWare is self.hardwareObj):
+            self.addMsg('[Hardware] New Device Found: ' + deviceName)
 
     def deviceReset(self, hWare):
         if(hWare is self.hardwareObj):
@@ -170,7 +220,7 @@ class hardwareListItem(QWidget):
 
     def programModified(self, hWare, Source):
         if(hWare is self.hardwareObj):
-            self.addMsg('[Manager] New programming recieved.')
+            self.addMsg('[Manager] Programming Data Recieved For: ' + Source.Get_Name())
 
     def addMsg(self, msg):
         self.msgWidget.addItem(time.strftime('[%m/%d/%Y %H:%M:%S] ') + msg)
@@ -352,7 +402,7 @@ class hardwareConfigWidget(QWidget):
         for item in self.deviceHandler.Get_Available_Devices():
             index = index + 1
             deviceSelection.addItem(item)
-            if(item == deviceHandler.Get_Standard_Field('device')):
+            if(item == deviceHandler.Get_Standard_Field('deviceName')):
                 deviceSelection.setCurrentIndex(index)
         #Doing this after solved the issue of rebuilding the instrument every time widget was shown
         deviceSelection.currentTextChanged.connect(self.deviceSelectionChanged)
