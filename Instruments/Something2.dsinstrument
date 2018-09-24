@@ -27,7 +27,7 @@
                 {
                     "drivingSocket": true,
                     "filterInputSource": null,
-                    "inputSource": "2e93ccb3-1d30-4d98-bd65-985cdd4b20a9",
+                    "inputSource": "29cd35e1-041d-4401-9e97-5be04b4339cc",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "paths": null,
@@ -67,7 +67,7 @@
                 {
                     "drivingSocket": true,
                     "filterInputSource": null,
-                    "inputSource": "8b958ef4-d19d-4ade-b11c-7d0fd3b901fe",
+                    "inputSource": "19186c15-5721-4351-9bc7-027c1f3bfe7d",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "paths": null,
@@ -106,7 +106,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "674544c1-ad77-4635-89de-e3e679100d05",
+                    "inputSource": "da24c595-c2a2-46f0-8177-6268dd1a40cf",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "prec": 0.1,
@@ -144,12 +144,83 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "29fe61b0-ac67-4c11-a949-8b56a3d4c9d2",
+                    "inputSource": "8dfd2443-9d41-40f5-9d0f-1f8d899ab6e0",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "prec": 0.1,
                     "tag": "[AO]",
                     "uuid": "9ff372b8-c46e-4507-9e48-0daccc2ae3f8",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "circLens_mrb",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": -1573.0,
+                        "y": 531.0
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "granularity": 0.0001,
+                "layoutGraphicSrc": "lens.png",
+                "name": "Unnamed Circular Lens",
+                "triggerComp": false,
+                "uuid": "3785f357-a75c-41de-8d95-ec506ed9299b",
+                "vMax": 10.0,
+                "vMin": 0.0
+            },
+            "compType": "Circular Lens",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "ba4dedb5-ef1a-4c9f-8136-a76b6a09ff15",
+                    "inputSourcePathNo": 1,
+                    "name": "Unnamed Circular Lens",
+                    "prec": 0.1,
+                    "tag": "[AO]",
+                    "uuid": "7b448bd6-a12d-4e7e-a1c7-b469826aed67",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "excPlates_mrb",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": -90.0,
+                        "x": 167.0,
+                        "y": 1110.0
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Excitation_Plates.png",
+                "name": "Unnamed Excitation Plates",
+                "triggerComp": false,
+                "uuid": "e5ebbadc-9d8b-45c6-b2e8-1a049b0ded8b"
+            },
+            "compType": "Excitation Plates",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "ab6f9457-c1d9-4d75-8ecd-8d4b77b0173e",
+                    "inputSourcePathNo": 1,
+                    "name": "Unnamed Excitation Plates",
+                    "prec": 0.1,
+                    "tag": "[AO]",
+                    "uuid": "660ebd00-4c07-4dda-99f1-02b8769643de",
                     "vMax": 10,
                     "vMin": 0
                 }

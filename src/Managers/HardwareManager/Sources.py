@@ -29,6 +29,7 @@ class Source():
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
     def __init__(self, name, physConID, trigger=False):
+        self.iM = None
         self.sourceSettings = dict()
         self.sourceSettings['name'] = name
         self.sourceSettings['uuid'] = str(uuid.uuid4())
@@ -64,6 +65,8 @@ class Source():
 
 ##### Search Functions #####
     def getSockets(self):
+        if(self.iM is None):
+            return list()
         if(self.iM.Get_Instrument() is None):
             return list()
         outputFilters = self.hM.Get_Filters(inputUUID = self.sourceSettings['uuid'])

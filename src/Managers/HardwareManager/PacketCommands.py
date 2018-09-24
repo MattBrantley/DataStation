@@ -57,10 +57,11 @@ class DigitalAcquisitionCommand(Command):
 ##### Analog Commands #####
 
 class AnalogWaveformCommand(Command):
-    def __init__(self, rate, yData):
+    def __init__(self, t0, f, wave):
         super().__init__()
-        self.rate = rate # rate is in units of Hertz (Hz)
-        self.yData = yData # is in units of voltage (V)
+        self.t0 = t0
+        self.f = f # is in units of Hertz (Hz)
+        self.wave = wave # is in units of voltage (V)
 
 class AnalogSparseCommand(Command):
     def __init__(self, pairs):

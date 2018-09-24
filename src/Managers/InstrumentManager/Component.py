@@ -141,7 +141,6 @@ class Component(QObject):
 ##### Functions Over-Ridden By Factoried Components #####
 
     def onCreationParent(self):
-        self.mW.postLog('Added New Component to Instrument: ' + self.componentType, DSConstants.LOG_PRIORITY_MED)
         self.onCreation()
 
     def onCreation(self): ### OVERRIDE ME!! ####
@@ -211,6 +210,10 @@ class Component(QObject):
 
     def setupWidgets(self):
         self.configWidget = ComponentConfigWidget(self)
+
+    def loadCustomFields(self, customFields):
+        for key, val in customFields.items():
+            self.Set_Custom_Field(key, val)
 
 ##### Event Type Modifications #####
 

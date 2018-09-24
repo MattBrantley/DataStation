@@ -44,8 +44,9 @@ class Instrument(QObject):
     def Remove_Component(self, component):
         return self.removeComponent(component)
 
-    def Add_Component(self, compModel, loadData=None):
-        return self.addComponent(compModel, loadData)
+    def Add_Component(self, compModel, customFields=dict(), loadData=None):
+        # customFields is a dictionary containing any customFields that should be applied before the component_add is emitted.
+        return self.addComponent(compModel, customFields, loadData)
 
     def Load_Sequence(self, path, showWarning=True):
         return self.loadSequence(path, showWarning)
@@ -107,19 +108,20 @@ class Instrument(QObject):
 
 ##### Component Manipulations #####
 
-    def addComponent(self, compModel, loadData=None):
+    def addComponent(self, compModel, customFields=dict(), loadData=None):
         newComp = type(compModel)(self.mW)
-        self.iM.componentModified(self)
         newComp.instr = self
         newComp.iM = self.iM
         newComp.mW = self.mW
         newComp.setupWidgets()
         newComp.name = 'Unnamed Component'
+        newComp.loadCustomFields(customFields)
         newComp.loadCompSettings(loadData)
         newComp.onCreationParent()
         newComp.onCreationFinishedParent()
         self.componentList.append(newComp)
         self.iM.componentAdded(self, newComp)
+        self.mW.postLog('Added New Component to Instrument: ' + newComp.componentType, DSConstants.LOG_PRIORITY_MED)
         return newComp
 
     def removeComponent(self, comp):
@@ -128,9 +130,6 @@ class Instrument(QObject):
             self.componentList.remove(comp)
             self.iM.componentRemoved(self, comp)
 
-    def reattachSockets(self):
-        pass
-    
 ##### Search Functions #####
 
     def getComponentByUUID(self, uuid):

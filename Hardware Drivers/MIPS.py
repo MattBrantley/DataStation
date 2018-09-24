@@ -32,8 +32,8 @@ class MIPS(HardwareDevice):
         self.scanned.emit()
 
     def initialize(self, deviceName):
-        if(self.hardwareSettings['deviceName'] != ''):
-            with serial.Serial(self.hardwareSettings['deviceName'], 115200, timeout=1) as ser:
+        if(deviceName != ''):
+            with serial.Serial(deviceName, 115200, timeout=1) as ser:
                 ser.write(b'GCHAN,DCB\r\n')
                 response = ser.readline()
                 if(response is not None):
@@ -43,7 +43,7 @@ class MIPS(HardwareDevice):
 
                 for channel in range(numDCB):
                     chOut = str(channel+1)
-                    nameTemp = self.hardwareSettings['deviceName'] + '/DCB/CH' + chOut
+                    nameTemp = deviceName + '/DCB/CH' + chOut
                     ser.write(b'GDCMIN,' + chOut.encode('ascii') + b'\r\n')
                     minTemp = self.MIPSYResponseToFloat(ser.readline())
                     ser.write(b'GDCMAX,' + chOut.encode('ascii') + b'\r\n')
@@ -175,7 +175,7 @@ class MIPS(HardwareDevice):
     def MIPSToString(self, array):
         strOut = ''
         if(array is None):
-            return None
+            return ''
         uniques = np.unique(array[:,0])
 
         for val in uniques:

@@ -411,8 +411,9 @@ class iView(pg.GraphicsWindow):
         text = stream.readQString()
         index = stream2.readInt()
 
-        comp = self.iM.Add_Component(self.iM.Get_Component_Model_By_Index(index))
-        comp.Set_Custom_Field('iViewSettings', {'x': dropX, 'y': dropY, 'r': 0})
+        tempCustomFields = {'iViewSettings': {'x': dropX, 'y': dropY, 'r': 0}}
+
+        self.iM.Add_Component(self.iM.Get_Component_Model_By_Index(index), customFields=tempCustomFields)
 
     def addiViewComp(self, instrument, component):
         if(component.Get_Standard_Field('triggerComp') is False):

@@ -228,8 +228,10 @@ class DSPlotItem():
         self.plotDataList = list()
 
         self.sequencerEditWidget = eventListWidget(mW, plotLayout.dockWidget, comp)
+        self.plotItem.plot(x=[-90, 90], y=[0, 0], pen = self.pen)
+
         self.iM.Component_Programming_Modified.connect(self.plot)
-        self.plotItem.plot(x=[-9000, 9000], y=[0, 0], pen = self.pen)
+        self.plot(None, self.component)
     
     def setShowXAxis(self, toggle):
         self.showXAxis = toggle
@@ -249,12 +251,14 @@ class DSPlotItem():
                     data = list()
                     for cmd in packet.Get_Commands(commandType=AnalogSparseCommand):
                         data.append(cmd.pairs)
-                    plotData = np.vstack(data)
+                    if(data):
+                        plotData = np.vstack(data)
+                        self.plotDataList.append(plotData)
+                        plotExpanded = np.vstack([[-900, plotData[0,1]], plotData, [900, plotData[-1,1]]])
+                        self.plotItem.plot(x=plotExpanded[:,0], y=plotExpanded[:,1], pen=self.pen)
                 else:
-                    plotData = np.array([[0,0], [0,1]])
-                self.plotDataList.append(plotData)
-                plotExpanded = np.vstack([[-9000, plotData[0,1]], plotData, [9000, plotData[-1,1]]])
-                self.plotItem.plot(x=np.append([0], plotExpanded[:,0]), y=plotExpanded[:,1], pen=self.pen, stepMode=True)
+                    pass
+                    #plotData = np.array([[0,0], [0,1]])
 
         self.plotItem.setLimits(xMin = 0, xMax = 1)
         self.plotLayout.updateBounds()
@@ -262,7 +266,7 @@ class DSPlotItem():
         self.plotItem.setLabels(bottom='Time (s)', left='voltage')
         self.setShowXAxis(self.showXAxis)
         self.plotItem.setLabel('left', self.component.Get_Standard_Field('name'))
-        #self.plotItem.setDownsampling(ds=True, auto=True, mode='peak') #mode='peak' produces strange results with large gaps in data
+        #self.plotItem.setDownsampling(ds=True, auto=True, mode='mean') #mode='peak' produces strange results with large gaps in data
         #self.plotItem.setClipToView(True)
 
     def getXBounds(self):

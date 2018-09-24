@@ -26,7 +26,6 @@ class DC_Electrode(Component):
         self.compSettings['vMin'] = 0.0
         self.compSettings['vMax'] = 10.0
         self.compSettings['granularity'] = 0.0001
-        self.compSettings['showSequencer'] = True 
         self.containerWidget = self.configWidgetContent()
         self.configWidget.setWidget(self.containerWidget)
         self.socket = self.addAOSocket(self.compSettings['name'])

@@ -86,10 +86,10 @@ class InstrumentManager(QObject):
     def Get_Instrument(self):
         return self.currentInstrument
 
-    def Add_Component(self, model):
+    def Add_Component(self, model, customFields=dict()):
         if(model is None):
             return False
-        return self.addCompToInstrument(model)
+        return self.addCompToInstrument(model, customFields)
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -137,9 +137,6 @@ class InstrumentManager(QObject):
 
     def instrumentConfigModified(self, instrument):
         self.Instrument_Config_Changed.emit()
-
-    def componentModified(self, instrument):
-        pass
 
     def componentAdded(self, instrument, component):
         self.Component_Added.emit(instrument, component)
@@ -193,7 +190,7 @@ class InstrumentManager(QObject):
 
     def loadPreviousSequence(self):
         if('sequenceURL' in self.wM.userProfile):
-            if(self.wM.userProfile['sequenceURL'] is not None):
+            if(self.wM.userProfile['sequenceURL'] is not None and self.currentInstrument is not None):
                 self.currentInstrument.loadSequence(self.wM.userProfile['sequenceURL'])
 
     def newInstrument(self, name, rootPath): # Instrument_Unloaded // Instrument_New
@@ -263,21 +260,18 @@ class InstrumentManager(QObject):
                         self.mW.postLog('Instrument contains component (' + comp['compType'] + ':' + comp['compIdentifier'] + ') that is not in the available component modules. Ignoring this component!', DSConstants.LOG_PRIORITY_MED)
                     else:
                         result = self.tempInstrument.Add_Component(compModel, loadData=comp['compSettings'])
-                        #if('compSettings' in comp):
-                        #    result.loadCompSettings(comp['compSettings'])
                         if('sockets' in comp):
                             if(isinstance(comp['sockets'], list)):
                                 result.loadSockets(comp['sockets'])
 
         self.currentInstrument = self.tempInstrument
-        self.currentInstrument.reattachSockets()
 
-    def addCompToInstrument(self, compModel):
+    def addCompToInstrument(self, compModel, customFields=dict()):
         if (self.currentInstrument is None):
             self.mW.postLog('No instrument is loaded - creating new one! ', DSConstants.LOG_PRIORITY_HIGH)
             self.currentInstrument = Instrument(self)
 
-        result = self.currentInstrument.addComponent(compModel)
+        result = self.currentInstrument.Add_Component(compModel, customFields=customFields)
         return result
 
 ##### Sequence Manipulation #####
