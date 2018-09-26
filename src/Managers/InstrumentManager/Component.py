@@ -133,10 +133,14 @@ class Component(QObject):
         self.instr.socketAdded(self, socket)
 
     def socketAttached(self, socket):
-        self.instr.socketAttached(socket, self)
+        self.onProgramParent()
+        self.instr.socketAttached(self, socket)
 
     def socketDetatched(self, socket):
-        self.instr.socketDetatched(socket, self)
+        self.instr.socketDetatched(self, socket)
+
+    def measurementReceived(self, socket, measurementPacket):
+        self.instr.measurementRecieved(self, socket, measurementPacket)
 
 ##### Functions Over-Ridden By Factoried Components #####
 

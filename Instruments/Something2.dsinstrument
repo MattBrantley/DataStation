@@ -27,7 +27,7 @@
                 {
                     "drivingSocket": true,
                     "filterInputSource": null,
-                    "inputSource": "29cd35e1-041d-4401-9e97-5be04b4339cc",
+                    "inputSource": "129eb98c-3432-4f2b-aea4-fc2ebfc927eb",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "paths": null,
@@ -67,7 +67,7 @@
                 {
                     "drivingSocket": true,
                     "filterInputSource": null,
-                    "inputSource": "19186c15-5721-4351-9bc7-027c1f3bfe7d",
+                    "inputSource": "5d62c4cf-c663-4cf1-b621-f0b46b68f0f2",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "paths": null,
@@ -106,7 +106,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "da24c595-c2a2-46f0-8177-6268dd1a40cf",
+                    "inputSource": "e0fe14b9-386b-47a6-8fc7-85610bbf8794",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "prec": 0.1,
@@ -144,7 +144,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "8dfd2443-9d41-40f5-9d0f-1f8d899ab6e0",
+                    "inputSource": "890a504a-343c-469b-9fed-2b0e857f31d7",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "prec": 0.1,
@@ -181,7 +181,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "ba4dedb5-ef1a-4c9f-8136-a76b6a09ff15",
+                    "inputSource": "9dbdd0c4-64dd-4310-be5a-7ee3431dbc21",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "prec": 0.1,
@@ -215,7 +215,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "ab6f9457-c1d9-4d75-8ecd-8d4b77b0173e",
+                    "inputSource": "674e3d57-d820-4019-babc-e12aeac3beae",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Excitation Plates",
                     "prec": 0.1,
@@ -223,6 +223,102 @@
                     "uuid": "660ebd00-4c07-4dda-99f1-02b8769643de",
                     "vMax": 10,
                     "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "pv_mrb",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": -2174.321853093569,
+                        "y": 1286.896551724138
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Excitation_Plates.png",
+                "name": "Unnamed Pulse Valve",
+                "triggerComp": false,
+                "uuid": "d33bcb3f-7c4c-4e00-8ea6-cca33d8c8d04"
+            },
+            "compType": "Pulse Valve",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "612291c7-ca10-47b1-a2f3-8c9e63145c52",
+                    "inputSourcePathNo": 1,
+                    "name": "Unnamed Pulse Valve",
+                    "tag": "[DO]",
+                    "uuid": "67b8dd3b-7fe9-4d22-b540-29566c2dfa02"
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "detecPlates_mrb",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": -5390.290512731604,
+                        "y": 812.4590163934427
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Detection_Plates.png",
+                "name": "Unnamed Detection Plates",
+                "triggerComp": false,
+                "uuid": "68603bed-ccf0-41cf-b5ac-780e7b3bed03"
+            },
+            "compType": "Detection Plates",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "40aebca1-6e9e-489e-a7c3-6fa3aeaa72eb",
+                    "inputSourcePathNo": 1,
+                    "name": "Unnamed Detection Plates",
+                    "prec": 0.1,
+                    "tag": "[AI]",
+                    "uuid": "a65ee44f-c588-4452-9742-3c409168ab16",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "pv_mrb",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": -2556.3173098289017,
+                        "y": 839.2429022082019
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Excitation_Plates.png",
+                "name": "Unnamed Pulse Valve",
+                "triggerComp": false,
+                "uuid": "1bef0e24-4231-43ad-9350-b2f26251d61b"
+            },
+            "compType": "Pulse Valve",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "c74a2b69-3d8d-4b7d-bdc5-f4eaad0e904c",
+                    "inputSourcePathNo": 1,
+                    "name": "Unnamed Pulse Valve",
+                    "tag": "[DO]",
+                    "uuid": "3b445ced-305c-42ec-80d2-17991b59b468"
                 }
             ],
             "triggerComp": false

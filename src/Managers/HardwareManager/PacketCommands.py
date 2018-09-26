@@ -1,4 +1,4 @@
-
+import numpy as np
 
 class commandPacket():
 ############################################################################################
@@ -62,6 +62,13 @@ class AnalogWaveformCommand(Command):
         self.t0 = t0
         self.f = f # is in units of Hertz (Hz)
         self.wave = wave # is in units of voltage (V)
+
+    def toPairs(self):
+        len = self.wave.shape[0]/self.f
+        x = np.arange(self.t0, self.t0 + len, 1/self.f)
+        y = self.wave
+        res = np.vstack([x, y]).transpose()
+        return res
 
 class AnalogSparseCommand(Command):
     def __init__(self, pairs):

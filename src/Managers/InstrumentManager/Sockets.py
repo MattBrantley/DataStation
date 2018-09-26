@@ -80,6 +80,10 @@ class Socket():
         if(target is not None):
             target[0].getProgrammingPacket(self.programmingPacket)
 
+    def getMeasurementPacket(self, measurementPacket):
+        print('Socket got packet')
+        self.cP.measurementReceived(self, measurementPacket)
+
 ##### Search Functions #####
 
     def getInputObject(self):
@@ -137,10 +141,12 @@ class Socket():
     def detatch(self):
         self.socketSettings['inputSource'] = None
         self.socketSettings['inputSourcePathNo'] = None
+        self.programmingPacket = None
         self.cP.socketDetatched(self)
 
     def attach(self, uuid, pathNumber):
         # Remove anything else that has a connection to what this is connecting to
+        # THERE SEEMS TO BE AN ISSUE HERE
         filtersAttached = self.hM.Get_Filters(inputUUID = uuid, pathNo=pathNumber)
         for Filter in filtersAttached:
             Filter.Detatch_Input()
@@ -152,11 +158,6 @@ class Socket():
         self.socketSettings['inputSource'] = uuid
         self.socketSettings['inputSourcePathNo'] = pathNumber
         self.cP.socketAttached(self)
-            
-    def sendData(self, packet): ### STILL NEEDS ADDRESSING
-        # There used to be some RadyCheck Syntax here - I couldn't understand it so I cut it out.
-        # I will need to add it back in at some point
-        pass
 
 class AOSocket(Socket):
     def __init__(self, cP, name, vMin, vMax, prec):

@@ -48,6 +48,7 @@ from src.DSWidgets.controlWidget import controlWidget
 from src.DSWidgets.logoWidget import logoDockWidget
 from src.DSWidgets.consoleWidget import consoleDockWidget
 from src.DSWidgets.progressBarWidget import progressBarDockWidget
+from src.DSWidgets.spectrumViewWidget import spectrumViewWidget
 
 sys._excepthook = sys.excepthook
 
@@ -85,7 +86,7 @@ class mainWindow(QMainWindow):
         self.loginWindow = loginDockWidget(self)
         self.loginWindow.setObjectName('loginWindow')
         self.postLog('Waiting on User Profile selection..', DSConstants.LOG_PRIORITY_HIGH)
-        self.loginWindow.runModal() #Open the login window and then waits until it finishes and calls the finishInitWithUser function
+        self.loginWindow.runModal() #Ope.trn the login window and then waits until it finishes and calls the finishInitWithUser function
 
         self.wM.connectWidgets() ## THIS NEEDS TO GO BYE BYE
 
@@ -186,6 +187,9 @@ class mainWindow(QMainWindow):
         self.progressBarDockWidget = progressBarDockWidget(self)
         self.progressBarDockWidget.setObjectName('progressBarWidget')
 
+        self.spectrumViewWidget = spectrumViewWidget(self)
+        self.spectrumViewWidget.setObjectName('spectrumViewWidget')
+
     def finishInitWithUser(self, userData):
         self.postLog('User Profile Selected: ' + userData['First Name'] + ' ' + userData['Last Name'], DSConstants.LOG_PRIORITY_HIGH)
         self.wM.userProfile = userData
@@ -228,6 +232,9 @@ class mainWindow(QMainWindow):
 
         self.addDockWidget(Qt.BottomDockWidgetArea, self.progressBarDockWidget)
         self.progressBarDockWidget.setFloating(True)
+
+        self.addDockWidget(Qt.BottomDockWidgetArea, self.spectrumViewWidget)
+        self.spectrumViewWidget.setFloating(True)
 
         self.AnimatedDocks = True
         self.setDockNestingEnabled(True)
@@ -302,6 +309,9 @@ class mainWindow(QMainWindow):
         if('windowStates' in self.wM.userProfile):
             tempState = QByteArray.fromHex(bytes(json.loads(self.wM.userProfile['windowStates']), 'ascii'))
             self.restoreState(tempState)
+
+        # Had a situation where the logowidget was stored to a profile - hardfix below
+        self.logoDockWidget.hide()
 
     def softExit(self):
         self.postLog('Shutting down Datastation!', DSConstants.LOG_PRIORITY_HIGH)

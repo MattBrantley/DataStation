@@ -4,11 +4,12 @@ from pyqode.core import api, modes, panels
 import os, json
 from shutil import copyfileobj
 import numpy as np
-import random
+import random, math
 from shutil import copyfile
 from src.Constants import DSConstants as DSConstants
 from src.DSWidgets.sequencerWidget.eventListWidget import eventListWidget
 from src.Managers.HardwareManager.PacketCommands import *
+from scipy import interpolate
 
 class sequencerDockWidget(QDockWidget):
     ITEM_GUID = Qt.UserRole
@@ -228,11 +229,12 @@ class DSPlotItem():
         self.plotDataList = list()
 
         self.sequencerEditWidget = eventListWidget(mW, plotLayout.dockWidget, comp)
-        self.plotItem.plot(x=[-90, 90], y=[0, 0], pen = self.pen)
+        a = sequencePlotDataItem(x=[-90, 90], y=[0, 0], pen = self.pen)
+        self.plotItem.addItem(a)
 
         self.iM.Component_Programming_Modified.connect(self.plot)
         self.plot(None, self.component)
-    
+
     def setShowXAxis(self, toggle):
         self.showXAxis = toggle
         if(toggle is True):
@@ -251,11 +253,16 @@ class DSPlotItem():
                     data = list()
                     for cmd in packet.Get_Commands(commandType=AnalogSparseCommand):
                         data.append(cmd.pairs)
+                    for cmd in packet.Get_Commands(commandType=AnalogWaveformCommand):
+                        data.append(cmd.toPairs())
                     if(data):
                         plotData = np.vstack(data)
+                        plotData = self.formatStepMode(plotData)
                         self.plotDataList.append(plotData)
                         plotExpanded = np.vstack([[-900, plotData[0,1]], plotData, [900, plotData[-1,1]]])
-                        self.plotItem.plot(x=plotExpanded[:,0], y=plotExpanded[:,1], pen=self.pen)
+                        a = sequencePlotDataItem(x=plotExpanded[:,0], y=plotExpanded[:,1], pen=self.pen)
+                        self.plotItem.addItem(a)
+                        self.plotItem.getViewBox().autoRange()
                 else:
                     pass
                     #plotData = np.array([[0,0], [0,1]])
@@ -266,8 +273,19 @@ class DSPlotItem():
         self.plotItem.setLabels(bottom='Time (s)', left='voltage')
         self.setShowXAxis(self.showXAxis)
         self.plotItem.setLabel('left', self.component.Get_Standard_Field('name'))
-        #self.plotItem.setDownsampling(ds=True, auto=True, mode='mean') #mode='peak' produces strange results with large gaps in data
-        #self.plotItem.setClipToView(True)
+        self.plotItem.setDownsampling(ds=True, auto=True, mode='peak') #mode='peak' produces strange results with large gaps in data
+        self.plotItem.setClipToView(True)
+
+    def formatStepMode(self, pairs):
+        x = np.zeros(pairs.shape[0]*2)
+        y = np.zeros(pairs.shape[0]*2)
+        x[0::2] = pairs[:,0]
+        x[1::2] = pairs[:,0]
+        y[0::2] = pairs[:,1]
+        y[1::2] = pairs[:,1]
+        y = np.roll(y,1)
+
+        return np.vstack([x,y]).transpose()
 
     def getXBounds(self):
         xMin = 0
@@ -301,6 +319,90 @@ class DSPlotItem():
         else:
             self.sequencerEditWidget.hide()
  
+class sequencePlotDataItem(pg.PlotDataItem):
+    def __init__(self, *args, **kargs):
+        super().__init__(*args, **kargs)
+
+    def interpolatePairs(self, x, y, interval):
+        xAxis = np.arange(x[0], x[-1]+interval, interval)
+        f = interpolate.interp1d(x, y, kind='previous', fill_value='extrapolate')
+        yAxis = f(xAxis)
+        #result = np.vstack([xAxis, yAxis]).transpose()
+        return xAxis, yAxis
+
+    def find_nearest(self, array, value):
+        idx = np.searchsorted(array, value, side='left')
+        if idx > 0 and (idx == len(array) or math.fabs(value - array[idx-1]) < math.fabs(value - array[idx])):
+            return array[idx-1]
+        else:
+            return array[idx]
+
+    def getData(self):
+        if self.xData is None:
+            return (None, None)
+            
+        if self.xDisp is None:
+            x = self.xData
+            y = self.yData
+                    
+            ds = self.opts['downsample']
+            if not isinstance(ds, int):
+                ds = 1
+                
+            if self.opts['autoDownsample']:
+                # this option presumes that x-values have uniform spacing
+                range = self.viewRect()
+                if range is not None:
+                    dx = float(x[-1]-x[0]) / (len(x)-1)
+                    x0 = (range.left()-x[0]) / dx
+                    x1 = (range.right()-x[0]) / dx
+                    width = self.getViewBox().width()
+                    #width = range.width()
+                    if width != 0.0:
+                        #ds = int(max(1, int((x1-x0) / (width*self.opts['autoDownsampleFactor']))))
+                        ds = int(max(1, int((x1-x0) / (width*0.0002))))
+                        
+
+                        #print('ds=' + str(ds))
+                    ## downsampling is expensive; delay until after clipping.
+            
+            if self.opts['clipToView']:
+                range = self.viewRect()
+                x0 = np.searchsorted(x, range.left(), side='left')
+                if(x0 > 0):
+                    x0 -= 1
+                x1 = np.searchsorted(x, range.right(), side='left')
+                if(x1 < x.shape[0]):
+                    x1 += 1
+                x = x[x0:x1]
+                y = y[x0:x1]
+                    
+            if ds > 1:
+                if self.opts['downsampleMethod'] == 'subsample':
+                    x = x[::ds]
+                    y = y[::ds]
+                elif self.opts['downsampleMethod'] == 'mean':
+                    n = len(x) // ds
+                    x = x[:n*ds:ds]
+                    y = y[:n*ds].reshape(n,ds).mean(axis=1)
+                elif self.opts['downsampleMethod'] == 'peak':
+                    n = len(x) // ds
+                    x1 = np.empty((n,2))
+                    x1[:] = x[:n*ds:ds,np.newaxis]
+                    x = x1.reshape(n*2)
+                    y1 = np.empty((n,2))
+                    y2 = y[:n*ds].reshape((n, ds))
+                    y1[:,0] = y2.max(axis=1)
+                    y1[:,1] = y2.min(axis=1)
+                    y = y1.reshape(n*2)
+
+
+            #x,y = self.interpolatePairs(x, y, 0.001)
+                
+            self.xDisp = x
+            self.yDisp = y
+        return self.xDisp, self.yDisp
+
 ############################################################################################
 ##################################### TREE VIEW WIDGET #####################################
 class DSNewFileDialog(QDialog):

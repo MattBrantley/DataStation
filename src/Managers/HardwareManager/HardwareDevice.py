@@ -11,6 +11,8 @@ class HardwareDeviceHandler(QObject):
     configure = pyqtSignal()
     program = pyqtSignal(list)
     softTrigger = pyqtSignal()
+    shutdown = pyqtSignal()
+    idleState = pyqtSignal()
 
     deviceChanged = pyqtSignal(str)
     loadPacket = pyqtSignal(dict)
@@ -59,6 +61,7 @@ class HardwareDeviceHandler(QObject):
 
         self.iM.Sequence_Unloaded.connect(self.toggleDeferredProgrammingOn)
         self.iM.Sequence_Loaded.connect(self.toggleDeferredProgrammingOff)
+        self.mW.DataStation_Closing.connect(self.shutdown)
 
     def initDeviceThread(self, deviceInformation):
         self.deviceThread = self.deviceModel(deviceInformation, self.hardwareSettings, self.deviceList, self.sourceList)
@@ -85,6 +88,8 @@ class HardwareDeviceHandler(QObject):
         self.configure.connect(self.deviceThread.configure)
         self.program.connect(self.deviceThread.program)
         self.softTrigger.connect(self.deviceThread.softTrigger)
+        self.shutdown.connect(self.deviceThread.shutdown)
+        self.idleState.connect(self.deviceThread.idleState)
 
         self.deviceChanged.connect(self.deviceThread.deviceChanged)
         self.loadPacket.connect(self.deviceThread.loadPacket)
@@ -100,6 +105,7 @@ class HardwareDeviceHandler(QObject):
         self.hM.hardwareScanned(self)
 
     def initialized(self):
+        self.idleState.emit()
         self.hM.hardwareInitialized(self)
 
     def configured(self):
@@ -118,8 +124,9 @@ class HardwareDeviceHandler(QObject):
     def deviceFound(self, deviceName):
         self.hM.hardwareDeviceFound(self, deviceName)
 
-    def measurementPacket(self, packet):
-        print('Measurement Packet')
+    def measurementPacket(self, source, measurementPacket):
+        print('Device Handler got packet')
+        source.Push_Measurement_Packet(measurementPacket)
 
     def statusMessage(self, msg):
         self.hM.hardwareStatusMessage(self, msg)
@@ -129,6 +136,7 @@ class HardwareDeviceHandler(QObject):
         self.hM.hardwareReadyStatusChanged(self, bool)
 
 ##################################### INTERNAL FUNCS #####################################
+
     def toggleDeferredProgrammingOn(self):
         self.deferredProgramming = True
 
@@ -183,7 +191,7 @@ class HardwareDeviceHandler(QObject):
 
         self.programPackets = list()
         for source in self.sourceList:
-            if(source.programmingPacket is not None):
+            if(source.programmingPacket is not None and source.isConnected()):
                 self.programPackets.append({'source': source, 'programmingPacket': source.programmingPacket})
         
         self.pushProgramming()
@@ -201,7 +209,9 @@ class HardwareDevice(QObject):
     programmed = pyqtSignal()
     softTriggered = pyqtSignal()
 
-    measurementPacket = pyqtSignal(object)
+    
+
+    measurementPacket = pyqtSignal(object, object) # source, measurementPacket
     statusMessage = pyqtSignal(str)
     readyStatus = pyqtSignal(bool)
     sourceAdded = pyqtSignal(object)
@@ -224,6 +234,12 @@ class HardwareDevice(QObject):
     def softTrigger(self):
         pass
 
+    def shutdown(self):
+        pass
+
+    def idle(self):
+        pass
+
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
     def Get_Standard_Field(self, field):
@@ -238,21 +254,36 @@ class HardwareDevice(QObject):
     def Add_AISource(self, name, vMin, vMax, prec):
         source = AISource('['+self.hardwareSettings['deviceName']+'] '+name, vMin, vMax, prec, name)
         self.addSource(source)
+        return source
 
     def Add_AOSource(self, name, vMin, vMax, prec):
         source = AOSource('['+self.hardwareSettings['deviceName']+'] '+name, vMin, vMax, prec, name)
         self.addSource(source)
+        return source
 
     def Add_DISource(self, name, trigger=True):
         source = DISource('['+self.hardwareSettings['deviceName']+'] '+name, name, trigger=True)
         self.addSource(source)
+        return source
 
     def Add_DOSource(self, name):
         source = DOSource('['+self.hardwareSettings['deviceName']+'] '+name, name)
         self.addSource(source)
+        return source
 
     def Add_Device(self, deviceName):
         self.addDevice(deviceName)
+
+    def Set_Ready_Status(self, status):
+        self.readyStatusCopy = status
+        self.readyStatus.emit(status)
+
+    def Ready_Status(self):
+        return self.readyStatusCopy
+
+    def Push_Measurements_Packet(self, source, measurementPacket):
+        self.measurementPacket.emit(source, measurementPacket)
+
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -272,9 +303,12 @@ class HardwareDevice(QObject):
         self.deviceList = deviceList
         self.sourceList = sourceList
         self.runThread = True
+        self.readyStatusCopy = False
 
-    def Set_Ready_Status(self, status):
-        self.readyStatus.emit(status)
+    @pyqtSlot()
+    def idleState(self):
+        self.idle()
+        QTimer().singleShot(1, self.idleState)
 
     def deviceChanged(self, deviceName):
         self.hardwareSettings['deviceName'] = deviceName
@@ -287,10 +321,6 @@ class HardwareDevice(QObject):
     def addDevice(self, deviceName):
         self.deviceList.append(deviceName)
         self.deviceFound.emit(deviceName)
-
-    def run(self):
-        while(self.runThread is True):
-            self.usleep(5) #change to usleep()!    
 
     def loadPacket(self, loadPacket):
         for key, val in loadPacket['hardwareSettings'].items():

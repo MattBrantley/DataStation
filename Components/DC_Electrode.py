@@ -151,10 +151,12 @@ class pulseTrainEvent(eventType):
         pairs = None
         for n in range(0, self.eventParams['Count'].v()):
             offset = n * (self.eventParams['offDuration'].v() + self.eventParams['onDuration'].v())
-            newEventStep = np.array([[self.time + offset, v0],
-            [self.time + offset, self.eventParams['Voltage'].v()],
-            [self.time + self.eventParams['onDuration'].v() + offset, self.eventParams['Voltage'].v()],
-            [self.time + self.eventParams['onDuration'].v() + offset, v0]])
+            #newEventStep = np.array([[self.time + offset, v0],
+            #[self.time + offset, self.eventParams['Voltage'].v()],
+            #[self.time + self.eventParams['onDuration'].v() + offset, self.eventParams['Voltage'].v()],
+            #[self.time + self.eventParams['onDuration'].v() + offset, v0]])
+            newEventStep = np.array([[self.time + offset, self.eventParams['Voltage'].v()],
+            [self.time + offset + self.eventParams['onDuration'].v(), v0]])
             if(pairs is None):
                 pairs = newEventStep
             else:

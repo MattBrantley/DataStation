@@ -1,0 +1,136 @@
+{
+    "eventData": [
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "params": {
+                        "Voltage": 5.0
+                    },
+                    "time": 0.001,
+                    "type": "Step"
+                }
+            ],
+            "name": "Unnamed Circular Lens",
+            "type": "Circular Lens",
+            "uuid": "c330fd81-ae6b-4e08-a8a6-3e5cd19889d3"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "params": {
+                        "Voltage": 5.0
+                    },
+                    "time": 0.001,
+                    "type": "Step"
+                }
+            ],
+            "name": "Unnamed Circular Lens",
+            "type": "Circular Lens",
+            "uuid": "e54d3171-4888-4639-aa43-fab25145473f"
+        },
+        {
+            "compID": "penTrap_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "params": {
+                        "Voltage": 3.0
+                    },
+                    "time": 0.001,
+                    "type": "Step"
+                }
+            ],
+            "name": "Unnamed Penning Trap",
+            "type": "Penning Trap",
+            "uuid": "e6a8589e-cb19-4953-9f94-9d9866ab6795"
+        },
+        {
+            "compID": "excPlates_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Amplitude": 0.1,
+                        "Duration": 0.05,
+                        "End": 10000.0,
+                        "Rate": 100000.0,
+                        "Start": 1000.0
+                    },
+                    "time": 0.0,
+                    "type": "Chirp"
+                }
+            ],
+            "name": "Unnamed Excitation Plates",
+            "type": "Excitation Plates",
+            "uuid": "594d2479-ae28-4106-9191-c4d09b224e7a"
+        },
+        {
+            "compID": "detecPlates_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Num. Points": 5000,
+                        "Rate": 10000.0
+                    },
+                    "time": 0.0,
+                    "type": "N-Count Collection"
+                }
+            ],
+            "name": "Unnamed Detection Plates",
+            "type": "Detection Plates",
+            "uuid": "ea30b3f6-2f85-4a1d-ae67-c2d60c990543"
+        },
+        {
+            "compID": "trig_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Width": 0.005
+                    },
+                    "time": 1.0,
+                    "type": "Pulse High"
+                }
+            ],
+            "name": "Unnamed Basic Trigger",
+            "type": "Basic Trigger",
+            "uuid": "26fcabe4-7def-4be5-ba16-d38c83fbb095"
+        },
+        {
+            "compID": "trig_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Width": 0.005
+                    },
+                    "time": 2.0,
+                    "type": "Pulse High"
+                }
+            ],
+            "name": "Unnamed Basic Trigger",
+            "type": "Basic Trigger",
+            "uuid": "533d7fbe-5769-4d4d-b3e1-a3933d8639fb"
+        }
+    ],
+    "instrument": "Basic FT-ICR"
+}

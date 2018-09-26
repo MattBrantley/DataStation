@@ -12,7 +12,7 @@
                 },
                 {
                     "params": {
-                        "Count": 20,
+                        "Count": 5,
                         "Voltage": 2.0,
                         "offDuration": 0.1,
                         "onDuration": 0.1
@@ -22,24 +22,9 @@
                 },
                 {
                     "params": {
-                        "Duration": 1.0,
-                        "Voltage": -5.0
+                        "Voltage": 0.0
                     },
-                    "time": 8.0,
-                    "type": "Linear Ramp"
-                },
-                {
-                    "params": {
-                        "Voltage": 5.0
-                    },
-                    "time": 21.0,
-                    "type": "Step"
-                },
-                {
-                    "params": {
-                        "Voltage": 6.0
-                    },
-                    "time": 22.0,
+                    "time": 3.0,
                     "type": "Step"
                 }
             ],
@@ -52,12 +37,19 @@
             "events": [
                 {
                     "params": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "params": {
                         "Count": 10,
                         "Voltage": 1.0,
                         "offDuration": 0.001,
                         "onDuration": 0.001
                     },
-                    "time": 5.0,
+                    "time": 2.5,
                     "type": "Pulse Train"
                 }
             ],
@@ -78,6 +70,83 @@
             "name": "Unnamed Circular Lens",
             "type": "Circular Lens",
             "uuid": "f96ab44e-c178-4d59-b18d-97fad84a56f3"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [],
+            "name": "Unnamed Circular Lens",
+            "type": "Circular Lens",
+            "uuid": "3785f357-a75c-41de-8d95-ec506ed9299b"
+        },
+        {
+            "compID": "excPlates_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Amplitude": 1.0,
+                        "Duration": 0.05,
+                        "End": 10000.0,
+                        "Rate": 100000.0,
+                        "Start": 1000.0
+                    },
+                    "time": 0.0,
+                    "type": "Chirp"
+                }
+            ],
+            "name": "Unnamed Excitation Plates",
+            "type": "Excitation Plates",
+            "uuid": "e5ebbadc-9d8b-45c6-b2e8-1a049b0ded8b"
+        },
+        {
+            "compID": "pv_mrb",
+            "events": [
+                {
+                    "params": {},
+                    "time": 0.0,
+                    "type": "Go Low"
+                },
+                {
+                    "params": {
+                        "Width": 0.05
+                    },
+                    "time": 2.0,
+                    "type": "Pulse High"
+                }
+            ],
+            "name": "Unnamed Pulse Valve",
+            "type": "Pulse Valve",
+            "uuid": "d33bcb3f-7c4c-4e00-8ea6-cca33d8c8d04"
+        },
+        {
+            "compID": "detecPlates_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Num. Points": 5000,
+                        "Rate": 10000.0
+                    },
+                    "time": 0.0,
+                    "type": "N-Count Collection"
+                }
+            ],
+            "name": "Unnamed Detection Plates",
+            "type": "Detection Plates",
+            "uuid": "68603bed-ccf0-41cf-b5ac-780e7b3bed03"
+        },
+        {
+            "compID": "pv_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Width": 0.05
+                    },
+                    "time": 1.0,
+                    "type": "Pulse High"
+                }
+            ],
+            "name": "Unnamed Pulse Valve",
+            "type": "Pulse Valve",
+            "uuid": "1bef0e24-4231-43ad-9350-b2f26251d61b"
         }
     ],
     "instrument": "Something2"

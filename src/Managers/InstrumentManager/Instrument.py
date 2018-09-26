@@ -91,6 +91,9 @@ class Instrument(QObject):
     def programmingModified(self, component):
         self.iM.programmingModified(self, component)
 
+    def measurementRecieved(self, component, socket, measurementPacket):
+        self.iM.measurementRecieved(self, component, socket, measurementPacket)
+
 ##### Instrument Manipulations #####
 
     def savePacket(self):

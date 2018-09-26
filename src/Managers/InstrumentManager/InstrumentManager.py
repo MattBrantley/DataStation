@@ -41,6 +41,7 @@ class InstrumentManager(QObject):
     Socket_Removed = pyqtSignal()
     Socket_Attached = pyqtSignal(object, object, object) # Instrument, Component, Socket
     Socket_Detatched = pyqtSignal(object, object, object) # Instrument, Component, Socket
+    Socket_Measurement_Packet_Recieved = pyqtSignal(object, object, object, object) # Instrument, Component, Socket, measurementPacket
     Socket_Config_Changed = pyqtSignal()
 
 ############################################################################################
@@ -167,6 +168,9 @@ class InstrumentManager(QObject):
 
     def programmingModified(self, instrument, component):
         self.Component_Programming_Modified.emit(instrument, component)
+
+    def measurementRecieved(self, instrument, component, socket, measurementPacket):
+        self.Socket_Measurement_Packet_Recieved.emit(instrument, component, socket, measurementPacket)
 
 ##### Search Functions ######
 

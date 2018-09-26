@@ -1,0 +1,246 @@
+{
+    "compList": [
+        {
+            "compIdentifier": "circLens_mrb",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": -2032.0,
+                        "y": 1047.0
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "granularity": 0.0001,
+                "layoutGraphicSrc": "lens.png",
+                "name": "Unnamed Circular Lens",
+                "triggerComp": false,
+                "uuid": "c330fd81-ae6b-4e08-a8a6-3e5cd19889d3",
+                "vMax": 10.0,
+                "vMin": 0.0
+            },
+            "compType": "Circular Lens",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "d6c31502-9d5d-4937-b94b-47310bf87e0e",
+                    "inputSourcePathNo": 1,
+                    "name": "Unnamed Circular Lens",
+                    "prec": 0.1,
+                    "tag": "[AO]",
+                    "uuid": "b385b665-7948-4263-a298-8aae7693c8a3",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "circLens_mrb",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": -368.0,
+                        "y": 1044.0
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "granularity": 0.0001,
+                "layoutGraphicSrc": "lens.png",
+                "name": "Unnamed Circular Lens",
+                "triggerComp": false,
+                "uuid": "e54d3171-4888-4639-aa43-fab25145473f",
+                "vMax": 10.0,
+                "vMin": 0.0
+            },
+            "compType": "Circular Lens",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "ef927279-dd43-4f68-a72a-96b0e21cb63a",
+                    "inputSourcePathNo": 1,
+                    "name": "Unnamed Circular Lens",
+                    "prec": 0.1,
+                    "tag": "[AO]",
+                    "uuid": "5278a199-6bc2-46fb-ad2b-16b517d7e83d",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "penTrap_mrb",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": -1818.0,
+                        "y": 1170.0
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "granularity": 0.0001,
+                "layoutGraphicSrc": "Penning_Trap.png",
+                "name": "Unnamed Penning Trap",
+                "triggerComp": false,
+                "uuid": "e6a8589e-cb19-4953-9f94-9d9866ab6795",
+                "vMax": 10.0,
+                "vMin": 0.0
+            },
+            "compType": "Penning Trap",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "88f63913-0e5d-408b-a25f-011170f9ce3c",
+                    "inputSourcePathNo": 1,
+                    "name": "Unnamed Penning Trap",
+                    "prec": 0.1,
+                    "tag": "[AO]",
+                    "uuid": "3ce44a87-e35d-4018-bf54-2a48a37a0cb4",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "excPlates_mrb",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": -1368.0,
+                        "y": 1168.0
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Excitation_Plates.png",
+                "name": "Unnamed Excitation Plates",
+                "triggerComp": false,
+                "uuid": "594d2479-ae28-4106-9191-c4d09b224e7a"
+            },
+            "compType": "Excitation Plates",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "04068683-facd-488e-9c0d-39e05ed84fd6",
+                    "inputSourcePathNo": 1,
+                    "name": "Unnamed Excitation Plates",
+                    "prec": 0.1,
+                    "tag": "[AO]",
+                    "uuid": "614b6595-f4ef-45d5-9c79-2ac73995538f",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "detecPlates_mrb",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": -1367.0,
+                        "y": 1283.0
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Detection_Plates.png",
+                "name": "Unnamed Detection Plates",
+                "triggerComp": false,
+                "uuid": "ea30b3f6-2f85-4a1d-ae67-c2d60c990543"
+            },
+            "compType": "Detection Plates",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "69457563-a639-4b7a-9dbe-b5dc0ffd3165",
+                    "inputSourcePathNo": 1,
+                    "name": "Unnamed Detection Plates",
+                    "prec": 0.1,
+                    "tag": "[AI]",
+                    "uuid": "b4b35148-4741-44f2-8169-6b9bb129fb99",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "trig_mrb",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": -1587.0,
+                        "y": 1012.0
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Trigger.png",
+                "name": "Unnamed Basic Trigger",
+                "triggerComp": false,
+                "uuid": "26fcabe4-7def-4be5-ba16-d38c83fbb095"
+            },
+            "compType": "Basic Trigger",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "1b4badec-57a8-482b-ae40-00aba46155b3",
+                    "inputSourcePathNo": 1,
+                    "name": "Unnamed Basic Trigger",
+                    "tag": "[DO]",
+                    "uuid": "32f169f4-cd7f-4440-84b6-98c673d2da82"
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "trig_mrb",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": -814.0,
+                        "y": 1027.0
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Trigger.png",
+                "name": "Unnamed Basic Trigger",
+                "triggerComp": false,
+                "uuid": "533d7fbe-5769-4d4d-b3e1-a3933d8639fb"
+            },
+            "compType": "Basic Trigger",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "3d47e40d-28e5-40b8-be99-ac481ba0fa93",
+                    "inputSourcePathNo": 1,
+                    "name": "Unnamed Basic Trigger",
+                    "tag": "[DO]",
+                    "uuid": "73661bea-dd41-409c-81b1-b2b47e2eeafc"
+                }
+            ],
+            "triggerComp": false
+        }
+    ],
+    "name": "Basic FT-ICR"
+}

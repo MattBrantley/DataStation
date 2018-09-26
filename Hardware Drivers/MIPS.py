@@ -2,6 +2,8 @@ from src.Managers.HardwareManager.HardwareDevice import HardwareDevice
 from src.Managers.HardwareManager.PacketCommands import *
 import niscope, time, sys, glob, serial, re, numpy as np
 
+ms = lambda: int(round(time.time() * 1000))
+
 class MIPS(HardwareDevice):
     hardwareType = 'MIPS'
     hardwareIdentifier = 'MRB_MIPS'
@@ -33,6 +35,8 @@ class MIPS(HardwareDevice):
 
     def initialize(self, deviceName):
         if(deviceName != ''):
+            self.reportTime = ms()
+            self.runTable = False
             with serial.Serial(deviceName, 115200, timeout=1) as ser:
                 ser.write(b'GCHAN,DCB\r\n')
                 response = ser.readline()
@@ -112,30 +116,33 @@ class MIPS(HardwareDevice):
     def softTrigger(self):
         self.Set_Ready_Status(False)
         with serial.Serial(self.Get_Standard_Field('deviceName'), 115200, timeout=1) as ser:
+            self.runTable = True
             self.Send_Status_Message(r'SENT: TBLSTRT\r\n')
             ser.write(b'TBLSTRT\r\n')
             self.Send_Status_Message('RECIEVED: ' + ser.readline().decode(encoding='ascii').rstrip("\n\r"))
         
         self.softTriggered.emit()
 
-        with serial.Serial(self.Get_Standard_Field('deviceName'), 115200, timeout=0.005) as ser:
-            returned = False
-            updateCounter = 0
-            while(returned is False):
-            #for i in range(10):
-                response = ser.readline().decode(encoding='ascii').rstrip("\n\r")
+    def idle(self):
+        if(self.runTable is False):
+            return
+        with serial.Serial(self.Get_Standard_Field('deviceName'), 115200, timeout=0.1) as ser:
+            responses = ser.readlines()
+            for response in responses:
+                response = response.decode(encoding='ascii').rstrip("\n\r")
                 if(response == 'TBLCMPLT'):
                     self.Send_Status_Message('RECIEVED: Table Completed')
+                    self.Set_Ready_Status(True)
+                    self.runTable = False
                 elif(response == 'TBLRDY'):
                     self.Send_Status_Message('RECIEVED: Table Ready!')
-                    returned = True
-                else:
-                    updateCounter += 1
-                    if(updateCounter == 200):
-                        self.Send_Status_Message('Running...')
-                        updateCounter = 0
+                    self.Set_Ready_Status(True)
+                    self.runTable = False
+            if(self.Ready_Status() is False):
+                if(ms() - self.reportTime >= 500):
+                    self.Send_Status_Message('Running...')
+                    self.reportTime = ms()
 
-        self.Set_Ready_Status(True)
 
 ############################################################################################
 ###################################### INTERNAL FUNCS ######################################
@@ -155,20 +162,21 @@ class MIPS(HardwareDevice):
                 dataAdded = list()
                 for cmd in programData['programmingPacket'].Get_Commands(commandType=AnalogSparseCommand):
                     dataAdded.append(cmd.pairs)
-                sparseData = np.vstack(dataAdded)
+                if(dataAdded):
+                    sparseData = np.vstack(dataAdded)
 
-                data = self.waveformToClockCount(sparseData)
-                length = sparseData.shape[0]
-                channelColumns = np.zeros((length,2))
-                channelColumns[:,0] = channelColumns[:,0] + channelTag
-                channelColumns[:,1] = channelColumns[:,1] + channelToken
+                    data = self.waveformToClockCount(sparseData)
+                    length = sparseData.shape[0]
+                    channelColumns = np.zeros((length,2))
+                    channelColumns[:,0] = channelColumns[:,0] + channelTag
+                    channelColumns[:,1] = channelColumns[:,1] + channelToken
 
-                wfm = np.hstack((data, channelColumns))
+                    wfm = np.hstack((data, channelColumns))
 
-                if(cD is None):
-                    cD = wfm
-                else:
-                    cD = np.vstack((cD, wfm))
+                    if(cD is None):
+                        cD = wfm
+                    else:
+                        cD = np.vstack((cD, wfm))
 
         return self.MIPSToString(cD)
 
@@ -187,7 +195,7 @@ class MIPS(HardwareDevice):
                 if(line[0,2] == 0):
                     token = str(int(line[0,3]))
                 else:
-                    token = chr(line[0,3])
+                    token = chr(int(line[0,3]))
                 
                 strOut += (':' + token + ':' + str(round(line[0,1], 2)))
             

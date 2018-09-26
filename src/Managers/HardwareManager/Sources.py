@@ -26,6 +26,9 @@ class Source():
     def Get_Number_Of_Paths(self):
         return 1
 
+    def Push_Measurement_Packet(self, measurementPacket):
+        self.pushMeasurementPacket(measurementPacket)
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
     def __init__(self, name, physConID, trigger=False):
@@ -62,6 +65,18 @@ class Source():
     def getProgrammingPacket(self, programmingPacket):
         self.programmingPacket = programmingPacket
         self.hWare.programDataReceived(self)
+
+    def isConnected(self):
+        if(self.getSockets()):
+            return True
+        else:
+            return False
+
+    def pushMeasurementPacket(self, measurementPacket):
+        print('Source got packet')
+        sockets = self.Get_Sockets()
+        if(sockets):
+            sockets[0].getMeasurementPacket(measurementPacket)
 
 ##### Search Functions #####
     def getSockets(self):

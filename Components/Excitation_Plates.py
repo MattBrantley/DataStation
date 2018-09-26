@@ -36,7 +36,6 @@ class chirpEvent(eventType):
 
     def __init__(self):
         super().__init__()
-        self.Add_Parameter(eventParameterDouble('Duration'))
         self.Add_Parameter(eventParameterDouble('Duration', allowZero=False, allowNegative=False, defaultVal=0.05))
         self.Add_Parameter(eventParameterDouble('Rate', allowZero=False, allowNegative=False, defaultVal=100000))
         self.Add_Parameter(eventParameterDouble('Start', allowZero=False, allowNegative=False, defaultVal=1000))
@@ -49,6 +48,8 @@ class chirpEvent(eventType):
     def toCommand(self):
         times = np.arange(self.time, self.time + self.eventParams['Duration'].v(), 1/self.eventParams['Rate'].v())
         wave = scipy.signal.chirp(times, self.eventParams['Start'].v(), times[-1], self.eventParams['End'].v())
+        wave = np.multiply(wave, self.eventParams['Amplitude'].v())
+        wave = np.append(wave, [[0], [0]])
         t0 = self.time
         f = self.eventParams['Rate'].v()
         command = AnalogWaveformCommand(t0, f, wave)
