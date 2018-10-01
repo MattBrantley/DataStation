@@ -81,7 +81,6 @@ class Socket():
             target[0].getProgrammingPacket(self.programmingPacket)
 
     def getMeasurementPacket(self, measurementPacket):
-        print('Socket got packet')
         self.cP.measurementReceived(self, measurementPacket)
 
 ##### Search Functions #####

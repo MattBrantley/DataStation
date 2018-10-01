@@ -125,7 +125,6 @@ class HardwareDeviceHandler(QObject):
         self.hM.hardwareDeviceFound(self, deviceName)
 
     def measurementPacket(self, source, measurementPacket):
-        print('Device Handler got packet')
         source.Push_Measurement_Packet(measurementPacket)
 
     def statusMessage(self, msg):
@@ -209,8 +208,6 @@ class HardwareDevice(QObject):
     programmed = pyqtSignal()
     softTriggered = pyqtSignal()
 
-    
-
     measurementPacket = pyqtSignal(object, object) # source, measurementPacket
     statusMessage = pyqtSignal(str)
     readyStatus = pyqtSignal(bool)
@@ -283,7 +280,6 @@ class HardwareDevice(QObject):
 
     def Push_Measurements_Packet(self, source, measurementPacket):
         self.measurementPacket.emit(source, measurementPacket)
-
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################

@@ -19,6 +19,9 @@ from PyQt5.QtGui import *
 # pyserial - pip install pyserial
 # labview runtime is automatically polled and link provided - thanks NI!
 
+# holovies - pip install holoviews
+# datashader - pip install datashader
+
 # --- In case of bug: break glass! ---
 #import traceback
 #traceback.print_stack() 

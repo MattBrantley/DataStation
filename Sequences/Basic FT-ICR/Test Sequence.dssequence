@@ -73,9 +73,9 @@
                     "params": {
                         "Amplitude": 0.1,
                         "Duration": 0.05,
-                        "End": 10000.0,
+                        "End": 100000.0,
                         "Rate": 100000.0,
-                        "Start": 1000.0
+                        "Start": 10000.0
                     },
                     "time": 0.0,
                     "type": "Chirp"
@@ -90,8 +90,10 @@
             "events": [
                 {
                     "params": {
-                        "Num. Points": 5000,
-                        "Rate": 10000.0
+                        "Num. Points": 100000,
+                        "Rate": 10000000.0,
+						"Range-Max": 10,
+						"Range-Min": -10
                     },
                     "time": 0.0,
                     "type": "N-Count Collection"
@@ -123,7 +125,7 @@
                     "params": {
                         "Width": 0.005
                     },
-                    "time": 2.0,
+                    "time": 0.999,
                     "type": "Pulse High"
                 }
             ],

@@ -78,11 +78,12 @@ class AnalogAcquisitionCommand(Command):
     ACQ_TRIG_EXTERNAL = 50
     ACQ_TRIG_THRESHOLD = 51
 
-    def __init__(self, rate, noSamples, acqRange, trig=ACQ_TRIG_EXTERNAL, trigThreshold=1, preTrigSamples=0):
+    def __init__(self, rate, noSamples, acqMax, acqMin, trig=ACQ_TRIG_EXTERNAL, trigThreshold=1, preTrigSamples=0):
         super().__init__()
         self.rate = rate # rate in units of Hertz (Hz)
         self.noSamples = noSamples
-        self.acqRange = acqRange # tuple of form (min, max) in units of voltage (V)
+        self.acqMax = acqMax
+        self.acqMin = acqMin
         self.trig = trig
         self.trigThreshold = trigThreshold # only used if trig=ACQ_TRIG_THRESHOLD, units in Voltage (V)
         self.preTrigSamples = preTrigSamples # the number of samples retained before the trigger event. 

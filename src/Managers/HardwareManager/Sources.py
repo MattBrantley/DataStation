@@ -73,7 +73,6 @@ class Source():
             return False
 
     def pushMeasurementPacket(self, measurementPacket):
-        print('Source got packet')
         sockets = self.Get_Sockets()
         if(sockets):
             sockets[0].getMeasurementPacket(measurementPacket)
