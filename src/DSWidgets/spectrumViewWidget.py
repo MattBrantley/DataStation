@@ -3,22 +3,15 @@ import pyqtgraph as pg
 from bokeh.io import output_notebook, show, save
 from bokeh.plotting import figure, output_file
 from bokeh.embed import file_html
+from bokeh.models import Range1d
 from bokeh.resources import Resources
 from bokeh.server.server import Server
 from bokeh.themes import Theme
 from bokeh.layouts import layout
 import numpy as np
+import scipy.constants as spc
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-import asyncio
-import holoviews as hv
-import datashader as ds
-from holoviews.operation.datashader import datashade, rasterize
-hv.extension('bokeh')
-
-from bokeh.layouts import column
-from bokeh.models import ColumnDataSource, Slider
-
-from bokeh.sampledata.sea_surface_temperature import sea_surface_temperature
+import asyncio, math
 
 class spectrumViewWidget(QDockWidget):
     ITEM_GUID = Qt.UserRole
@@ -82,10 +75,16 @@ class bokehServer(QObject):
 
     def newData(self, data):
         p = figure(plot_width=400, plot_height=400, title="Transient")
+        p2 = figure(plot_width=400, plot_height=400, title="Mass Spectrum")
+        #p2.x_range=Range1d(5, 2000)
         t = np.arange(0, data.wave.shape[0], 1)
         t = np.multiply(t, 1/data.f)
         p.line(t, data.wave)
-        grid = layout(children=[[p]], sizing_mode='stretch_both', merge_tools=True)
+        ta, tb = self.doFFT(data.wave, 1/data.f)
+        vfunc = np.vectorize(self.ftomz)
+        ta = vfunc(ta[1:], 9.34)
+        p2.line(ta, tb[1:])
+        grid = layout(children=[[p], [p2]], sizing_mode='stretch_both', merge_tools=True)
         self.plotData = grid
 
     def modify_doc(self, doc):
@@ -94,3 +93,14 @@ class bokehServer(QObject):
             doc.add_root(grid)
 
         doc.theme = Theme(filename='D:/InstrPlatform/DataStation/src/TestScripts/theme.yaml')
+
+    def doFFT(self, data, dT):
+        yData = np.fft.rfft(data)
+        yData = np.abs(yData)**2
+        xData = np.fft.rfftfreq(data.shape[0], dT)
+
+        return xData, yData
+
+    def ftomz(self, f, b):
+        return (spc.e*b) / (2*spc.pi*f) / 1.660539e-27
+        

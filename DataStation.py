@@ -1,10 +1,10 @@
 import sys, uuid, pickle, numpy as np, sqlite3, os, matplotlib.pyplot as plt, random, psutil, imp, multiprocessing, copy, queue, json
 from pathlib import Path
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
-from matplotlib.figure import Figure
-from mpl_toolkits.mplot3d import Axes3D
-from mpl_toolkits.mplot3d import proj3d
+#from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+#from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
+#from matplotlib.figure import Figure
+#from mpl_toolkits.mplot3d import Axes3D
+#from mpl_toolkits.mplot3d import proj3d
 from xml.dom.minidom import *
 from xml.etree.ElementTree import *
 from PyQt5.QtCore import *
@@ -17,10 +17,14 @@ from PyQt5.QtGui import *
 # niscope - pip install niscope
 # proctitle - pip install setproctitle -- NOT USED?
 # pyserial - pip install pyserial
+# pyqt5 version updated "pip install pyqt5"
+#   -> Caused issues with matplotlib fixed with "pip install matplotlib --upgrade"
+#   -> Downgraded to pyqt5 v 5.10.1 with "pip install pyqt5==5.10.1 --user"
+# pyqtchart - pip install pyqtchart --user
+#   -> Had to redowngrade to 5.10.1
+#   -> Downgraded pyqtchart to 5.10.1
 # labview runtime is automatically polled and link provided - thanks NI!
 
-# holovies - pip install holoviews
-# datashader - pip install datashader
 
 # --- In case of bug: break glass! ---
 #import traceback
@@ -76,7 +80,7 @@ class mainWindow(QMainWindow):
         self.srcDir = os.path.join(self.rootDir, 'src')
         self.ssDir = os.path.join(self.rootDir, 'Stylesheets')
 
-        with open(os.path.join(self.ssDir, 'darkstyle.stylesheet')) as file:
+        with open(os.path.join(self.ssDir, 'darkorange.stylesheet')) as file:
             ssTxt = file.read()
             #self.setStyleSheet(ssTxt)
 

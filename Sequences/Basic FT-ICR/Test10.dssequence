@@ -71,11 +71,11 @@
             "events": [
                 {
                     "params": {
-                        "Amplitude": 0.5,
-                        "Duration": 0.05,
-                        "End": 100000.0,
-                        "Rate": 10000000.0,
-                        "Start": 10000.0
+                        "Amplitude": 0.4,
+                        "Duration": 0.004,
+                        "End": 360000.0,
+                        "Rate": 100000000.0,
+                        "Start": 7556000.0
                     },
                     "time": 0.0,
                     "type": "Chirp"
@@ -90,10 +90,10 @@
             "events": [
                 {
                     "params": {
-                        "Num. Points": 100000,
-                        "Range-Max": 1.0,
-                        "Range-Min": -1.0,
-                        "Rate": 10000000.0
+                        "Num. Points": 400000,
+                        "Range-Max": 0.1,
+                        "Range-Min": -0.1,
+                        "Rate": 20000000.0
                     },
                     "time": 0.0,
                     "type": "N-Count Collection"
@@ -110,7 +110,7 @@
                     "params": {
                         "Width": 0.005
                     },
-                    "time": 1.0,
+                    "time": 8.5042,
                     "type": "Pulse High"
                 }
             ],
@@ -125,13 +125,71 @@
                     "params": {
                         "Width": 0.005
                     },
-                    "time": 0.999,
+                    "time": 8.5,
                     "type": "Pulse High"
                 }
             ],
             "name": "Unnamed Basic Trigger",
             "type": "Basic Trigger",
             "uuid": "533d7fbe-5769-4d4d-b3e1-a3933d8639fb"
+        },
+        {
+            "compID": "fil_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Voltage": 0.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "params": {
+                        "Voltage": -70.0
+                    },
+                    "time": 0.5,
+                    "type": "Step"
+                },
+                {
+                    "params": {
+                        "Voltage": 0.0
+                    },
+                    "time": 8.0,
+                    "type": "Step"
+                }
+            ],
+            "name": "Unnamed Filament",
+            "type": "Filament",
+            "uuid": "65d26fd1-fd48-4bdd-9d8f-2b2ee2752ff8"
+        },
+        {
+            "compID": "pulsevalve_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Width": 0.005
+                    },
+                    "time": 1.0,
+                    "type": "Pulse High"
+                },
+                {
+                    "params": {
+                        "Width": 0.005
+                    },
+                    "time": 2.0,
+                    "type": "Pulse High"
+                },
+                {
+                    "params": {
+                        "Width": 0.005
+                    },
+                    "time": 3.0,
+                    "type": "Pulse High"
+                }
+            ],
+            "name": "Unnamed Pulse Valve",
+            "type": "Pulse Valve",
+            "uuid": "c23c13b6-e51f-48ab-acd8-c96f3c5aa5c1"
         }
     ],
     "instrument": "Basic FT-ICR"

@@ -25,7 +25,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "d6c31502-9d5d-4937-b94b-47310bf87e0e",
+                    "inputSource": "d494bcf6-735e-4e6e-8802-6d07486e3908",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "prec": 0.1,
@@ -62,7 +62,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "ef927279-dd43-4f68-a72a-96b0e21cb63a",
+                    "inputSource": "5185ba98-a757-4080-b521-ffb8768231ff",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "prec": 0.1,
@@ -99,7 +99,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "88f63913-0e5d-408b-a25f-011170f9ce3c",
+                    "inputSource": "c1636b8c-7bb8-4dd0-827a-a7adee2eed9a",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Penning Trap",
                     "prec": 0.1,
@@ -133,7 +133,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "04068683-facd-488e-9c0d-39e05ed84fd6",
+                    "inputSource": "5cca2f06-2b53-476e-a1f4-e0dbd7a8686f",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Excitation Plates",
                     "prec": 0.1,
@@ -167,7 +167,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "69457563-a639-4b7a-9dbe-b5dc0ffd3165",
+                    "inputSource": "cd2ad14a-98ab-4ea8-a1c6-a15f3a2678c7",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Detection Plates",
                     "prec": 0.1,
@@ -201,7 +201,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "1b4badec-57a8-482b-ae40-00aba46155b3",
+                    "inputSource": "e43d718e-c007-4de2-93b7-bf657d6add87",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Basic Trigger",
                     "tag": "[DO]",
@@ -232,11 +232,79 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "3d47e40d-28e5-40b8-be99-ac481ba0fa93",
+                    "inputSource": "7fb9ee41-a983-4651-8aad-5a489ace7855",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Basic Trigger",
                     "tag": "[DO]",
                     "uuid": "73661bea-dd41-409c-81b1-b2b47e2eeafc"
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "fil_mrb",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": -172.0,
+                        "y": 1216.0
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "granularity": 0.0001,
+                "layoutGraphicSrc": "Filament.png",
+                "name": "Unnamed Filament",
+                "triggerComp": false,
+                "uuid": "65d26fd1-fd48-4bdd-9d8f-2b2ee2752ff8",
+                "vMax": 10.0,
+                "vMin": 0.0
+            },
+            "compType": "Filament",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "a8458622-bf4c-48c8-9971-713a75edb120",
+                    "inputSourcePathNo": 1,
+                    "name": "Unnamed Filament",
+                    "prec": 0.1,
+                    "tag": "[AO]",
+                    "uuid": "18065f94-d9bb-4524-9bd9-47d144cfd244",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "pulsevalve_mrb",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": -2668.0,
+                        "y": 628.0
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Pulse_Valve.png",
+                "name": "Unnamed Pulse Valve",
+                "triggerComp": false,
+                "uuid": "c23c13b6-e51f-48ab-acd8-c96f3c5aa5c1"
+            },
+            "compType": "Pulse Valve",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "89ead9b4-bd58-49f5-b93c-c6dd0126e7d5",
+                    "inputSourcePathNo": 1,
+                    "name": "Unnamed Pulse Valve",
+                    "tag": "[DO]",
+                    "uuid": "2b361960-8eb4-49ce-a4e4-1f6184bb851d"
                 }
             ],
             "triggerComp": false

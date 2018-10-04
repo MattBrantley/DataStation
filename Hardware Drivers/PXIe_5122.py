@@ -45,7 +45,7 @@ class PXIe_5122(HardwareDevice):
             if(packet is not None):
                 self.session.abort()
                 self.session.vertical_range = packet.acqMax-packet.acqMin
-                self.session.vertical_coupling = niscope.VerticalCoupling.DC
+                self.session.vertical_coupling = niscope.VerticalCoupling.AC
                 self.session.vertical_offset = (packet.acqMin + packet.acqMax) / 2
                 self.session.probe_attenuation = 1
                 self.session.channels[0].channel_enabled = True

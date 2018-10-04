@@ -253,8 +253,8 @@ class DSPlotItem():
                     data = list()
                     for cmd in packet.Get_Commands(commandType=AnalogSparseCommand):
                         data.append(cmd.pairs)
-                    for cmd in packet.Get_Commands(commandType=AnalogWaveformCommand):
-                        data.append(cmd.toPairs())
+                    #for cmd in packet.Get_Commands(commandType=AnalogWaveformCommand):
+                    #    data.append(cmd.toPairs())
                     if(data):
                         plotData = np.vstack(data)
                         plotData = self.formatStepMode(plotData)
