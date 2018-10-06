@@ -15,6 +15,11 @@ class DSWindow(QMainWindow):
         self.setGeometry(300, 300, 1280, 720)
         self.show()
 
+##### DataStation Reserverd #####
+    def closeEvent(self, event):
+        print('Window Closing')
+        event.accept()
+
 ##### Modules #####
     def transferModule(self, module):
         self.addDockWidget(Qt.LeftDockWidgetArea, module)

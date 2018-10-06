@@ -4,6 +4,7 @@ from src.Constants import readyCheckPacket
 from src.Managers.ModuleManager.DSModule import DSModule
 from src.Managers.ModuleManager.moduleManagerWindow import moduleManagerWindow
 from src.Managers.ModuleManager.DSWindow import DSWindow
+from src.Managers.ModuleManager.ModuleHandler import ModuleHandler
 import json as json
 from PyQt5.Qt import *
 
@@ -77,10 +78,8 @@ class ModuleManager(QObject):
 ##### Modules #####
 
     def addModuleInstance(self, module, window):
-        modInstance = module.modClass(self.mW)
-        modInstance.setWindowTitle(module.name)
-        self.modules.append(modInstance)
-        window.transferModule(modInstance)
+        modHandler = ModuleHandler(module, window, self.mW)
+        self.modules.append(modHandler)
 
     def scanModules(self):
         self.modulesAvailable = list()

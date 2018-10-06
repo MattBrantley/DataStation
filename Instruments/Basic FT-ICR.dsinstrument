@@ -133,7 +133,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "5cca2f06-2b53-476e-a1f4-e0dbd7a8686f",
+                    "inputSource": "be983f63-b05e-469f-9dfe-13a197daa87d",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Excitation Plates",
                     "prec": 0.1,
@@ -167,7 +167,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "cd2ad14a-98ab-4ea8-a1c6-a15f3a2678c7",
+                    "inputSource": "ce940115-4334-464b-988b-333f0cef8480",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Detection Plates",
                     "prec": 0.1,
