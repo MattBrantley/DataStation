@@ -40,6 +40,7 @@ from src.Constants import DSConstants as DSConstants
 from src.Managers.WorkspaceManager.WorkspaceManager import WorkspaceManager, DSUnits, DSPrefix
 from src.Managers.InstrumentManager.InstrumentManager import InstrumentManager
 from src.Managers.HardwareManager.HardwareManager import HardwareManager
+from src.Managers.ModuleManager.ModuleManager import ModuleManager
 from src.DSWidgets.settingsWidget import settingsDockWidget, settingsDefaultImporterListWidget
 from src.DSWidgets.inspectorWidget import inspectorDockWidget
 from src.DSWidgets.workspaceWidget import workspaceTreeDockWidget, WorkspaceTreeWidget
@@ -147,14 +148,19 @@ class mainWindow(QMainWindow):
         self.hM.loadHardwareDrivers()               # HARDWARE DRIVERS
         self.hM.loadLabviewInterface()              # LABVIEW INTERFACE
 
+        self.mM = ModuleManager(self)           # MODULE MANAGER
+        self.mM.scanModules()                       # LOAD MODULES
+
         self.wM.connections(self.iM, self.hM)
         self.iM.connections(self.wM, self.hM)
         self.hM.connections(self.wM, self.iM)
+        self.mM.connections(self.wM, self.hM, self.iM)
 
     def loadWDockWidgets(self):
         # All used widgets need to be registered here - they autopopulate into the menu.
         # Also, ensure the widget is imported in the import statements above.
         # Generate a widget instance in initUI()
+
         self.processWidget = processWidget(self)
         self.processWidget.setObjectName('processWidget')
 

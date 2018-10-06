@@ -370,7 +370,7 @@
                         "physConID": "0",
                         "prec": 0.1,
                         "trigger": false,
-                        "uuid": "5cca2f06-2b53-476e-a1f4-e0dbd7a8686f",
+                        "uuid": "2ed58568-4bc8-41cd-a02a-f1e53e3b221e",
                         "vMax": 1,
                         "vMin": 1
                     },
@@ -380,7 +380,7 @@
                         "physConID": "1",
                         "prec": 0.1,
                         "trigger": false,
-                        "uuid": "b1c55f94-9131-487b-a166-fb6620298cda",
+                        "uuid": "a60ae0e2-4738-4e3d-9841-7aa1a173fa8e",
                         "vMax": 1,
                         "vMin": 1
                     }
@@ -405,7 +405,7 @@
                         "physConID": "0",
                         "prec": 0.1,
                         "trigger": false,
-                        "uuid": "cd2ad14a-98ab-4ea8-a1c6-a15f3a2678c7",
+                        "uuid": "47d28ff8-37cf-47f0-848f-9118d0c6ce1c",
                         "vMax": 10,
                         "vMin": -10
                     },
@@ -415,7 +415,7 @@
                         "physConID": "1",
                         "prec": 0.1,
                         "trigger": false,
-                        "uuid": "58590865-a4fe-4fff-94eb-200d6515c152",
+                        "uuid": "dbaa707c-a30b-40e7-8a1b-0c4fcb6f8ab3",
                         "vMax": 10,
                         "vMin": -10
                     }

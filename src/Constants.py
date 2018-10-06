@@ -45,6 +45,13 @@ class DSConstants():
         self.logTexts['English'].text['VI_SAVE'] = 'Saving Virtual Instrument to file...'
         self.logTexts['English'].text['VI_SAVE_NO_VI'] = 'Attempting to write virtual instrument to file but no instrument is loaded!! Aborting...'
 
+class moduleFlags():
+    SHOW_ON_CREATION = 100
+    HIDE_ON_CREATION = 101
+
+    DOCK_ON_CREATION = 110
+    FLOAT_ON_CREATION = 111
+
 class DSLogTexts():
 
     def __init__(self, language):
