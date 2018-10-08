@@ -25,17 +25,17 @@ class scriptProcessManager():
             self.managers[i].clear()
         self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
-    def connectWidgets(self):
-        self.processWidget = self.mW.processWidget
-        self.initTimer()
+    #def connectWidgets(self):
+    #    self.processWidget = self.mW.processWidget
+    #    self.initTimer()
 
     def getAvailManager(self):
         for mgr in self.managers:
             if(mgr.inUse is False):
                 return mgr
 
-    def addProcessToWidget(self, job):
-        self.processWidget.addProcessToWidget(job)
+    #def addProcessToWidget(self, job):
+    #    self.processWidget.addProcessToWidget(job)
 
     def initTimer(self):
         self.queueUpdateTimer.timeout.connect(self.updateQueueWorkers)
@@ -44,12 +44,12 @@ class scriptProcessManager():
     def addJobToQueue(self, worker):
         self.addProcessToWidget(worker)
 
-    def getNextAvailableWorker(self):
-        for widgetItem in self.processWidget.processList.findItems('', Qt.MatchRegExp):
-            #worker = widgetItem.data(Qt.UserRole)
-            active = widgetItem.data(Qt.UserRole+1)
-            if(active == False):
-                return widgetItem.data(Qt.UserRole)
+    #def getNextAvailableWorker(self):
+    #    for widgetItem in self.processWidget.processList.findItems('', Qt.MatchRegExp):
+    #        #worker = widgetItem.data(Qt.UserRole)
+    #        active = widgetItem.data(Qt.UserRole+1)
+    #        if(active == False):
+    #            return widgetItem.data(Qt.UserRole)
 
     def startNextWorker(self):
         worker = self.getNextAvailableWorker()
@@ -64,52 +64,52 @@ class scriptProcessManager():
                 self.abortJob(worker)
                 return None
 
-    def updateQueueWorkers(self):
-        self.processWidget.setWindowTitle('Process Queue: (' + str(self.processWidget.processList.count()) + ' items)')
-        if(self.activeWorkers): # This is to counteract some weird case of the list being [None] when empty
-            for worker in self.activeWorkers: # Checking if any of the workers have returned
-                worker.updateJobWidget()
-                if(worker.killRequest == True):
-                    self.terminateRunningJob(worker)
-                elif(self.pollThreadForCompletion(worker) == False):
-                    self.completeJob(worker)
+    #def updateQueueWorkers(self):
+    #    self.processWidget.setWindowTitle('Process Queue: (' + str(self.processWidget.processList.count()) + ' items)')
+    #    if(self.activeWorkers): # This is to counteract some weird case of the list being [None] when empty
+    #        for worker in self.activeWorkers: # Checking if any of the workers have returned
+    #            worker.updateJobWidget()
+    #            if(worker.killRequest == True):
+    #                self.terminateRunningJob(worker)
+    #            elif(self.pollThreadForCompletion(worker) == False):
+    #                self.completeJob(worker)
 
-        if(len(self.activeWorkers) < self.numWorkers):
-            #if(self.jobQueue.empty() is False):
-            if(self.processWidget.processList.count() is not 0):
-                newWorker = self.startNextWorker()
-                if(newWorker):
-                    self.activeWorkers.append(newWorker)
+    #    if(len(self.activeWorkers) < self.numWorkers):
+    #        #if(self.jobQueue.empty() is False):
+    #        if(self.processWidget.processList.count() is not 0):
+    #            newWorker = self.startNextWorker()
+    #            if(newWorker):
+    #                self.activeWorkers.append(newWorker)
 
     def pollThreadForCompletion(self, worker):
         return worker.process.is_alive()
 
-    def abortJob(self, worker):
-        if(worker.jobActive == False):
-            worker.removeJobWidget(self.processWidget.processList)
-        else:
-            worker.killSelf()
+    #def abortJob(self, worker):
+    #    if(worker.jobActive == False):
+    #        worker.removeJobWidget(self.processWidget.processList)
+    #    else:
+    #        worker.killSelf()
 
-    def terminateRunningJob(self, worker):
-        worker.removeJobWidget(self.processWidget.processList)
-        worker.releaseMgr()
-        self.activeWorkers.remove(worker)
+    #def terminateRunningJob(self, worker):
+    #    worker.removeJobWidget(self.processWidget.processList)
+    #    worker.releaseMgr()
+    #    self.activeWorkers.remove(worker)
 
-    def completeJob(self, worker):
-        Op = self.workspace.workspaceTreeWidget.submitOperation(worker.uScript, worker.selectedItem)
-        dataOut = worker.dOut
-        idx = 0
-        for dataSet in dataOut:
-            if(dataSet.verify()):
-                dataSet.name = self.workspace.cleanStringName(dataSet.name)
-                self.workspace.submitResultsToWorkspace(Op, dataSet)
-            else:
-                print('DataSet[' + str(idx) + '] is corrupted: Aborting Import.')
-            idx += 1
+    #def completeJob(self, worker):
+    #    Op = self.workspace.workspaceTreeWidget.submitOperation(worker.uScript, worker.selectedItem)
+    #    dataOut = worker.dOut
+    #    idx = 0
+    #    for dataSet in dataOut:
+    #        if(dataSet.verify()):
+    #            dataSet.name = self.workspace.cleanStringName(dataSet.name)
+    #            self.workspace.submitResultsToWorkspace(Op, dataSet)
+    #        else:
+    #            print('DataSet[' + str(idx) + '] is corrupted: Aborting Import.')
+    #        idx += 1
 
-        worker.removeJobWidget(self.processWidget.processList)
-        worker.releaseMgr()
-        self.activeWorkers.remove(worker)
+    #    worker.removeJobWidget(self.processWidget.processList)
+    #    worker.releaseMgr()
+    #    self.activeWorkers.remove(worker)
 
     def submitJob(self, uScript, selectedItem):
         worker = workerObj(uScript, selectedItem, self.workspace, self)  # Worker will run and then return addJobToQueue if successful

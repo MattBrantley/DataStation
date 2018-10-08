@@ -77,8 +77,8 @@ class WorkspaceManager():
     def instrumentLoaded(self):
         self.userProfile['instrumentURL'] = self.iM.currentInstrument.url
 
-    def connectWidgets(self):
-        self.userScriptController.connectWidgets()
+    #def connectWidgets(self):
+    #    self.userScriptController.connectWidgets()
         
     def initDatabaseCommManager(self):
         self.DBCommMgr = databaseCommManager(self)
@@ -275,98 +275,3 @@ class WorkspaceManager():
             return Axis
         else:
             return None
-
-    def surfacePlotItem(self, selectedItem):
-        dockWidget = QDockWidget(selectedItem.text(0), self.mW)
-        multiWidget = QWidget()
-        layout = QGridLayout()
-        pltFigure = plt.figure()
-        pltCanvas = FigureCanvas(pltFigure)
-        pltToolbar = NavigationToolbar(pltCanvas, dockWidget)
-        layout.addWidget(pltToolbar)
-        layout.addWidget(pltCanvas)
-        multiWidget.setLayout(layout)
-        dockWidget.setWidget(multiWidget)
-        dockWidget.setAttribute(Qt.WA_DeleteOnClose)
-        self.mW.addDockWidget(Qt.RightDockWidgetArea, dockWidget)
-        dockWidget.setFloating(True)
-        GUID = selectedItem.data(0, self.ITEM_GUID)
-        dataSet = self.getScriptIODataFromSQLByGUID(GUID)
-        data = dataSet.matrix
-        ax = pltFigure.add_subplot(111, projection='3d')
-
-        if isinstance(data, np.ndarray):
-            if len(data.shape) == 2:
-                row, col = data.shape
-                xValues = np.arange(row)
-                yValues = np.arange(col)
-                x, y = np.meshgrid(xValues, yValues)
-                ax.set_zlim(np.min(data), np.max(data))
-                ax.set_xlim(np.min(xValues), np.max(xValues))
-                ax.set_ylim(np.min(yValues), np.max(yValues))
-                ax.view_init(elev=45, azim=45)
-                ax.w_xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
-                ax.w_yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
-                ax.w_zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
-                ax.w_xaxis.line.set_color((1.0, 1.0, 1.0, 1.0))
-                ax.w_yaxis.line.set_color((1.0, 1.0, 1.0, 1.0))
-                ax.w_zaxis.line.set_color((1.0, 1.0, 1.0, 1.0))
-                ax.set_xticks([])
-                ax.set_yticks([])
-                ax.set_zticks([])
-                try:
-                    ax.plot_surface(x, y, data.T, rstride=1, cstride=1000,
-                                    cmap='GnBu', lw=0.1)
-                except:
-                    pass
-            else:
-                dockWidget.close()
-        else:
-            dockWidget.close()
-
-    def linePlotItem(self, selectedItem):
-        dockWidget = QDockWidget(selectedItem.text(0), self.mW)
-        multiWidget = QWidget()
-        layout = QGridLayout()
-        pltFigure = plt.figure()
-        pltCanvas = FigureCanvas(pltFigure)
-        pltToolbar = NavigationToolbar(pltCanvas, dockWidget)
-        layout.addWidget(pltToolbar)
-        layout.addWidget(pltCanvas)
-        multiWidget.setLayout(layout)
-        dockWidget.setWidget(multiWidget)
-        dockWidget.setAttribute(Qt.WA_DeleteOnClose)
-        self.mW.addDockWidget(Qt.RightDockWidgetArea, dockWidget)
-        dockWidget.setFloating(True)
-        GUID = selectedItem.data(0, self.ITEM_GUID)
-        dataSet = self.getScriptIODataFromSQLByGUID(GUID)
-        data = dataSet.matrix
-        ax = pltFigure.add_subplot(111)
-        if isinstance(data, np.ndarray):
-            if len(data.shape) == 1:
-                ax.plot(data)
-            elif len(data.shape) == 2:
-                row, col = data.shape
-                if col == 1:
-                    try:
-                        ax.plot(data[:, 0])
-                    except:
-                        # Should add in a popup for the user to know that
-                        # the argument was wrong, or some other feedback.
-                        pass
-                elif col == 2:
-                    try:
-                        ax.plot(data[:, 0], data[:, 1])
-                    except:
-                        pass
-                elif row == 2:
-                    try:
-                        ax.plot(data[0], data[1])
-                    except:
-                        pass
-                else:
-                    dockWidget.close()
-            else:
-                dockWidget.close()
-        else:
-            dockWidget.close()

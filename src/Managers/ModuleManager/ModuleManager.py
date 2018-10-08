@@ -1,11 +1,11 @@
-import os, sys, imp, time, inspect, json as json
+import os, sys, imp, time, inspect, json as json, uuid
 from src.Constants import DSConstants as DSConstants
 from src.Constants import readyCheckPacket
 from src.Managers.ModuleManager.DSModule import DSModule
 from src.Managers.ModuleManager.moduleManagerWindow import moduleManagerWindow
 from src.Managers.ModuleManager.DSWindow import DSWindow
 from src.Managers.ModuleManager.ModuleHandler import ModuleHandler
-import json as json
+from src.Managers.ModuleManager.loadingScreenWidget import loadingScreenWidget
 from PyQt5.Qt import *
 
 class ModuleManager(QObject):
@@ -18,6 +18,13 @@ class ModuleManager(QObject):
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
 
+    ##### Manager Widget #####
+    def Show_Manager_Widget(self):
+        self.showManagerWidget()
+
+    def Get_Manager_Menu(self):
+        return self.menu
+
     ##### Modules #####
     def Get_Available_Modules(self):
         return self.modulesAvailable
@@ -25,8 +32,8 @@ class ModuleManager(QObject):
     def Scan_Modules(self):
         self.scanModules()
 
-    def Add_Module_Instance(self, module, window):
-        self.addModuleInstance(module, window)
+    def Add_Module_Instance(self, module, window, uuid=str(uuid.uuid4())):
+        self.addModuleInstance(module, window, uuid)
 
     ##### Windows #####
     def Add_New_Window(self):
@@ -35,18 +42,24 @@ class ModuleManager(QObject):
     def Get_Windows(self):
         return self.mainWindows
 
+    def Set_Stylesheet(self, path):
+        self.setStylesheet(path)
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
 
-    def __init__(self, mW):
+    def __init__(self, core):
         super().__init__()
-        self.mW = mW
-        self.moduleDir = os.path.join(self.mW.rootDir, 'Modules')
+        self.core = core
+        self.moduleDir = os.path.join(self.core.rootDir, 'Modules')
         self.modulesAvailable = list()
         self.modules = list()
         self.mainWindows = list()
 
-        self.mW.DataStation_Closing.connect(self.DSClosing)
+        self.populateMenu()
+
+        self.core.DataStation_Loaded.connect(self.DSLoaded)
+        self.core.DataStation_Closing.connect(self.DSClosing)
 
 ##### DataStation Reserved Functions #####
 
@@ -57,33 +70,105 @@ class ModuleManager(QObject):
         self.initModuleSettingsWindow()
         # Called after all managers are created so they can connect to each other's signals
 
+    def DSLoading(self):
+        self.loadScreenWidget = loadingScreenWidget(self.core)
+
+    def DSLoaded(self):
+        self.loadScreenWidget.close()
+        tSaveURL = os.path.join(self.core.srcDir, 'testSave.json')
+        if(os.path.isfile(tSaveURL)):
+            with open(tSaveURL, 'r+') as file:
+                try:
+                    windowData = json.load(file)
+                    self.loadWindowStates(windowData)
+                except:
+                    print('ERROR OCCURED LOADING')
+
     def DSClosing(self):
-        for window in self.mainWindows:
-            window.close()
-        print('Module Manager Closing')
+        tSaveURL = os.path.join(self.core.srcDir, 'testSave.json')
+        with open(tSaveURL, 'w') as file:
+            json.dump(self.saveWindowStates(), file, sort_keys=True, indent=4)
+
+        self.closeWindows()
+
+    def populateMenu(self):
+        self.showWidgetAction = QAction('Show Module Widget')
+        self.showWidgetAction.triggered.connect(self.Show_Manager_Widget)
+
+        self.menu = QMenu('Modules')
+        self.menu.addAction(self.showWidgetAction)
+
+        return self.menu
 
 ##### Module Manager Settings Window #####
 
     def initModuleSettingsWindow(self):
-        self.moduleSettingsWindow = moduleManagerWindow(self.mW)
+        self.moduleSettingsWindow = moduleManagerWindow(self.core)
+        #self.moduleSettingsWindow.show()
+
+    def showManagerWidget(self):
         self.moduleSettingsWindow.show()
+        self.moduleSettingsWindow.setWindowState(self.moduleSettingsWindow.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
+        self.moduleSettingsWindow.activateWindow()
+
+##### Stylesheets #####
+
+    def setStylesheet(self, path):
+        try:
+            with open(os.path.join(path)) as file:
+                ssTxt = file.read()
+                self.setStyleSheet(ssTxt)
+        except:
+            print('Could not load stylesheet')
+        #with open(os.path.join(self.ssDir, 'darkorange.stylesheet')) as file:
+        #    ssTxt = file.read()
+            #self.setStyleSheet(ssTxt)
 
 ##### Windows #####
 
     def addWindow(self):
-        newWindow = DSWindow(self.mW)
+        newWindow = DSWindow(self.core)
         newWindow.setWindowTitle('DataStation Expansion Window #' + str(len(self.mainWindows)+1))
         self.mainWindows.append(newWindow)
+        return newWindow
+
+    def closeWindows(self):
+        for window in self.mainWindows:
+            window.close()
+
+    def saveWindowStates(self):
+        windowStates = list()
+        for window in self.mainWindows:
+            windowStates.append(window.saveWindowState())
+        return windowStates
+
+    def loadWindowStates(self, data):
+        for window in data:
+            newWindow = self.addWindow()
+            self.restoreModules(window['modules'], newWindow)
+            newWindow.loadWindowState(window)
 
 ##### Modules #####
 
-    def addModuleInstance(self, module, window):
-        modHandler = ModuleHandler(module, window, self.mW)
+    def addModuleInstance(self, module, window, uuid):
+        modHandler = ModuleHandler(module, window, self.core, uuid)
         self.modules.append(modHandler)
+
+    def restoreModules(self, modDataList, window):
+        for modData in modDataList:
+            mod = self.getModByPath(modData['filePath'])
+            if mod is not None:
+                self.Add_Module_Instance(mod, window, uuid=modData['uuid'])
+
+    def getModByPath(self, path):
+        for mod in self.modulesAvailable:
+            if(mod.filePath == path):
+                return mod
+        return None
 
     def scanModules(self):
         self.modulesAvailable = list()
-        self.mW.postLog('Searching For Modules... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.core.postLog('Searching For Modules... ', DSConstants.LOG_PRIORITY_HIGH)
 
         for root, dirs, files in os.walk(self.moduleDir):
             for name in files:
@@ -92,9 +177,9 @@ class ModuleManager(QObject):
                 if(res is not False):
                     nMod = ModuleAvailable(self.moduleDir, name, url, res)
                     self.modulesAvailable.append(nMod)
-                    self.mW.postLog('   Found Module: ' + name, DSConstants.LOG_PRIORITY_HIGH)
+                    self.core.postLog('   Found Module: ' + name, DSConstants.LOG_PRIORITY_HIGH)
 
-        self.mW.postLog('Finished Searching For Modules!', DSConstants.LOG_PRIORITY_HIGH)
+        self.core.postLog('Finished Searching For Modules!', DSConstants.LOG_PRIORITY_HIGH)
 
     def verifyModule(self, url):
         mod_name, file_ext = os.path.splitext(os.path.split(url)[-1])

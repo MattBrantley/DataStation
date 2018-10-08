@@ -5,7 +5,7 @@ class moduleManagerWindow(QMainWindow):
     ITEM_GUID = Qt.UserRole
 
     def __init__(self, mW):
-        super().__init__(mW)
+        super().__init__(None)
         self.setWindowTitle('Module Manager')
         self.mW = mW
         self.mM = mW.mM

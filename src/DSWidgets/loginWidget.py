@@ -39,7 +39,7 @@ class loginDockWidget(QDockWidget):
         self.editButton.pressed.connect(self.showEditUserPopup)
         
         self.acceptButton.setEnabled(False)
-        self.acceptButton.pressed.connect(self.finishModal)
+        #self.acceptButton.pressed.connect(self.finishModal)
         self.editButton.setEnabled(False)
 
         self.loginContainer.setLayout(self.loginLayout)
@@ -63,9 +63,9 @@ class loginDockWidget(QDockWidget):
         frameGm.moveCenter(centerPoint)
         self.move(frameGm.topLeft())
 
-    def finishModal(self):
-        self.hide()
-        self.mW.finishInitWithUser(self.userProfiles[self.userList.currentRow()])
+    #def finishModal(self):
+    #    self.hide()
+    #    self.mW.finishInitWithUser(self.userProfiles[self.userList.currentRow()])
 
     def showNewUserPopup(self):
         self.newUserPopup.loadSettings(None)
@@ -104,7 +104,7 @@ class loginDockWidget(QDockWidget):
 
     def profileDoubleClicked(self, e):
         self.profileSelectionChanged(self.userList.currentRow())
-        self.finishModal()
+        #self.finishModal()
 
     def profileSelectionChanged(self, row):
         if(len(self.userList.selectedItems()) > 0):

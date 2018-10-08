@@ -1,5 +1,5 @@
 from PyQt5.Qt import *
-import sys
+import sys, uuid
 from os.path import dirname
 
 class ModuleHandler(QObject):
@@ -11,23 +11,21 @@ class ModuleHandler(QObject):
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
-    def __init__(self, modObject, window, mW):
+    def __init__(self, modObject, window, mW, uuid):
         super().__init__()
         self.mW = mW
         self.mM = mW.mM
         self.modObject = modObject
         self.window = window
+        self.uuid = uuid
 
         self.instantiateModule()
         self.Assign_To_Window(window)
 
     def instantiateModule(self):
-        #oldPath = sys.path
-        #sys.path.append(dirname(self.modOBject.filePath))
         self.modInstance = self.modObject.modClass(self.mW)
+        self.modInstance.setObjectName(self.uuid)
         self.modInstance.setWindowTitle(self.modObject.name)
 
-        #sys.path = oldPath
-
     def assignToWindow(self, window):
-        self.window.transferModule(self.modInstance)
+        self.window.transferModule(self)
