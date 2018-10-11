@@ -42,7 +42,7 @@ class HardwareDeviceHandler(QObject):
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
-    def __init__(self, mW, deviceModel, loadData):
+    def __init__(self, ds, deviceModel, loadData):
         super().__init__()
         self.deviceModel = deviceModel
         self.loadData = loadData
@@ -50,10 +50,10 @@ class HardwareDeviceHandler(QObject):
         self.programPackets = list()
         self.hardwareReadyStatus = False
 
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
-        self.wM = mW.wM
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
+        self.wM = ds.wM
 
         self.hardwareSettings = dict()
         self.deviceList = list()
@@ -61,7 +61,7 @@ class HardwareDeviceHandler(QObject):
 
         self.iM.Sequence_Unloaded.connect(self.toggleDeferredProgrammingOn)
         self.iM.Sequence_Loaded.connect(self.toggleDeferredProgrammingOff)
-        self.mW.DataStation_Closing.connect(self.shutdown)
+        self.ds.DataStation_Closing.connect(self.shutdown)
 
     def initDeviceThread(self, deviceInformation):
         self.deviceThread = self.deviceModel(deviceInformation, self.hardwareSettings, self.deviceList, self.sourceList)

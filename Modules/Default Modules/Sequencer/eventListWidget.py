@@ -13,11 +13,11 @@ class eventListWidget(QDockWidget):
     STATUS_REMOVED = 603
     STATUS_INVALID = 604
 
-    def __init__(self, mW, sequencerWidget, comp):
-        super().__init__('Sequencer: ' + comp.Get_Standard_Field('name'), parent=mW.sequencerDockWidget)
+    def __init__(self, ds, sequencerWidget, comp):
+        super().__init__('Sequencer: ' + comp.Get_Standard_Field('name'), parent=ds.sequencerDockWidget)
         self.comp = comp
-        self.mW = mW
-        self.iM = mW.iM
+        self.ds = ds
+        self.iM = ds.iM
         self.sequencerWidget = sequencerWidget
         self.setFeatures(QDockWidget.DockWidgetClosable)
         self.setMinimumSize(QSize(750,450))

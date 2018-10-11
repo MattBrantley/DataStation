@@ -15,13 +15,13 @@ class instrumentEditor(DSModule):
     Module_Name = 'Instrument Editor'
     Module_Flags = [mfs.SHOW_ON_CREATION, mfs.FLOAT_ON_CREATION]
 
-    def __init__(self, mW):
-        super().__init__(mW)
-        self.mW = mW
-        self.iM = mW.iM
+    def __init__(self, ds):
+        super().__init__(ds)
+        self.ds = ds
+        self.iM = ds.iM
         self.resize(1000, 800)
         self.fileSystem = DSEditorFSModel()
-        self.rootPath = os.path.join(self.mW.rootDir, 'Instruments')
+        self.rootPath = os.path.join(self.ds.rootDir, 'Instruments')
         self.fsIndex = self.fileSystem.setRootPath(self.rootPath)
 
         self.toolbar = QToolBar()
@@ -32,7 +32,7 @@ class instrumentEditor(DSModule):
         self.toolWidgets = QTabWidget()
         
         self.instrumentNavigator = DSTreeView(self, self.fileSystem)
-        self.componentList = componentsList(self, self.mW)
+        self.componentList = componentsList(self, self.ds)
 
         self.instrumentView = iView(self)
 
@@ -76,8 +76,8 @@ class instrumentEditor(DSModule):
         self.instrumentNavigator.hideColumn(3)
 
     def new(self):
-        self.mW.postLog('Creating new instrument', DSConstants.LOG_PRIORITY_HIGH)
-        fname, ok = QInputDialog.getText(self.mW, "Virtual Instrument Name", "Virtual Instrument Name")
+        self.ds.postLog('Creating new instrument', DSConstants.LOG_PRIORITY_HIGH)
+        fname, ok = QInputDialog.getText(self.ds, "Virtual Instrument Name", "Virtual Instrument Name")
         if(ok):
             self.iM.New_Instrument(name=fname, path=self.rootPath)
         else:
@@ -115,7 +115,7 @@ class instrumentEditor(DSModule):
         self.saveAsInstrument(savePath)
 
     def saveAsInstrument(self, savePath):
-        fname, ok = QInputDialog.getText(self.mW, "Virtual Instrument Name", "Virtual Instrument Name")
+        fname, ok = QInputDialog.getText(self.ds, "Virtual Instrument Name", "Virtual Instrument Name")
         checkPath = os.path.join(savePath, fname + '.dsinstrument')
         if(ok):
             pass
@@ -123,7 +123,7 @@ class instrumentEditor(DSModule):
             return
 
         if(os.path.exists(checkPath)):
-            reply = QMessageBox.question(self.mW, 'File Warning!', 'File exists - overwrite?', QMessageBox.Yes, QMessageBox.No)
+            reply = QMessageBox.question(self.ds, 'File Warning!', 'File exists - overwrite?', QMessageBox.Yes, QMessageBox.No)
             if(reply == QMessageBox.No):
                 return
 
@@ -131,7 +131,7 @@ class instrumentEditor(DSModule):
 
     def saveInstrument(self, savePath):
         if(self.iM.Get_Instrument().Get_Name() == 'Default Instrument'):
-            fname, ok = QInputDialog.getText(self.mW, "Virtual Instrument Name", "Virtual Instrument Name")
+            fname, ok = QInputDialog.getText(self.ds, "Virtual Instrument Name", "Virtual Instrument Name")
             if(ok):
                 self.iM.Get_Instruemnt().Set_Name(fname)
             else:
@@ -199,11 +199,11 @@ class instrumentEditor(DSModule):
         self.saveAsAction.setEnabled(True)
 
 class componentsList(QListWidget):
-    def __init__(self, widget, mW, parent=None):
+    def __init__(self, widget, ds, parent=None):
         super(componentsList, self).__init__(None)
 
-        self.mW = mW
-        self.iM = mW.iM
+        self.ds = ds
+        self.iM = ds.iM
         self.setDragEnabled(True)
         self.setViewMode(QListView.ListMode)
         self.setIconSize(QSize(60, 60))
@@ -232,7 +232,7 @@ class componentsList(QListWidget):
 
     def populateList(self):
         for val in self.iM.Get_Component_Models_Available():
-            tempIcon = QIcon(os.path.join(self.mW.rootDir, 'Components\img\\' + val.iconGraphicSrc))
+            tempIcon = QIcon(os.path.join(self.ds.rootDir, 'Components\img\\' + val.iconGraphicSrc))
             self.addItem(componentItem(tempIcon, val.componentType))
 
 class componentItem(QListWidgetItem):
@@ -371,8 +371,8 @@ class iView(pg.GraphicsWindow):
         super(iView, self).__init__(parent)
 
         self.instrumentWidget = instrumentWidget
-        self.mW = instrumentWidget.mW
-        self.iM = instrumentWidget.mW.iM
+        self.ds = instrumentWidget.ds
+        self.iM = instrumentWidget.ds.iM
         self.setAcceptDrops(True)
         self.view = self.addViewBox()
         self.view.setAspectLocked()
@@ -421,7 +421,7 @@ class iView(pg.GraphicsWindow):
         if(component.Get_Standard_Field('triggerComp') is False):
             try:
                 ivs = component.Get_Custom_Field('iViewSettings')
-                m = iViewComponent(self.mW, component, self, width=1, height=1, pos=(ivs['x'], ivs['y']), angle=ivs['r'])
+                m = iViewComponent(self.ds, component, self, width=1, height=1, pos=(ivs['x'], ivs['y']), angle=ivs['r'])
                 self.view.addItem(m)
                 self.iViewCompList.append(m)
             except:
@@ -458,14 +458,14 @@ class ParamObj:
         return self.__params[param]
 
 class iViewGraphic(pg.GraphicsObject, ParamObj):
-    def __init__(self, mW, src, pen=None, brush=None, **opts):
+    def __init__(self, ds, src, pen=None, brush=None, **opts):
         defaults = dict(width=2, height=2)
-        self.mW = mW
+        self.ds = ds
         defaults.update(opts)
         ParamObj.__init__(self)
         pg.GraphicsObject.__init__(self)
         
-        self.pxm = QPixmap(os.path.join(self.mW.rootDir, 'Components\img\\' + src))
+        self.pxm = QPixmap(os.path.join(self.ds.rootDir, 'Components\img\\' + src))
         self.surfaces = [iViewGraphicBound(self.pxm.width(), self.pxm.height())]
         
         if pen is None:
@@ -528,7 +528,7 @@ class iViewGraphicBound(pg.GraphicsObject, ParamObj):
 
 class iViewObject(pg.GraphicsObject, ParamObj):
     sigStateChanged = pyqtSignal()
-    mW = None
+    ds = None
     index = 0
     instrComp = None
 
@@ -615,19 +615,19 @@ class iViewObject(pg.GraphicsObject, ParamObj):
         pass
 
 class iViewComponent(iViewObject):
-    def __init__(self, mW, instrComp, iView, **params):
+    def __init__(self, ds, instrComp, iView, **params):
         defaults = {
             'width': 1,
             'height': 1,
             'angle' : 180
         }
-        self.mW = mW
+        self.ds = ds
         self.instrComp = instrComp
         self.iView = iView
         defaults.update(params)
         src = instrComp.compSettings['layoutGraphicSrc']
 
-        self.gitem = iViewGraphic(self.mW, src, brush=(100,100,100,255), **defaults)
+        self.gitem = iViewGraphic(self.ds, src, brush=(100,100,100,255), **defaults)
         iViewObject.__init__(self, self.gitem, iView, **defaults)
 
     def onSave(self):

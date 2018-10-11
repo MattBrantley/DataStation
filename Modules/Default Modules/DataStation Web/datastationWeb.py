@@ -8,8 +8,9 @@ class datastationWeb(DSModule):
     Module_Name = 'DataStation Web'
     Module_Flags = [mfs.SHOW_ON_CREATION, mfs.FLOAT_ON_CREATION]
 
-    def __init__(self, mW):
-        super().__init__(mW)
+    def __init__(self, ds):
+        super().__init__(ds)
+        self.ds = ds
         #self.setFeatures(self.features() & ~QDockWidget.DockWidgetClosable & ~QDockWidget.DockWidgetMovable & ~QDockWidget.DockWidgetFloatable & ~QDockWidget.DockWidgetVerticalTitleBar)
         self.browser = QWebEngineView()
         self.browser.load(QUrl("http://news.google.com"))

@@ -14,19 +14,19 @@ class scriptProcessManager():
     tickLength = 50 # Time between worker update cycles (This can slow down dramatically if the main thread lags)
 
     def __init__(self, workspace):
-        #self.processWidget = workspace.mW.processWidget
+        #self.processWidget = workspace.ds.processWidget
         self.workspace = workspace
-        self.mW = self.workspace.mW
+        self.ds = self.workspace.ds
         self.queueUpdateTimer = QTimer()
 
-        self.mW.postLog('Building I/O Managers... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Building I/O Managers... ', DSConstants.LOG_PRIORITY_HIGH)
         for i in range (0, self.numWorkers):
             self.managers.append(procCommManager())
             self.managers[i].clear()
-        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+        self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     #def connectWidgets(self):
-    #    self.processWidget = self.mW.processWidget
+    #    self.processWidget = self.ds.processWidget
     #    self.initTimer()
 
     def getAvailManager(self):
@@ -157,7 +157,7 @@ class userScriptsController():
             print('No import function for extension: ' + ext)
 
     def runImporter(self, importer):
-        fname = QFileDialog.getOpenFileNames(self.parent.mW, 'Open File', self.parent.workspaceURL, filter=importer.genFilter())
+        fname = QFileDialog.getOpenFileNames(self.parent.ds, 'Open File', self.parent.workspaceURL, filter=importer.genFilter())
         for fileURL in fname[0]:
             fileName, fileExtension = os.path.splitext(fileURL)
             self.doImport(fileURL, fileExtension, importer)
@@ -232,20 +232,20 @@ class userScriptsController():
 
         return class_inst
 
-    def initActionForScript(self, script, mW, selectedItem):
-        action = QAction(QIcon(os.path.join(os.path.dirname(__file__), 'icons4\settings-6.png')), script.name, mW)
+    def initActionForScript(self, script, ds, selectedItem):
+        action = QAction(QIcon(os.path.join(os.path.dirname(__file__), 'icons4\settings-6.png')), script.name, ds)
         action.setStatusTip(script.tooltip)
         action.triggered.connect(lambda: self.processManager.submitJob(script, selectedItem))
         return action
 
-    def populateActionMenu(self, menu, scriptType, mW, selectedItem):
+    def populateActionMenu(self, menu, scriptType, ds, selectedItem):
         for script in self.scripts[scriptType.type]:
-            action = self.initActionForScript(script, mW, selectedItem)
+            action = self.initActionForScript(script, ds, selectedItem)
             menu.addAction(action)
 
-    def populateImportMenu(self, menu, mW):
+    def populateImportMenu(self, menu, ds):
         for script in self.scripts['Import']:
-            action = QAction(QIcon(os.path.join(os.path.dirname(__file__), 'icons2\pendrive.png')), script.name, mW)
+            action = QAction(QIcon(os.path.join(os.path.dirname(__file__), 'icons2\pendrive.png')), script.name, ds)
             action.setStatusTip('Import file(s) with ' + script.name)
             action.triggered.connect(functools.partial(self.runImporter, script))
             menu.addAction(action)

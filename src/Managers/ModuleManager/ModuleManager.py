@@ -48,18 +48,18 @@ class ModuleManager(QObject):
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
 
-    def __init__(self, core):
+    def __init__(self, ds):
         super().__init__()
-        self.core = core
-        self.moduleDir = os.path.join(self.core.rootDir, 'Modules')
+        self.ds = ds
+        self.moduleDir = os.path.join(self.ds.rootDir, 'Modules')
         self.modulesAvailable = list()
         self.modules = list()
         self.mainWindows = list()
 
         self.populateMenu()
 
-        self.core.DataStation_Loaded.connect(self.DSLoaded)
-        self.core.DataStation_Closing.connect(self.DSClosing)
+        self.ds.DataStation_Loaded.connect(self.DSLoaded)
+        self.ds.DataStation_Closing.connect(self.DSClosing)
 
 ##### DataStation Reserved Functions #####
 
@@ -71,11 +71,11 @@ class ModuleManager(QObject):
         # Called after all managers are created so they can connect to each other's signals
 
     def DSLoading(self):
-        self.loadScreenWidget = loadingScreenWidget(self.core)
+        self.loadScreenWidget = loadingScreenWidget(self.ds)
 
     def DSLoaded(self):
         self.loadScreenWidget.close()
-        tSaveURL = os.path.join(self.core.srcDir, 'testSave.json')
+        tSaveURL = os.path.join(self.ds.srcDir, 'testSave.json')
         if(os.path.isfile(tSaveURL)):
             with open(tSaveURL, 'r+') as file:
                 try:
@@ -85,7 +85,7 @@ class ModuleManager(QObject):
                     print('ERROR OCCURED LOADING')
 
     def DSClosing(self):
-        tSaveURL = os.path.join(self.core.srcDir, 'testSave.json')
+        tSaveURL = os.path.join(self.ds.srcDir, 'testSave.json')
         with open(tSaveURL, 'w') as file:
             json.dump(self.saveWindowStates(), file, sort_keys=True, indent=4)
 
@@ -103,7 +103,7 @@ class ModuleManager(QObject):
 ##### Module Manager Settings Window #####
 
     def initModuleSettingsWindow(self):
-        self.moduleSettingsWindow = moduleManagerWindow(self.core)
+        self.moduleSettingsWindow = moduleManagerWindow(self.ds)
         #self.moduleSettingsWindow.show()
 
     def showManagerWidget(self):
@@ -127,7 +127,7 @@ class ModuleManager(QObject):
 ##### Windows #####
 
     def addWindow(self):
-        newWindow = DSWindow(self.core)
+        newWindow = DSWindow(self.ds)
         newWindow.setWindowTitle('DataStation Expansion Window #' + str(len(self.mainWindows)+1))
         self.mainWindows.append(newWindow)
         return newWindow
@@ -151,7 +151,7 @@ class ModuleManager(QObject):
 ##### Modules #####
 
     def addModuleInstance(self, module, window, uuid):
-        modHandler = ModuleHandler(module, window, self.core, uuid)
+        modHandler = ModuleHandler(module, window, self.ds, uuid)
         self.modules.append(modHandler)
 
     def restoreModules(self, modDataList, window):
@@ -168,7 +168,7 @@ class ModuleManager(QObject):
 
     def scanModules(self):
         self.modulesAvailable = list()
-        self.core.postLog('Searching For Modules... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Searching For Modules... ', DSConstants.LOG_PRIORITY_HIGH)
 
         for root, dirs, files in os.walk(self.moduleDir):
             for name in files:
@@ -177,9 +177,9 @@ class ModuleManager(QObject):
                 if(res is not False):
                     nMod = ModuleAvailable(self.moduleDir, name, url, res)
                     self.modulesAvailable.append(nMod)
-                    self.core.postLog('   Found Module: ' + name, DSConstants.LOG_PRIORITY_HIGH)
+                    self.ds.postLog('   Found Module: ' + name, DSConstants.LOG_PRIORITY_HIGH)
 
-        self.core.postLog('Finished Searching For Modules!', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Finished Searching For Modules!', DSConstants.LOG_PRIORITY_HIGH)
 
     def verifyModule(self, url):
         mod_name, file_ext = os.path.splitext(os.path.split(url)[-1])

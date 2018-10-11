@@ -12,11 +12,11 @@ class profileSelection(DSModule):
     Module_Name = 'Profile Selection'
     Module_Flags = [mfs.SHOW_ON_CREATION, mfs.FLOAT_ON_CREATION]
 
-    def __init__(self, mW):
-        super().__init__(mW)
+    def __init__(self, ds):
+        super().__init__(ds)
         self.userProfiles = []
-        self.mW = mW
-        self.profilePathFolder = os.path.join(self.mW.rootDir, 'Profiles')
+        self.ds = ds
+        self.profilePathFolder = os.path.join(self.ds.rootDir, 'Profiles')
 
         self.setWindowFlags(self.windowFlags() & QtCore.Qt.CustomizeWindowHint)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowMinMaxButtonsHint)
@@ -29,7 +29,7 @@ class profileSelection(DSModule):
         self.newButton = QPushButton("New")
         self.editButton = QPushButton("Edit")
         self.acceptButton = QPushButton("Accept")
-        self.mW = mW
+        self.ds = ds
 
         self.loginLayout.addWidget(self.userList)
         self.buttonLayout.addWidget(self.newButton)
@@ -70,7 +70,7 @@ class profileSelection(DSModule):
 
     def finishModal(self):
         self.hide()
-        self.mW.finishInitWithUser(self.userProfiles[self.userList.currentRow()])
+        self.ds.finishInitWithUser(self.userProfiles[self.userList.currentRow()])
 
     def showNewUserPopup(self):
         self.newUserPopup.loadSettings(None)
@@ -79,7 +79,7 @@ class profileSelection(DSModule):
         self.newUserPopup.loadSettings(self.userProfiles[self.userList.currentRow()])
 
     def populateUserProfiles(self):
-        self.mW.postLog('Loading User Profiles... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Loading User Profiles... ', DSConstants.LOG_PRIORITY_HIGH)
         self.userList.clear()
         self.userProfiles = []
 
@@ -92,7 +92,7 @@ class profileSelection(DSModule):
                     self.userList.addItem(userProfile['Last Name'] + ', ' + userProfile['First Name'])
 
         self.profileSelectionChanged(-1)
-        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=True)
+        self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=True)
     
     def loadUserProfile(self, url): # 'First Name' and 'Last Name' are the only required fields.
         with open(url, 'r') as file:
@@ -103,7 +103,7 @@ class profileSelection(DSModule):
                         profileData['url'] = url
                         return profileData
             except ValueError as e:
-                self.mW.postLog('Corrupted user profile at (' + url + ')!! ', DSConstants.LOG_PRIORITY_MED)
+                self.ds.postLog('Corrupted user profile at (' + url + ')!! ', DSConstants.LOG_PRIORITY_MED)
 
         return None
 
@@ -120,18 +120,18 @@ class profileSelection(DSModule):
             self.editButton.setEnabled(False)
 
     def closeEvent(self, event):
-        self.mW.postLog('No User Profile selected...', DSConstants.LOG_PRIORITY_HIGH)
-        self.mW.signalClose()
+        self.ds.postLog('No User Profile selected...', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.signalClose()
         event.accept()
 
     def updateUserProfile(self):
-        if(any(self.mW.wM.userProfile) and ('url' in self.mW.wM.userProfile)):
-            self.mW.postLog('Updating User Profile... (' + self.mW.wM.userProfile['url'] + ').. ', DSConstants.LOG_PRIORITY_HIGH)        
-            with open(self.mW.wM.userProfile['url'], 'w') as file:
-                json.dump(self.mW.wM.userProfile, file)
+        if(any(self.ds.wM.userProfile) and ('url' in self.ds.wM.userProfile)):
+            self.ds.postLog('Updating User Profile... (' + self.ds.wM.userProfile['url'] + ').. ', DSConstants.LOG_PRIORITY_HIGH)        
+            with open(self.ds.wM.userProfile['url'], 'w') as file:
+                json.dump(self.ds.wM.userProfile, file)
                 time.sleep(1) #NOT ELEGANT - NEED CROSS PLATFORM SOLUTION
         else:
-            self.mW.postLog('Error Updating User Profile or No Profile Loaded.', DSConstants.LOG_PRIORITY_HIGH)        
+            self.ds.postLog('Error Updating User Profile or No Profile Loaded.', DSConstants.LOG_PRIORITY_HIGH)        
 
 class newProfileDockWidget(QDockWidget):
     def __init__(self, loginWindow, profileData):
@@ -212,7 +212,7 @@ class newProfileDockWidget(QDockWidget):
         while(os.path.isfile(savePathAppend)):
             savePathAppend = savePath + str(num) + '.dsprofile'
             num = num + 1
-        self.loginWindow.mW.postLog('Writing User Profile... (' + savePathAppend + ').. ', DSConstants.LOG_PRIORITY_HIGH)
+        self.loginWindow.ds.postLog('Writing User Profile... (' + savePathAppend + ').. ', DSConstants.LOG_PRIORITY_HIGH)
         if(self.profileData is None):
             with open(savePathAppend, 'w') as file:
                 json.dump(userProfile, file)
@@ -221,7 +221,7 @@ class newProfileDockWidget(QDockWidget):
                 os.remove(self.profileData['url'])
             with open(savePathAppend, 'w') as file:
                 json.dump(userProfile, file)
-        self.loginWindow.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+        self.loginWindow.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
         self.loginWindow.populateUserProfiles()
         self.hide()

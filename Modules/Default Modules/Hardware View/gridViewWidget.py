@@ -10,19 +10,20 @@ from src.Managers.HardwareManager.Sources import AOSource, AISource, DOSource, D
 class gridViewWidget(QWidget):
     doNotAutoPopulate = True
 
-    def __init__(self, mW):
+    def __init__(self, dockWidget, ds):
         super().__init__()
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
-        self.wM = mW.wM
+        self.dockWidget = dockWidget
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
+        self.wM = ds.wM
 
         self.socketList = list()
         self.sourceList = list()
 
-        self.filterStackWidget = filterStackWidget(self.mW)
+        self.filterStackWidget = filterStackWidget(dockWidget, self.ds)
         self.filterStackWidget.setObjectName('filterStackWidget')
-        self.mW.addDockWidget(Qt.BottomDockWidgetArea, self.filterStackWidget)
+        self.dockWidget.Get_Window().addDockWidget(Qt.BottomDockWidgetArea, self.filterStackWidget)
         self.filterStackWidget.hide()
         self.filterStackWidget.setFloating(True)
 
@@ -41,7 +42,7 @@ class gridViewWidget(QWidget):
         self.gridWidget = QGraphicsView()
         self.gridTransform = QTransform()
         self.gridWidget.setTransform(self.gridTransform)
-        self.iScene = iScene(self, self.gridTransform, self.mW)
+        self.iScene = iScene(self, self.gridTransform, self.ds)
         gridRect = QRectF(0, 0, 1600, 1600)
         self.gridWidget.setSceneRect(gridRect)
         self.gridWidget.setScene(self.iScene)
@@ -136,12 +137,12 @@ class iScene(QGraphicsScene):
     itemList = list()
     highlightList = list()
 
-    def __init__(self, widget, transform, mW):
+    def __init__(self, widget, transform, ds):
         super().__init__()
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
-        self.wM = mW.wM
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
+        self.wM = ds.wM
         self.widget = widget
         self.transform = transform
 
@@ -155,7 +156,7 @@ class iScene(QGraphicsScene):
         return len(self.widget.sourceList)*self.cellHeight + self.marginTop
 
     def connectPlugsAndSockets(self):
-        #self.widget.mW.controlWidget.configChanged()
+        #self.widget.ds.controlWidget.configChanged()
         self.clearItems()
         for socket in self.widget.socketList:
             #if(socket.cP.isTriggerComponent is True):
@@ -227,12 +228,12 @@ class iScene(QGraphicsScene):
             self.drawColHighlight(col, QColor(255, 255, 117))
 
     def drawRowHighlight(self, row, color):
-        rowObj = iSceneRowHighlight(self, row, color, self.mW)
+        rowObj = iSceneRowHighlight(self, row, color, self.ds)
         self.addItem(rowObj)
         self.highlightList.append(rowObj)
 
     def drawColHighlight(self, col, color):
-        colObj = iSceneColHighlight(self, col, color, self.mW)
+        colObj = iSceneColHighlight(self, col, color, self.ds)
         self.addItem(colObj)
         self.highlightList.append(colObj)
 
@@ -286,7 +287,7 @@ class iScene(QGraphicsScene):
             self.clearCol(col)
         if(self.multiConnectSockets is False):
             self.clearRow(row)
-        item = iSceneItem(self, col, row, None, color, self.mW)
+        item = iSceneItem(self, col, row, None, color, self.ds)
         self.addItem(item)
         self.itemList.append(item)
 
@@ -328,14 +329,14 @@ class iScene(QGraphicsScene):
         return QPointF(tempX, tempY)
 
 class iSceneItem(QGraphicsRectItem):
-    def __init__(self, scene, row, col, status, color, mW):
+    def __init__(self, scene, row, col, status, color, ds):
         self.row = row
         self.col = col
         self.iScene = scene
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
-        self.wM = mW.wM
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
+        self.wM = ds.wM
         point = self.iScene.getPointAtGrid(row, col)
         super().__init__(point.x()+2, point.y()+2, iScene.cellWidth-4, iScene.cellHeight-4)
         if(color == 'red'):
@@ -344,14 +345,14 @@ class iSceneItem(QGraphicsRectItem):
             self.setBrush(QColor(100, 100, 100))
 
 class iSceneRowHighlight(QGraphicsRectItem):
-    def __init__(self, scene, row, color, mW):
+    def __init__(self, scene, row, color, ds):
         self.row = row
         self.color = color
         self.iScene = scene
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
-        self.wM = mW.wM
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
+        self.wM = ds.wM
         point = self.iScene.getPointAtGrid(row,0)
         super().__init__(0, point.y(), self.iScene.sceneWidth(), self.iScene.cellHeight)
         self.setBrush(color)
@@ -361,14 +362,14 @@ class iSceneRowHighlight(QGraphicsRectItem):
         self.setZValue(-50)
 
 class iSceneColHighlight(QGraphicsRectItem):
-    def __init__(self, scene, col, color, mW):
+    def __init__(self, scene, col, color, ds):
         self.col = col
         self.color = color
         self.iScene = scene
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
-        self.wM = mW.wM
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
+        self.wM = ds.wM
         point = self.iScene.getPointAtGrid(0, col)
         super().__init__(point.x(), 0, self.iScene.cellWidth, self.iScene.sceneHeight())
         self.setBrush(color)

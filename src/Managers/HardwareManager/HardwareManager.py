@@ -98,24 +98,24 @@ class HardwareManager(QObject):
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
-    def __init__(self, mW):
+    def __init__(self, ds):
         super().__init__()
 
-        self.mW = mW
+        self.ds = ds
         self.readyStatus = False
-        self.filtersDir = os.path.join(self.mW.rootDir, 'Filters')
-        self.hardwareDriverDir = os.path.join(self.mW.rootDir, 'Hardware Drivers')
+        self.filtersDir = os.path.join(self.ds.rootDir, 'Filters')
+        self.hardwareDriverDir = os.path.join(self.ds.rootDir, 'Hardware Drivers')
         self.filtersAvailable = list()
         self.driversAvailable = list()
         self.deviceHandlerList = list()
         self.sourceObjList = list()
         self.filterList = list()
 
-        self.mW.DataStation_Closing.connect(self.saveHardwareState)
+        self.ds.DataStation_Closing.connect(self.saveHardwareState)
 
     def connections(self, iM, wM):
-        self.iM = self.mW.iM
-        self.wM = self.mW.wM
+        self.iM = self.ds.iM
+        self.wM = self.ds.wM
 
 ##### DataStation Reserved Functions #####
 
@@ -220,10 +220,10 @@ class HardwareManager(QObject):
         return outList
 
     def getTrigCompsRefUUID(self, uuid):
-        return self.mW.iM.getTrigCompsRefUUID(uuid)
+        return self.ds.iM.getTrigCompsRefUUID(uuid)
     
     def removeCompByUUID(self, uuid):
-        return self.mW.iM.removeCompByUUID(uuid)
+        return self.ds.iM.removeCompByUUID(uuid)
 
     def getHardwareObjectByUUID(self, uuid):
         for deviceHandler in self.devoceHandlerList:
@@ -254,7 +254,7 @@ class HardwareManager(QObject):
 ##### Initialization Functions #####
 
     def loadFilters(self):
-        self.mW.postLog('Loading User Filters... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Loading User Filters... ', DSConstants.LOG_PRIORITY_HIGH)
 
         for root, dirs, files in os.walk(self.filtersDir):
             for name in files:
@@ -263,10 +263,10 @@ class HardwareManager(QObject):
                 if (filterHolder != None):
                     self.filtersAvailable.append(filterHolder)
 
-        self.mW.postLog('Finished Loading User Filters!', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Finished Loading User Filters!', DSConstants.LOG_PRIORITY_HIGH)
 
     def loadHardwareDrivers(self):
-        self.mW.postLog('Loading Hardware Drivers... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Loading Hardware Drivers... ', DSConstants.LOG_PRIORITY_HIGH)
 
         for root, dirs, files in os.walk(self.hardwareDriverDir):
             for name in files:
@@ -275,12 +275,12 @@ class HardwareManager(QObject):
                 if (driverHolder != None):
                     self.driversAvailable.append(driverHolder)
 
-        self.mW.postLog('Finished Loading Hardware Drivers!', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Finished Loading Hardware Drivers!', DSConstants.LOG_PRIORITY_HIGH)
 
     def loadLabviewInterface(self):
-        self.mW.postLog('Initializing DataStation Labview Interface... ', DSConstants.LOG_PRIORITY_HIGH)
-        self.lvInterface = DataStation_LabviewExtension(self.mW)
-        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+        self.ds.postLog('Initializing DataStation Labview Interface... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.lvInterface = DataStation_LabviewExtension(self.ds)
+        self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     def loadFilterFromFile(self, filepath):
         class_inst = None
@@ -290,7 +290,7 @@ class HardwareManager(QObject):
         loaded = False
 
         if file_ext.lower() == '.py':
-            self.mW.postLog('   Found Filter Script: ' + filepath, DSConstants.LOG_PRIORITY_MED)
+            self.ds.postLog('   Found Filter Script: ' + filepath, DSConstants.LOG_PRIORITY_MED)
             py_mod = imp.load_source(mod_name, filepath)
         else:
             return
@@ -300,15 +300,15 @@ class HardwareManager(QObject):
                 loaded = True
                 class_temp = getattr(py_mod, expected_class)(filepath)
                 class_temp.hM = self
-                class_temp.mW = self.mW
-                class_temp.iM = self.mW.iM
+                class_temp.ds = self.ds
+                class_temp.iM = self.ds.iM
                 if isinstance(class_temp, Filter):  # verify that Filter inherits the correct class
                     class_inst = class_temp
 
         if(loaded):
-            self.mW.postLog('  (Success!)', DSConstants.LOG_PRIORITY_MED, newline=False)
+            self.ds.postLog('  (Success!)', DSConstants.LOG_PRIORITY_MED, newline=False)
         else:
-            self.mW.postLog(' (Failed!)', DSConstants.LOG_PRIORITY_MED, newline=False)
+            self.ds.postLog(' (Failed!)', DSConstants.LOG_PRIORITY_MED, newline=False)
 
         class_inst.hM = self
         #class_inst.setupWidgets()
@@ -322,7 +322,7 @@ class HardwareManager(QObject):
         loaded = False
 
         if file_ext.lower() == '.py':
-            self.mW.postLog('   Found Hardware Driver: ' + filepath, DSConstants.LOG_PRIORITY_MED)
+            self.ds.postLog('   Found Hardware Driver: ' + filepath, DSConstants.LOG_PRIORITY_MED)
             py_mod = imp.load_source(mod_name, filepath)
         else:
             return
@@ -335,9 +335,9 @@ class HardwareManager(QObject):
                     loaded = True
                 
         if(loaded):
-            self.mW.postLog('  (Success!)', DSConstants.LOG_PRIORITY_MED, newline=False)
+            self.ds.postLog('  (Success!)', DSConstants.LOG_PRIORITY_MED, newline=False)
         else:
-            self.mW.postLog(' (Failed!)', DSConstants.LOG_PRIORITY_MED, newline=False)
+            self.ds.postLog(' (Failed!)', DSConstants.LOG_PRIORITY_MED, newline=False)
 
         return class_inst
 
@@ -351,14 +351,14 @@ class HardwareManager(QObject):
                 newFilter.onLoad(data)
                 #newFilter.Attach_Input(filterInputSource, pathNo)
             else:
-                self.mW.postLog('Attempting To Restore Filter With Identifier (' + data['filterIdentifier'] + ') But Could Not Find Matching User_Filter... ', DSConstants.LOG_PRIORITY_HIGH)
+                self.ds.postLog('Attempting To Restore Filter With Identifier (' + data['filterIdentifier'] + ') But Could Not Find Matching User_Filter... ', DSConstants.LOG_PRIORITY_HIGH)
             return newFilter
         return None
 
     def addFilter(self, filterModel, loadData=None):
         if(filterModel is not None):
             newFilter = type(filterModel)(self)
-            newFilter.mW = self.mW
+            newFilter.ds = self.ds
             newFilter.iM = self.iM
             newFilter.hM = self
             newFilter.wM = self.wM
@@ -368,7 +368,7 @@ class HardwareManager(QObject):
             if(loadData is not None):
                 newFilter.loadPacket(loadData)
 
-            self.mW.postLog('Added Filter: ' + newFilter.Get_Type(), DSConstants.LOG_PRIORITY_MED)
+            self.ds.postLog('Added Filter: ' + newFilter.Get_Type(), DSConstants.LOG_PRIORITY_MED)
             self.Filter_Added.emit(newFilter)
             return newFilter
         return None
@@ -379,13 +379,13 @@ class HardwareManager(QObject):
         pass
 
     def addDigitalTriggerComp(self, hardwareObj):
-        triggerComp = self.mW.iM.addCompToInstrument(Digital_Trigger_Component)
+        triggerComp = self.ds.iM.addCompToInstrument(Digital_Trigger_Component)
         triggerComp.onConnect(hardwareObj.hardwareSettings['name'], hardwareObj.hardwareSettings['uuid'])
         return triggerComp
 
     def addHardwareObj(self, deviceModel, loadData=None):
         #tempHardware = type(hardwareModel)(self)
-        newHandler = HardwareDeviceHandler(self.mW, type(deviceModel), loadData)
+        newHandler = HardwareDeviceHandler(self.ds, type(deviceModel), loadData)
         self.deviceHandlerList.append(newHandler)
         self.Hardware_Added.emit(newHandler)
         newHandler.initDeviceThread(self.lvInterface.devices)
@@ -397,16 +397,16 @@ class HardwareManager(QObject):
         self.deviceHandlerList.remove(deviceHandler)
 
     def loadHardwareState(self):
-        self.mW.postLog('Restoring Hardware State... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Restoring Hardware State... ', DSConstants.LOG_PRIORITY_HIGH)
         if('hardwareState' in self.wM.settings):
             tempHardwareSettings = self.wM.settings['hardwareState']
-            self.mW.wM.settings['hardwareState'] = None
+            self.ds.wM.settings['hardwareState'] = None
             if(self.processHardwareData(tempHardwareSettings) is True):
-                self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+                self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
             else:
-                self.mW.postLog('Error Loading Hardware State - Aborting!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+                self.ds.postLog('Error Loading Hardware State - Aborting!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
         else:
-            self.mW.postLog('No Hardware State Found - Aborting!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+            self.ds.postLog('No Hardware State Found - Aborting!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
         self.Hardware_State_Loaded.emit()
 
@@ -418,10 +418,10 @@ class HardwareManager(QObject):
                     if(hardwareModel is not None):
                         self.addHardwareObj(hardwareModel, loadData=state)
                     else:
-                        self.mW.postLog('Hardware Component State Found (Identifier: ' + state['hardwareIdentifier'] + ') But No Drivers Are Present For This Identifier! Partial Hardware State Import Continuing...', DSConstants.LOG_PRIORITY_HIGH)
+                        self.ds.postLog('Hardware Component State Found (Identifier: ' + state['hardwareIdentifier'] + ') But No Drivers Are Present For This Identifier! Partial Hardware State Import Continuing...', DSConstants.LOG_PRIORITY_HIGH)
                         
                 else:
-                    self.mW.postLog('Hardware Component State Data Corrupted! Partial Hardware State Import Continuing...', DSConstants.LOG_PRIORITY_HIGH)
+                    self.ds.postLog('Hardware Component State Data Corrupted! Partial Hardware State Import Continuing...', DSConstants.LOG_PRIORITY_HIGH)
 
             for filterState in hardwareData['filters']:
                 if(('filterIdentifier') in filterState):
@@ -429,10 +429,10 @@ class HardwareManager(QObject):
                     if(filterModel is not None):
                         self.addFilter(filterModel, loadData=filterState)
                     else:
-                        self.mW.postLog('Filter State Found (Identifier: ' + filterState['filterIdentifier'] + ') But No Filter Models Are Present For This Identifier! Partial Hardware State Import Continuing...', DSConstants.LOG_PRIORITY_HIGH)
+                        self.ds.postLog('Filter State Found (Identifier: ' + filterState['filterIdentifier'] + ') But No Filter Models Are Present For This Identifier! Partial Hardware State Import Continuing...', DSConstants.LOG_PRIORITY_HIGH)
                         
                 else:
-                    self.mW.postLog('Filter State Data Corrupted! Partial Hardware State Import Continuing...', DSConstants.LOG_PRIORITY_HIGH)
+                    self.ds.postLog('Filter State Data Corrupted! Partial Hardware State Import Continuing...', DSConstants.LOG_PRIORITY_HIGH)
                         
 
             return True
@@ -440,7 +440,7 @@ class HardwareManager(QObject):
             return False
 
     def saveHardwareState(self):
-        self.mW.postLog('Recording Hardware State... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Recording Hardware State... ', DSConstants.LOG_PRIORITY_HIGH)
         savePacket = dict()
         savePacket['hardwareStates'] = list()
         savePacket['filters'] = list()
@@ -454,4 +454,4 @@ class HardwareManager(QObject):
 
         self.wM.settings['hardwareState'] = savePacket
 
-        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH)

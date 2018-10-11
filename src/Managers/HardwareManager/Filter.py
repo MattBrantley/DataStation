@@ -65,7 +65,7 @@ class Filter():
         self.filterSettings['inputSourcePathNo'] = None
 
         self.iM = None # These are defined by hardwareManager immediately after generation
-        self.mW = None # These are defined by hardwareManager immediately after generation
+        self.ds = None # These are defined by hardwareManager immediately after generation
         self.hM = None # These are defined by hardwareManager immediately after generation
         self.hW = None # These are defined by hardwareManager immediately after generation
 
@@ -177,7 +177,7 @@ class Filter():
         if(len(target) == 0):
             self.filterSettings['inputSource'] = None
             self.filterSettings['inputSourcePathNo'] = None
-            self.mW.postLog('FILTER RESTORE ERROR: ' + self.filterSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Filter/Source that does not exist!!!' , DSConstants.LOG_PRIORITY_MED)
+            self.ds.postLog('FILTER RESTORE ERROR: ' + self.filterSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Filter/Source that does not exist!!!' , DSConstants.LOG_PRIORITY_MED)
             return # No Filter or Source found at that uuid - clear this filter's reference.
 
     def attachInput(self, uuid, pathNumber):

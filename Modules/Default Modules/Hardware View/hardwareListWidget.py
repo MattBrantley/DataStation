@@ -9,15 +9,16 @@ from src.Managers.HardwareManager.Sources import AOSource, AISource, DOSource, D
 
 class hardwareListWidget(QWidget):
 
-    def __init__(self, mW):
+    def __init__(self, dockWidget, ds):
         super().__init__()
-        self.mW = mW
-        self.hM = mW.hM
-        self.iM = mW.iM
-        self.wM = mW.wM
+        self.dockWidget = dockWidget
+        self.ds = ds
+        self.hM = ds.hM
+        self.iM = ds.iM
+        self.wM = ds.wM
 
         self.mainLayout = QVBoxLayout()
-        self.hardwareList = hardwareListView(self, self.mW)
+        self.hardwareList = hardwareListView(self.dockWidget.Get_Window(), self.ds)
         self.setLayout(self.mainLayout)
 
         self.scroll = QScrollArea(self)
@@ -36,23 +37,23 @@ class hardwareListWidget(QWidget):
     def newButtonPressed(self):
         menu = QMenu()
 
-        hardwareMenuAction = hardwareSelectionWidget(self, menu, self.mW)
+        hardwareMenuAction = hardwareSelectionWidget(self, menu, self.ds)
         menu.addAction(hardwareMenuAction)
         action = menu.exec_(QCursor().pos())
 
     def addHardware(self, hardwareObj):
-        widgetItem = hardwareListItem(self.hardwareList, self.mW, hardwareObj)
+        widgetItem = hardwareListItem(self.hardwareList, self.ds, hardwareObj)
         
         self.hardwareList.addWidget(widgetItem)
 
 class hardwareListView(QWidget):
 
-    def __init__(self, parent, mW):
+    def __init__(self, parent, ds):
         super().__init__()
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
-        self.wM = mW.wM
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
+        self.wM = ds.wM
         self.parent = parent
         self.hardwareItemList = list()
         self.mainLayout = QVBoxLayout()
@@ -71,25 +72,25 @@ class hardwareListItem(QWidget):
     heightMaximized = 400
     state = 'min'
 
-    def __init__(self, hardwareListView, mW, hardwareObj):
+    def __init__(self, hardwareListView, ds, hardwareObj):
         super().__init__()
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
-        self.wM = mW.wM
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
+        self.wM = ds.wM
         self.hardwareListView = hardwareListView
         self.hardwareObj = hardwareObj
-        self.msgWidget = driverMessageWidget(self.mW)
+        self.msgWidget = driverMessageWidget(self.ds)
 
         self.configButton = QPushButton()
-        self.configIcon = QIcon(os.path.join(self.mW.srcDir, 'icons5\settings.png'))
+        self.configIcon = QIcon(os.path.join(self.ds.srcDir, 'icons5\settings.png'))
         self.configButton.setIcon(self.configIcon)
         self.configButton.setIconSize(QSize(16,16))
         self.configButton.pressed.connect(self.showConfigWidget)
 
         self.statusButton = QPushButton()
-        self.statusIconNotReady = QIcon(os.path.join(self.mW.srcDir, 'icons5\warning.png'))
-        self.statusIconReady = QIcon(os.path.join(self.mW.srcDir, r'icons5\rotate.png'))
+        self.statusIconNotReady = QIcon(os.path.join(self.ds.srcDir, 'icons5\warning.png'))
+        self.statusIconReady = QIcon(os.path.join(self.ds.srcDir, r'icons5\rotate.png'))
         self.statusButton.setIcon(self.statusIconNotReady)
         self.statusButton.setIconSize(QSize(16,16))
         #self.configButton.pressed.connect(self.showConfigWidget)
@@ -118,7 +119,7 @@ class hardwareListItem(QWidget):
         self.botPortionLayout = QVBoxLayout()
         self.botPortion.setLayout(self.botPortionLayout)
         self.sourceLabel = QLabel("Sources:")
-        self.sourceListWidget = sourceListWidget(self.hardwareObj, self.mW)
+        self.sourceListWidget = sourceListWidget(self.hardwareObj, self.ds)
         self.botPortionLayout.addWidget(self.sourceLabel)
         self.botPortionLayout.addWidget(self.sourceListWidget)
 
@@ -279,7 +280,7 @@ class hardwareListItem(QWidget):
 
     def showConfigWidget(self):
         menu = QMenu()
-        hardwareConfig = QWidgetAction(self.mW)
+        hardwareConfig = QWidgetAction(self.ds)
         hardwareConfig.setDefaultWidget(hardwareConfigWidget(self.hardwareObj))
         menu.addAction(hardwareConfig)
 
@@ -298,14 +299,14 @@ class hardwareListItem(QWidget):
             return
 
 class hardwareSelectionWidget(QWidgetAction):
-    def __init__(self, parent, menu, mW):
+    def __init__(self, parent, menu, ds):
         super().__init__(None)
         self.parent = parent
         self.menu = menu
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
-        self.wM = mW.wM
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
+        self.wM = ds.wM
         self.pWidget = QWidget()
         self.pLayout = QVBoxLayout()
         self.pSpinBox = QListWidget()
@@ -333,13 +334,13 @@ class hardwareSelectionItem(QListWidgetItem):
         self.hardwareModel = hardwareModel
 
 class sourceListWidget(QListWidget):
-    def __init__(self, hardwareObj, mW):
+    def __init__(self, hardwareObj, ds):
         super().__init__()
         self.hardwareObj = hardwareObj
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
-        self.wM = mW.wM
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
+        self.wM = ds.wM
 
         self.hM.Source_Added.connect(self.addSource)
         self.hM.Source_Removed.connect(self.removeSource)
@@ -351,7 +352,7 @@ class sourceListWidget(QListWidget):
 
     def addSource(self, hardwareObj, source):
         if(hardwareObj is self.hardwareObj):
-            self.addItem(sourceListItem(source, self.mW))
+            self.addItem(sourceListItem(source, self.ds))
 
     def removeSource(self, hardwareObj, source):
         removeRow = None
@@ -363,24 +364,24 @@ class sourceListWidget(QListWidget):
             self.takeItem(removeRow)
 
 class sourceListItem(QListWidgetItem):
-    def __init__(self, source, mW):
+    def __init__(self, source, ds):
         super().__init__()
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
-        self.wM = mW.wM
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
+        self.wM = ds.wM
         self.source = source
         self.setText(self.source.Get_Name())
         self.setFlags(self.flags() | Qt.ItemIsUserCheckable)
         self.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
 class driverMessageWidget(QListWidget):
-    def __init__(self, mW):
+    def __init__(self, ds):
         super().__init__()
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
-        self.wM = mW.wM
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
+        self.wM = ds.wM
         self.maximumHeight = 150
 
 class hardwareConfigWidget(QWidget):

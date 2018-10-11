@@ -18,12 +18,12 @@ class Sequencer(DSModule):
     Module_Flags = [mfs.SHOW_ON_CREATION, mfs.FLOAT_ON_CREATION]
     ITEM_GUID = Qt.UserRole
 
-    def __init__(self, mW):
-        super().__init__(mW)
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
-        self.wM = mW.wM
+    def __init__(self, ds):
+        super().__init__(ds)
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
+        self.wM = ds.wM
         self.plotPaddingPercent = 1
         self.plotList = list()
         self.resize(1000, 800)
@@ -31,8 +31,8 @@ class Sequencer(DSModule):
         self.xMin = 0
         self.xMax = 1
 
-        self.sequenceNavigator = DSTreeView(self.mW, self)
-        self.sequenceView = DSGraphicsLayoutWidget(self.mW, self)
+        self.sequenceNavigator = DSTreeView(self.ds, self)
+        self.sequenceView = DSGraphicsLayoutWidget(self.ds, self)
         self.initActionsAndToolbar()
         self.initLayout()
 
@@ -57,7 +57,7 @@ class Sequencer(DSModule):
         self.saveAsAction.triggered.connect(self.iM.saveSequenceAs)
 
         self.toggleTree = QToolButton(self)
-        self.toggleTree.setIcon(QIcon(os.path.join(self.mW.srcDir, 'icons3\css.png')))
+        self.toggleTree.setIcon(QIcon(os.path.join(self.ds.srcDir, 'icons3\css.png')))
         self.toggleTree.setCheckable(True)
         self.toggleTree.setStatusTip('Show/Hide The Sequence Browser')
         self.toggleTree.toggled.connect(self.treeToggled)
@@ -104,12 +104,12 @@ class Sequencer(DSModule):
 
 class DSGraphicsLayoutWidget(pg.GraphicsLayoutWidget):
 
-    def __init__(self, mW, dockWidget):
+    def __init__(self, ds, dockWidget):
         super().__init__()
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
-        self.wM = mW.wM
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
+        self.wM = ds.wM
 
         self.xMin = 0
         self.xMax = 1
@@ -131,7 +131,7 @@ class DSGraphicsLayoutWidget(pg.GraphicsLayoutWidget):
         settings = component.Get_Custom_Field('sequencerSettings')
         if(settings['show'] is True):
             self.nextRow()
-            plot = DSPlotItem(self.mW, self, component)
+            plot = DSPlotItem(self.ds, self, component)
             self.plotList.append(plot)
 
             if(len(self.plotList) == 1):
@@ -219,11 +219,11 @@ class DSGraphicsLayoutWidget(pg.GraphicsLayoutWidget):
 class DSPlotItem():
     plotPaddingPercent = 1
 
-    def __init__(self, mW, plotLayout, comp):
+    def __init__(self, ds, plotLayout, comp):
         super().__init__()
 
-        self.mW = mW
-        self.iM = mW.iM
+        self.ds = ds
+        self.iM = ds.iM
         self.component = comp
         self.plotLayout = plotLayout
         self.plotItem = plotLayout.addPlot()
@@ -231,7 +231,7 @@ class DSPlotItem():
         self.showXAxis = True
         self.plotDataList = list()
 
-        self.sequencerEditWidget = eventListWidget(mW, plotLayout.dockWidget, comp)
+        self.sequencerEditWidget = eventListWidget(ds, plotLayout.dockWidget, comp)
         a = sequencePlotDataItem(x=[-90, 90], y=[0, 0], pen = self.pen)
         self.plotItem.addItem(a)
 
@@ -446,13 +446,13 @@ class DSEditorFSModel(QFileSystemModel):
             return super(QFileSystemModel, self).headerData(section, orientation, role)
 
 class DSTreeView(QTreeView):
-    def __init__(self, dockWidget, mW):
+    def __init__(self, dockWidget, ds):
         super().__init__()
         self.dockWidget = dockWidget
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
-        self.wM = mW.wM
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
+        self.wM = ds.wM
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.rightClick)
 

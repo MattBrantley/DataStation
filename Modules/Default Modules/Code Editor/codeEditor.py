@@ -9,9 +9,9 @@ class codeEditor(DSModule):
     Module_Name = 'Code Editor'
     Module_Flags = [mfs.SHOW_ON_CREATION, mfs.FLOAT_ON_CREATION]
 
-    def __init__(self, mW):
-        super().__init__(mW)
-        self.mW = mW
+    def __init__(self, ds):
+        super().__init__(ds)
+        self.ds = ds
         self.resize(1000, 800)
 
         self.initActions()

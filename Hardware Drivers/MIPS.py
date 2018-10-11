@@ -34,54 +34,57 @@ class MIPS(HardwareDevice):
         self.scanned.emit()
 
     def initialize(self, deviceName):
-        if(deviceName != ''):
-            self.reportTime = ms()
-            self.runTable = False
-            with serial.Serial(deviceName, 115200, timeout=1) as ser:
-                ser.write(b'GCHAN,DCB\r\n')
-                response = ser.readline()
-                if(response is not None):
-                    numDCB = self.MIPSYResponseToInt(response)
-                else:
-                    numDCB = 0
+        try:
+            if(deviceName != ''):
+                self.reportTime = ms()
+                self.runTable = False
+                with serial.Serial(deviceName, 115200, timeout=1) as ser:
+                    ser.write(b'GCHAN,DCB\r\n')
+                    response = ser.readline()
+                    if(response is not None):
+                        numDCB = self.MIPSYResponseToInt(response)
+                    else:
+                        numDCB = 0
 
-                for channel in range(numDCB):
-                    chOut = str(channel+1)
-                    nameTemp = deviceName + '/DCB/CH' + chOut
-                    ser.write(b'GDCMIN,' + chOut.encode('ascii') + b'\r\n')
-                    minTemp = self.MIPSYResponseToFloat(ser.readline())
-                    ser.write(b'GDCMAX,' + chOut.encode('ascii') + b'\r\n')
-                    maxTemp = self.MIPSYResponseToFloat(ser.readline())
-                    self.Add_AOSource('DCB/'+chOut, minTemp, maxTemp, 0.1)
+                    for channel in range(numDCB):
+                        chOut = str(channel+1)
+                        nameTemp = deviceName + '/DCB/CH' + chOut
+                        ser.write(b'GDCMIN,' + chOut.encode('ascii') + b'\r\n')
+                        minTemp = self.MIPSYResponseToFloat(ser.readline())
+                        ser.write(b'GDCMAX,' + chOut.encode('ascii') + b'\r\n')
+                        maxTemp = self.MIPSYResponseToFloat(ser.readline())
+                        self.Add_AOSource('DCB/'+chOut, minTemp, maxTemp, 0.1)
 
-                # MIPS has no way to poll Digital Out and Digital In channel counts seperately
-                self.Add_DOSource('DIO/A')
-                self.Add_DOSource('DIO/B')
-                self.Add_DOSource('DIO/C')
-                self.Add_DOSource('DIO/D')
-                self.Add_DOSource('DIO/E')
-                self.Add_DOSource('DIO/F')
-                self.Add_DOSource('DIO/G')
-                self.Add_DOSource('DIO/H')
-                self.Add_DOSource('DIO/I')
-                self.Add_DOSource('DIO/J')
-                self.Add_DOSource('DIO/K')
-                self.Add_DOSource('DIO/L')
-                self.Add_DOSource('DIO/M')
-                self.Add_DOSource('DIO/N')
-                self.Add_DOSource('DIO/O')
-                self.Add_DOSource('DIO/P')
+                    # MIPS has no way to poll Digital Out and Digital In channel counts seperately
+                    self.Add_DOSource('DIO/A')
+                    self.Add_DOSource('DIO/B')
+                    self.Add_DOSource('DIO/C')
+                    self.Add_DOSource('DIO/D')
+                    self.Add_DOSource('DIO/E')
+                    self.Add_DOSource('DIO/F')
+                    self.Add_DOSource('DIO/G')
+                    self.Add_DOSource('DIO/H')
+                    self.Add_DOSource('DIO/I')
+                    self.Add_DOSource('DIO/J')
+                    self.Add_DOSource('DIO/K')
+                    self.Add_DOSource('DIO/L')
+                    self.Add_DOSource('DIO/M')
+                    self.Add_DOSource('DIO/N')
+                    self.Add_DOSource('DIO/O')
+                    self.Add_DOSource('DIO/P')
 
-                self.Add_DISource('DIO/Q')
-                self.Add_DISource('DIO/R', trigger=True)
-                self.Add_DISource('DIO/S')
-                self.Add_DISource('DIO/T')
-                self.Add_DISource('DIO/U')
-                self.Add_DISource('DIO/V')
-                self.Add_DISource('DIO/W')
-                self.Add_DISource('DIO/X')
+                    self.Add_DISource('DIO/Q')
+                    self.Add_DISource('DIO/R', trigger=True)
+                    self.Add_DISource('DIO/S')
+                    self.Add_DISource('DIO/T')
+                    self.Add_DISource('DIO/U')
+                    self.Add_DISource('DIO/V')
+                    self.Add_DISource('DIO/W')
+                    self.Add_DISource('DIO/X')
+        except:
+            pass
 
-        self.initialized.emit()
+            self.initialized.emit()
         
     def configure(self):
 

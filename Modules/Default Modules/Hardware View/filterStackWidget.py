@@ -10,12 +10,13 @@ from src.Managers.HardwareManager.Sources import Source
 class filterStackWidget(QDockWidget):
     doNotAutoPopulate = True
 
-    def __init__(self, mW):
-        super().__init__('Filter Stack Editor', parent=mW)
-        self.mW = mW
-        self.hM = mW.hM
-        self.iM = mW.iM
-        self.wM = mW.wM
+    def __init__(self, dockWidget, ds):
+        super().__init__('Filter Stack Editor', parent=dockWidget)
+        self.dockWidget = dockWidget
+        self.ds = ds
+        self.hM = ds.hM
+        self.iM = ds.iM
+        self.wM = ds.wM
         self.rootSource = None
         self.hide()
         self.setAllowedAreas(Qt.NoDockWidgetArea)
@@ -32,7 +33,7 @@ class filterStackWidget(QDockWidget):
         self.hM.Filter_Attached.connect(self.drawScene)
         self.hM.Filter_Detatched.connect(self.drawScene)
 
-        self.mW.DataStation_Loaded.connect(self.hide)
+        self.ds.DataStation_Loaded.connect(self.hide)
 
     def setSource(self, rootSource):
         self.rootSource = rootSource
@@ -50,12 +51,12 @@ class filterView(QGraphicsView):
     colBuffer = QPointF(0, 20)
     colGap = QPointF(10, 0)
 
-    def __init__(self, mW, scene, transform):
+    def __init__(self, ds, scene, transform):
         super().__init__()
-        self.mW = mW
-        self.hM = mW.hM
-        self.iM = mW.iM
-        self.wM = mW.wM
+        self.ds = ds
+        self.hM = ds.hM
+        self.iM = ds.iM
+        self.wM = ds.wM
         self.mainScene = scene
         self.setScene(scene)
         self.mainTransform = transform
@@ -97,13 +98,13 @@ class filterView(QGraphicsView):
 
         for obj in objList:
             if(issubclass(type(obj), Source)):
-                drawObj = sourceWidgetObject(self.mW, obj, self, self.mainScene)
+                drawObj = sourceWidgetObject(self.ds, obj, self, self.mainScene)
                 self.filterObjList.append(drawObj)
             if(issubclass(type(obj), Filter)):
-                drawObj = filterWidgetObject(self.mW, obj, self, self.mainScene)
+                drawObj = filterWidgetObject(self.ds, obj, self, self.mainScene)
                 self.filterObjList.append(drawObj)
             if(issubclass(type(obj), Socket)):
-                drawObj = socketWidgetObject(self.mW, obj, self, self.mainScene)
+                drawObj = socketWidgetObject(self.ds, obj, self, self.mainScene)
                 self.filterObjList.append(drawObj)
             drawObjects.append(drawObj)
             if(drawObj.rect.width() > maxWidth):
@@ -222,9 +223,9 @@ class filterScene(QGraphicsScene):
 
 class widgetObject():
 
-    def __init__(self, mW, sourceObject, view, scene, color, topRound=False, botRound=False, topRadius=5, botRadius=5):
-        self.mW = mW
-        self.hM = mW.hM
+    def __init__(self, ds, sourceObject, view, scene, color, topRound=False, botRound=False, topRadius=5, botRadius=5):
+        self.ds = ds
+        self.hM = ds.hM
         self.sourceObject = sourceObject
         self.view = view
         self.scene = scene
@@ -265,9 +266,9 @@ class widgetObject():
         menu = QMenu()
 
         addFilterMenu = menu.addMenu('Add Filter')
-        filterMenuAction = filterSelectionWidget(self, menu, pathNo, self.mW)
+        filterMenuAction = filterSelectionWidget(self, menu, pathNo, self.ds)
         addSocketMenu = menu.addMenu("Add Socket")
-        socketMenuAction = socketSelectionWidget(self, menu, pathNo, self.mW)
+        socketMenuAction = socketSelectionWidget(self, menu, pathNo, self.ds)
         addFilterMenu.addAction(filterMenuAction)
         addSocketMenu.addAction(socketMenuAction)
         action = menu.exec_(pos)
@@ -281,10 +282,10 @@ class widgetObject():
         item.socket.Attach_Input(self.sourceObject.Get_UUID(), pathNo)
 
 class filterWidgetObject(widgetObject):
-    def __init__(self, mW, sourceObject, view, scene):
-        super().__init__(mW, sourceObject, view, scene, QColor(165, 214, 167))
+    def __init__(self, ds, sourceObject, view, scene):
+        super().__init__(ds, sourceObject, view, scene, QColor(165, 214, 167))
         self.sourceObject = sourceObject
-        self.mW = mW
+        self.ds = ds
         self.rect = QRectF(0, 0, 250, 80 + self.arrowGap*(self.sourceObject.Get_Number_Of_Paths()-1))
         self.type = "Filter"
         self.descString = 'Filter: ' + self.sourceObject.Get_Type()
@@ -324,9 +325,9 @@ class filterWidgetObject(widgetObject):
         self.sourceObject.Remove()
 
 class sourceWidgetObject(widgetObject):
-    def __init__(self, mW, sourceObject, view, scene):
-        super().__init__(mW, sourceObject, view, scene, QColor(239, 154, 154), topRound=True)
-        self.mW = mW
+    def __init__(self, ds, sourceObject, view, scene):
+        super().__init__(ds, sourceObject, view, scene, QColor(239, 154, 154), topRound=True)
+        self.ds = ds
         self.rect = QRectF(0, 0, 250, 80)
         self.type = "Source"
         self.descString = str(type(self.sourceObject).__name__) + ': ' + self.sourceObject.Get_Name()
@@ -349,10 +350,10 @@ class sourceWidgetObject(widgetObject):
         self.scene.addItem(self.boxOutline)
 
 class socketWidgetObject(widgetObject):
-    def __init__(self, mW, sourceObject, view, scene):
-        super().__init__(mW, sourceObject, view, scene, QColor(129, 212, 250), botRound=True)
+    def __init__(self, ds, sourceObject, view, scene):
+        super().__init__(ds, sourceObject, view, scene, QColor(129, 212, 250), botRound=True)
         self.sourceObject = sourceObject
-        self.mW = mW
+        self.ds = ds
         self.rect = QRectF(0, 0, 250, 80)
         self.type = "Socket"
         self.descString = "Socket: " + self.sourceObject.Get_Name()
@@ -377,12 +378,12 @@ class socketWidgetObject(widgetObject):
         self.sourceObject.Detatch_Input()
 
 class filterSelectionWidget(QWidgetAction):
-    def __init__(self, parent, menu, pathNo, mW):
+    def __init__(self, parent, menu, pathNo, ds):
         super().__init__(None)
         super().__init__(None)
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
         self.parent = parent
         self.menu = menu
         self.pathNo = pathNo
@@ -414,11 +415,11 @@ class filterSelectionItem(QListWidgetItem):
         self.filterModel = filterModel
 
 class socketSelectionWidget(QWidgetAction):
-    def __init__(self, parent, menu, pathNo, mW):
+    def __init__(self, parent, menu, pathNo, ds):
         super().__init__(None)
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
         self.parent = parent
         self.menu = menu
         self.pathNo = pathNo

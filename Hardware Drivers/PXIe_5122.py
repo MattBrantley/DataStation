@@ -21,16 +21,19 @@ class PXIe_5122(HardwareDevice):
         self.scanned.emit()
 
     def initialize(self, deviceName):
-        if(deviceName != ''):
-            self.session = None
-            self.wfm_handles = list()
-            self.reportTime = ms()
-            with niscope.Session(deviceName) as session:
-                # Would get more session data here
-                self.source0 = self.Add_AISource('0', -10, 10, 0.1)
-                self.source1 = self.Add_AISource('1', -10, 10, 0.1)
+        try:
+            if(deviceName != ''):
+                self.session = None
+                self.wfm_handles = list()
+                self.reportTime = ms()
+                with niscope.Session(deviceName) as session:
+                    # Would get more session data here
+                    self.source0 = self.Add_AISource('0', -10, 10, 0.1)
+                    self.source1 = self.Add_AISource('1', -10, 10, 0.1)
 
-            self.session = niscope.Session(deviceName)
+                self.session = niscope.Session(deviceName)
+        except:
+            pass
 
         self.initialized.emit()
 

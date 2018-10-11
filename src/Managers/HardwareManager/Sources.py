@@ -58,9 +58,9 @@ class Source():
 
     def registerHWare(self, hWare):
         self.hWare = hWare
-        self.mW = hWare.mW
-        self.iM = hWare.mW.iM
-        self.hM = hWare.mW.hM
+        self.ds = hWare.ds
+        self.iM = hWare.ds.iM
+        self.hM = hWare.ds.hM
 
     def getProgrammingPacket(self, programmingPacket):
         self.programmingPacket = programmingPacket
@@ -107,7 +107,7 @@ class Source():
 
     def attachPathSelf(self, pathNo, uuid):
         if(uuid is None):
-            self.mW.postLog('SOURCE ATTACH ERROR: ' + self.sourceSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Path Filter/Socket that is NoneValue!!!' , DSConstants.LOG_PRIORITY_MED)
+            self.ds.postLog('SOURCE ATTACH ERROR: ' + self.sourceSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Path Filter/Socket that is NoneValue!!!' , DSConstants.LOG_PRIORITY_MED)
             self.sourceSettings['paths'][pathNo-1] = None
             return False 
 
@@ -115,7 +115,7 @@ class Source():
         if(targetFilterOrSocket is None):
             targetFilterOrSocket = self.hM.getSocketByUUID(uuid) #If it's not a filter, search for a Socket
         if(targetFilterOrSocket is None):
-            self.mW.postLog('SOURCE ATTACH ERROR: ' + self.sourceSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Path Filter/Socket that does not exist!!!' , DSConstants.LOG_PRIORITY_MED)
+            self.ds.postLog('SOURCE ATTACH ERROR: ' + self.sourceSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Path Filter/Socket that does not exist!!!' , DSConstants.LOG_PRIORITY_MED)
             self.sourceSettings['paths'][pathNo-1] = None
             return False
         

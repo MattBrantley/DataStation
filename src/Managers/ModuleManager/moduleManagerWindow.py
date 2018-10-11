@@ -4,27 +4,27 @@ import os
 class moduleManagerWindow(QMainWindow):
     ITEM_GUID = Qt.UserRole
 
-    def __init__(self, mW):
+    def __init__(self, ds):
         super().__init__(None)
         self.setWindowTitle('Module Manager')
-        self.mW = mW
-        self.mM = mW.mM
+        self.ds = ds
+        self.mM = ds.mM
 
         self.mainWidget = QTabWidget()
         self.setCentralWidget(self.mainWidget)
 
-        self.modulesTab = modulesTab(self.mW)
+        self.modulesTab = modulesTab(self.ds)
         self.mainWidget.addTab(self.modulesTab, 'Modules')
 
-        self.windowsTab = windowsTab(self.mW)
+        self.windowsTab = windowsTab(self.ds)
         self.mainWidget.addTab(self.windowsTab, 'Windows')
         
 class windowsTab(QWidget):
 
-    def __init__(self, mW):
+    def __init__(self, ds):
         super().__init__()
-        self.mW = mW
-        self.mM = mW.mM
+        self.ds = ds
+        self.mM = ds.mM
         self.initWindow()
 
     def initWindow(self):
@@ -48,11 +48,11 @@ class windowsTab(QWidget):
 
 class modulesTab(QWidget):
 
-    def __init__(self, mW):
+    def __init__(self, ds):
         super().__init__()
         self.showFolders = False
-        self.mW = mW
-        self.mM = mW.mM
+        self.ds = ds
+        self.mM = ds.mM
         self.initWindow()
         self.populateWindow()
 
@@ -72,9 +72,9 @@ class modulesTab(QWidget):
         self.leftSideLayout = QVBoxLayout()
         self.leftSide.setLayout(self.leftSideLayout)
 
-        self.moduleIcon = QIcon(os.path.join(self.mW.srcDir, 'icons/pie-chart.png'))
+        self.moduleIcon = QIcon(os.path.join(self.ds.srcDir, 'icons/pie-chart.png'))
 
-        self.moduleTree = moduleTree(self.mW)
+        self.moduleTree = moduleTree(self.ds)
 
         #self.moduleTree.contextMenuEvent.connect(self.moduleContextMenu)
 
@@ -134,10 +134,10 @@ class modulesTab(QWidget):
         return QTreeWidgetItem(parentNode, [nodeName, ''])
 
 class moduleTree(QTreeWidget):
-    def __init__(self, mW):
+    def __init__(self, ds):
         super().__init__()
-        self.mW = mW
-        self.mM = mW.mM
+        self.ds = ds
+        self.mM = ds.mM
 
         self.setColumnCount(0)
         self.setSortingEnabled(True)

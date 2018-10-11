@@ -12,11 +12,11 @@ class SimpleInstrumentControl(DSModule):
     Module_Name = 'Simple Instrument Control'
     Module_Flags = [mfs.SHOW_ON_CREATION, mfs.FLOAT_ON_CREATION]
 
-    def __init__(self, mW):
-        super().__init__(mW)
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
+    def __init__(self, ds):
+        super().__init__(ds)
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
         self.readyCheckMessages = list()
 
         self.mainLayout = QHBoxLayout()
@@ -50,7 +50,7 @@ class SimpleInstrumentControl(DSModule):
         self.timer.start(10)
 
     def initButtons(self):
-        dir = self.mW.srcDir
+        dir = self.ds.srcDir
         self.runOnceButton = QPushButton()
         self.runOnceIcon = QIcon(os.path.join(dir, 'icons5\\reply.png'))
         self.runOnceButton.setIcon(self.runOnceIcon)
@@ -212,7 +212,7 @@ class SimpleInstrumentControl(DSModule):
 class readyCheckButton(QPushButton):
     def __init__(self, controlWidget):
         super().__init__()
-        dir = controlWidget.mW.srcDir
+        dir = controlWidget.ds.srcDir
         self.messageCount = 0
         self.readyCheckInfoIcon = QIcon(os.path.join(dir, 'icons5\information.png'))
         self.readyCheckErrorIcon = QIcon(os.path.join(dir, 'icons5\warning.png'))

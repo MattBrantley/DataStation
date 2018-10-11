@@ -95,18 +95,18 @@ class InstrumentManager(QObject):
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
 
-    def __init__(self, mW):
+    def __init__(self, ds):
         super().__init__()
-        self.mW = mW
+        self.ds = ds
         self.readyStatus = False
-        self.instrumentDir = os.path.join(self.mW.rootDir, 'Instruments')
-        self.componentsDir = os.path.join(self.mW.rootDir, 'Components')
-        self.sequencesDir = os.path.join(self.mW.rootDir, 'Sequences')
+        self.instrumentDir = os.path.join(self.ds.rootDir, 'Instruments')
+        self.componentsDir = os.path.join(self.ds.rootDir, 'Components')
+        self.sequencesDir = os.path.join(self.ds.rootDir, 'Sequences')
         self.currentInstrument = None
         self.currentSequenceURL = None
         self.componentsAvailable = list()
 
-        self.mW.DataStation_Closing.connect(self.unsavedChangesCheck)
+        self.ds.DataStation_Closing.connect(self.unsavedChangesCheck)
 
 ##### DataStation Reserved Functions #####
 
@@ -206,12 +206,12 @@ class InstrumentManager(QObject):
 
     def saveInstrument(self):# Instrument_Saving
         if(self.currentInstrument is not None):
-            self.mW.postLog('VI_Save', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
+            self.ds.postLog('VI_Save', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
             self.Instrument_Saving.emit()
             self.writeInstrumentToFile(self.currentInstrument.savePacket(), self.currentInstrument.url)
-            self.mW.postLog(' ...Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+            self.ds.postLog(' ...Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
         else:
-            self.mW.postLog('VI_Save_No_VI', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
+            self.ds.postLog('VI_Save_No_VI', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
 
     def writeInstrumentToFile(self, saveData, url=None):
         if(url is None):
@@ -229,9 +229,9 @@ class InstrumentManager(QObject):
             json.dump(saveData, file, sort_keys=True, indent=4)
 
     def loadInstrument(self, url): # Instrument_Unloaded // Instrument_Loaded
-        self.mW.postLog('Loading User Instrument (' + url + ')... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Loading User Instrument (' + url + ')... ', DSConstants.LOG_PRIORITY_HIGH)
         if(os.path.exists(url) is False):
-            self.mW.postLog('Path (' + url + ') does not exist! Aborting! ', DSConstants.LOG_PRIORITY_HIGH)
+            self.ds.postLog('Path (' + url + ') does not exist! Aborting! ', DSConstants.LOG_PRIORITY_HIGH)
             return
 
         with open(url, 'r') as file:
@@ -240,11 +240,11 @@ class InstrumentManager(QObject):
                 self.Instrument_Unloaded.emit()
                 if(isinstance(instrumentData, dict)):
                     if(self.processInstrumentData(instrumentData, url) is False):
-                        self.mW.postLog('Corrupted instrument at (' + url + ') - aborting! ', DSConstants.LOG_PRIORITY_MED)
+                        self.ds.postLog('Corrupted instrument at (' + url + ') - aborting! ', DSConstants.LOG_PRIORITY_MED)
             except ValueError as e:
-                self.mW.postLog('Corrupted instrument at (' + url + ') - aborting! ', DSConstants.LOG_PRIORITY_MED)
+                self.ds.postLog('Corrupted instrument at (' + url + ') - aborting! ', DSConstants.LOG_PRIORITY_MED)
                 return
-        self.mW.postLog('Finished Loading User Instrument!', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Finished Loading User Instrument!', DSConstants.LOG_PRIORITY_HIGH)
 
         self.Instrument_Loaded.emit()
 
@@ -261,7 +261,7 @@ class InstrumentManager(QObject):
                 if(('compIdentifier' in comp) and ('compType' in comp)):
                     compModel = self.findCompModelByIdentifier(comp['compIdentifier'])
                     if(compModel is None):
-                        self.mW.postLog('Instrument contains component (' + comp['compType'] + ':' + comp['compIdentifier'] + ') that is not in the available component modules. Ignoring this component!', DSConstants.LOG_PRIORITY_MED)
+                        self.ds.postLog('Instrument contains component (' + comp['compType'] + ':' + comp['compIdentifier'] + ') that is not in the available component modules. Ignoring this component!', DSConstants.LOG_PRIORITY_MED)
                     else:
                         result = self.tempInstrument.Add_Component(compModel, loadData=comp['compSettings'])
                         if('sockets' in comp):
@@ -272,7 +272,7 @@ class InstrumentManager(QObject):
 
     def addCompToInstrument(self, compModel, customFields=dict()):
         if (self.currentInstrument is None):
-            self.mW.postLog('No instrument is loaded - creating new one! ', DSConstants.LOG_PRIORITY_HIGH)
+            self.ds.postLog('No instrument is loaded - creating new one! ', DSConstants.LOG_PRIORITY_HIGH)
             self.currentInstrument = Instrument(self)
 
         result = self.currentInstrument.Add_Component(compModel, customFields=customFields)
@@ -281,7 +281,7 @@ class InstrumentManager(QObject):
 ##### Sequence Manipulation #####
 
     def openSequenceFile(self, filePath):
-        self.mW.postLog('Opening Sequence File (' + filePath + ')... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Opening Sequence File (' + filePath + ')... ', DSConstants.LOG_PRIORITY_HIGH)
         sequenceData = None
 
         if(os.path.isfile(filePath) is True):
@@ -289,10 +289,10 @@ class InstrumentManager(QObject):
                 try:
                     sequenceData = json.load(file)
                 except ValueError as e:
-                    self.mW.postLog('Corrupted sequence file - aborting!', DSConstants.LOG_PRIORITY_HIGH)
+                    self.ds.postLog('Corrupted sequence file - aborting!', DSConstants.LOG_PRIORITY_HIGH)
                     return None
         else:
-            self.mW.postLog('Sequence Path was invalid - aborting!', DSConstants.LOG_PRIORITY_HIGH)
+            self.ds.postLog('Sequence Path was invalid - aborting!', DSConstants.LOG_PRIORITY_HIGH)
             return None
 
         self.currentInstrument.sequenceInfoUpdate(filePath, os.path.basename(filePath))
@@ -300,11 +300,11 @@ class InstrumentManager(QObject):
         return sequenceData
 
         if(self.instrument.processSequenceData(sequenceData) is False):
-            self.mW.postLog('Sequence at (' + filePath + ') not loaded - aborting! ', DSConstants.LOG_PRIORITY_HIGH)
+            self.ds.postLog('Sequence at (' + filePath + ') not loaded - aborting! ', DSConstants.LOG_PRIORITY_HIGH)
         else:
             self.currentSequenceURL = filePath
 
-        self.mW.postLog('Finished Loading Sequence!', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Finished Loading Sequence!', DSConstants.LOG_PRIORITY_HIGH)
 
     def getSequenceSaveData(self):
         if(self.currentInstrument is not None):
@@ -323,7 +323,7 @@ class InstrumentManager(QObject):
         saveURL = os.path.join(os.path.join(self.sequencesDir, self.currentInstrument.name), fileName)
 
         saveData = self.getSequenceSaveData()
-        self.mW.postLog('Saving Sequence (' + saveURL + ')... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Saving Sequence (' + saveURL + ')... ', DSConstants.LOG_PRIORITY_HIGH)
         if(os.path.exists(saveURL)):
             os.remove(saveURL)
         with open(saveURL, 'w') as file:
@@ -332,10 +332,10 @@ class InstrumentManager(QObject):
         self.currentInstrument.sequenceInfoUpdate(saveURL, fileName)
         self.wM.userProfile['sequenceURL'] = saveURL
         self.Sequence_Saved.emit(self.currentInstrument) 
-        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+        self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     def saveSequenceAs(self):
-        fname, ok = QInputDialog.getText(self.mW, "Sequence Name", "Sequence Name")
+        fname, ok = QInputDialog.getText(self.ds, "Sequence Name", "Sequence Name")
         if(os.path.exists(os.path.join(self.sequencesDir, self.currentInstrument.name)) is False):
             os.mkdir(os.path.join(self.sequencesDir, self.currentInstrument.name))
         saveURL = os.path.join(os.path.join(self.sequencesDir, self.currentInstrument.name), fname + '.dssequence')
@@ -345,12 +345,12 @@ class InstrumentManager(QObject):
             return
 
         if(os.path.exists(saveURL)):
-            reply = QMessageBox.question(self.mW, 'File Warning!', 'File exists - overwrite?', QMessageBox.Yes, QMessageBox.No)
+            reply = QMessageBox.question(self.ds, 'File Warning!', 'File exists - overwrite?', QMessageBox.Yes, QMessageBox.No)
             if(reply == QMessageBox.No):
                 return
 
         saveData = self.getSequenceSaveData()
-        self.mW.postLog('Saving Sequence (' + saveURL + ')... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Saving Sequence (' + saveURL + ')... ', DSConstants.LOG_PRIORITY_HIGH)
         if(os.path.exists(saveURL)):
             os.remove(saveURL)
         with open(saveURL, 'w') as file:
@@ -360,7 +360,7 @@ class InstrumentManager(QObject):
         self.currentInstrument.sequenceInfoUpdate(saveURL, fname+'.dssequence')
         self.wM.userProfile['sequenceURL'] = saveURL
         self.Sequence_Saved.emit(self.currentInstrument) 
-        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+        self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     def newSequence(self):
         result = DSNewFileDialog.newFile()
@@ -368,7 +368,7 @@ class InstrumentManager(QObject):
 ##### Components #####
 
     def loadComponents(self):
-        self.mW.postLog('Loading Component Models... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Loading Component Models... ', DSConstants.LOG_PRIORITY_HIGH)
 
         for root, dirs, files in os.walk(self.componentsDir):
             for name in files:
@@ -377,7 +377,7 @@ class InstrumentManager(QObject):
                 if (compHolder != None):
                     self.componentsAvailable.append(compHolder)
 
-        self.mW.postLog('Finished Loading Component Models!', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Finished Loading Component Models!', DSConstants.LOG_PRIORITY_HIGH)
 
     def loadComponentFromFile(self, filepath): # I think this is only for the models
         class_inst = None
@@ -386,22 +386,22 @@ class InstrumentManager(QObject):
         loaded = False
 
         if file_ext.lower() == '.py':
-            self.mW.postLog('   Found Component Script: ' + filepath, DSConstants.LOG_PRIORITY_MED)
+            self.ds.postLog('   Found Component Script: ' + filepath, DSConstants.LOG_PRIORITY_MED)
             py_mod = imp.load_source(mod_name, filepath)
         else:
             return
 
         if (py_mod != None):
             if(hasattr(py_mod, mod_name) is True):
-                class_temp = getattr(py_mod, mod_name)(self.mW)
+                class_temp = getattr(py_mod, mod_name)(self.ds)
                 if issubclass(type(class_temp), Component):
                     class_inst = class_temp
                     loaded = True
 
         if(loaded):
             class_inst.iM = self
-            self.mW.postLog('  (Success!)', DSConstants.LOG_PRIORITY_MED, newline=False)
+            self.ds.postLog('  (Success!)', DSConstants.LOG_PRIORITY_MED, newline=False)
         else:
-            self.mW.postLog(' (Failed!)', DSConstants.LOG_PRIORITY_MED, newline=False)
+            self.ds.postLog(' (Failed!)', DSConstants.LOG_PRIORITY_MED, newline=False)
 
         return class_inst

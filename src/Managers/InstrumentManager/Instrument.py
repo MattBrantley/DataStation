@@ -7,7 +7,7 @@ class Instrument(QObject):
     def __init__(self, iM):
         super().__init__()
         self.iM = iM
-        self.mW = self.iM.mW
+        self.ds = self.iM.ds
         self.name = 'Default Instrument'
         self.url = None
         self.sequencePath = ''
@@ -112,10 +112,10 @@ class Instrument(QObject):
 ##### Component Manipulations #####
 
     def addComponent(self, compModel, customFields=dict(), loadData=None):
-        newComp = type(compModel)(self.mW)
+        newComp = type(compModel)(self.ds)
         newComp.instr = self
         newComp.iM = self.iM
-        newComp.mW = self.mW
+        newComp.ds = self.ds
         newComp.setupWidgets()
         newComp.name = 'Unnamed Component'
         newComp.loadCustomFields(customFields)
@@ -124,7 +124,7 @@ class Instrument(QObject):
         newComp.onCreationFinishedParent()
         self.componentList.append(newComp)
         self.iM.componentAdded(self, newComp)
-        self.mW.postLog('Added New Component to Instrument: ' + newComp.componentType, DSConstants.LOG_PRIORITY_MED)
+        self.ds.postLog('Added New Component to Instrument: ' + newComp.componentType, DSConstants.LOG_PRIORITY_MED)
         return newComp
 
     def removeComponent(self, comp):
@@ -192,10 +192,10 @@ class Instrument(QObject):
 
     def loadSequence(self, path, showWarning=True):
         data = self.iM.openSequenceFile(path)
-        self.mW.postLog('Applying sequence to instrument... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Applying sequence to instrument... ', DSConstants.LOG_PRIORITY_HIGH)
 
         if(data is None):
-            self.mW.postLog('Sequence data was empty - aborting!', DSConstants.LOG_PRIORITY_HIGH)
+            self.ds.postLog('Sequence data was empty - aborting!', DSConstants.LOG_PRIORITY_HIGH)
             return False
 
         if(data['instrument'] != self.Get_Name() and showWarning is True):
@@ -214,10 +214,10 @@ class Instrument(QObject):
         for datum in data['eventData']:
             comp = self.getComponents(uuid=datum['uuid'])
             if(not comp):
-                self.mW.postLog('Sequence data for comp with uuid (' + datum['uuid'] + ') cannot be assigned! Possibly from different instrument.', DSConstants.LOG_PRIORITY_HIGH)
+                self.ds.postLog('Sequence data for comp with uuid (' + datum['uuid'] + ') cannot be assigned! Possibly from different instrument.', DSConstants.LOG_PRIORITY_HIGH)
             else:
                 comp[0].loadSequenceData(datum['events'])
 
-        self.mW.postLog('Sequence applied to instrument!', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Sequence applied to instrument!', DSConstants.LOG_PRIORITY_HIGH)
         self.iM.sequenceLoaded(self)
         return True

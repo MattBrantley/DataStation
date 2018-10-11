@@ -20,16 +20,19 @@ class PXIe_5451(HardwareDevice):
         self.scanned.emit()
 
     def initialize(self, deviceName):
-        if(deviceName != ''):
-            self.session = None
-            self.wfm_handles = list()
-            self.reportTime = ms()
-            with nifgen.Session(deviceName) as session:
-                self.maxRate = session.arb_sample_rate
-                for i in range(0, 2):
-                    self.Add_AOSource(str(i), 1, 1, 0.1)
+        try:
+            if(deviceName != ''):
+                self.session = None
+                self.wfm_handles = list()
+                self.reportTime = ms()
+                with nifgen.Session(deviceName) as session:
+                    self.maxRate = session.arb_sample_rate
+                    for i in range(0, 2):
+                        self.Add_AOSource(str(i), 1, 1, 0.1)
 
-            self.session = nifgen.Session(deviceName)
+                self.session = nifgen.Session(deviceName)
+        except:
+            pass
 
         self.initialized.emit()
 

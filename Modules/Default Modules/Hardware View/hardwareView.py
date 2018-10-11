@@ -15,12 +15,12 @@ class hardwareView(DSModule):
     Module_Flags = [mfs.SHOW_ON_CREATION, mfs.FLOAT_ON_CREATION]
     ITEM_GUID = Qt.UserRole
 
-    def __init__(self, mW):
-        super().__init__(mW)
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
-        self.wM = mW.wM
+    def __init__(self, ds):
+        super().__init__(ds)
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
+        self.wM = ds.wM
 
         #self.hide()
         self.resize(800, 800)
@@ -29,8 +29,8 @@ class hardwareView(DSModule):
         self.mainContainer = QMainWindow()
         self.mainContainer.addToolBar(self.toolbar)
 
-        self.hardwareWidget = hardwareListWidget(self.mW)
-        self.connectorGridWidget = gridViewWidget(self.mW)
+        self.hardwareWidget = hardwareListWidget(self, self.ds)
+        self.connectorGridWidget = gridViewWidget(self, self.ds)
         self.filtersWidget = QWidget()
         self.driversWidget = QWidget()
 

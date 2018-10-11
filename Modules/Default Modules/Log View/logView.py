@@ -7,14 +7,14 @@ class logView(DSModule):
     Module_Name = 'Log View'
     Module_Flags = [mfs.SHOW_ON_CREATION, mfs.FLOAT_ON_CREATION]
 
-    def __init__(self, mW):
-        super().__init__(mW)
+    def __init__(self, ds):
+        super().__init__(ds)
         self.logTextEdit = QPlainTextEdit()
         self.resize(600, 200)
         #self.setFeatures(QtGui.QDockWidget.DockWidgetFloatable | QtGui.QDockWidget.DockWidgetMovable)
         #self.hide()
         self.setWidget(self.logTextEdit)
-        self.mW = mW
+        self.ds = ds
         self.logTextEdit.setReadOnly(True)
         self.logTextEdit.setWordWrapMode(QTextOption.NoWrap)
         #self.logTextEdit.setCenterOnScroll(True)

@@ -55,7 +55,7 @@ class hardwareObject():
 #################################### INTERNAL USER ONLY ####################################
 
     def __init__(self, hM, modelObject=False, **kwargs):
-        self.mW = None                #Factory does not write this. Hardware manager writes it immediately after init.
+        self.ds = None                #Factory does not write this. Hardware manager writes it immediately after init.
         self.iM = None                #Factory does not write this. Hardware manager writes it immediately after init.
         self.wM = None                #Factory does not write this. Hardware manager writes it immediately after init.
         self.hM = None                #Factory does not write this. Hardware manager writes it immediately after init.
@@ -196,7 +196,7 @@ class hardwareObject():
 
     def showConfigWidget(self, pos):
         menu = QMenu()
-        hardwareConfig = QWidgetAction(self.mW)
+        hardwareConfig = QWidgetAction(self.ds)
         hardwareConfig.setDefaultWidget(self.hardwareObjectConfigWidgetParent())
         menu.addAction(hardwareConfig)
 

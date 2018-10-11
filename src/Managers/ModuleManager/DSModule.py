@@ -10,13 +10,16 @@ class DSModule(QDockWidget):
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
 
+    def Get_Window(self):
+        print(self.window())
+        return self.window()
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
-    def __init__(self, mW):
+    def __init__(self, ds):
         super().__init__()
-        self.mW = mW
-        self.iM = mW.iM
-        self.hM = mW.hM
-        self.mM = mW.mM
-        self.wM = mW.wM
+        self.ds = ds
+        self.iM = ds.iM
+        self.hM = ds.hM
+        self.mM = ds.mM
+        self.wM = ds.wM

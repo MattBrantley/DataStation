@@ -60,7 +60,7 @@ class Socket():
         self.cP = cP
         self.iM = cP.iM
         self.hM = cP.iM.hM
-        self.mW = cP.iM.mW
+        self.ds = cP.iM.ds
 
         self.programmingPacket = None
 
@@ -134,7 +134,7 @@ class Socket():
         if(len(target) == 0):
             self.socketSettings['inputSource'] = None
             self.socketSettings['inputSourcePathNo'] = None
-            self.mW.postLog('SOCKET RESTORE ERROR: ' + self.socketSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Filter/Source that does not exist!!!' , DSConstants.LOG_PRIORITY_MED)
+            self.ds.postLog('SOCKET RESTORE ERROR: ' + self.socketSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Filter/Source that does not exist!!!' , DSConstants.LOG_PRIORITY_MED)
             return # No Filter or Source found at that uuid - clear this socket's reference.
         
     def detatch(self):

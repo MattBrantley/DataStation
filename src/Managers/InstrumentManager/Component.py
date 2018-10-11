@@ -65,7 +65,7 @@ class Component(QObject):
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
 
-    def __init__(self, mW, **kwargs):
+    def __init__(self, ds, **kwargs):
         super().__init__()
         self.allowOverlappingEvents = False
         self.compSettings = {}
@@ -75,7 +75,7 @@ class Component(QObject):
         self.compSettings['triggerComp'] = False
         self.compSettings['customFields'] = dict()
         self.instr = None           #Factory does not write this. It's in the very next line in Instrument though.
-        self.mW = mW                #Factory does not write this. It's in the very next line in Instrument though.
+        self.ds = ds                #Factory does not write this. It's in the very next line in Instrument though.
         self.iM = None              #Factory does not write this. It's in the very next line in Instrument though.
         self.valid = False
         self.isTriggerComponent = False
@@ -167,7 +167,7 @@ class Component(QObject):
         pass
 
     def onRemovalParent(self):
-        self.mW.postLog('Removing Instrument Component: ' + self.componentType, DSConstants.LOG_PRIORITY_MED)
+        self.ds.postLog('Removing Instrument Component: ' + self.componentType, DSConstants.LOG_PRIORITY_MED)
         for socket in self.socketList:
             socket.Detatch_Input()
         self.onRemoval()
@@ -315,7 +315,7 @@ class Component(QObject):
         for datum in eventData:
             datumType = self.getEventTypeByName(datum)
             if(datumType is None):
-                self.mW.postLog('Sequence File had an unknown event type (' + datum['type'] + ') for component type (' + self.componentType + ')... ', DSConstants.LOG_PRIORITY_HIGH)
+                self.ds.postLog('Sequence File had an unknown event type (' + datum['type'] + ') for component type (' + self.componentType + ')... ', DSConstants.LOG_PRIORITY_HIGH)
                 continue
             eventTemp = datumType()
             eventTemp.loadPacket(datum)

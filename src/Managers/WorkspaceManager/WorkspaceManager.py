@@ -55,18 +55,18 @@ class WorkspaceManager():
     ITEM_NAME = Qt.UserRole+2
     ITEM_UNITS = Qt.UserRole+3
 
-    def __init__(self, mW):
+    def __init__(self, ds):
         super().__init__()
-        self.mW = mW
-        self.filtersDir = os.path.join(self.mW.rootDir, 'User Filters')
-        self.scriptsDir = os.path.join(self.mW.rootDir, 'User Scripts')
-        self.userDataDir = os.path.join(self.mW.rootDir, 'User Data')
-        self.hardwareDriversDir = os.path.join(self.mW.rootDir, 'Hardware Drivers')
-        self.workspaceTreeWidget = None #Will be loaded in by mW
+        self.ds = ds
+        self.filtersDir = os.path.join(self.ds.rootDir, 'User Filters')
+        self.scriptsDir = os.path.join(self.ds.rootDir, 'User Scripts')
+        self.userDataDir = os.path.join(self.ds.rootDir, 'User Data')
+        self.hardwareDriversDir = os.path.join(self.ds.rootDir, 'Hardware Drivers')
+        self.workspaceTreeWidget = None #Will be loaded in by ds
 
         self.readSettings()
 
-        self.mW.DataStation_Closing_Final.connect(self.updateSettings)
+        self.ds.DataStation_Closing_Final.connect(self.updateSettings)
 
     def connections(self, iM, hM):
         self.iM = iM
@@ -84,28 +84,28 @@ class WorkspaceManager():
         self.DBCommMgr = databaseCommManager(self)
 
     def readSettings(self):
-        self.mW.postLog('Loading Settings... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Loading Settings... ', DSConstants.LOG_PRIORITY_HIGH)
         if(os.path.isfile(self.settingsURL)):
             with open(self.settingsURL, 'r+') as inFile:
                 try:
                     self.settings = json.load(inFile)
                     inFile.close()
-                    self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+                    self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
                 except ValueError:
-                    self.mW.postLog('Settings File is Corrupt!!! Making New One..', DSConstants.LOG_PRIORITY_HIGH)
+                    self.ds.postLog('Settings File is Corrupt!!! Making New One..', DSConstants.LOG_PRIORITY_HIGH)
                     inFile.close()
                     self.settings = self.generateDefaultSettingsFile()
                     self.updateSettings()
         else:
-            self.mW.postLog('Settings File Not Found! Making New One..', DSConstants.LOG_PRIORITY_HIGH)
+            self.ds.postLog('Settings File Not Found! Making New One..', DSConstants.LOG_PRIORITY_HIGH)
             self.settings = self.generateDefaultSettingsFile()
             self.updateSettings()
 
     def updateSettings(self):
-        self.mW.postLog('Updating Settings File... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Updating Settings File... ', DSConstants.LOG_PRIORITY_HIGH)
         with open(self.settingsURL, 'w') as file:
             json.dump(self.settings, file, sort_keys=True, indent=4)
-        self.mW.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+        self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     def generateDefaultSettingsFile(self):
         data = {'Default Importers': {}}
@@ -118,11 +118,11 @@ class WorkspaceManager():
         self.workspaceURL = URL
         self.settings['workspaceURL'] = URL
 
-        self.mW.workspaceTreeDockWidget.setWindowTitle(os.path.basename(URL))
-        self.mW.workspaceTreeDockWidget.updateState(DSConstants.MW_STATE_WORKSPACE_LOADED)
+        self.ds.workspaceTreeDockWidget.setWindowTitle(os.path.basename(URL))
+        self.ds.workspaceTreeDockWidget.updateState(DSConstants.MW_STATE_WORKSPACE_LOADED)
 
     def newWorkspace(self):
-        fname = QFileDialog.getSaveFileName(self.mW, 'Save File', self.userDataDir, filter='*.db')
+        fname = QFileDialog.getSaveFileName(self.ds, 'Save File', self.userDataDir, filter='*.db')
         if fname[0]:
             self.workspaceTreeWidget.clear()
             xmlString = tostring(self.workspaceTreeWidget.toXML(), encoding="unicode")
@@ -136,7 +136,7 @@ class WorkspaceManager():
             conn.close()
 
     def saveWSToNewSql(self):
-        fname = QFileDialog.getSaveFileName(self.mW, 'Save File', self.userDataDir)
+        fname = QFileDialog.getSaveFileName(self.ds, 'Save File', self.userDataDir)
         if fname[0]:
             self.setLoadedWorkspace(fname[0])
             self.saveWSToSql()
@@ -209,7 +209,7 @@ class WorkspaceManager():
 
     def loadWSFromSql(self, url=None):
         if(url is False):
-            fname = QFileDialog.getOpenFileName(self.mW, 'Open File', self.userDataDir, filter='*.db')
+            fname = QFileDialog.getOpenFileName(self.ds, 'Open File', self.userDataDir, filter='*.db')
         else:
             fname = list()
             fname.append(url)
@@ -231,7 +231,7 @@ class WorkspaceManager():
         return str
 
     def importData(self):
-        fname = QFileDialog.getOpenFileNames(self.mW, 'Open File', self.workspaceURL, filter=self.userScripts.genImportDialogFilter())
+        fname = QFileDialog.getOpenFileNames(self.ds, 'Open File', self.workspaceURL, filter=self.userScripts.genImportDialogFilter())
         for fileURL in fname[0]:
             fileName, fileExtension = os.path.splitext(fileURL)
             self.userScriptController.runDefaultImporter(fileURL, fileExtension)
