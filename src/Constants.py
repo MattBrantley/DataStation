@@ -46,11 +46,13 @@ class DSConstants():
         self.logTexts['English'].text['VI_SAVE_NO_VI'] = 'Attempting to write virtual instrument to file but no instrument is loaded!! Aborting...'
 
 class moduleFlags():
-    SHOW_ON_CREATION = 100
-    HIDE_ON_CREATION = 101
+    CAN_HIDE = 200
+    CAN_DELETE = 201
 
-    DOCK_ON_CREATION = 110
-    FLOAT_ON_CREATION = 111
+    CAN_FLOAT = 210
+
+    SINGLE_INSTANCE = 300
+    DEFAULT_MODULE = 301
 
 class DSLogTexts():
 

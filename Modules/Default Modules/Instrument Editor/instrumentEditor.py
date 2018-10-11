@@ -13,7 +13,7 @@ from src.Constants import moduleFlags as mfs
 
 class instrumentEditor(DSModule):
     Module_Name = 'Instrument Editor'
-    Module_Flags = [mfs.SHOW_ON_CREATION, mfs.FLOAT_ON_CREATION]
+    Module_Flags = []
 
     def __init__(self, ds):
         super().__init__(ds)

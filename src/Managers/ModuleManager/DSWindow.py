@@ -6,6 +6,9 @@ class DSWindow(QMainWindow):
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
     
+    def Widget_Closing(self, widget):
+        pass
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
     def __init__(self, core):
@@ -21,7 +24,31 @@ class DSWindow(QMainWindow):
 
 ##### DataStation Reserverd #####
     def closeEvent(self, event):
+        if(self.mM.isShutdown is False):
+            menu = QMenu()
+
+            removeMenu = QAction('Remove Window From Workspace')
+            removeMenu.triggered.connect(self.removeWindow)
+            shutDownMenu = QAction("Shut Down DataStation")
+            shutDownMenu.triggered.connect(self.closeDataStation)
+            menu.addAction(removeMenu)
+            menu.addAction(shutDownMenu)
+
+            action = menu.exec_(QCursor().pos())
+            if(action is None):
+                event.ignore()
+                return
+
         event.accept()
+        
+    def removeWindow(self):
+        self.mM.Close_Window(self)
+        #event.accept()
+
+    def closeDataStation(self):
+        self.mM.Close_DataStation(self)
+        #event.accept()
+
 
 ##### Modules #####
     def transferModule(self, moduleHandler):
@@ -51,7 +78,6 @@ class DSWindow(QMainWindow):
         return moduleSerialList
 
 ##### Window Configuration #####
-
     def centerWindow(self):
         frameGm = self.frameGeometry()
         screen = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
@@ -72,3 +98,19 @@ class DSWindow(QMainWindow):
         #self.viewMenu.addMenu(self.viewWindowsMenu)
 
         self.moduleManagerMenu = self.menubar.addMenu(self.mM.Get_Manager_Menu())
+
+    #def populateViewWindowMenu(self):
+    #    windows = self.findChildren(QDockWidget)
+    #    self.viewWindowsMenu.clear()
+    #    for window in windows:
+    #        if(hasattr(window, 'doNotAutoPopulate') is False):
+    #            action = QAction(str(window.windowTitle()), self)
+    #            action.setCheckable(True)
+    #            action.setChecked(window.isVisible())##
+
+    #            if(window.isVisible()):
+    #                action.triggered.connect(window.hide)
+    #            else:
+    #                action.triggered.connect(window.show)
+
+    #            self.viewWindowsMenu.addAction(action)

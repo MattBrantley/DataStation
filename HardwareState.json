@@ -1,0 +1,19 @@
+{
+    "filters": [],
+    "hardwareStates": [
+        {
+            "hardwareIdentifier": "MRB_MIPS",
+            "hardwareSettings": {
+                "deviceName": "",
+                "hardwareIdentifier": "MRB_MIPS",
+                "hardwareType": "MIPS",
+                "name": "",
+                "physID": "",
+                "triggerCompUUID": "",
+                "triggerMode": "",
+                "uuid": "1b1b549f-f6c2-46e7-8f9a-4673cf1263d3"
+            },
+            "sourceList": []
+        }
+    ]
+}

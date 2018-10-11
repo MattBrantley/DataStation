@@ -6,11 +6,14 @@ from src.Constants import moduleFlags as mfs
 
 class Console(DSModule):
     Module_Name = 'Console'
-    Module_Flags = [mfs.SHOW_ON_CREATION, mfs.FLOAT_ON_CREATION]
+    Module_Flags = []
     ITEM_GUID = Qt.UserRole
 
     def __init__(self, ds):
         super().__init__(ds)
         self.ds = ds 
-        self.consoleWidget = ConsoleWidget(self.Get_Window())
+
+    def configureWidget(self, window):
+        self.window = window
+        self.consoleWidget = ConsoleWidget(self.window)
         self.setWidget(self.consoleWidget)

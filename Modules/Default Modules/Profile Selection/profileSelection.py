@@ -10,26 +10,26 @@ from src.Constants import moduleFlags as mfs
 
 class profileSelection(DSModule):
     Module_Name = 'Profile Selection'
-    Module_Flags = [mfs.SHOW_ON_CREATION, mfs.FLOAT_ON_CREATION]
+    Module_Flags = [mfs.SINGLE_INSTANCE, mfs.DEFAULT_MODULE, mfs.CAN_FLOAT]
 
     def __init__(self, ds):
         super().__init__(ds)
         self.userProfiles = []
         self.ds = ds
-        self.profilePathFolder = os.path.join(self.ds.rootDir, 'Profiles')
+        self.profilePathFolder = os.path.join(self.modDataPath, 'Profiles')
 
         self.setWindowFlags(self.windowFlags() & QtCore.Qt.CustomizeWindowHint)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowMinMaxButtonsHint)
         self.loginContainer = QWidget()
         self.loginLayout = QVBoxLayout()
         self.userList = QListWidget()
+        self.activeUser = None
 
         self.buttonWidget = QWidget()
         self.buttonLayout = QHBoxLayout()
         self.newButton = QPushButton("New")
         self.editButton = QPushButton("Edit")
         self.acceptButton = QPushButton("Accept")
-        self.ds = ds
 
         self.loginLayout.addWidget(self.userList)
         self.buttonLayout.addWidget(self.newButton)
@@ -44,7 +44,7 @@ class profileSelection(DSModule):
         self.editButton.pressed.connect(self.showEditUserPopup)
         
         self.acceptButton.setEnabled(False)
-        self.acceptButton.pressed.connect(self.finishModal)
+        self.acceptButton.pressed.connect(self.finish)
         self.editButton.setEnabled(False)
 
         self.loginContainer.setLayout(self.loginLayout)
@@ -57,7 +57,16 @@ class profileSelection(DSModule):
 
         self.populateUserProfiles()
 
-    def runModal(self):
+        self.ds.DataStation_Loaded.connect(self.showWidget)
+        self.ds.DataStation_Closing.connect(self.updateUserProfile)
+
+    def configureWidget(self, window):
+        self.window = window
+        self.hide()
+
+    def showWidget(self):
+        self.setFloating(True)
+        self.resize(400, 400)
         self.show()
         self.center()
 
@@ -67,10 +76,6 @@ class profileSelection(DSModule):
         centerPoint = QApplication.desktop().screenGeometry(screen).center()
         frameGm.moveCenter(centerPoint)
         self.move(frameGm.topLeft())
-
-    def finishModal(self):
-        self.hide()
-        self.ds.finishInitWithUser(self.userProfiles[self.userList.currentRow()])
 
     def showNewUserPopup(self):
         self.newUserPopup.loadSettings(None)
@@ -109,7 +114,7 @@ class profileSelection(DSModule):
 
     def profileDoubleClicked(self, e):
         self.profileSelectionChanged(self.userList.currentRow())
-        self.finishModal()
+        self.finish()
 
     def profileSelectionChanged(self, row):
         if(len(self.userList.selectedItems()) > 0):
@@ -119,19 +124,25 @@ class profileSelection(DSModule):
             self.acceptButton.setEnabled(False)
             self.editButton.setEnabled(False)
 
-    def closeEvent(self, event):
-        self.ds.postLog('No User Profile selected...', DSConstants.LOG_PRIORITY_HIGH)
-        self.ds.signalClose()
-        event.accept()
-
     def updateUserProfile(self):
-        if(any(self.ds.wM.userProfile) and ('url' in self.ds.wM.userProfile)):
-            self.ds.postLog('Updating User Profile... (' + self.ds.wM.userProfile['url'] + ').. ', DSConstants.LOG_PRIORITY_HIGH)        
-            with open(self.ds.wM.userProfile['url'], 'w') as file:
-                json.dump(self.ds.wM.userProfile, file)
-                time.sleep(1) #NOT ELEGANT - NEED CROSS PLATFORM SOLUTION
+        if(self.activeUser is not None):
+            self.ds.postLog('Updating User Profile... (' + self.activeUser['url'] + ').. ', DSConstants.LOG_PRIORITY_HIGH)     
+            self.activeUser['windowStates'] = self.ds.mM.Save_Window_States()    
+            with open(self.activeUser['url'], 'w') as file:
+                json.dump(self.activeUser, file)
+                time.sleep(1) #NOT ELEGANT - NEED CROSS PLATFORM SOLUTION   
+
+    def setActiveUser(self):
+        self.activeUser = self.userProfiles[self.userList.currentRow()]
+        if('windowStates' in self.activeUser):
+            self.ds.mM.Load_Window_States(self.activeUser['windowStates'])
         else:
-            self.ds.postLog('Error Updating User Profile or No Profile Loaded.', DSConstants.LOG_PRIORITY_HIGH)        
+            self.ds.mM.Load_Window_States(list())
+
+    def finish(self):
+        self.setActiveUser()
+        self.ds.mM.Hide_Main_Window()
+        self.hide()
 
 class newProfileDockWidget(QDockWidget):
     def __init__(self, loginWindow, profileData):

@@ -32,7 +32,7 @@ import warnings
 warnings.warn = warn
 
 from src.Constants import DSConstants as DSConstants
-from src.Managers.WorkspaceManager.WorkspaceManager import WorkspaceManager, DSUnits, DSPrefix
+from src.Managers.WorkspaceManager.WorkspaceManager import WorkspaceManager
 from src.Managers.InstrumentManager.InstrumentManager import InstrumentManager
 from src.Managers.HardwareManager.HardwareManager import HardwareManager
 from src.Managers.ModuleManager.ModuleManager import ModuleManager
@@ -46,7 +46,7 @@ def default_exception_hook(exctype, value, traceback):
 
 sys.excepthook = default_exception_hook
 
-class DataStation_Core(QObject):
+class DataStation_Core(QMainWindow):
     logDetail = DSConstants.LOG_PRIORITY_MED
 
 ############################################################################################
@@ -74,14 +74,16 @@ class DataStation_Core(QObject):
         self.setAppIcons()
         self.initManagers()
         self.hM.loadHardwareState()
-        self.postLog('Waiting on User Profile selection..', DSConstants.LOG_PRIORITY_HIGH)
 
-        self.wM.loadPreviousWS()
-        self.iM.loadPreviousInstrument()
-        self.iM.loadPreviousSequence()
+        #self.wM.loadPreviousWS()
+        #self.iM.loadPreviousInstrument()
+        #self.iM.loadPreviousSequence()
+
+        self.initTrayMenu()
 
         self.DataStation_Loaded.emit()
-        self.postLog('Data Station Finished Loading!', DSConstants.LOG_PRIORITY_HIGH)
+
+        self.app.lastWindowClosed.connect(self.lastWindowClosed)
 
     def setAppIcons(self):
         self.app_icon = QIcon()
@@ -95,14 +97,22 @@ class DataStation_Core(QObject):
         self.trayIcon = QSystemTrayIcon(self.app_icon, self)
         self.trayIcon.show()
 
+    def initTrayMenu(self):
+        self.trayMenu = QMenu()
+        self.exitAction = QAction('Shutdown DataStation')
+        self.exitAction.triggered.connect(self.softExit)
+
+        self.trayMenu.addAction(self.exitAction)
+        self.trayMenu.addSeparator()
+
+        self.trayIcon.setContextMenu(self.trayMenu)
+
     def initManagers(self):
         self.mM = ModuleManager(self)           # MODULE MANAGER
-        self.mM.DSLoading()
         self.mM.scanModules()                       # LOAD MODULES
+        self.mM.DSLoading()
 
         self.wM = WorkspaceManager(self)        # WORKSPACE CONTROLLER
-        self.wM.initUserScriptController()          # USER SCRIPTS
-        self.wM.initDatabaseCommManager()           # DATABASE COMM
 
         self.iM = InstrumentManager(self)       # INSTRUMENT MANAGER
         self.iM.loadComponents()                    # USER COMPONENTS
@@ -117,51 +127,6 @@ class DataStation_Core(QObject):
         self.hM.connections(self.wM, self.iM)
         self.mM.connections(self.wM, self.hM, self.iM)
 
-    #def finishInitWithUser(self, userData):
-        #self.postLog('User Profile Selected: ' + userData['First Name'] + ' ' + userData['Last Name'], DSConstants.LOG_PRIORITY_HIGH)
-        #self.wM.userProfile = userData
-
-        #self.setGeometry(300, 300, 1280, 720)
-        #self.setWindowTitle('DataStation (Alpha)')
-        #self.show()
-        #self.restoreWindowStates()
-
-    #def initActions(self):
-    #    self.exitAction = QAction(QIcon(os.path.join(self.srcDir, r'icons2\minimize.png')), 'Exit', self)
-    #    self.exitAction.setShortcut('Ctrl+Q')
-    #    self.exitAction.setStatusTip('Exit Application')
-    #    self.exitAction.triggered.connect(self.close)
-
-    #def initMenu(self):
-    #    self.menubar = self.menuBar()
-    #    self.fileMenu = self.menubar.addMenu('&File')
-    #    self.fileMenu.addSeparator()
-    #    self.fileMenu.addAction(self.exitAction)
-
-        #self.viewWindowsMenu = QMenu('Windows')
-        #self.viewWindowsMenu.aboutToShow.connect(self.populateViewWindowMenu)
-
-        #self.viewMenu = self.menubar.addMenu('&View')
-        #self.viewMenu.addMenu(self.viewWindowsMenu)
-
-        #self.moduleManagerMenu = self.menubar.addMenu(self.mM.populateMenu())
-
-    #def populateViewWindowMenu(self):
-    #    windows = self.findChildren(QDockWidget)
-    #    self.viewWindowsMenu.clear()
-    #    for window in windows:
-    #        if(hasattr(window, 'doNotAutoPopulate') is False):
-    #            action = QAction(str(window.windowTitle()), self)
-    #            action.setCheckable(True)
-    #            action.setChecked(window.isVisible())##
-
-    #            if(window.isVisible()):
-    #                action.triggered.connect(window.hide)
-    #            else:
-    #                action.triggered.connect(window.show)
-
-    #            self.viewWindowsMenu.addAction(action)
-
     def postLog(self, key, level, **kwargs):
         useKey = kwargs.get('textKey', False)
         if(useKey):
@@ -170,19 +135,22 @@ class DataStation_Core(QObject):
             text = key
 
         if(self.logDetail >= level):
-            #self.logDockWidget.postLog(text, **kwargs)
             self.Log_Posted.emit(text)
             #print(text)
             app.processEvents()
 
     def softExit(self):
         self.postLog('Shutting down Datastation!', DSConstants.LOG_PRIORITY_HIGH)
+        self.mM.isShutdown = True
         self.trayIcon.hide()
         self.DataStation_Closing.emit()
         self.DataStation_Closing_Final.emit()
+        self.app.processEvents()
+        self.app.quit()
 
-    def signalClose(self):
-        self.close()
+    def lastWindowClosed(self):
+        self.trayIcon.showMessage('DataStation Still Running!', 'All windows were closed but DataStation is still running in the background!', QSystemTrayIcon.Information)
+        pass
 
     def closeEvent(self, event):
         self.softExit()
@@ -190,6 +158,7 @@ class DataStation_Core(QObject):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    app.setQuitOnLastWindowClosed(False)
     core = DataStation_Core(app)
     try:
         sys.exit(app.exec_())

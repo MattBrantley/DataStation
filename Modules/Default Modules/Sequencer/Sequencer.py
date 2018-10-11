@@ -15,7 +15,7 @@ from src.Constants import moduleFlags as mfs
 
 class Sequencer(DSModule):
     Module_Name = 'Sequencer'
-    Module_Flags = [mfs.SHOW_ON_CREATION, mfs.FLOAT_ON_CREATION]
+    Module_Flags = []
     ITEM_GUID = Qt.UserRole
 
     def __init__(self, ds):

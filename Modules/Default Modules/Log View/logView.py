@@ -5,7 +5,7 @@ from src.Constants import moduleFlags as mfs
 
 class logView(DSModule):
     Module_Name = 'Log View'
-    Module_Flags = [mfs.SHOW_ON_CREATION, mfs.FLOAT_ON_CREATION]
+    Module_Flags = [mfs.CAN_DELETE, mfs.CAN_FLOAT]
 
     def __init__(self, ds):
         super().__init__(ds)

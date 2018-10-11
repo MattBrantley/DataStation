@@ -29,3 +29,4 @@ class ModuleHandler(QObject):
 
     def assignToWindow(self, window):
         self.window.transferModule(self)
+        self.modInstance.configureWidget(self.window)

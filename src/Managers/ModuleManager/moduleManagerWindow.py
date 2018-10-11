@@ -18,6 +18,11 @@ class moduleManagerWindow(QMainWindow):
 
         self.windowsTab = windowsTab(self.ds)
         self.mainWidget.addTab(self.windowsTab, 'Windows')
+
+        self.ds.DataStation_Closing.connect(self.closing)
+
+    def closing(self):
+        self.close()
         
 class windowsTab(QWidget):
 

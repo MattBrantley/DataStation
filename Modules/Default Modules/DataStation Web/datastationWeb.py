@@ -6,7 +6,7 @@ from src.Constants import moduleFlags as mfs
 
 class datastationWeb(DSModule):
     Module_Name = 'DataStation Web'
-    Module_Flags = [mfs.SHOW_ON_CREATION, mfs.FLOAT_ON_CREATION]
+    Module_Flags = []
 
     def __init__(self, ds):
         super().__init__(ds)

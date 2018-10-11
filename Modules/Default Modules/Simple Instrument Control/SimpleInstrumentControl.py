@@ -10,7 +10,7 @@ from pathlib import Path
 
 class SimpleInstrumentControl(DSModule):
     Module_Name = 'Simple Instrument Control'
-    Module_Flags = [mfs.SHOW_ON_CREATION, mfs.FLOAT_ON_CREATION]
+    Module_Flags = []
 
     def __init__(self, ds):
         super().__init__(ds)

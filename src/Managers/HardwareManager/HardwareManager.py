@@ -105,6 +105,8 @@ class HardwareManager(QObject):
         self.readyStatus = False
         self.filtersDir = os.path.join(self.ds.rootDir, 'Filters')
         self.hardwareDriverDir = os.path.join(self.ds.rootDir, 'Hardware Drivers')
+        self.hardwareStatePath = os.path.join(self.ds.rootDir, 'HardwareState.json')
+
         self.filtersAvailable = list()
         self.driversAvailable = list()
         self.deviceHandlerList = list()
@@ -396,18 +398,59 @@ class HardwareManager(QObject):
         deviceHandler.onRemove()
         self.deviceHandlerList.remove(deviceHandler)
 
-    def loadHardwareState(self):
-        self.ds.postLog('Restoring Hardware State... ', DSConstants.LOG_PRIORITY_HIGH)
-        if('hardwareState' in self.wM.settings):
-            tempHardwareSettings = self.wM.settings['hardwareState']
-            self.ds.wM.settings['hardwareState'] = None
-            if(self.processHardwareData(tempHardwareSettings) is True):
-                self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
-            else:
-                self.ds.postLog('Error Loading Hardware State - Aborting!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
-        else:
-            self.ds.postLog('No Hardware State Found - Aborting!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+##### Hardware State ######
+    def saveHardwareState(self):
+        self.ds.postLog('Recording Hardware State... ', DSConstants.LOG_PRIORITY_HIGH)
+        savePacket = dict()
+        savePacket['hardwareStates'] = list()
+        savePacket['filters'] = list()
 
+        for deviceHandler in self.deviceHandlerList:
+            savePacket['hardwareStates'].append(deviceHandler.savePacket())
+
+        for Filter in self.filterList:
+            savePacket['filters'].append(Filter.savePacket())
+
+        self.writeHardwareStateFile(savePacket)
+
+        self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH)
+
+    def writeHardwareStateFile(self, stateData):
+        self.ds.postLog('Updating Settings File... ', DSConstants.LOG_PRIORITY_HIGH)
+        with open(self.hardwareStatePath, 'w') as file:
+            json.dump(stateData, file, sort_keys=True, indent=4)
+        self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+
+    #def loadHardwareState(self):
+    #    self.ds.postLog('Restoring Hardware State... ', DSConstants.LOG_PRIORITY_HIGH)
+    #    if('hardwareState' in self.wM.settings):
+    #        tempHardwareSettings = self.wM.settings['hardwareState']
+    #        self.ds.wM.settings['hardwareState'] = None
+    #        if(self.processHardwareData(tempHardwareSettings) is True):
+    #            self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+    #        else:
+    #            self.ds.postLog('Error Loading Hardware State - Aborting!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+    #    else:
+    #        self.ds.postLog('No Hardware State Found - Aborting!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+    #
+    #    self.Hardware_State_Loaded.emit()
+
+    def loadHardwareState(self):
+        self.ds.postLog('Loading Hardware State Data.. ', DSConstants.LOG_PRIORITY_HIGH)
+        if(os.path.isfile(self.hardwareStatePath)):
+            with open(self.hardwareStatePath, 'r+') as stateFile:
+                try:
+                    stateData = json.load(stateFile)
+                    stateFile.close()
+                    self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+                except ValueError:
+                    stateData = None
+                    self.ds.postLog('Hardware State File is Corrupt!!! Ignoring..', DSConstants.LOG_PRIORITY_HIGH)
+            if(stateData is not None):
+                self.processHardwareData(stateData)
+        else:
+            self.ds.postLog('Hardware State File Not Found! Ignoring..', DSConstants.LOG_PRIORITY_HIGH)
+        
         self.Hardware_State_Loaded.emit()
 
     def processHardwareData(self, hardwareData):
@@ -430,28 +473,8 @@ class HardwareManager(QObject):
                         self.addFilter(filterModel, loadData=filterState)
                     else:
                         self.ds.postLog('Filter State Found (Identifier: ' + filterState['filterIdentifier'] + ') But No Filter Models Are Present For This Identifier! Partial Hardware State Import Continuing...', DSConstants.LOG_PRIORITY_HIGH)
-                        
                 else:
                     self.ds.postLog('Filter State Data Corrupted! Partial Hardware State Import Continuing...', DSConstants.LOG_PRIORITY_HIGH)
-                        
-
             return True
         else:
             return False
-
-    def saveHardwareState(self):
-        self.ds.postLog('Recording Hardware State... ', DSConstants.LOG_PRIORITY_HIGH)
-        savePacket = dict()
-        savePacket['hardwareStates'] = list()
-        savePacket['filters'] = list()
-
-        for deviceHandler in self.deviceHandlerList:
-            savePacket['hardwareStates'].append(deviceHandler.savePacket())
-
-        for Filter in self.filterList:
-            savePacket['filters'].append(Filter.savePacket())
-
-
-        self.wM.settings['hardwareState'] = savePacket
-
-        self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH)

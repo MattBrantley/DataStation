@@ -12,8 +12,7 @@ from src.Constants import moduleFlags as mfs
 
 class hardwareView(DSModule):
     Module_Name = 'Hardware View'
-    Module_Flags = [mfs.SHOW_ON_CREATION, mfs.FLOAT_ON_CREATION]
-    ITEM_GUID = Qt.UserRole
+    Module_Flags = []
 
     def __init__(self, ds):
         super().__init__(ds)
@@ -22,7 +21,10 @@ class hardwareView(DSModule):
         self.hM = ds.hM
         self.wM = ds.wM
 
+    def configureWidget(self, window):
+
         #self.hide()
+        self.window = window
         self.resize(800, 800)
         self.toolbar = QToolBar()
 

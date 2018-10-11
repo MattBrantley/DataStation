@@ -5,7 +5,7 @@ from src.Managers.ModuleManager.DSModule import DSModule
 from src.Managers.ModuleManager.moduleManagerWindow import moduleManagerWindow
 from src.Managers.ModuleManager.DSWindow import DSWindow
 from src.Managers.ModuleManager.ModuleHandler import ModuleHandler
-from src.Managers.ModuleManager.loadingScreenWidget import loadingScreenWidget
+from src.Managers.ModuleManager.mainWindow import mainWindow
 from PyQt5.Qt import *
 
 class ModuleManager(QObject):
@@ -13,7 +13,20 @@ class ModuleManager(QObject):
 ############################################################################################
 ##################################### EXTERNAL SIGNALS #####################################
     
+    def Close_Window(self, window):
+        self.windowClosing(window)
 
+    def Close_DataStation(self, window):
+        self.closeDataStation(window)
+
+    def Save_Window_States(self):
+        return self.saveWindowStates()
+
+    def Load_Window_States(self, data):
+        self.loadWindowStates(data)
+
+    def Hide_Main_Window(self):
+        self.hideMainWindow()
 
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
@@ -47,7 +60,6 @@ class ModuleManager(QObject):
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
-
     def __init__(self, ds):
         super().__init__()
         self.ds = ds
@@ -55,14 +67,15 @@ class ModuleManager(QObject):
         self.modulesAvailable = list()
         self.modules = list()
         self.mainWindows = list()
+        self.isShutdown = False
+        self.defaultModules = ['Default Loading Screen', 'Profile Selection']
 
         self.populateMenu()
 
-        self.ds.DataStation_Loaded.connect(self.DSLoaded)
+        #self.ds.DataStation_Loaded.connect(self.DSLoaded)
         self.ds.DataStation_Closing.connect(self.DSClosing)
 
 ##### DataStation Reserved Functions #####
-
     def connections(self, wM, hM, iM):
         self.wM = wM
         self.hM = hM
@@ -71,25 +84,35 @@ class ModuleManager(QObject):
         # Called after all managers are created so they can connect to each other's signals
 
     def DSLoading(self):
-        self.loadScreenWidget = loadingScreenWidget(self.ds)
+        self.mainWindow = mainWindow(self.ds)
+
+        for modName in self.defaultModules:
+            widget = self.getModByModName(modName)
+            if(widget is not None):
+                self.addModuleInstance(widget, self.mainWindow, '')
+
+        self.mainWindow.centerWindow()
 
     def DSLoaded(self):
-        self.loadScreenWidget.close()
         tSaveURL = os.path.join(self.ds.srcDir, 'testSave.json')
         if(os.path.isfile(tSaveURL)):
             with open(tSaveURL, 'r+') as file:
-                try:
-                    windowData = json.load(file)
-                    self.loadWindowStates(windowData)
-                except:
-                    print('ERROR OCCURED LOADING')
+                #try:
+                windowData = json.load(file)
+                self.loadWindowStates(windowData)
+                #except:
+                #    print('ERROR OCCURED LOADING')
 
     def DSClosing(self):
         tSaveURL = os.path.join(self.ds.srcDir, 'testSave.json')
         with open(tSaveURL, 'w') as file:
             json.dump(self.saveWindowStates(), file, sort_keys=True, indent=4)
 
-        self.closeWindows()
+        self.closeAllWindows()
+
+    def closeDataStation(self, window):
+        self.isShutdown = True
+        self.ds.softExit()
 
     def populateMenu(self):
         self.showWidgetAction = QAction('Show Module Widget')
@@ -101,7 +124,6 @@ class ModuleManager(QObject):
         return self.menu
 
 ##### Module Manager Settings Window #####
-
     def initModuleSettingsWindow(self):
         self.moduleSettingsWindow = moduleManagerWindow(self.ds)
         #self.moduleSettingsWindow.show()
@@ -112,7 +134,6 @@ class ModuleManager(QObject):
         self.moduleSettingsWindow.activateWindow()
 
 ##### Stylesheets #####
-
     def setStylesheet(self, path):
         try:
             with open(os.path.join(path)) as file:
@@ -125,6 +146,8 @@ class ModuleManager(QObject):
             #self.setStyleSheet(ssTxt)
 
 ##### Windows #####
+    def hideMainWindow(self):
+        self.mainWindow.hide()
 
     def addWindow(self):
         newWindow = DSWindow(self.ds)
@@ -132,7 +155,10 @@ class ModuleManager(QObject):
         self.mainWindows.append(newWindow)
         return newWindow
 
-    def closeWindows(self):
+    def windowClosing(self, window):
+        self.mainWindows.remove(window)
+
+    def closeAllWindows(self):
         for window in self.mainWindows:
             window.close()
 
@@ -147,9 +173,11 @@ class ModuleManager(QObject):
             newWindow = self.addWindow()
             self.restoreModules(window['modules'], newWindow)
             newWindow.loadWindowState(window)
+        
+        if(len(self.mainWindows) == 0):
+            self.addWindow()
 
 ##### Modules #####
-
     def addModuleInstance(self, module, window, uuid):
         modHandler = ModuleHandler(module, window, self.ds, uuid)
         self.modules.append(modHandler)
@@ -159,6 +187,18 @@ class ModuleManager(QObject):
             mod = self.getModByPath(modData['filePath'])
             if mod is not None:
                 self.Add_Module_Instance(mod, window, uuid=modData['uuid'])
+
+    def getModByFileName(self, name):
+        for mod in self.modulesAvailable:
+            if(mod.fileName == name):
+                return mod
+        return None
+
+    def getModByModName(self, name):
+        for mod in self.modulesAvailable:
+            if(mod.name == name):
+                return mod
+        return None
 
     def getModByPath(self, path):
         for mod in self.modulesAvailable:

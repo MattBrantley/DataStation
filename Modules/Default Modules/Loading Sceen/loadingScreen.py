@@ -1,16 +1,22 @@
 from PyQt5.Qt import *
 import os, time
+from src.Managers.ModuleManager.DSModule import DSModule
+from src.Constants import moduleFlags as mfs
 
-class loadingScreenWidget(QMainWindow):
-    def __init__(self, core):
-        super().__init__(None)
-        self.core = core
+class loadingScreen(DSModule):
+    Module_Name = 'Default Loading Screen'
+    Module_Flags = []
+
+    def __init__(self, ds):
+        super().__init__(ds)
+        self.ds = ds
+        self.setWindowTitle('DataStation is Loading..')
 
         self.mainWidget = QWidget()
         self.mainLayout = QVBoxLayout()
         self.mainWidget.setLayout(self.mainLayout)
 
-        self.splashImage = QPixmap(os.path.join(self.core.srcDir, r'DSIcons\DataStation_Full.png'))
+        self.splashImage = QPixmap(os.path.join(self.ds.srcDir, r'DSIcons\DataStation_Full.png'))
         self.logoWidget = QLabel(self)
         self.logoWidget.setPixmap(self.splashImage)
         self.resize(self.splashImage.width(), self.splashImage.height())
@@ -30,11 +36,9 @@ class loadingScreenWidget(QMainWindow):
         self.mainLayout.addWidget(self.logoWidget)
         self.mainLayout.addWidget(self.logWindow)
 
-        self.setCentralWidget(self.mainWidget)
-        self.centerWindow()
-        self.show()
+        self.setWidget(self.mainWidget)
 
-        self.core.Log_Posted.connect(self.postLog)
+        self.ds.Log_Posted.connect(self.postLog)
 
     def postLog(self, text, **kwargs):
         if('newline' in kwargs):
@@ -44,12 +48,4 @@ class loadingScreenWidget(QMainWindow):
 
         self.logWindow.appendPlainText(time.strftime('[%m/%d/%Y %H:%M:%S] ') + text)
         self.logWindow.verticalScrollBar().setValue(self.logWindow.verticalScrollBar().maximum())
-        
-
-    def centerWindow(self):
-        frameGm = self.frameGeometry()
-        screen = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
-        centerPoint = QApplication.desktop().screenGeometry(screen).center()
-        frameGm.moveCenter(centerPoint)
-        self.move(frameGm.topLeft())
-
+    
