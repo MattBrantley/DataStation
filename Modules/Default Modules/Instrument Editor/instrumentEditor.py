@@ -1,10 +1,8 @@
 from PyQt5.Qt import *
 from PyQt5.QtCore import *
 import pyqtgraph as pg # This library gives a bunch of FutureWarnings that are unpleasant! Fix for this is in the main .py file header.
-import os
+import os, random, numpy as np
 from shutil import copyfileobj
-import numpy as np
-import random
 from src.Constants import DSConstants as DSConstants
 from PyQt5.QtGui import *
 from shutil import copyfile
@@ -15,14 +13,15 @@ class instrumentEditor(DSModule):
     Module_Name = 'Instrument Editor'
     Module_Flags = []
 
-    def __init__(self, ds):
-        super().__init__(ds)
+    def __init__(self, ds, handler):
+        super().__init__(ds, handler)
         self.ds = ds
         self.iM = ds.iM
         self.resize(1000, 800)
         self.fileSystem = DSEditorFSModel()
         self.rootPath = os.path.join(self.ds.rootDir, 'Instruments')
         self.fsIndex = self.fileSystem.setRootPath(self.rootPath)
+        self.settingsFile = os.path.join(self.modDataPath, 'settings.json')
 
         self.toolbar = QToolBar()
         
@@ -50,9 +49,22 @@ class instrumentEditor(DSModule):
         self.mainContainer.setCentralWidget(self.instrumentContainer)
         self.updateToolbarState()
 
-        self.iM.Instrument_Unloaded.connect(self.updateTitle)
-        self.iM.Instrument_Loaded.connect(self.updateTitle)
-        self.iM.Instrument_Config_Changed.connect(self.updateTitle)
+        self.iM.Instrument_Unloaded.connect(self.instrumentChanged)
+        self.iM.Instrument_Loaded.connect(self.instrumentChanged)
+        self.iM.Instrument_Config_Changed.connect(self.instrumentChanged)
+
+        self.ds.DataStation_Closing.connect(self.onShutdown)
+
+        self.onStart()
+
+    def onStart(self):
+        prevInstrumentPath = self.Read_Setting('Instrument_Path')
+        print(prevInstrumentPath)
+        if isinstance(prevInstrumentPath, str):
+            self.openInstrument(prevInstrumentPath)
+
+    def onShutdown(self, instrument):
+        pass
 
     def initToolbar(self):
         self.toolbar.addAction(self.newAction)
@@ -84,11 +96,13 @@ class instrumentEditor(DSModule):
             return
         self.updateTitle()
 
-    def updateTitle(self):
-        if(self.iM.Get_Instrument() is not None):
-            self.setWindowTitle('Instrument View (' + self.iM.Get_Instrument().Get_Name() + ')')
+    def instrumentChanged(self, instrument):
+        if(instrument is not None):
+            self.setWindowTitle('Instrument View (' + instrument.Get_Name() + ')')
+            self.Write_Setting('Instrument_Path', instrument.Get_Path())
         else:
             self.setWindowTitle('Instrument View (None)')
+            self.Write_Setting('Instrument_Path', None)
 
     def save(self):
         savePath = None
@@ -192,7 +206,6 @@ class instrumentEditor(DSModule):
 
     def openInstrument(self, filePath):
         self.iM.Load_Instrument(filePath)
-        self.updateTitle()
 
     def updateToolbarState(self):
         self.saveAction.setEnabled(True)

@@ -14,7 +14,7 @@ class eventListWidget(QDockWidget):
     STATUS_INVALID = 604
 
     def __init__(self, ds, sequencerWidget, comp):
-        super().__init__('Sequencer: ' + comp.Get_Standard_Field('name'), parent=ds.sequencerDockWidget)
+        super().__init__('Sequencer: ' + comp.Get_Standard_Field('name'), parent=sequencerWidget)
         self.comp = comp
         self.ds = ds
         self.iM = ds.iM

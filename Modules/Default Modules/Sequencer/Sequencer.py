@@ -18,8 +18,8 @@ class Sequencer(DSModule):
     Module_Flags = []
     ITEM_GUID = Qt.UserRole
 
-    def __init__(self, ds):
-        super().__init__(ds)
+    def __init__(self, ds, handler):
+        super().__init__(ds, handler)
         self.ds = ds
         self.iM = ds.iM
         self.hM = ds.hM
@@ -179,7 +179,6 @@ class DSGraphicsLayoutWidget(pg.GraphicsLayoutWidget):
             selectedPlots[0].toggleEditWidget(event.globalPos())
 
     def mousePressEvent(self, event):
-        
         if(event.buttons() == Qt.RightButton):
             event.accept()
             selectedPlots = self.findPlotByMousePos(event.globalPos())

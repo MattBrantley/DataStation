@@ -9,8 +9,8 @@ class codeEditor(DSModule):
     Module_Name = 'Code Editor'
     Module_Flags = []
 
-    def __init__(self, ds):
-        super().__init__(ds)
+    def __init__(self, ds, handler):
+        super().__init__(ds, handler)
         self.ds = ds
         self.resize(1000, 800)
 

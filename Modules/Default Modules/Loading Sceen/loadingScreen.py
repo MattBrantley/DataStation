@@ -7,8 +7,8 @@ class loadingScreen(DSModule):
     Module_Name = 'Default Loading Screen'
     Module_Flags = []
 
-    def __init__(self, ds):
-        super().__init__(ds)
+    def __init__(self, ds, handler):
+        super().__init__(ds, handler)
         self.ds = ds
         self.setWindowTitle('DataStation is Loading..')
 

@@ -12,8 +12,8 @@ class profileSelection(DSModule):
     Module_Name = 'Profile Selection'
     Module_Flags = [mfs.SINGLE_INSTANCE, mfs.DEFAULT_MODULE, mfs.CAN_FLOAT]
 
-    def __init__(self, ds):
-        super().__init__(ds)
+    def __init__(self, ds, handler):
+        super().__init__(ds, handler)
         self.userProfiles = []
         self.ds = ds
         self.profilePathFolder = os.path.join(self.modDataPath, 'Profiles')

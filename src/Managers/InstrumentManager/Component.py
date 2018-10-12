@@ -267,8 +267,9 @@ class Component(QObject):
         return True
 
     def clearEvents(self):
-        for event in reversed(self.eventList):
-            self.removeEvent(event)
+        self.removeEvents(self.eventList)
+        #for event in reversed(self.eventList):
+        #    self.removeEvent(event)
 
     # At the moment, addEvents and removeEvents both force a recalculation. For
     # the sequencer widget, this means that a modify event (add and remove) will

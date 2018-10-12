@@ -94,19 +94,20 @@ class ModuleManager(QObject):
         self.mainWindow.centerWindow()
 
     def DSLoaded(self):
-        tSaveURL = os.path.join(self.ds.srcDir, 'testSave.json')
-        if(os.path.isfile(tSaveURL)):
-            with open(tSaveURL, 'r+') as file:
-                #try:
-                windowData = json.load(file)
-                self.loadWindowStates(windowData)
+        pass
+        #tSaveURL = os.path.join(self.ds.srcDir, 'testSave.json')
+        #if(os.path.isfile(tSaveURL)):
+        #    with open(tSaveURL, 'r+') as file:
+        #        #try:
+        #        windowData = json.load(file)
+        #        self.loadWindowStates(windowData)
                 #except:
                 #    print('ERROR OCCURED LOADING')
 
     def DSClosing(self):
-        tSaveURL = os.path.join(self.ds.srcDir, 'testSave.json')
-        with open(tSaveURL, 'w') as file:
-            json.dump(self.saveWindowStates(), file, sort_keys=True, indent=4)
+        #tSaveURL = os.path.join(self.ds.srcDir, 'testSave.json')
+        #with open(tSaveURL, 'w') as file:
+        #    json.dump(self.saveWindowStates(), file, sort_keys=True, indent=4)
 
         self.closeAllWindows()
 

@@ -12,11 +12,11 @@ class InstrumentManager(QObject):
 ##################################### EXTERNAL SIGNALS #####################################
 
 ##### Signals: Instrument #####
-    Instrument_Loaded = pyqtSignal()
-    Instrument_Unloaded = pyqtSignal()
-    Instrument_Saving = pyqtSignal()
-    Instrument_New = pyqtSignal()
-    Instrument_Config_Changed = pyqtSignal()
+    Instrument_Loaded = pyqtSignal(object) # Instrument
+    Instrument_Unloaded = pyqtSignal(object) # Instrument
+    Instrument_Saving = pyqtSignal(object) # Instrument
+    Instrument_New = pyqtSignal(object) # Instrument
+    Instrument_Config_Changed = pyqtSignal(object) # Instrument
     
 ##### Signals: Components #####
     Component_Added = pyqtSignal(object, object) # Instrument, Component
@@ -137,7 +137,7 @@ class InstrumentManager(QObject):
         pass
 
     def instrumentConfigModified(self, instrument):
-        self.Instrument_Config_Changed.emit()
+        self.Instrument_Config_Changed.emit(instrument)
 
     def componentAdded(self, instrument, component):
         self.Component_Added.emit(instrument, component)
@@ -187,27 +187,27 @@ class InstrumentManager(QObject):
 
 ##### Instrument Manipulations ######
 
-    def loadPreviousInstrument(self):
-        if('instrumentURL' in self.wM.userProfile):
-            if(self.wM.userProfile['instrumentURL'] is not None):
-                self.loadInstrument(self.wM.userProfile['instrumentURL'])
+    #def loadPreviousInstrument(self):
+    #    if('instrumentURL' in self.wM.userProfile):
+    #        if(self.wM.userProfile['instrumentURL'] is not None):
+    #            self.loadInstrument(self.wM.userProfile['instrumentURL'])
 
-    def loadPreviousSequence(self):
-        if('sequenceURL' in self.wM.userProfile):
-            if(self.wM.userProfile['sequenceURL'] is not None and self.currentInstrument is not None):
-                self.currentInstrument.loadSequence(self.wM.userProfile['sequenceURL'])
+    #def loadPreviousSequence(self):
+    #    if('sequenceURL' in self.wM.userProfile):
+    #        if(self.wM.userProfile['sequenceURL'] is not None and self.currentInstrument is not None):
+    #            self.currentInstrument.loadSequence(self.wM.userProfile['sequenceURL'])
 
     def newInstrument(self, name, rootPath): # Instrument_Unloaded // Instrument_New
-        self.Instrument_Unloaded.emit()
+        self.Instrument_Unloaded.emit(self.currentInstrument)
         self.currentInstrument = Instrument(self)
         self.currentInstrument.url = os.path.join(rootPath, name+'.dsinstrument')
         self.currentInstrument.name = name
-        self.Instrument_New.emit()
+        self.Instrument_New.emit(self.currentInstrument)
 
     def saveInstrument(self):# Instrument_Saving
         if(self.currentInstrument is not None):
             self.ds.postLog('VI_Save', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
-            self.Instrument_Saving.emit()
+            self.Instrument_Saving.emit(self.currentInstrument)
             self.writeInstrumentToFile(self.currentInstrument.savePacket(), self.currentInstrument.url)
             self.ds.postLog(' ...Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
         else:
@@ -237,16 +237,17 @@ class InstrumentManager(QObject):
         with open(url, 'r') as file:
             try:
                 instrumentData = json.load(file)
-                self.Instrument_Unloaded.emit()
+                self.Instrument_Unloaded.emit(self.currentInstrument)
                 if(isinstance(instrumentData, dict)):
-                    if(self.processInstrumentData(instrumentData, url) is False):
+                    newInstrument = self.processInstrumentData(instrumentData, url)
+                    if(newInstrument is False):
                         self.ds.postLog('Corrupted instrument at (' + url + ') - aborting! ', DSConstants.LOG_PRIORITY_MED)
             except ValueError as e:
                 self.ds.postLog('Corrupted instrument at (' + url + ') - aborting! ', DSConstants.LOG_PRIORITY_MED)
                 return
         self.ds.postLog('Finished Loading User Instrument!', DSConstants.LOG_PRIORITY_HIGH)
 
-        self.Instrument_Loaded.emit()
+        self.Instrument_Loaded.emit(newInstrument)
 
     def processInstrumentData(self, instrumentData, url):
         self.tempInstrument = Instrument(self)
@@ -269,6 +270,7 @@ class InstrumentManager(QObject):
                                 result.loadSockets(comp['sockets'])
 
         self.currentInstrument = self.tempInstrument
+        return self.currentInstrument
 
     def addCompToInstrument(self, compModel, customFields=dict()):
         if (self.currentInstrument is None):
@@ -296,7 +298,6 @@ class InstrumentManager(QObject):
             return None
 
         self.currentInstrument.sequenceInfoUpdate(filePath, os.path.basename(filePath))
-        self.wM.userProfile['sequenceURL'] = filePath
         return sequenceData
 
         if(self.instrument.processSequenceData(sequenceData) is False):
@@ -330,7 +331,6 @@ class InstrumentManager(QObject):
             json.dump(saveData, file, sort_keys=True, indent=4)
             
         self.currentInstrument.sequenceInfoUpdate(saveURL, fileName)
-        self.wM.userProfile['sequenceURL'] = saveURL
         self.Sequence_Saved.emit(self.currentInstrument) 
         self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
@@ -358,7 +358,6 @@ class InstrumentManager(QObject):
         self.currentSequenceURL = saveURL
 
         self.currentInstrument.sequenceInfoUpdate(saveURL, fname+'.dssequence')
-        self.wM.userProfile['sequenceURL'] = saveURL
         self.Sequence_Saved.emit(self.currentInstrument) 
         self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 

@@ -32,6 +32,8 @@ class hardwareListWidget(QWidget):
         self.scroll.setWidgetResizable(True)
         self.scroll.setWidget(self.hardwareList)
 
+        self.populateExistingHardware()
+
         self.hM.Hardware_Added.connect(self.addHardware)
         
     def newButtonPressed(self):
@@ -40,6 +42,10 @@ class hardwareListWidget(QWidget):
         hardwareMenuAction = hardwareSelectionWidget(self, menu, self.ds)
         menu.addAction(hardwareMenuAction)
         action = menu.exec_(QCursor().pos())
+
+    def populateExistingHardware(self):
+        for hardwareObj in self.hM.Get_Hardware():
+            self.addHardware(hardwareObj)
 
     def addHardware(self, hardwareObj):
         widgetItem = hardwareListItem(self.hardwareList, self.ds, hardwareObj)

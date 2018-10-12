@@ -8,8 +8,8 @@ class processStatus(DSModule):
     Module_Name = 'Process Status'
     Module_Flags = []
 
-    def __init__(self, ds):
-        super().__init__(ds)
+    def __init__(self, ds, handler):
+        super().__init__(ds, handler)
         
         self.setFeatures(QDockWidget.DockWidgetFloatable | QDockWidget.DockWidgetMovable)
 

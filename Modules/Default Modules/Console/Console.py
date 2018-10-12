@@ -9,8 +9,8 @@ class Console(DSModule):
     Module_Flags = []
     ITEM_GUID = Qt.UserRole
 
-    def __init__(self, ds):
-        super().__init__(ds)
+    def __init__(self, ds, handler):
+        super().__init__(ds, handler)
         self.ds = ds 
 
     def configureWidget(self, window):

@@ -9,6 +9,9 @@ class ModuleHandler(QObject):
     def Assign_To_Window(self, window):
         self.assignToWindow(window)
 
+    def Get_UUID(self):
+        return self.uuid
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
     def __init__(self, modObject, window, ds, uuid):
@@ -23,7 +26,7 @@ class ModuleHandler(QObject):
         self.Assign_To_Window(window)
 
     def instantiateModule(self):
-        self.modInstance = self.modObject.modClass(self.ds)
+        self.modInstance = self.modObject.modClass(self.ds, self)
         self.modInstance.setObjectName(self.uuid)
         self.modInstance.setWindowTitle(self.modObject.name)
 

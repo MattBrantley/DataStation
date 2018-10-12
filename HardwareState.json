@@ -4,7 +4,7 @@
         {
             "hardwareIdentifier": "MRB_MIPS",
             "hardwareSettings": {
-                "deviceName": "",
+                "deviceName": "COM14",
                 "hardwareIdentifier": "MRB_MIPS",
                 "hardwareType": "MIPS",
                 "name": "",
@@ -13,7 +13,336 @@
                 "triggerMode": "",
                 "uuid": "1b1b549f-f6c2-46e7-8f9a-4673cf1263d3"
             },
-            "sourceList": []
+            "sourceList": [
+                {
+                    "enabled": false,
+                    "name": "[COM14] DCB/1",
+                    "physConID": "DCB/1",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "a9511b94-c347-4411-8d69-b9a374fb6ee6",
+                    "vMax": 250.0,
+                    "vMin": -250.0
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DCB/2",
+                    "physConID": "DCB/2",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "9694dfab-6bb4-4f03-976f-29472be355c7",
+                    "vMax": 250.0,
+                    "vMin": -250.0
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DCB/3",
+                    "physConID": "DCB/3",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "4757c588-6a8a-49aa-992d-31f782cf8187",
+                    "vMax": 250.0,
+                    "vMin": -250.0
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DCB/4",
+                    "physConID": "DCB/4",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "8ba59079-cfc6-4f90-bb78-d3ca4525cb91",
+                    "vMax": 250.0,
+                    "vMin": -250.0
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DCB/5",
+                    "physConID": "DCB/5",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "663955e1-15fc-4f08-b186-2b88f29050f1",
+                    "vMax": 250.0,
+                    "vMin": -250.0
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DCB/6",
+                    "physConID": "DCB/6",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "1fb8cfa3-9aa5-4a0e-ae96-74ee3c20aa81",
+                    "vMax": 250.0,
+                    "vMin": -250.0
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DCB/7",
+                    "physConID": "DCB/7",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "7f0998b7-4025-448f-8975-12f21ebd5f04",
+                    "vMax": 250.0,
+                    "vMin": -250.0
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DCB/8",
+                    "physConID": "DCB/8",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "ac57191e-455f-4e9c-9217-c825b9a07aaa",
+                    "vMax": 250.0,
+                    "vMin": -250.0
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DCB/9",
+                    "physConID": "DCB/9",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "af976cff-f9e9-4910-94a1-73c3a1e55fa5",
+                    "vMax": 50.0,
+                    "vMin": -50.0
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DCB/10",
+                    "physConID": "DCB/10",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "4511c2f9-7ddf-44ca-bfe6-fc0ef5537d53",
+                    "vMax": 50.0,
+                    "vMin": -50.0
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DCB/11",
+                    "physConID": "DCB/11",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "15637747-2448-434f-ba1b-06d91f12edd4",
+                    "vMax": 50.0,
+                    "vMin": -50.0
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DCB/12",
+                    "physConID": "DCB/12",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "8fbfdeb0-e3b4-4e57-a4c9-19d8348494eb",
+                    "vMax": 50.0,
+                    "vMin": -50.0
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DCB/13",
+                    "physConID": "DCB/13",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "4bd7259a-e239-486c-95ed-22e85ae3a0dc",
+                    "vMax": 50.0,
+                    "vMin": -50.0
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DCB/14",
+                    "physConID": "DCB/14",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "f33e4ab8-19ef-4a47-893b-0e8c905eb57f",
+                    "vMax": 50.0,
+                    "vMin": -50.0
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DCB/15",
+                    "physConID": "DCB/15",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "3024e115-7727-4081-863d-9f85fd8f5011",
+                    "vMax": 50.0,
+                    "vMin": -50.0
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DCB/16",
+                    "physConID": "DCB/16",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "edbe4812-a29e-4317-944c-0029948ac41f",
+                    "vMax": 50.0,
+                    "vMin": -50.0
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/A",
+                    "physConID": "DIO/A",
+                    "trigger": false,
+                    "uuid": "4b500001-0d48-48f4-8eee-9478064ce71f"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/B",
+                    "physConID": "DIO/B",
+                    "trigger": false,
+                    "uuid": "d8ee0c3e-7a64-40ff-a3ea-35c4bab43513"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/C",
+                    "physConID": "DIO/C",
+                    "trigger": false,
+                    "uuid": "4afce933-4ed2-4f4b-8931-3fa7fc354717"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/D",
+                    "physConID": "DIO/D",
+                    "trigger": false,
+                    "uuid": "c2326a2b-b992-4a7b-aab5-4d66aad5364e"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/E",
+                    "physConID": "DIO/E",
+                    "trigger": false,
+                    "uuid": "036615fc-10d7-430f-b316-012508900a36"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/F",
+                    "physConID": "DIO/F",
+                    "trigger": false,
+                    "uuid": "292fcc11-2a0b-4e16-9d69-e47b170ac8ae"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/G",
+                    "physConID": "DIO/G",
+                    "trigger": false,
+                    "uuid": "c4b8987a-a78c-44ab-9ee8-66ff98f98973"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/H",
+                    "physConID": "DIO/H",
+                    "trigger": false,
+                    "uuid": "7eca2b2b-12ec-4dda-8728-600dd1d99e66"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/I",
+                    "physConID": "DIO/I",
+                    "trigger": false,
+                    "uuid": "75156700-c6eb-4989-9744-de94930b2e7f"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/J",
+                    "physConID": "DIO/J",
+                    "trigger": false,
+                    "uuid": "f33c57d0-50f3-4831-9b7b-caa93909db6e"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/K",
+                    "physConID": "DIO/K",
+                    "trigger": false,
+                    "uuid": "87c6d982-4e81-4f07-a03f-31450684bcc7"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/L",
+                    "physConID": "DIO/L",
+                    "trigger": false,
+                    "uuid": "0dd151d8-3f85-4b45-8a33-4102f3d617ca"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/M",
+                    "physConID": "DIO/M",
+                    "trigger": false,
+                    "uuid": "520309ce-3fff-43c9-ada8-3d5493bc0c7f"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/N",
+                    "physConID": "DIO/N",
+                    "trigger": false,
+                    "uuid": "fc3ad1ef-2b6f-4a61-9c5a-0b319d1d5af4"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/O",
+                    "physConID": "DIO/O",
+                    "trigger": false,
+                    "uuid": "7235bf93-9943-4071-bf79-3b12b68a9fbc"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/P",
+                    "physConID": "DIO/P",
+                    "trigger": false,
+                    "uuid": "ff893a4c-0287-476e-85d7-d33cc531425c"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/Q",
+                    "physConID": "DIO/Q",
+                    "trigger": true,
+                    "uuid": "7cdbd274-d6e3-4346-b542-e6e953c54ae5"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/R",
+                    "physConID": "DIO/R",
+                    "trigger": true,
+                    "uuid": "76549969-3191-468d-a363-1cfb61450270"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/S",
+                    "physConID": "DIO/S",
+                    "trigger": true,
+                    "uuid": "d92027ec-0c0e-45b4-a264-9ce99be18f7f"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/T",
+                    "physConID": "DIO/T",
+                    "trigger": true,
+                    "uuid": "25f7ae52-407f-4a3e-a734-2f737fd2dda5"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/U",
+                    "physConID": "DIO/U",
+                    "trigger": true,
+                    "uuid": "5ce2627d-ca90-4883-8acf-182dfe0dd439"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/V",
+                    "physConID": "DIO/V",
+                    "trigger": true,
+                    "uuid": "52cfa2ee-7872-4f4f-9af7-d78f1bb1ba3f"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/W",
+                    "physConID": "DIO/W",
+                    "trigger": true,
+                    "uuid": "67e78350-d5ad-4baa-8bb6-5e6d11562481"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/X",
+                    "physConID": "DIO/X",
+                    "trigger": true,
+                    "uuid": "c9f6f5a4-d29a-471f-b9ae-259147018bf5"
+                }
+            ]
         }
     ]
 }

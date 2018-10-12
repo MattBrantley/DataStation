@@ -8,8 +8,8 @@ class datastationWeb(DSModule):
     Module_Name = 'DataStation Web'
     Module_Flags = []
 
-    def __init__(self, ds):
-        super().__init__(ds)
+    def __init__(self, ds, handler):
+        super().__init__(ds, handler)
         self.ds = ds
         #self.setFeatures(self.features() & ~QDockWidget.DockWidgetClosable & ~QDockWidget.DockWidgetMovable & ~QDockWidget.DockWidgetFloatable & ~QDockWidget.DockWidgetVerticalTitleBar)
         self.browser = QWebEngineView()

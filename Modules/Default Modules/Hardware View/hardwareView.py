@@ -14,8 +14,8 @@ class hardwareView(DSModule):
     Module_Name = 'Hardware View'
     Module_Flags = []
 
-    def __init__(self, ds):
-        super().__init__(ds)
+    def __init__(self, ds, handler):
+        super().__init__(ds, handler)
         self.ds = ds
         self.iM = ds.iM
         self.hM = ds.hM
@@ -39,7 +39,7 @@ class hardwareView(DSModule):
         self.tabWidget = QTabWidget()
         self.tabWidget.addTab(self.hardwareWidget, "Attached Hardware")
         self.tabWidget.addTab(self.connectorGridWidget, "Connection Grid")
-        self.tabWidget.addTab(self.filtersWidget, "Filters")
-        self.tabWidget.addTab(self.driversWidget, "Hardware Drivers")
+        #self.tabWidget.addTab(self.filtersWidget, "Filters")
+        #self.tabWidget.addTab(self.driversWidget, "Hardware Drivers")
         self.mainContainer.setCentralWidget(self.tabWidget)
         self.setWidget(self.mainContainer)
