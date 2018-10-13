@@ -1,19 +1,9 @@
 from src.Managers.InstrumentManager.Component import *
 from src.Constants import readyCheckPacket
 from copy import deepcopy
+import json, os
 
 class Instrument(QObject):
-
-    def __init__(self, iM):
-        super().__init__()
-        self.iM = iM
-        self.ds = self.iM.ds
-        self.name = 'Default Instrument'
-        self.url = None
-        self.sequencePath = ''
-        self.sequenceName = ''
-        self.componentList = list()
-
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
 
@@ -54,8 +44,27 @@ class Instrument(QObject):
     def Save_Sequence(self, name=None, path=None):
         pass
 
+    def Save_Instrument(self, name=None, path=None):
+        if(name is not None):
+            self.currentInstrument.Set_Name(name)
+        if(path is not None):
+            self.currentInstrument.Set_Path(path)
+        self.saveInstrument()
+
+    def Load_Instrument_File(self, path):
+        self.loadInstrumentFile(path)
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
+    def __init__(self, iM):
+        super().__init__()
+        self.iM = iM
+        self.ds = self.iM.ds
+        self.name = 'Default Instrument'
+        self.directory = None
+        self.sequencePath = ''
+        self.sequenceName = ''
+        self.componentList = list()
 
 ##### DataStation Interface Functions #####
 
@@ -108,6 +117,64 @@ class Instrument(QObject):
 
     def loadPacket(self):
         pass
+
+    #### Save Instrument ####
+    def saveInstrument(self):
+        if(self.currentInstrument is not None):
+            self.ds.postLog('VI_Save', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
+            self.writeInstrumentToFile()
+            self.iM.instrumentSaved(self)
+            self.ds.postLog(' ...Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
+        else:
+            self.ds.postLog('VI_Save_No_VI', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
+
+    def writeInstrumentToFile(self): ### Implement swap ASAP
+        if(self.directory is None):
+            instrumentSaveURL = self.iM.Instrument_Save_Directory()  
+        else:
+            instrumentSaveURL = self.directory
+
+        fullPath = os.path.join(instrumentSaveURL, self.currentInstrument.name + '.dsinstrument') 
+
+        if(os.path.exists(fullPath)):
+            os.remove(fullPath)
+        with open(fullPath, 'w') as file:
+            json.dump(self.savePacket(), file, sort_keys=True, indent=4)
+
+    #### Load Instrument ####
+    def loadInstrumentFile(self, path):
+        self.directory = os.path.dirname(path)
+        self.ds.postLog('Loading User Instrument (' + path + ')... ', DSConstants.LOG_PRIORITY_HIGH)
+        if(os.path.exists(path) is False):
+            self.ds.postLog('Path (' + path + ') does not exist! Aborting! ', DSConstants.LOG_PRIORITY_HIGH)
+            return
+
+        with open(path, 'r') as file:
+            try:
+                instrumentData = json.load(file)
+                if(isinstance(instrumentData, dict)):
+                    self.processInstrumentData(instrumentData)
+            except ValueError as e:
+                self.ds.postLog('Corrupted instrument at (' + path + ') - aborting! ', DSConstants.LOG_PRIORITY_MED)
+
+    def processInstrumentData(self, instrumentData):
+        if('name' in instrumentData):
+            self.tempInstrument.name = instrumentData['name']
+        else:
+            return False
+
+        if('compList' in instrumentData):
+            for comp in instrumentData['compList']:
+                if(('compIdentifier' in comp) and ('compType' in comp)):
+                    compModel = self.findCompModelByIdentifier(comp['compIdentifier'])
+                    if(compModel is None):
+                        self.ds.postLog('Instrument contains component (' + comp['compType'] + ':' + comp['compIdentifier'] + ') that is not in the available component modules. Ignoring this component!', DSConstants.LOG_PRIORITY_MED)
+                    else:
+                        result = self.Add_Component(compModel, loadData=comp['compSettings'])
+                        if('sockets' in comp):
+                            if(isinstance(comp['sockets'], list)):
+                                result.loadSockets(comp['sockets'])
+        return True
 
 ##### Component Manipulations #####
 
@@ -219,5 +286,5 @@ class Instrument(QObject):
                 comp[0].loadSequenceData(datum['events'])
 
         self.ds.postLog('Sequence applied to instrument!', DSConstants.LOG_PRIORITY_HIGH)
-        self.iM.sequenceLoaded(self)
+        self.iM.sequenceLoaded(self, path)
         return True

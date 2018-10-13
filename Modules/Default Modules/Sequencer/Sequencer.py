@@ -40,7 +40,6 @@ class Sequencer(DSModule):
 
         self.iM.Sequence_Loaded.connect(self.sequenceLoaded)
         self.iM.Sequence_Saved.connect(self.sequenceLoaded)
-        self.iM.Sequence_Unloaded.connect(self.sequenceUnloaded)
 
     def initActionsAndToolbar(self):
         self.newAction = QAction('New', self)

@@ -50,7 +50,7 @@ class instrumentEditor(DSModule):
         self.updateToolbarState()
 
         self.iM.Instrument_Unloaded.connect(self.instrumentChanged)
-        self.iM.Instrument_Loaded.connect(self.instrumentChanged)
+        #self.iM.Instrument_Loaded.connect(self.instrumentChanged)
         self.iM.Instrument_Config_Changed.connect(self.instrumentChanged)
 
         self.ds.DataStation_Closing.connect(self.onShutdown)
@@ -59,11 +59,10 @@ class instrumentEditor(DSModule):
 
     def onStart(self):
         prevInstrumentPath = self.Read_Setting('Instrument_Path')
-        print(prevInstrumentPath)
         if isinstance(prevInstrumentPath, str):
             self.openInstrument(prevInstrumentPath)
 
-    def onShutdown(self, instrument):
+    def onShutdown(self):
         pass
 
     def initToolbar(self):

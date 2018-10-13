@@ -59,7 +59,7 @@ class HardwareDeviceHandler(QObject):
         self.deviceList = list()
         self.sourceList = list()
 
-        self.iM.Sequence_Unloaded.connect(self.toggleDeferredProgrammingOn)
+        #self.iM.Sequence_Unloaded.connect(self.toggleDeferredProgrammingOn)
         self.iM.Sequence_Loaded.connect(self.toggleDeferredProgrammingOff)
         self.ds.DataStation_Closing.connect(self.shutdown)
 
