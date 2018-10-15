@@ -1,7 +1,7 @@
 from PyQt5.Qt import *
 import os, uuid, time, sys, numpy as np
 from multiprocessing import Process, Queue, Pipe
-from src.Constants import DSConstants as DSConstants, readyCheckPacket
+from src.Constants import DSConstants as DSConstants
 from src.Managers.HardwareManager.Sources import *
 from src.Managers.InstrumentManager.Sockets import *
 
@@ -97,6 +97,7 @@ class HardwareDeviceHandler(QObject):
         self.thread.start()
 
         self.scan.emit()
+        
         if(self.loadData is not None):
             self.loadPacket.emit(self.loadData)
 
@@ -175,15 +176,10 @@ class HardwareDeviceHandler(QObject):
         self.hM.handlerSoftTriggerSent(self)
         self.softTrigger.emit()
 
-    def readyCheck(self):
-        subs = list()
-        for source in self.sourceList:
-            subs.append(source.readyCheck())
-        
-        if(self.hardwareReadyStatus is True):
-            return readyCheckPacket('Device Handler', DSConstants.READY_CHECK_READY, subs=subs)
-        else:
-            return readyCheckPacket('Device Handler', DSConstants.READY_CHECK_ERROR, msg='Device Not Ready!', subs=subs)
+    def readyCheck(self, traceIn):
+        trace = list(traceIn).append(self)
+        if self.hardwareReadyStatus is False:
+            self.iM.Fail_Ready_Check(trace, 'Device Not Ready!')
  
     def programDataReceived(self, source):
         self.hM.programmingModified(self, source)

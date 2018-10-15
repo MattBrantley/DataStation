@@ -67,6 +67,10 @@ class HardwareManager(QObject):
         for handler in self.deviceHandlerList:
             handler.onRun()
 
+    def Fail_Ready_Check(self, trace, msg):
+        if(isinstance(trace[0], Instrument)):
+            trace[0].Fail_Ready_Check(trace, msg)
+
 ##### Functions: Hardware Models #####
 
     def Get_Hardware_Models_Available(self):
@@ -113,9 +117,14 @@ class HardwareManager(QObject):
         self.sourceObjList = list()
         self.filterList = list()
 
+        self.loadFilters()
+        self.loadHardwareDrivers()
+        self.loadLabviewInterface()
+
+        self.ds.DataStation_Loaded.connect(self.loadHardwareState)
         self.ds.DataStation_Closing.connect(self.saveHardwareState)
 
-    def connections(self, iM, wM):
+    def connections(self):
         self.iM = self.ds.iM
         self.wM = self.ds.wM
 

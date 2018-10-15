@@ -1,6 +1,6 @@
 from PyQt5.Qt import *
 import os, uuid
-from src.Constants import DSConstants as DSConstants, readyCheckPacket
+from src.Constants import DSConstants as DSConstants
 import numpy as np
 from src.Managers.InstrumentManager.Sockets import Socket
 from src.Managers.HardwareManager.Sources import Source
@@ -74,7 +74,24 @@ class Filter():
     def getUUID(self):
         return self.filterSettings['uuid']
 
-##### Functions Over-Ridden By Factoried Components #####
+    def readyCheck(self, traceIn):
+        trace = list(traceIn).append(self)
+
+        if self.getInputObject() is not None:
+            self.getInputObject().readyCheck(trace)
+
+    def getInputObject(self):
+        if(self.filterSettings['inputSource'] is None or self.filterSettings['inputSourcePathNo'] is None):
+            return None
+        else:
+            inputObj = self.hM.Get_Filters(uuid=self.filterSettings['inputSource'])
+            if not inputObj:
+                inputObj = self.hM.Get_Sources(uuid=self.filterSettings['inputSource'])
+            if not inputObj:
+                return None
+        return inputObj
+
+##### Functions Over-Ridden By Factoried Filters #####
 
     def procForwardParent(self, packetIn):
         packetType = self.getPacketType(packetIn)
@@ -96,21 +113,9 @@ class Filter():
         subs = list()
         packetType = self.getPacketType(packetIn)
 
-        if(packetType is None):
-            #Incoming packet is an unknown type
-            return readyCheckPacket('Filter', DSConstants.READY_CHECK_ERROR, msg='Unknown Packet Type Transferred!')
-
         packetOut = self.procReverse(pathNo, packetIn, packetType)
         if(packetOut is None):
             packetOut = packetIn
-
-        if(self.filterSettings['inputSource'] is None or self.filterSettings['inputSourcePathNo'] is None):
-            return readyCheckPacket('Filter', DSConstants.READY_CHECK_ERROR, msg='Filter Is Not Attached!')
-        else:
-            subs.append(self.filterSettings['inputSource'].procReverseParent(self.filterInputPathNo, packetOut))
-        
-        #return readyCheckPacket('Filter', DSConstants.READY_CHECK_READY)
-        return readyCheckPacket('Filter', DSConstants.READY_CHECK_READY, subs=subs)
 
     def procReverse(self, pathNo, packetIn, packetType): ### OVERRIDE ME!! ####
         return None

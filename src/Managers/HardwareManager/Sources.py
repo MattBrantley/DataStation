@@ -2,7 +2,7 @@ from PyQt5.Qt import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import os, sys, imp, math, uuid, numpy as np
-from src.Constants import DSConstants as DSConstants, readyCheckPacket
+from src.Constants import DSConstants as DSConstants
 from src.Managers.InstrumentManager.Sockets import *
 
 class Source():
@@ -42,16 +42,21 @@ class Source():
         self.programmingPacket = None
  
 ##### DataStation Interface Functions #####
-    def readyCheck(self):
+
+    def readyCheck(self, traceIn):
+        trace = list(traceIn).append(self)
         drivingSocketCount = 0
         for socket in self.getSockets():
-            if(socket.socketSettings['drivingSocket'] == True):
+            if socket.socketSettings['drivingSocket'] == True:
                 drivingSocketCount = drivingSocketCount + 1
 
-        if(drivingSocketCount > 1):
-            return readyCheckPacket('Socket', DSConstants.READY_CHECK_ERROR, msg='Source Has More Than One Driving Socket!')
+        if drivingSocketCount > 1:
+            self.iM.Fail_Ready_Check(trace, 'Source Has More Than One Driving Socket!')
 
-        return readyCheckPacket('Socket', DSConstants.READY_CHECK_READY)
+        if self.programmingPacket is None:
+            self.iM.Fail_Ready_Check(trace, 'Active Source Has No Programming Packet')
+
+        self.hWare.readyCheck(trace)
 
     def getUUID(self):
         return self.sourceSettings['uuid']
@@ -97,7 +102,7 @@ class Source():
         return self.parsePacket(packetIn)
 
     def parsePacket(self, packetIn): ### OVERRIDE ME!! ####
-        return readyCheckPacket('Source', DSConstants.READY_CHECK_ERROR, msg='Critical Source Error! Default Source Object Used Somewhere!')
+        pass
 
 ##### Source Manipulation Functions #####
     def attachPathOther(self, uuid):
@@ -150,16 +155,18 @@ class AISource(Source):
         self.sourceSettings['vMax'] = vMax
         self.sourceSettings['prec'] = prec
 
-    def parsePacket(self, packetIn):
-        if(isinstance(packetIn, waveformPacket) is False):
-            return readyCheckPacket('Analog Input Source', DSConstants.READY_CHECK_ERROR, msg='Analog Input Source Recieved Unknown Packet Type!')
+    def readyCheck(self, traceIn):
+        trace = list(traceIn).append(self)
+        super().readyCheck(traceIn)
+        if(isinstance(self.programmingPacket, waveformPacket) is False):
+            self.iM.Fail_Ready_Check(trace, 'Analog Input Source Recieved Unknown Programming Packet Type!')
         
-        if(self.packetInSourceRange(packetIn) is False):
-            return readyCheckPacket('Analog Input Source', DSConstants.READY_CHECK_ERROR, msg='Analog Input Source Waveform Out Of Range!')
+        if(self.packetInSourceRange(self.programmingPacket) is False):
+            self.iM.Fail_Ready_Check(trace, 'Analog Input Source Programming Packet Out Of Source Range')
 
-        self.programData = packetIn
-        self.programData.physicalConnectorID = self.physicalConnectorID
-        return readyCheckPacket('Analog Input Source', DSConstants.READY_CHECK_READY)
+    def parsePacket(self, packetIn):
+        self.programmingPacket = packetIn
+        self.programmingPacket.physicalConnectorID = self.physicalConnectorID
 
     def packetInSourceRange(self, packetIn):
         return True
@@ -171,16 +178,18 @@ class AOSource(Source):
         self.sourceSettings['vMax'] = vMax
         self.sourceSettings['prec'] = prec
 
-    def parsePacket(self, packetIn):
-        if(isinstance(packetIn, waveformPacket) is False):
-            return readyCheckPacket('Analog Output Source', DSConstants.READY_CHECK_ERROR, msg='Analog Output Source Recieved Unknown Packet Type!')
+    def readyCheck(self, traceIn):
+        trace = list(traceIn).append(self)
+        super().readyCheck(traceIn)
+        if(isinstance(self.programmingPacket, waveformPacket) is False):
+            self.iM.Fail_Ready_Check(trace, 'Analog Input Source Recieved Unknown Programming Packet Type!')
         
-        if(self.packetInSourceRange(packetIn) is False):
-            return readyCheckPacket('Analog Output Source', DSConstants.READY_CHECK_ERROR, msg='Analog Output Source Waveform Out Of Range!')
+        if(self.packetInSourceRange(self.programmingPacket) is False):
+            self.iM.Fail_Ready_Check(trace, 'Analog Input Source Programming Packet Out Of Source Range')
 
-        self.programData = packetIn
-        self.programData.physicalConnectorID = self.physicalConnectorID
-        return readyCheckPacket('Analog Output Source', DSConstants.READY_CHECK_READY)
+    def parsePacket(self, packetIn):
+        self.programmingPacket = packetIn
+        self.programmingPacket.physicalConnectorID = self.physicalConnectorID
             
     def packetInSourceRange(self, packetIn):
         if(packetIn.waveformData is None):
@@ -197,16 +206,18 @@ class DOSource(Source):
     def __init__(self, name, physConID):
         super().__init__(name, physConID)
 
-    def parsePacket(self, packetIn):
-        if(isinstance(packetIn, waveformPacket) is False):
-            return readyCheckPacket('Digital Output Source', DSConstants.READY_CHECK_ERROR, msg='Digital Output Source Recieved Unknown Packet Type!')
+    def readyCheck(self, traceIn):
+        trace = list(traceIn).append(self)
+        super().readyCheck(traceIn)
+        if(isinstance(self.programmingPacket, waveformPacket) is False):
+            self.iM.Fail_Ready_Check(trace, 'Analog Input Source Recieved Unknown Programming Packet Type!')
         
-        if(self.packetInSourceRange(packetIn) is False):
-            return readyCheckPacket('Digital Output Source', DSConstants.READY_CHECK_ERROR, msg='Digital Output Source Waveform Out Of Range!')
+        if(self.packetInSourceRange(self.programmingPacket) is False):
+            self.iM.Fail_Ready_Check(trace, 'Analog Input Source Programming Packet Out Of Source Range')
 
-        self.programData = packetIn
-        self.programData.physicalConnectorID = self.physicalConnectorID
-        return readyCheckPacket('Digital Output Source', DSConstants.READY_CHECK_READY)
+    def parsePacket(self, packetIn):
+        self.programmingPacket = packetIn
+        self.programmingPacket.physicalConnectorID = self.physicalConnectorID
 
     def packetInSourceRange(self, packetIn):
         return True
@@ -215,16 +226,18 @@ class DISource(Source):
     def __init__(self, name, physConID, trigger=False):
         super().__init__(name, physConID, trigger=trigger)
 
-    def parsePacket(self, packetIn):
-        if(isinstance(packetIn, waveformPacket) is False):
-            return readyCheckPacket('Digital Input Source', DSConstants.READY_CHECK_ERROR, msg='Digital Input Source Recieved Unknown Packet Type!')
+    def readyCheck(self, traceIn):
+        trace = list(traceIn).append(self)
+        super().readyCheck(traceIn)
+        if(isinstance(self.programmingPacket, waveformPacket) is False):
+            self.iM.Fail_Ready_Check(trace, 'Analog Input Source Recieved Unknown Programming Packet Type!')
         
-        if(self.packetInSourceRange(packetIn) is False):
-            return readyCheckPacket('Digital Input Source', DSConstants.READY_CHECK_ERROR, msg='Digital Input Source Waveform Out Of Range!')
+        if(self.packetInSourceRange(self.programmingPacket) is False):
+            self.iM.Fail_Ready_Check(trace, 'Analog Input Source Programming Packet Out Of Source Range')
 
-        self.programData = packetIn
-        self.programData.physicalConnectorID = self.physicalConnectorID
-        return readyCheckPacket('Digital Input Source', DSConstants.READY_CHECK_READY)
+    def parsePacket(self, packetIn):
+        self.programmingPacket = packetIn
+        self.programmingPacket.physicalConnectorID = self.physicalConnectorID
 
     def packetInSourceRange(self, packetIn):
         return True

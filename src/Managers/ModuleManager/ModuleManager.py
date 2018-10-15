@@ -71,17 +71,17 @@ class ModuleManager(QObject):
         self.defaultModules = ['Default Loading Screen', 'Profile Selection']
 
         self.populateMenu()
+        self.scanModules()
+        self.DSLoading()
 
-        #self.ds.DataStation_Loaded.connect(self.DSLoaded)
         self.ds.DataStation_Closing.connect(self.DSClosing)
 
 ##### DataStation Reserved Functions #####
-    def connections(self, wM, hM, iM):
-        self.wM = wM
-        self.hM = hM
-        self.iM = iM
+    def connections(self):
+        self.wM = self.ds.wM
+        self.hM = self.ds.hM
+        self.iM = self.ds.iM
         self.initModuleSettingsWindow()
-        # Called after all managers are created so they can connect to each other's signals
 
     def DSLoading(self):
         self.mainWindow = mainWindow(self.ds)

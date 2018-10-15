@@ -7,7 +7,6 @@ import json as json
 from PyQt5.Qt import *
 
 class InstrumentManager(QObject):
-
 ############################################################################################
 ##################################### EXTERNAL SIGNALS #####################################
 
@@ -24,8 +23,8 @@ class InstrumentManager(QObject):
     Component_Programming_Modified = pyqtSignal(object, object) # Instrument, Component
 
 ##### Signals: Sequence #####
-    Sequence_Loaded = pyqtSignal(object, str) # Instrument, Sequence Path
-    Sequence_Saved = pyqtSignal(object, str) # Instrument, Sequence Path
+    Sequence_Loaded = pyqtSignal(object) # Instrument, Sequence Path
+    Sequence_Saved = pyqtSignal(object) # Instrument, Sequence Path
 
 ##### Signals: Events #####
     Event_Added = pyqtSignal(object, object, object) # Instrument, Component, Event
@@ -34,20 +33,12 @@ class InstrumentManager(QObject):
 
 ##### Signals: Sockets #####
     Socket_Added = pyqtSignal(object, object, object) # Instrument, Component, Socket
-    Socket_Removed = pyqtSignal()
     Socket_Attached = pyqtSignal(object, object, object) # Instrument, Component, Socket
     Socket_Detatched = pyqtSignal(object, object, object) # Instrument, Component, Socket
     Socket_Measurement_Packet_Recieved = pyqtSignal(object, object, object, object) # Instrument, Component, Socket, measurementPacket
 
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
-
-##### Functions: Instrument Manager #####
-    def Do_Ready_Check(self):
-        return self.readyCheck()
-
-    def Ready_Check_Status(self):
-        return
 
 ##### Functions: Component Models #####
     def Get_Component_Models_Available(self):
@@ -60,10 +51,13 @@ class InstrumentManager(QObject):
             return None
 
 ##### Functions: Instrument Management #####
+    def Get_Instruments(self, name=-1):
+        return self.getInstruments(name)
+
     def Load_Instrument(self, path):
         newInstrument = self.New_Instrument()
         if newInstrument is not None:
-            mewInstrument.Load_Instrument_File(path)
+            newInstrument.Load_Instrument_File(path)
 
     def Close_Instrument(self):
         pass
@@ -82,11 +76,9 @@ class InstrumentManager(QObject):
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
-
     def __init__(self, ds):
         super().__init__()
         self.ds = ds
-        self.readyStatus = False
         self.instrumentsDir = os.path.join(self.ds.rootDir, 'Instruments')
         self.componentsDir = os.path.join(self.ds.rootDir, 'Components')
         self.sequencesDir = os.path.join(self.ds.rootDir, 'Sequences')
@@ -94,34 +86,16 @@ class InstrumentManager(QObject):
         self.componentsAvailable = list()
         self.instruments = list()
 
-        self.ds.DataStation_Closing.connect(self.unsavedChangesCheck)
+        self.loadComponents()
 
 ##### DataStation Reserved Functions #####
-
-    def connections(self, wM, hM):
-        self.wM = wM
-        self.hM = hM
+    def connections(self):
+        self.wM = self.ds.wM
+        self.hM = self.ds.hM
+        self.mM = self.ds.mM
         # Called after all managers are created so they can connect to each other's signals
 
-    def unsavedChangesCheck(self):
-        print('UNSAVED CHANGES TO INSTRUMENT')
-        
-    def readyCheck(self):
-        subs = list()
-        self.readyStatus = True
-        if self.instruments:
-            for instrument in self.instruments:
-                check = instrument.readyCheck()
-                self.readyStatus = check.readyStatus
-                subs.append(check)
-        else:
-            self.readyStatus = False
-            return readyCheckPacket('Instrument Manager', DSConstants.READY_CHECK_ERROR, msg='No Instruments Loaded!')
-
-        return readyCheckPacket('Instrument Manager', DSConstants.READY_CHECK_READY, subs=subs)
-
-##### Functions Called Internally By Current Instrument #####
-
+##### Functions Called Internally By Factoried Instruments #####
     def instrumentModified(self, instrument):
         pass
 
@@ -152,8 +126,11 @@ class InstrumentManager(QObject):
     def eventModified(self, instrument, component, event): ## Not used?
         self.Event_Modified.emit(instrument, component, event)
 
-    def sequenceLoaded(self, instrument, sequencePath):
-        self.Sequence_Loaded.emit(instrument, sequencePath)
+    def sequenceLoaded(self, instrument):
+        self.Sequence_Loaded.emit(instrument)
+
+    def sequenceSaved(self, instrument):
+        self.Sequence_Saved.emit(instrument)
 
     def programmingModified(self, instrument, component):
         self.Component_Programming_Modified.emit(instrument, component)
@@ -166,7 +143,18 @@ class InstrumentManager(QObject):
 
     def instrumentFileLoaded(self, instrument):
         self.Instrument_File_Loaded.emit(instrument)
+        
 ##### Search Functions ######
+
+    def getInstruments(self, name, path):
+        outList = list()
+        for instrument in self.instruments:
+            if(instrument.Get_Name() != name and name != -1):
+                continue
+            if(instrument.Get_Path() != path and path != -1):
+                continue
+            outList.append(instrument)
+        return outList
 
     def removeCompByUUID(self, uuid):
         for instrument in self.instruments:
@@ -180,9 +168,8 @@ class InstrumentManager(QObject):
         return None
 
 ##### Instrument Manipulations ######
-
     def newInstrument(self, name, rootPath): # Instrument_Unloaded // Instrument_New
-        newInstrument = Instrument(self)
+        newInstrument = Instrument(self.ds)
         newInstrument.url = os.path.join(rootPath, name+'.dsinstrument')
         newInstrument.name = name
         self.instruments.append(newInstrument)
@@ -190,91 +177,10 @@ class InstrumentManager(QObject):
         return newInstrument
 
 ##### Sequence Manipulation #####
-
-    def openSequenceFile(self, filePath):
-        self.ds.postLog('Opening Sequence File (' + filePath + ')... ', DSConstants.LOG_PRIORITY_HIGH)
-        sequenceData = None
-
-        if(os.path.isfile(filePath) is True):
-            with open(filePath, 'r') as file:
-                try:
-                    sequenceData = json.load(file)
-                except ValueError as e:
-                    self.ds.postLog('Corrupted sequence file - aborting!', DSConstants.LOG_PRIORITY_HIGH)
-                    return None
-        else:
-            self.ds.postLog('Sequence Path was invalid - aborting!', DSConstants.LOG_PRIORITY_HIGH)
-            return None
-
-        self.currentInstrument.sequenceInfoUpdate(filePath, os.path.basename(filePath))
-        return sequenceData
-
-        if(self.instrument.processSequenceData(sequenceData) is False): ### self.instrument?
-            self.ds.postLog('Sequence at (' + filePath + ') not loaded - aborting! ', DSConstants.LOG_PRIORITY_HIGH)
-        else:
-            self.currentSequenceURL = filePath
-
-        self.ds.postLog('Finished Loading Sequence!', DSConstants.LOG_PRIORITY_HIGH)
-
-    def getSequenceSaveData(self):
-        if(self.currentInstrument is not None):
-            return self.currentInstrument.getSequenceSaveData()
-        else:
-            return None
-
-    def saveSequence(self):
-        if(self.currentSequenceURL is None):
-            self.saveSequenceAs()
-            return
-
-        fileName = os.path.basename(self.currentSequenceURL)
-        if(os.path.exists(os.path.join(self.sequencesDir, self.currentInstrument.name)) is False):
-            os.mkdir(os.path.join(self.sequencesDir, self.currentInstrument.name))
-        saveURL = os.path.join(os.path.join(self.sequencesDir, self.currentInstrument.name), fileName)
-
-        saveData = self.getSequenceSaveData()
-        self.ds.postLog('Saving Sequence (' + saveURL + ')... ', DSConstants.LOG_PRIORITY_HIGH)
-        if(os.path.exists(saveURL)):
-            os.remove(saveURL)
-        with open(saveURL, 'w') as file:
-            json.dump(saveData, file, sort_keys=True, indent=4)
-            
-        self.currentInstrument.sequenceInfoUpdate(saveURL, fileName)
-        self.Sequence_Saved.emit(self.currentInstrument, saveURL) 
-        self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
-
-    def saveSequenceAs(self):
-        fname, ok = QInputDialog.getText(self.ds, "Sequence Name", "Sequence Name")
-        if(os.path.exists(os.path.join(self.sequencesDir, self.currentInstrument.name)) is False):
-            os.mkdir(os.path.join(self.sequencesDir, self.currentInstrument.name))
-        saveURL = os.path.join(os.path.join(self.sequencesDir, self.currentInstrument.name), fname + '.dssequence')
-        if(ok):
-            pass
-        else:
-            return
-
-        if(os.path.exists(saveURL)):
-            reply = QMessageBox.question(self.ds, 'File Warning!', 'File exists - overwrite?', QMessageBox.Yes, QMessageBox.No)
-            if(reply == QMessageBox.No):
-                return
-
-        saveData = self.getSequenceSaveData()
-        self.ds.postLog('Saving Sequence (' + saveURL + ')... ', DSConstants.LOG_PRIORITY_HIGH)
-        if(os.path.exists(saveURL)):
-            os.remove(saveURL)
-        with open(saveURL, 'w') as file:
-            json.dump(saveData, file, sort_keys=True, indent=4)
-        self.currentSequenceURL = saveURL
-
-        self.currentInstrument.sequenceInfoUpdate(saveURL, fname+'.dssequence')
-        self.Sequence_Saved.emit(self.currentInstrument) 
-        self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
-
     def newSequence(self):
         result = DSNewFileDialog.newFile()
 
 ##### Components #####
-
     def loadComponents(self):
         self.ds.postLog('Loading Component Models... ', DSConstants.LOG_PRIORITY_HIGH)
 

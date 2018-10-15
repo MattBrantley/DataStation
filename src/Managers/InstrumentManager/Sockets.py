@@ -2,7 +2,7 @@ from PyQt5.Qt import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import os, sys, imp, math, uuid
-from src.Constants import DSConstants as DSConstants, readyCheckPacket
+from src.Constants import DSConstants as DSConstants
 from src.Managers.HardwareManager.Sources import Source
 
 class Socket():
@@ -48,7 +48,7 @@ class Socket():
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
 
-    def __init__(self, cP, name):
+    def __init__(self, comp, name):
         super().__init__()
         self.socketSettings = dict()
         self.socketSettings['tag'] = '[??]'
@@ -57,20 +57,14 @@ class Socket():
         self.socketSettings['inputSourcePathNo'] = None
         self.socketSettings['uuid'] = str(uuid.uuid4())
         self.socketSettings['drivingSocket'] = True
-        self.cP = cP
-        self.iM = cP.iM
-        self.hM = cP.iM.hM
-        self.ds = cP.iM.ds
+        self.comp = comp
+        self.ds = comp.ds
+        self.iM = self.ds.iM
+        self.hM = self.ds.hM
 
         self.programmingPacket = None
 
 ##### DataStation Interface Functions #####
-
-    def readyCheck(self):
-        if(self.getSource() is not None):
-            return readyCheckPacket('Socket [' + self.socketSettings['name'] + ']', DSConstants.READY_CHECK_READY)
-        else:
-            return readyCheckPacket('Socket [' + self.socketSettings['name'] + ']', DSConstants.READY_CHECK_ERROR, msg='Socket Has No Source!')
 
     def getUUID(self):
         return self.socketSettings['uuid']
@@ -81,7 +75,16 @@ class Socket():
             target[0].getProgrammingPacket(self.programmingPacket)
 
     def getMeasurementPacket(self, measurementPacket):
-        self.cP.measurementReceived(self, measurementPacket)
+        self.comp.measurementReceived(self, measurementPacket)
+
+##### Instrument Ready Check #####
+
+    def readyCheck(self, traceIn):
+        trace = list(traceIn).append(self)
+        if(self.Get_Source() is None):
+            self.iM.Fail_Ready_Check(trace, 'Socket has no route to a source!')
+        else:
+            self.getInputObject().readyCheck(trace)
 
 ##### Search Functions #####
 
@@ -141,7 +144,7 @@ class Socket():
         self.socketSettings['inputSource'] = None
         self.socketSettings['inputSourcePathNo'] = None
         self.programmingPacket = None
-        self.cP.socketDetatched(self)
+        self.comp.socketDetatched(self)
 
     def attach(self, uuid, pathNumber):
         # Remove anything else that has a connection to what this is connecting to
@@ -156,30 +159,30 @@ class Socket():
 
         self.socketSettings['inputSource'] = uuid
         self.socketSettings['inputSourcePathNo'] = pathNumber
-        self.cP.socketAttached(self)
+        self.comp.socketAttached(self)
 
 class AOSocket(Socket):
-    def __init__(self, cP, name, vMin, vMax, prec):
-        super().__init__(cP, name)
+    def __init__(self, comp, name, vMin, vMax, prec):
+        super().__init__(comp, name)
         self.socketSettings['tag'] = '[AO]'
         self.socketSettings['vMin'] = vMin
         self.socketSettings['vMax'] = vMax
         self.socketSettings['prec'] = prec
 
 class AISocket(Socket):
-    def __init__(self, cP, name, vMin, vMax, prec):
-        super().__init__(cP, name)
+    def __init__(self, comp, name, vMin, vMax, prec):
+        super().__init__(comp, name)
         self.socketSettings['tag'] = '[AI]'
         self.socketSettings['vMin'] = vMin
         self.socketSettings['vMax'] = vMax
         self.socketSettings['prec'] = prec
 
 class DOSocket(Socket):
-    def __init__(self, cP, name):
-        super().__init__(cP, name)
+    def __init__(self, comp, name):
+        super().__init__(comp, name)
         self.socketSettings['tag'] = '[DO]'
         
 class DISocket(Socket):
-    def __init__(self, cP, name):
-        super().__init__(cP, name)
+    def __init__(self, comp, name):
+        super().__init__(comp, name)
         self.socketSettings['tag'] = '[DI]'

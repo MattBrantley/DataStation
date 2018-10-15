@@ -1,7 +1,7 @@
 from PyQt5.Qt import *
 from PyQt5.QtGui import QStandardItemModel
 import os, random, uuid, numpy as np
-from src.Constants import DSConstants as DSConstants, readyCheckPacket
+from src.Constants import DSConstants as DSConstants
 from src.Managers.InstrumentManager.Sockets import *
 
 class Component(QObject):
@@ -45,6 +45,9 @@ class Component(QObject):
         self.addEvents(events)
         return True
 
+    def Clear_Events(self):
+        self.Remove_Events(self.Get_Events())
+
     def Remove_Events(self, events):
         self.removeEvents(events)
         return True
@@ -53,14 +56,14 @@ class Component(QObject):
         self.combineAddRemoveEvents(addEvents, removeEvents)
         return True
 
-    def Get_Data(self):
-        return self.data
-
     def Get_Events(self):
         return self.eventList
 
     def Get_Instrument(self):
         return self.instr
+
+    def Serialize_Events(self):
+        return self.saveEventsPacket
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -86,51 +89,17 @@ class Component(QObject):
         self.sequencerEditWidget = None
         self.eventTypeList = list()
         self.eventList = list()
-        self.data = list()
 
 ##### Datastation Reserved Functions #####
 
-    def readyCheck(self):
-        subs = list()
-        goodToContinue = True
+    def readyCheck(self, traceIn):
+        trace = list(traceIn).append(self)
         for socket in self.socketList:
-            newSub = socket.readyCheck()
-            subs.append(newSub)
-            if(newSub.readyStatus == DSConstants.READY_CHECK_ERROR):
-                goodToContinue = False
-        
-        #if(goodToContinue is True):
-        #    if(isinstance(runResults, readyCheckPacket)):
-        #        subs.append(runResults)
-        #        if(runResults.readyStatus == DSConstants.READY_CHECK_ERROR):
-        #            goodToContinue = False
-        #    else:
-        #        if(runResults is not True):
-        #            subs.append(readyCheckPacket('User Component [' + self.compSettings['name'] + ']', DSConstants.READY_CHECK_ERROR, msg='User Component onRun() Did Not Return readyCheckPacket or True!'))
-        #            goodToContinue = False
-        
-        if(goodToContinue is True):
-            pass
-            #index = 0
-            #for socket in self.socketList:
-            #    if(self.pathDataPackets[index] is not None):
-            #        #if(self.pathDataPackets[index].waveformData is None):
-            #        #    subs.append(readyCheckPacket('User Component', DSConstants.READY_CHECK_ERROR, msg='User Component onRun() populated and empty packet (no waveformData!)' + str(index+1) + '!'))
-            #        #else:
-            #        subs.append(socket.onDataToSourcesParent(self.pathDataPackets[index]))
-            #    else:
-            #        subs.append(readyCheckPacket('User Component [' + self.compSettings['name'] + ']', DSConstants.READY_CHECK_ERROR, msg='User Component onRun() Did Not Populate pathDataPackets for Path #' + str(index+1) + '!'))
-            #    index = index + 1
-    
-        if(goodToContinue is True):
-            return readyCheckPacket('Component', DSConstants.READY_CHECK_READY, subs=subs)
-        else:
-            return readyCheckPacket('Component', DSConstants.READY_CHECK_ERROR, subs=subs)
+            socket.readyCheck(trace)
+        for event in self.eventList:
+            event.readyCheck(self.iM, trace)
 
 ##### Functions Called By Factoried Sockets #####
-
-    def socketAdded(self, socket):
-        self.instr.socketAdded(self, socket)
 
     def socketAttached(self, socket):
         self.onProgramParent()
@@ -141,6 +110,9 @@ class Component(QObject):
 
     def measurementReceived(self, socket, measurementPacket):
         self.instr.measurementRecieved(self, socket, measurementPacket)
+
+    def readyCheckInterrupt(self, socket, msg):
+        self.instr.componentReadyCheckInterrupt(self, socket, msg)
 
 ##### Functions Over-Ridden By Factoried Components #####
 
@@ -266,11 +238,6 @@ class Component(QObject):
                     return False
         return True
 
-    def clearEvents(self):
-        self.removeEvents(self.eventList)
-        #for event in reversed(self.eventList):
-        #    self.removeEvent(event)
-
     # At the moment, addEvents and removeEvents both force a recalculation. For
     # the sequencer widget, this means that a modify event (add and remove) will
     # force two updates. It's a minor performance loss. This can be bypassed by
@@ -311,7 +278,7 @@ class Component(QObject):
             self.onProgramParent()
 
     def loadSequenceData(self, eventData):
-        self.clearEvents()
+        self.Clear_Events()
         eventListIn = list()
         for datum in eventData:
             datumType = self.getEventTypeByName(datum)
@@ -353,25 +320,25 @@ class Component(QObject):
     def addAOSocket(self, name):
         socket = AOSocket(self, name, 0, 10, 0.1)
         self.socketList.append(socket)
-        self.socketAdded(socket)
+        self.instr.socketAdded(self, socket)
         return socket
 
     def addAISocket(self, name):
         socket = AISocket(self, name, 0, 10, 0.1)
         self.socketList.append(socket)
-        self.socketAdded(socket)
+        self.instr.socketAdded(self, socket)
         return socket
 
     def addDOSocket(self, name):
         socket = DOSocket(self, name)
         self.socketList.append(socket)
-        self.socketAdded(socket)
+        self.instr.socketAdded(self, socket)
         return socket
 
     def addDISocket(self, name):
         socket = DISocket(self, name)
         self.socketList.append(socket)
-        self.socketAdded(socket)
+        self.instr.socketAdded(self, socket)
         return socket
 
     def saveSockets(self):

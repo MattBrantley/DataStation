@@ -17,6 +17,6 @@ class WorkspaceManager(QObject):
         super().__init__()
         self.ds = ds
         
-    def connections(self, iM, hM):
-        self.iM = iM
-        self.hM = hM
+    def connections(self):
+        self.iM = self.ds.iM
+        self.hM = self.ds.hM

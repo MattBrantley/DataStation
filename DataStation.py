@@ -47,7 +47,6 @@ def default_exception_hook(exctype, value, traceback):
 sys.excepthook = default_exception_hook
 
 class DataStation_Core(QMainWindow):
-    logDetail = DSConstants.LOG_PRIORITY_MED
 
 ############################################################################################
 ##################################### EXTERNAL SIGNALS #####################################
@@ -73,11 +72,6 @@ class DataStation_Core(QMainWindow):
 
         self.setAppIcons()
         self.initManagers()
-        self.hM.loadHardwareState()
-
-        #self.wM.loadPreviousWS()
-        #self.iM.loadPreviousInstrument()
-        #self.iM.loadPreviousSequence()
 
         self.initTrayMenu()
 
@@ -109,23 +103,14 @@ class DataStation_Core(QMainWindow):
 
     def initManagers(self):
         self.mM = ModuleManager(self)           # MODULE MANAGER
-        self.mM.scanModules()                       # LOAD MODULES
-        self.mM.DSLoading()
-
         self.wM = WorkspaceManager(self)        # WORKSPACE CONTROLLER
-
         self.iM = InstrumentManager(self)       # INSTRUMENT MANAGER
-        self.iM.loadComponents()                    # USER COMPONENTS
-
         self.hM = HardwareManager(self)         # HARDWARE MANAGER
-        self.hM.loadFilters()                       # USER FILTERS
-        self.hM.loadHardwareDrivers()               # HARDWARE DRIVERS
-        self.hM.loadLabviewInterface()              # LABVIEW INTERFACE
 
-        self.wM.connections(self.iM, self.hM)
-        self.iM.connections(self.wM, self.hM)
-        self.hM.connections(self.wM, self.iM)
-        self.mM.connections(self.wM, self.hM, self.iM)
+        self.wM.connections()
+        self.iM.connections()
+        self.hM.connections()
+        self.mM.connections()
 
     def postLog(self, key, level, **kwargs):
         useKey = kwargs.get('textKey', False)
@@ -134,7 +119,7 @@ class DataStation_Core(QMainWindow):
         else:
             text = key
 
-        if(self.logDetail >= level):
+        if(DSConstants.LOG_PRIORITY_MED >= level):
             self.Log_Posted.emit(text)
             #print(text)
             app.processEvents()

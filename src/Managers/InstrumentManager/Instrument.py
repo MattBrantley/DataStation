@@ -1,5 +1,5 @@
 from src.Managers.InstrumentManager.Component import *
-from src.Constants import readyCheckPacket
+from src.Managers.InstrumentManager.EventSequence import EventSequence
 from copy import deepcopy
 import json, os
 
@@ -16,7 +16,7 @@ class Instrument(QObject):
         return True
 
     def Get_Path(self):
-        return self.url
+        return self.getPath()
 
     def Set_Path(self, path):
         self.url = path
@@ -25,8 +25,8 @@ class Instrument(QObject):
     def Get_Sockets(self, uuid=-1, inputUUID=-1, pathNo=-1, socketType=None):
         return self.getSockets(uuid, inputUUID, pathNo, socketType)
 
-    def Get_Components(self):
-        return self.componentList
+    def Get_Components(self, uuid=-1):
+        return self.getComponents(uuid)
 
     def Get_Sequence_Info(self):
         return self.sequencePath, self.sequenceName
@@ -41,9 +41,6 @@ class Instrument(QObject):
     def Load_Sequence(self, path, showWarning=True):
         return self.loadSequence(path, showWarning)
 
-    def Save_Sequence(self, name=None, path=None):
-        pass
-
     def Save_Instrument(self, name=None, path=None):
         if(name is not None):
             self.currentInstrument.Set_Name(name)
@@ -54,28 +51,46 @@ class Instrument(QObject):
     def Load_Instrument_File(self, path):
         self.loadInstrumentFile(path)
 
+    def Get_Sequence_Directory(self):
+        return os.path.join(self.iM.Sequences_Save_Directory, self.Get_Name())
+
+    def Ready_Check_Status(self):
+        if self.readyCheckFails is False:
+            return True
+        else:
+            return False
+
+    def Ready_Check_List(self):
+        return self.readyCheckFails
+
+    def Fail_Ready_Check(self, trace, msg):
+        self.readyCheckFail(trace, msg)
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
-    def __init__(self, iM):
+    def __init__(self, ds):
         super().__init__()
-        self.iM = iM
-        self.ds = self.iM.ds
+        self.ds = ds
+        self.iM = ds.iM
         self.name = 'Default Instrument'
+        self.readyCheckList = list()
         self.directory = None
-        self.sequencePath = ''
-        self.sequenceName = ''
+        self.sequence = EventSequence(self.ds, self)
         self.componentList = list()
 
-##### DataStation Interface Functions #####
+        self.iM.Instrument_Ready_Check.connect(self.readyCheck)
+
+##### Instrument Ready Check #####
 
     def readyCheck(self):
-        subs = list()
-        if(len(self.componentList) == 0):
-            return readyCheckPacket('Active Instrument', DSConstants.READY_CHECK_ERROR, msg='Instrument has no components!')
-        for component in self.componentList:
-            subs.append(component.readyCheck())
+        self.readyCheckList = list()
+        trace = [self]
+        for comp in self.componentList:
+            comp.readyCheck(trace)
+        self.sequence.readyCheck(trace)
 
-        return readyCheckPacket('Active Instrument', DSConstants.READY_CHECK_READY, subs=subs)
+    def readyCheckFail(self, trace, msg):
+        self.readyChickList.append({'Trace': trace, 'Msg': msg})
 
 ##### Functions Called By Factoried Components #####
 
@@ -103,6 +118,21 @@ class Instrument(QObject):
     def measurementRecieved(self, component, socket, measurementPacket):
         self.iM.measurementRecieved(self, component, socket, measurementPacket)
 
+    def componentReadyCheckInterrupt(self, component, socket, msg):
+        readyCheckMsg = dict()
+        readyCheckMsg['Trace']  = [component, socket, msg]
+        readyCheckMsg['msg'] = msg
+        self.readyCheckFails.append(readyCheckMsg)
+        self.ready = False
+
+##### Functions Called By Sequence #####
+
+    def sequenceSaved(self):
+        self.iM.sequenceSaved(self)
+
+    def sequenceLoaded(self):
+        self.iM.sequenceLoaded(self)
+
 ##### Instrument Manipulations #####
 
     def savePacket(self):
@@ -118,6 +148,14 @@ class Instrument(QObject):
     def loadPacket(self):
         pass
 
+    def getPath(self):
+        if(self.directory is None):
+            instrumentSaveURL = self.iM.Instrument_Save_Directory()  
+        else:
+            instrumentSaveURL = self.directory
+
+        return os.path.join(instrumentSaveURL, self.Get_Name() + '.dsinstrument') 
+
     #### Save Instrument ####
     def saveInstrument(self):
         if(self.currentInstrument is not None):
@@ -129,12 +167,7 @@ class Instrument(QObject):
             self.ds.postLog('VI_Save_No_VI', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
 
     def writeInstrumentToFile(self): ### Implement swap ASAP
-        if(self.directory is None):
-            instrumentSaveURL = self.iM.Instrument_Save_Directory()  
-        else:
-            instrumentSaveURL = self.directory
-
-        fullPath = os.path.join(instrumentSaveURL, self.currentInstrument.name + '.dsinstrument') 
+        fullPath = self.Get_Path()
 
         if(os.path.exists(fullPath)):
             os.remove(fullPath)
@@ -202,14 +235,7 @@ class Instrument(QObject):
 
 ##### Search Functions #####
 
-    def getComponentByUUID(self, uuid):
-        for comp in self.componentList:
-            if('uuid' in comp.compSettings):
-                if(comp.compSettings['uuid'] == uuid):
-                    return comp
-        return None
-
-    def getComponents(self, uuid=-1):
+    def getComponents(self, uuid):
         outList = list()
         for component in self.componentList:
             if(component.compSettings['uuid'] != uuid and uuid != -1):
@@ -217,7 +243,7 @@ class Instrument(QObject):
             outList.append(component)
         return outList
 
-    def getSockets(self, uuid=-1, inputUUID=-1, pathNo=-1, socketType=None):
+    def getSockets(self, uuid, inputUUID, pathNo, socketType):
         outList = list()
         for socket in self.getAllSockets():
             if(socket.socketSettings['uuid'] != uuid and uuid != -1):
@@ -238,53 +264,3 @@ class Instrument(QObject):
             socketList += component.Get_Sockets()
         return socketList
 
-##### Event Functions #####
-
-    def sequenceInfoUpdate(self, path, name):
-        self.sequencePath = path
-        self.sequenceName = name
-
-    def clearEvents(self):
-        for comp in self.componentList:
-            comp.clearEvents()
-        
-    def getSequenceSaveData(self):
-        savePacket = dict()
-        savePacket['instrument'] = self.Get_Name()
-        compSaveData = list()
-        for comp in self.componentList:
-            compSaveData.append(comp.saveEventsPacket())
-        savePacket['eventData'] = compSaveData
-        return savePacket
-
-    def loadSequence(self, path, showWarning=True):
-        data = self.iM.openSequenceFile(path)
-        self.ds.postLog('Applying sequence to instrument... ', DSConstants.LOG_PRIORITY_HIGH)
-
-        if(data is None):
-            self.ds.postLog('Sequence data was empty - aborting!', DSConstants.LOG_PRIORITY_HIGH)
-            return False
-
-        if(data['instrument'] != self.Get_Name() and showWarning is True):
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Warning)
-            msg.setText("The sequence is for a different instrument (" + data['instrument'] + ") than what is currently loaded (" + self.Get_Name() + "). It is unlikely this sequence will load.. Continue?")
-            msg.setWindowTitle("Sequence/Instrument Compatibability Warning")
-            msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-
-            retval = msg.exec_()
-            if(retval == QMessageBox.No):
-                return False
-
-        self.clearEvents()
-
-        for datum in data['eventData']:
-            comp = self.getComponents(uuid=datum['uuid'])
-            if(not comp):
-                self.ds.postLog('Sequence data for comp with uuid (' + datum['uuid'] + ') cannot be assigned! Possibly from different instrument.', DSConstants.LOG_PRIORITY_HIGH)
-            else:
-                comp[0].loadSequenceData(datum['events'])
-
-        self.ds.postLog('Sequence applied to instrument!', DSConstants.LOG_PRIORITY_HIGH)
-        self.iM.sequenceLoaded(self, path)
-        return True

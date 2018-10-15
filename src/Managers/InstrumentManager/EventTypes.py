@@ -24,19 +24,30 @@ class eventType():
 ############################################################################################
 ###################################### OVERRIDE THESE ######################################
 
-    def getLength(self, params):
+    def Get_Length(self, params):
         return 0
+
+    def Ready_Check(self):
+        return True, ''
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
+
+    def readyCheck(self, iM, traceIn):
+        trace = list(traceIn).append(self)
+        status, msg = self.Ready_Check()
+        if status is False:
+            iM.Fail_Ready_Check(trace, msg)
 
     def savePacket(self):
         savePacket = dict()
         savePacket['time'] = self.time
         savePacket['type'] = self.name
         paramDict = dict()
+
         for key, param in self.eventParams.items():
             paramDict[key] = param.value()
+            
         savePacket['params'] = paramDict
         return savePacket
 

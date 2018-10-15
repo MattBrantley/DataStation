@@ -17,7 +17,6 @@ class ModuleHandler(QObject):
     def __init__(self, modObject, window, ds, uuid):
         super().__init__()
         self.ds = ds
-        self.mM = ds.mM
         self.modObject = modObject
         self.window = window
         self.uuid = uuid
