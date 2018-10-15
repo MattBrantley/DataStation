@@ -13,9 +13,10 @@ class InstrumentManager(QObject):
 ##### Signals: Instrument #####
     Instrument_File_Loaded = pyqtSignal(object) # Instrument
     Instrument_Removed = pyqtSignal(object) # Instrument
-    Instrument_Saved = pyqtSignal(object) # Instrument
+    Instrument_Saving = pyqtSignal(object) # Instrument
     Instrument_New = pyqtSignal(object) # Instrument
     Instrument_Config_Changed = pyqtSignal(object) # Instrument
+    Instrument_Name_Changed = pyqtSignal(object) # Instrument
     
 ##### Signals: Components #####
     Component_Added = pyqtSignal(object, object) # Instrument, Component
@@ -51,16 +52,16 @@ class InstrumentManager(QObject):
             return None
 
 ##### Functions: Instrument Management #####
-    def Get_Instruments(self, name=-1):
-        return self.getInstruments(name)
+    def Get_Instruments(self, name=-1, path=-1, uuid=-1):
+        return self.getInstruments(name, path, uuid)
 
     def Load_Instrument(self, path):
         newInstrument = self.New_Instrument()
         if newInstrument is not None:
             newInstrument.Load_Instrument_File(path)
 
-    def Close_Instrument(self):
-        pass
+    def Close_Instrument(self, instrument):
+        self.closeInstrument(instrument)
 
     def New_Instrument(self, name=None, directory=None):
         return self.newInstrument(name, directory)
@@ -98,6 +99,9 @@ class InstrumentManager(QObject):
 ##### Functions Called Internally By Factoried Instruments #####
     def instrumentModified(self, instrument):
         pass
+
+    def instrumentNameChanged(self, instrument):
+        self.Instrument_Name_Changed.emit(instrument)
 
     def instrumentConfigModified(self, instrument):
         self.Instrument_Config_Changed.emit(instrument)
@@ -146,12 +150,14 @@ class InstrumentManager(QObject):
         
 ##### Search Functions ######
 
-    def getInstruments(self, name, path):
+    def getInstruments(self, name, path, uuid):
         outList = list()
         for instrument in self.instruments:
             if(instrument.Get_Name() != name and name != -1):
                 continue
             if(instrument.Get_Path() != path and path != -1):
+                continue
+            if(instrument.Get_UUID() != uuid and uuid != -1):
                 continue
             outList.append(instrument)
         return outList
@@ -168,13 +174,19 @@ class InstrumentManager(QObject):
         return None
 
 ##### Instrument Manipulations ######
-    def newInstrument(self, name, rootPath): # Instrument_Unloaded // Instrument_New
+    def newInstrument(self, name, rootPath): # Instrument_New
         newInstrument = Instrument(self.ds)
-        newInstrument.url = os.path.join(rootPath, name+'.dsinstrument')
-        newInstrument.name = name
+        if name is not None:
+            newInstrument.name = name
+        if rootPath is not None:
+            newInstrument.directory = rootPath
         self.instruments.append(newInstrument)
         self.Instrument_New.emit(newInstrument)
         return newInstrument
+
+    def closeInstrument(self, instrument): # Instrument_Removed
+        self.instruments.remove(instrument)
+        self.Instrument_Removed.emit(instrument)
 
 ##### Sequence Manipulation #####
     def newSequence(self):

@@ -1,12 +1,13 @@
 from PyQt5.Qt import *
 from PyQt5.QtCore import *
-import os, random, numpy as np, pyqtgraph as pg
+import os, random, numpy as np
 from src.Constants import DSConstants as DSConstants, moduleFlags as mfs
 from PyQt5.QtGui import *
 from src.Managers.ModuleManager.DSModule import DSModule
 from componentsList import componentsList
+from instrumentView import instrumentView
+from loadedInstruments import loadedInstruments
 from treeView import treeView
-#from instrumentView import instrumentView
 
 class instrumentEditor(DSModule):
     Module_Name = 'Instrument Editor'
@@ -17,34 +18,41 @@ class instrumentEditor(DSModule):
         self.ds = ds
         self.iM = ds.iM
         self.rootPath = os.path.join(self.ds.rootDir, 'Instruments')
+        self.targetUUID = None
+        self.targetPath = None
         self.targetInstrument = None
 
         self.mainContainer = QMainWindow()
         
-        self.instrumentNavigator = DSTreeView(self, self.fileSystem)
-        self.componentList = componentsList(self, self.ds)
+        self.instrumentNavigator = treeView(self)
+        self.componentList = componentsList(self)
+        self.loadedInstruments = loadedInstruments(self)
         self.instrumentView = instrumentView(self)
 
         self.toolWidgets = QTabWidget()
         self.toolWidgets.addTab(self.instrumentNavigator, "Instruments")
         self.toolWidgets.addTab(self.componentList, "Component Pallet")
+        self.toolWidgets.addTab(self.loadedInstruments, "Loaded Instruments")
 
         self.instrumentContainer = QSplitter()
         self.instrumentContainer.addWidget(self.toolWidgets)
         self.instrumentContainer.addWidget(self.instrumentView)
 
-        self.instrumentContainer.setStretchFactor(1, 3)
+        #self.instrumentContainer.setStretchFactor(1, 3)
         self.setWidget(self.mainContainer) 
         self.mainContainer.setCentralWidget(self.instrumentContainer)
-        self.updateToolbarState()
 
         self.toolbar = QToolBar()
         self.initActions()
         self.initToolbar()
         self.mainContainer.addToolBar(self.toolbar)
+        self.updateToolbarState()
 
         self.iM.Instrument_Removed.connect(self.populateInstrumentList)
+        self.iM.Instrument_New.connect(self.newInstrument)
+        self.iM.Instrument_Name_Changed.connect(self.newInstrument)
         self.iM.Instrument_New.connect(self.populateInstrumentList)
+        self.iM.Instrument_Name_Changed.connect(self.populateInstrumentList)
 
         prevInstrumentPath = self.Read_Setting('Instrument_Path')
         if isinstance(prevInstrumentPath, str):
@@ -78,16 +86,25 @@ class instrumentEditor(DSModule):
         self.lockToggle.toggled.connect(self.lockToggled)
         self.lockToggle.toggle()
 
-        self.instrumentSelectionBox = QComboBox(self)
-        self.instrumentSelectionBox.currentTextChanged(self.instrumentSelectionChanged)
+        self.instrumentSelectionBox = QComboBox(self.toolbar)
+        self.instrumentSelectionBox.setMinimumWidth(200)
+        self.instrumentSelectionBox.currentIndexChanged.connect(self.instrumentSelectionChanged)
 
     def populateInstrumentList(self, instrument):
         self.instrumentSelectionBox.clear()
+        self.loadedInstruments.clear()
         self.instrumentSelectionBox.addItem('')
-        for idx, instrument in enumerate(self.iM.Get_Instruments):
+        for idx, instrument in enumerate(self.iM.Get_Instruments()):
             self.instrumentSelectionBox.addItem(instrument.Get_Name())
-            if instrument.Get_File() == self.targetInstrument:
-                self.instrumentSelectionBox.setCurrentIndex(idx)
+            self.instrumentSelectionBox.setItemData(idx+1, instrument.Get_UUID(), role=Qt.UserRole)
+            if(instrument.Get_UUID() == self.targetUUID):
+                self.instrumentSelectionBox.setCurrentIndex(idx+1)
+
+            self.loadedInstruments.addInstrument(instrument)
+
+    def newInstrument(self, instrument):
+        if os.path.abspath(instrument.Get_Path()) == os.path.abspath(self.targetPath):
+            self.targetUUID = instrument.Get_UUID()
 
     def initToolbar(self):
         self.toolbar.addAction(self.newAction)
@@ -98,9 +115,22 @@ class instrumentEditor(DSModule):
 
         self.toolbar.addWidget(self.toolToggle)
         self.toolbar.addWidget(self.lockToggle)
+
+        self.toolbar.addSeparator()
+
+        self.toolbar.addWidget(self.instrumentSelectionBox)
     
-    def instrumentSelectionChanged(self, text):
-        instrument = self.iM.Get_Instruments(name=text)
+    def instrumentSelectionChanged(self, index):
+        uuid = self.instrumentSelectionBox.itemData(index, role=Qt.UserRole)
+        instrument = self.iM.Get_Instruments(uuid=uuid)
+
+        if not instrument:
+            instrument = None
+        else:
+            instrument = instrument[0]
+
+        self.targetInstrument = instrument
+
         if(instrument is not None):
             self.setWindowTitle('Instrument View (' + instrument.Get_Name() + ')')
             self.Write_Setting('Instrument_Path', instrument.Get_Path())
@@ -108,7 +138,10 @@ class instrumentEditor(DSModule):
             self.setWindowTitle('Instrument View (None)')
             self.Write_Setting('Instrument_Path', None)
 
+        self.instrumentView.loadTargetInstrument()
+
     def openInstrument(self, filePath):
+        self.targetPath = filePath
         self.iM.Load_Instrument(filePath)
 
     def new(self):
@@ -195,10 +228,3 @@ class instrumentEditor(DSModule):
     def updateToolbarState(self):
         self.saveAction.setEnabled(True)
         self.saveAsAction.setEnabled(True)
-
-        iViewSaveData = dict()
-        iViewSaveData['x'] = self.gitem.pos().x()
-        iViewSaveData['y'] = self.gitem.pos().y()
-        iViewSaveData['r'] = self.roi.angle()
-
-        return iViewSaveData

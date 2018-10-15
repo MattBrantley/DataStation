@@ -8,6 +8,9 @@ class EventSequence():
     def Save_Sequence(self, filepath):
         self.saveSequence(filepath)
 
+    def Load_Sequence_File(self, filePath):
+        self.loadSequence(filePath)
+
     def Get_File_Name(self):
         return self.filename
 
@@ -38,7 +41,7 @@ class EventSequence():
 
     def clearAllEvents(self):
         for comp in self.instr.Get_Components():
-            comp.clearEvents()
+            comp.Clear_Events()
 
     #### Load Sequence ####
     def loadSequence(self, path):
@@ -60,7 +63,7 @@ class EventSequence():
         #    if(retval == QMessageBox.No):
         #        return False
 
-        self.instr.Clear_All_Events()
+        self.Clear_All_Events()
 
         for datum in data['eventData']:
             comp = self.instr.Get_Components(uuid=datum['uuid'])

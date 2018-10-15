@@ -1,17 +1,14 @@
 from PyQt5.Qt import *
 import pyqtgraph as pg # This library gives a bunch of FutureWarnings that are unpleasant! Fix for this is in the main .py file header.
-from pyqode.core import api, modes, panels
-import os, json
-from shutil import copyfileobj
-import numpy as np
-import random, math
-from shutil import copyfile
-from src.Constants import DSConstants as DSConstants
+import os, json, numpy as np, random, math
 from eventListWidget import eventListWidget
+from loadedInstruments import loadedInstruments
 from src.Managers.HardwareManager.PacketCommands import *
 from scipy import interpolate
 from src.Managers.ModuleManager.DSModule import DSModule
 from src.Constants import moduleFlags as mfs
+from sequenceTreeView import sequenceTreeView
+from DSLinePlot import DSLinePlotAxisGroup, DSLinePlotWidget
 
 class Sequencer(DSModule):
     Module_Name = 'Sequencer'
@@ -24,6 +21,9 @@ class Sequencer(DSModule):
         self.iM = ds.iM
         self.hM = ds.hM
         self.wM = ds.wM
+
+        self.targetInstrument = None
+
         self.plotPaddingPercent = 1
         self.plotList = list()
         self.resize(1000, 800)
@@ -31,29 +31,49 @@ class Sequencer(DSModule):
         self.xMin = 0
         self.xMax = 1
 
-        self.sequenceNavigator = DSTreeView(self.ds, self)
-        self.sequenceView = DSGraphicsLayoutWidget(self.ds, self)
+        self.sequenceNavigator = sequenceTreeView(self)
+        self.sequenceView = sequencePlots(self)
+        #self.sequenceView = DSGraphicsLayoutWidget(self.ds, self)
+        self.loadedInstruments = loadedInstruments(self)
+
         self.initActionsAndToolbar()
         self.initLayout()
 
         self.updateToolbarState()
 
-        self.iM.Sequence_Loaded.connect(self.sequenceLoaded)
-        self.iM.Sequence_Saved.connect(self.sequenceLoaded)
+        #self.iM.Sequence_Loaded.connect(self.sequenceLoaded)
+        #self.iM.Sequence_Saved.connect(self.sequenceLoaded)
+
+        self.iM.Instrument_Removed.connect(self.populateInstrumentList)
+        self.iM.Instrument_New.connect(self.populateInstrumentList)
+        self.iM.Instrument_Name_Changed.connect(self.populateInstrumentList)
+        self.populateInstrumentList(None)
+
+    def populateInstrumentList(self, instrument):
+        self.instrumentSelectionBox.clear()
+        self.loadedInstruments.clear()
+        self.instrumentSelectionBox.addItem('')
+        for idx, instrument in enumerate(self.iM.Get_Instruments()):
+            self.instrumentSelectionBox.addItem(instrument.Get_Name())
+            self.instrumentSelectionBox.setItemData(idx+1, instrument.Get_UUID(), role=Qt.UserRole)
+            #if(instrument.Get_UUID() == self.targetUUID):
+            #    self.instrumentSelectionBox.setCurrentIndex(idx+1)
+
+            self.loadedInstruments.addInstrument(instrument)
 
     def initActionsAndToolbar(self):
         self.newAction = QAction('New', self)
         self.newAction.setShortcut('Ctrl+N')
         self.newAction.setStatusTip('New')
-        self.newAction.triggered.connect(self.iM.newSequence)
+        #self.newAction.triggered.connect(self.iM.newSequence)
 
         self.saveAction = QAction('Save', self)
         self.saveAction.setStatusTip('Save')
-        self.saveAction.triggered.connect(self.iM.saveSequence)
+        #self.saveAction.triggered.connect(self.iM.saveSequence)
 
         self.saveAsAction = QAction('Save As', self)
         self.saveAsAction.setStatusTip('Save As')
-        self.saveAsAction.triggered.connect(self.iM.saveSequenceAs)
+        #self.saveAsAction.triggered.connect(self.iM.saveSequenceAs)
 
         self.toggleTree = QToolButton(self)
         self.toggleTree.setIcon(QIcon(os.path.join(self.ds.srcDir, 'icons3\css.png')))
@@ -70,6 +90,34 @@ class Sequencer(DSModule):
         self.toolbar.addSeparator()
 
         self.toolbar.addWidget(self.toggleTree)
+
+        self.toolbar.addSeparator()
+
+        self.instrumentSelectionBox = QComboBox(self.toolbar)
+        self.instrumentSelectionBox.setMinimumWidth(200)
+        self.instrumentSelectionBox.currentIndexChanged.connect(self.instrumentSelectionChanged)
+        
+        self.toolbar.addWidget(self.instrumentSelectionBox)
+
+    def instrumentSelectionChanged(self, index):
+        uuid = self.instrumentSelectionBox.itemData(index, role=Qt.UserRole)
+        instrument = self.iM.Get_Instruments(uuid=uuid)
+
+        if not instrument:
+            instrument = None
+        else:
+            instrument = instrument[0]
+
+        self.targetInstrument = instrument
+
+        if(instrument is not None):
+            self.setWindowTitle('Sequencer (' + instrument.Get_Name() + ')')
+            self.sequenceView.loadInstrument(instrument)
+            #self.Write_Setting('Instrument_Path', instrument.Get_Path())
+        else:
+            self.sequenceView.clearAllPlots()
+            self.setWindowTitle('Sequencer (None)')
+            #self.Write_Setting('Instrument_Path', None)
 
     def initLayout(self):
         
@@ -100,6 +148,50 @@ class Sequencer(DSModule):
     def updateToolbarState(self):
         self.saveAction.setEnabled(True)
         self.saveAsAction.setEnabled(True)
+
+class sequencePlots(QWidget):
+    def __init__(self, module):
+        super().__init__()
+        self.module = module
+        self.iM = module.iM
+        self.plotList = list()
+        self.layout = QVBoxLayout()
+        self.layout.setSpacing(0)
+        self.setLayout(self.layout)
+
+        self.axisGroup = DSLinePlotAxisGroup()
+        
+        self.iM.Component_Added.connect(self.addPlot)
+        self.iM.Component_Removed.connect(self.removePlot)
+
+    def loadInstrument(self, instrument):
+        for component in instrument.Get_Components():
+            self.addPlot(instrument, component)
+
+    def addPlot(self, instrument, component):
+        if instrument is self.module.targetInstrument:
+            n = 100000
+            xdata2 = np.linspace(0., 100., n)
+            plot = DSLinePlotWidget(component.Get_Standard_Field('Name'))
+            plot.Link_X_Axis_To_Group(self.axisGroup)
+            plot.component = component
+            plot.Add_Line(xdata2, np.random.random_sample(n))
+
+            self.layout.addWidget(plot)
+            self.plotList.append(plot)
+
+    def clearAllPlots(self):
+        for plot in self.plotList:
+            self.plotList.remove(plot)
+            self.layout.removeWidget(plot)
+
+    def removePlot(self, instrument, component):
+        if instrument in self.module.targetInstrument:
+            for plot in self.plotList:
+                if component is plot.component:
+                    self.plotList.remove(plot)
+                    self.layout.removeWidget(plot)
+                    plot.deleteLater()
 
 class DSGraphicsLayoutWidget(pg.GraphicsLayoutWidget):
 
@@ -403,112 +495,3 @@ class sequencePlotDataItem(pg.PlotDataItem):
             self.xDisp = x
             self.yDisp = y
         return self.xDisp, self.yDisp
-
-############################################################################################
-##################################### TREE VIEW WIDGET #####################################
-class DSNewFileDialog(QDialog):
-    def __init__(self):
-        super().__init__()
-        self.layout = QVBoxLayout(self)
-        self.scriptType = QComboBox()
-        self.scriptType.setWindowTitle('New Sequence..')
-        self.scriptType.addItem('Display')
-        self.scriptType.addItem('Export')
-        self.scriptType.addItem('Generator')
-        self.scriptType.addItem('Import')
-        self.scriptType.addItem('Interact')
-        self.scriptType.addItem('Operation')
-
-        self.layout.addWidget(self.scriptType)
-
-        self.buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
-        self.buttons.accepted.connect(self.accept)
-        self.buttons.rejected.connect(self.reject)
-        self.layout.addWidget(self.buttons)
-
-    @staticmethod
-    def newFile():
-        dialog = DSNewFileDialog()
-        result = dialog.exec_()
-        return (result == QDialog.Accepted)
-
-class DSEditorFSModel(QFileSystemModel):
-    def __init__(self):
-        super().__init__()
-        self.setReadOnly(False)
-
-    def headerData(self, section, orientation, role):
-        if section == 0 and role == Qt.DisplayRole:
-            return "Sequences"
-        else:
-            return super(QFileSystemModel, self).headerData(section, orientation, role)
-
-class DSTreeView(QTreeView):
-    def __init__(self, dockWidget, ds):
-        super().__init__()
-        self.dockWidget = dockWidget
-        self.ds = ds
-        self.iM = ds.iM
-        self.hM = ds.hM
-        self.wM = ds.wM
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.rightClick)
-
-        self.fileSystem = DSEditorFSModel()
-        self.fsRoot = self.iM.sequencesDir
-        self.fsIndex = self.fileSystem.setRootPath(self.fsRoot)  #This is a placeholder - will need updating.
-
-        self.setModel(self.fileSystem)
-        self.setDragEnabled(True)
-        self.setAcceptDrops(True)
-        self.setDefaultDropAction(Qt.MoveAction)
-        self.setRootIndex(self.fsIndex)
-        self.doubleClicked.connect(self.doubleClickedAction)
-        self.hideColumn(1)
-        self.hideColumn(2)
-        self.hideColumn(3)
-
-    def rightClick(self, point):
-        idx = self.mapToGlobal(point)
-
-        item = self.selectionModel().selectedIndexes()
-        if(os.path.isdir(self.fileSystem.filePath(item[0]))):        #Don't show menu on folders
-            return
-
-        openAction = QAction('Open', self)
-        openAction.triggered.connect(lambda: self.open(self.fileSystem.filePath(item[0])))
-
-        deleteAction = QAction('Delete', self)
-        deleteAction.triggered.connect(lambda: self.delete(self.fileSystem.filePath(item[0])))
-
-        duplicateAction = QAction('Duplicate', self)
-        duplicateAction.triggered.connect(lambda: self.duplicate(self.fileSystem.filePath(item[0])))
-
-        menu = QMenu(self)
-        menu.addAction(openAction)
-        menu.addAction(deleteAction)
-        menu.addAction(duplicateAction)
-        menu.exec(idx)
-
-    def doubleClickedAction(self, index):
-        item = self.fileSystem.fileInfo(index)
-        filePath = item.filePath()
-        fileExt = os.path.splitext(item.fileName())[1]
-        if(fileExt == '.sqpy'):
-            self.openSequence(filePath)
-
-    def open(self, item):
-        if(self.iM.Get_Instrument() is not None):
-            self.iM.Get_Instrument().Load_Sequence(item)
-
-    def delete(self, item):
-        os.remove(item)
-
-    def duplicate(self, item):
-        tempPath = os.path.splitext(item)[0] + '_copy' + os.path.splitext(item)[1]
-        tempNum = 1
-        while(os.path.isfile(tempPath)):
-            tempNum = tempNum + 1
-            tempPath = os.path.splitext(item)[0] + '_copy' + str(tempNum) + os.path.splitext(item)[1]
-        
-        copyfile(item, tempPath)

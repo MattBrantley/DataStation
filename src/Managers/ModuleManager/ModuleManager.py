@@ -225,6 +225,9 @@ class ModuleManager(QObject):
     def verifyModule(self, url):
         mod_name, file_ext = os.path.splitext(os.path.split(url)[-1])
 
+        pathStore = sys.path
+        sys.path.append(os.path.dirname(url))
+
         if file_ext.lower() == '.py':
             py_mod = imp.load_source(mod_name, url)
         else:

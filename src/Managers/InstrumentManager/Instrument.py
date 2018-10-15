@@ -12,7 +12,7 @@ class Instrument(QObject):
 
     def Set_Name(self, name):
         self.name = name
-        self.iM.instrumentConfigModified(self)
+        self.iM.instrumentNameChanged(self)
         return True
 
     def Get_Path(self):
@@ -22,14 +22,14 @@ class Instrument(QObject):
         self.url = path
         return True
 
+    def Get_UUID(self):
+        return self.uuid
+
     def Get_Sockets(self, uuid=-1, inputUUID=-1, pathNo=-1, socketType=None):
         return self.getSockets(uuid, inputUUID, pathNo, socketType)
 
     def Get_Components(self, uuid=-1):
         return self.getComponents(uuid)
-
-    def Get_Sequence_Info(self):
-        return self.sequencePath, self.sequenceName
 
     def Remove_Component(self, component):
         return self.removeComponent(component)
@@ -38,8 +38,11 @@ class Instrument(QObject):
         # customFields is a dictionary containing any customFields that should be applied before the component_add is emitted.
         return self.addComponent(compModel, customFields, loadData)
 
-    def Load_Sequence(self, path, showWarning=True):
-        return self.loadSequence(path, showWarning)
+    def Get_Sequence(self):
+        return self.sequence
+
+    def Load_Sequence(self, path):
+        self.Get_Sequence().Load_Sequence_File(path)
 
     def Save_Instrument(self, name=None, path=None):
         if(name is not None):
@@ -77,8 +80,7 @@ class Instrument(QObject):
         self.directory = None
         self.sequence = EventSequence(self.ds, self)
         self.componentList = list()
-
-        self.iM.Instrument_Ready_Check.connect(self.readyCheck)
+        self.uuid = str(uuid.uuid4())
 
 ##### Instrument Ready Check #####
 
@@ -137,7 +139,7 @@ class Instrument(QObject):
 
     def savePacket(self):
         saveData = dict()
-        saveData['name'] = self.name
+        saveData['name'] = self.Get_Name()
         saveCompList = list()
         for component in self.componentList:
             saveCompList.append(component.onSaveParent())
@@ -192,14 +194,14 @@ class Instrument(QObject):
 
     def processInstrumentData(self, instrumentData):
         if('name' in instrumentData):
-            self.tempInstrument.name = instrumentData['name']
+            self.Set_Name(instrumentData['name'])
         else:
             return False
 
         if('compList' in instrumentData):
             for comp in instrumentData['compList']:
                 if(('compIdentifier' in comp) and ('compType' in comp)):
-                    compModel = self.findCompModelByIdentifier(comp['compIdentifier'])
+                    compModel = self.iM.findCompModelByIdentifier(comp['compIdentifier'])
                     if(compModel is None):
                         self.ds.postLog('Instrument contains component (' + comp['compType'] + ':' + comp['compIdentifier'] + ') that is not in the available component modules. Ignoring this component!', DSConstants.LOG_PRIORITY_MED)
                     else:

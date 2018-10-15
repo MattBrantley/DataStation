@@ -1,14 +1,15 @@
 from PyQt5.Qt import *
 from PyQt5.QtCore import *
+import pyqtgraph as pg
 import os
 
 class instrumentView(pg.GraphicsWindow):
-    def __init__(self, instrumentWidget, parent=None):
+    def __init__(self, module, parent=None):
         super().__init__(parent)
 
-        self.instrumentWidget = instrumentWidget
-        self.ds = instrumentWidget.ds
-        self.iM = instrumentWidget.ds.iM
+        self.module = module
+        self.ds = module.ds
+        self.iM = module.ds.iM
         self.setAcceptDrops(True)
         self.view = self.addViewBox()
         self.view.setAspectLocked()
@@ -22,9 +23,10 @@ class instrumentView(pg.GraphicsWindow):
         self.iM.Component_Added.connect(self.addiViewComp)
         self.iM.Component_Removed.connect(self.removeiViewComp)
 
-    def updateiViewState(self):
-        for item in self.iViewCompList:
-            item.instrComp.Set_Custom_Field('iViewSettings', item.onSave())
+    def updateiViewState(self, instrument):
+        if instrument is self.module.targetInstrument:
+            for item in self.iViewCompList:
+                item.instrComp.Set_Custom_Field('iViewSettings', item.onSave())
 
     def dragEnterEvent(self, e):
         if(e.mimeData().text() == "compDrag"):
@@ -53,20 +55,34 @@ class instrumentView(pg.GraphicsWindow):
 
         self.iM.Add_Component(self.iM.Get_Component_Model_By_Index(index), customFields=tempCustomFields)
 
+    def loadTargetInstrument(self):
+        self.clearView()
+        if(self.module.targetInstrument is not None):
+            for comp in self.module.targetInstrument.Get_Components():
+                self.addiViewComp(self.module.targetInstrument, comp)
+
+    def clearView(self):
+        for icomp in self.iViewCompList:
+            self.view.removeItem(icomp)
+
+        self.iViewCompList.clear()
+
     def addiViewComp(self, instrument, component):
-        if(component.Get_Standard_Field('triggerComp') is False):
-            try:
-                ivs = component.Get_Custom_Field('iViewSettings')
-                m = iViewComponent(self.ds, component, self, width=1, height=1, pos=(ivs['x'], ivs['y']), angle=ivs['r'])
-                self.view.addItem(m)
-                self.iViewCompList.append(m)
-            except:
-                pass
+        if instrument is self.module.targetInstrument:
+            if(component.Get_Standard_Field('triggerComp') is False):
+                try:
+                    ivs = component.Get_Custom_Field('iViewSettings')
+                    m = iViewComponent(self.ds, component, self, width=1, height=1, pos=(ivs['x'], ivs['y']), angle=ivs['r'])
+                    self.view.addItem(m)
+                    self.iViewCompList.append(m)
+                except:
+                    pass
 
     def removeiViewComp(self, instrument, component):
-        for icomp in self.iViewCompList:
-            if(icomp.instrComp is component):
-                self.view.removeItem(icomp)
+        if instrument is self.module.targetInstrument:
+            for icomp in self.iViewCompList:
+                if(icomp.instrComp is component):
+                    self.view.removeItem(icomp)
 
 class ParamObj:
     # Just a helper for tracking parameters and responding to changes
@@ -266,4 +282,15 @@ class iViewComponent(iViewObject):
         self.gitem = iViewGraphic(self.ds, src, brush=(100,100,100,255), **defaults)
         iViewObject.__init__(self, self.gitem, iView, **defaults)
 
+        self.sigStateChanged.connect(self.saveState)
+
+    def saveState(self):
+        self.instrComp.Set_Custom_Field('iViewSettings', self.onSave())
+
     def onSave(self):
+        iViewSaveData = dict()
+        iViewSaveData['x'] = self.gitem.pos().x()
+        iViewSaveData['y'] = self.gitem.pos().y()
+        iViewSaveData['r'] = self.roi.angle()
+
+        return iViewSaveData

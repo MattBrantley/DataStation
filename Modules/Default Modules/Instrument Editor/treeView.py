@@ -2,22 +2,13 @@ from PyQt5.Qt import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import os
-
-class DSEditorFSModel(QFileSystemModel):
-    def __init__(self):
-        super().__init__()
-        self.setReadOnly(False)
-        self.setNameFilters({'*.dsinstrument'})
-
-    def headerData(self, section, orientation, role):
-        if section == 0 and role == Qt.DisplayRole:
-            return "Instruments"
-        else:
-            return super(QFileSystemModel, self).headerData(section, orientation, role)
+from shutil import copyfile
 
 class treeView(QTreeView):
-    def __init__(self):
+    def __init__(self, module):
         super().__init__()
+        self.module = module
+        self.ds = module.ds
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.rightClick)
         
@@ -25,7 +16,7 @@ class treeView(QTreeView):
         self.rootPath = os.path.join(self.ds.rootDir, 'Instruments')
         self.fsIndex = self.fileSystem.setRootPath(self.rootPath)
 
-        self.instrumentNavigator.setModel(self.fileSystem)
+        self.setModel(self.fileSystem)
         self.setDragEnabled(True)
         self.setAcceptDrops(True)
         self.setDefaultDropAction(Qt.MoveAction)
@@ -45,12 +36,12 @@ class treeView(QTreeView):
 
         item = self.selectionModel().selectedIndexes()
         if(len(item) > 0):
-            if(os.path.isdir(self.model.filePath(item[0]))):        #Show different menu on folders
+            if(os.path.isdir(self.fileSystem.filePath(item[0]))):        #Show different menu on folders
                 newInstrumentAction = QAction('New Instrument', self)
-                newInstrumentAction.triggered.connect(lambda: self.newInstrumentAction(self.model.filePath(item[0])))
+                newInstrumentAction.triggered.connect(lambda: self.newInstrumentAction(self.fileSystem.filePath(item[0])))
 
                 newFolderAction = QAction('New Folder', self)
-                newFolderAction.triggered.connect(lambda: self.newFolderAction(self.model.filePath(item[0])))
+                newFolderAction.triggered.connect(lambda: self.newFolderAction(self.fileSystem.filePath(item[0])))
                 
                 menu = QMenu(self)
                 menu.addAction(newInstrumentAction)
@@ -58,19 +49,19 @@ class treeView(QTreeView):
                 menu.exec(idx)
             else:                                                   #Show this menu for non-folder items
                 openInstrumentAction = QAction('Open', self)
-                openInstrumentAction.triggered.connect(lambda: self.openInstrumentAction(self.model.filePath(item[0])))
+                openInstrumentAction.triggered.connect(lambda: self.openInstrumentAction(self.fileSystem.filePath(item[0])))
 
                 newInstrumentAction = QAction('New Instrument', self)
-                newInstrumentAction.triggered.connect(lambda: self.newInstrumentAction(self.model.filePath(item[0])))
+                newInstrumentAction.triggered.connect(lambda: self.newInstrumentAction(self.fileSystem.filePath(item[0])))
 
                 newFolderAction = QAction('New Folder', self)
-                newFolderAction.triggered.connect(lambda: self.newFolderAction(self.model.filePath(item[0])))
+                newFolderAction.triggered.connect(lambda: self.newFolderAction(self.fileSystem.filePath(item[0])))
                 
                 deleteAction = QAction('Delete', self)
-                deleteAction.triggered.connect(lambda: self.delete(self.model.filePath(item[0])))
+                deleteAction.triggered.connect(lambda: self.delete(self.fileSystem.filePath(item[0])))
 
                 duplicateAction = QAction('Duplicate', self)
-                duplicateAction.triggered.connect(lambda: self.duplicate(self.model.filePath(item[0])))
+                duplicateAction.triggered.connect(lambda: self.duplicate(self.fileSystem.filePath(item[0])))
 
                 menu = QMenu(self)
                 menu.addAction(openInstrumentAction)
@@ -112,3 +103,15 @@ class treeView(QTreeView):
             tempPath = os.path.splitext(item)[0] + '_copy' + str(tempNum) + os.path.splitext(item)[1]
 
         copyfile(item, tempPath)
+
+class DSEditorFSModel(QFileSystemModel):
+    def __init__(self):
+        super().__init__()
+        self.setReadOnly(False)
+        self.setNameFilters({'*.dsinstrument'})
+
+    def headerData(self, section, orientation, role):
+        if section == 0 and role == Qt.DisplayRole:
+            return "Instruments"
+        else:
+            return super(QFileSystemModel, self).headerData(section, orientation, role)

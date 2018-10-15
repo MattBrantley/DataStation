@@ -3,11 +3,11 @@ from PyQt5.QtCore import *
 import os
 
 class componentsList(QListWidget):
-    def __init__(self, widget, ds, parent=None):
-        super(componentsList, self).__init__(None)
-
-        self.ds = ds
-        self.iM = ds.iM
+    def __init__(self, module):
+        super().__init__(None)
+        self.module = module
+        self.ds = module.ds
+        self.iM = module.ds.iM
         self.setDragEnabled(True)
         self.setViewMode(QListView.ListMode)
         self.setIconSize(QSize(60, 60))
