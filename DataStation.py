@@ -72,11 +72,9 @@ class DataStation_Core(QMainWindow):
 
         self.setAppIcons()
         self.initManagers()
-
         self.initTrayMenu()
 
         self.DataStation_Loaded.emit()
-
         self.app.lastWindowClosed.connect(self.lastWindowClosed)
 
     def setAppIcons(self):

@@ -30,6 +30,7 @@ class Component(QObject):
 
     def Set_Custom_Field(self, field, data):
         self.compSettings['customFields'][field] = data
+        self.instr.componentCustomFieldChanged(self, field)
         return True
 
     def Remove_Component(self):
@@ -170,8 +171,6 @@ class Component(QObject):
         savePacket['compType'] = self.componentType
         savePacket['compIdentifier'] = self.componentIdentifier
         savePacket['triggerComp'] = self.isTriggerComponent
-        #if(hasattr(self, 'iViewComponent')):
-        #    savePacket['iViewSettings'] = self.iViewComponent.onSave()
         savePacket['sockets'] = self.saveSockets()
 
         return savePacket
@@ -180,6 +179,7 @@ class Component(QObject):
         if(compSettings is not None):
             for key, value in compSettings.items():
                 self.compSettings[key] = value
+                self.instr.componentStandardFieldChanged(self, 'name')
 
     def setPathDataPacket(self, pathNo, packet):
         self.pathDataPackets[pathNo-1] = packet

@@ -8,7 +8,7 @@ from scipy import interpolate
 from src.Managers.ModuleManager.DSModule import DSModule
 from src.Constants import moduleFlags as mfs
 from sequenceTreeView import sequenceTreeView
-from DSLinePlot import DSLinePlotAxisGroup, DSLinePlotWidget
+from SequenceCanvas import SequenceCanvas
 
 class Sequencer(DSModule):
     Module_Name = 'Sequencer'
@@ -32,7 +32,7 @@ class Sequencer(DSModule):
         self.xMax = 1
 
         self.sequenceNavigator = sequenceTreeView(self)
-        self.sequenceView = sequencePlots(self)
+        self.sequenceView = sequencerPlot(self)
         #self.sequenceView = DSGraphicsLayoutWidget(self.ds, self)
         self.loadedInstruments = loadedInstruments(self)
 
@@ -41,12 +41,13 @@ class Sequencer(DSModule):
 
         self.updateToolbarState()
 
-        #self.iM.Sequence_Loaded.connect(self.sequenceLoaded)
+        self.iM.Sequence_Loaded.connect(self.sequenceLoaded)
         #self.iM.Sequence_Saved.connect(self.sequenceLoaded)
 
         self.iM.Instrument_Removed.connect(self.populateInstrumentList)
         self.iM.Instrument_New.connect(self.populateInstrumentList)
         self.iM.Instrument_Name_Changed.connect(self.populateInstrumentList)
+
         self.populateInstrumentList(None)
 
     def populateInstrumentList(self, instrument):
@@ -120,7 +121,6 @@ class Sequencer(DSModule):
             #self.Write_Setting('Instrument_Path', None)
 
     def initLayout(self):
-        
         self.mainContainer = QMainWindow()
         self.mainContainer.addToolBar(self.toolbar)
         self.sequencerContainer = QSplitter()
@@ -133,7 +133,7 @@ class Sequencer(DSModule):
         self.mainContainer.setCentralWidget(self.sequencerContainer)
 
     def sequenceLoaded(self, instrument): #Update when Sequence has been fixed in iM
-        seqInfo = instrument.Get_Sequence_Info()
+        seqInfo = instrument.Get_Sequence()
         self.setWindowTitle('Sequencer (' + seqInfo[1] + ')')
 
     def sequenceUnloaded(self, instrument):
@@ -149,49 +149,90 @@ class Sequencer(DSModule):
         self.saveAction.setEnabled(True)
         self.saveAsAction.setEnabled(True)
 
-class sequencePlots(QWidget):
+class sequencerPlot(QWidget):
     def __init__(self, module):
         super().__init__()
         self.module = module
+        self.ds = module.ds
         self.iM = module.iM
         self.plotList = list()
-        self.layout = QVBoxLayout()
-        self.layout.setSpacing(0)
-        self.setLayout(self.layout)
-
-        self.axisGroup = DSLinePlotAxisGroup()
+        self.canvas = SequenceCanvas()
+        self.canvas.rightClicked.connect(self.toggleEditWidget)
         
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
+        self.layout.addWidget(self.canvas)
+
         self.iM.Component_Added.connect(self.addPlot)
         self.iM.Component_Removed.connect(self.removePlot)
+        self.iM.Component_Standard_Field_Changed.connect(self.componentStandardFieldChanged)
 
     def loadInstrument(self, instrument):
         for component in instrument.Get_Components():
             self.addPlot(instrument, component)
+        self.canvas.restoreZoom()
 
     def addPlot(self, instrument, component):
         if instrument is self.module.targetInstrument:
-            n = 100000
-            xdata2 = np.linspace(0., 100., n)
-            plot = DSLinePlotWidget(component.Get_Standard_Field('Name'))
-            plot.Link_X_Axis_To_Group(self.axisGroup)
-            plot.component = component
-            plot.Add_Line(xdata2, np.random.random_sample(n))
+            if(component.Get_Custom_Field('sequencerSettings') is None):
+                component.Set_Custom_Field('sequencerSettings', {'show': True})
 
-            self.layout.addWidget(plot)
-            self.plotList.append(plot)
+            settings = component.Get_Custom_Field('sequencerSettings')
+            if(settings['show'] is True):
+                plot = self.canvas.Add_Plot()
+                plot.setTitle(component.Get_Standard_Field('name'))
+                plot.component = component
+                plot.sequencerEditWidget = eventListWidget(self.ds, self.module, component)
+                self.plotList.append(plot)
+                self.drawPlotForComponent(instrument, component)
+
+    def drawPlotForComponent(self, instrument, component):
+        if instrument is self.module.targetInstrument:
+            for plot in self.plotList:
+                if plot.component is component:
+                    plot.Clear_Lines()
+                    #plot.Add_Line(np.linspace(0., 100., 5000), np.random.random_sample(5000))
+
+                    for socket in component.Get_Sockets():
+                        packet = socket.Get_Programming_Packet()
+                        if(packet is not None):
+                            data = list()
+                            for cmd in packet.Get_Commands(commandType=AnalogSparseCommand):
+                                data.append(cmd.pairs)
+                            if(data):
+                                plotData = np.vstack(data)
+                                #print(plotData)
+                                plot.Add_Line(plotData[:,0], plotData[:,1])
+                            else:
+                                plot.Add_Line(np.zeros(1), np.zeros(1))
+                        else:
+                            plot.Add_Line(np.zeros(1), np.zeros(1))
+
+
+    def componentStandardFieldChanged(self, instrument, component, field):
+        if instrument is self.module.targetInstrument:
+            if field == 'name':
+                print('NAME')
+                for plot in self.plotList:
+                    if plot.component is component:
+                        plot.setTitle(component.Get_Standard_Field('name'))
 
     def clearAllPlots(self):
-        for plot in self.plotList:
-            self.plotList.remove(plot)
-            self.layout.removeWidget(plot)
+        self.canvas.Clear_Plots()
+        self.plotList = list()
 
     def removePlot(self, instrument, component):
-        if instrument in self.module.targetInstrument:
-            for plot in self.plotList:
-                if component is plot.component:
-                    self.plotList.remove(plot)
-                    self.layout.removeWidget(plot)
-                    plot.deleteLater()
+        if instrument is self.module.targetInstrument:
+            self.clearAllPlots()
+            self.loadInstrument(instrument)
+
+    def toggleEditWidget(self, plot, eventPos):
+        plot.sequencerEditWidget.move(eventPos + QPoint(2, 2))
+        if(plot.sequencerEditWidget.isHidden()):
+            plot.sequencerEditWidget.updateTitle()
+            plot.sequencerEditWidget.show()
+        else:
+            plot.sequencerEditWidget.hide()
 
 class DSGraphicsLayoutWidget(pg.GraphicsLayoutWidget):
 
@@ -321,7 +362,6 @@ class DSPlotItem():
         self.showXAxis = True
         self.plotDataList = list()
 
-        self.sequencerEditWidget = eventListWidget(ds, plotLayout.dockWidget, comp)
         a = sequencePlotDataItem(x=[-90, 90], y=[0, 0], pen = self.pen)
         self.plotItem.addItem(a)
 
@@ -346,8 +386,6 @@ class DSPlotItem():
                     data = list()
                     for cmd in packet.Get_Commands(commandType=AnalogSparseCommand):
                         data.append(cmd.pairs)
-                    #for cmd in packet.Get_Commands(commandType=AnalogWaveformCommand):
-                    #    data.append(cmd.toPairs())
                     if(data):
                         plotData = np.vstack(data)
                         plotData = self.formatStepMode(plotData)
@@ -358,7 +396,6 @@ class DSPlotItem():
                         self.plotItem.getViewBox().autoRange()
                 else:
                     pass
-                    #plotData = np.array([[0,0], [0,1]])
 
         self.plotItem.setLimits(xMin = 0, xMax = 1)
         self.plotLayout.updateBounds()

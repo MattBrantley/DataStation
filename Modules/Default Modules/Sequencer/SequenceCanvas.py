@@ -6,13 +6,23 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
 import numpy as np
-#   "{:.1f}".format(val)
 class SequencePlot(QObject):
+
     def __init__(self, canvas, title='Untitled'):
         super().__init__()
         self.title = title
         self.canvas = canvas
+        self.createObjects()
 
+        #self.reserve = QLineSeries()
+        #self.reserve.append(-900000, -900000)
+        #self.canvas.chart.addSeries(self.reserve)
+        #self.yAxis.updateAxis()
+        #self.updateXMinMax(np.array([0, 1]))
+        #self.reserve.attachAxis(self.canvas.xAxis)
+        #self.reserve.attachAxis(self.canvas.yAxis)
+
+    def createObjects(self):
         self.yMin = 90000
         self.yMax = -90000
 
@@ -24,26 +34,26 @@ class SequencePlot(QObject):
         self.yAxisLine.setPen(self.yAxisLinePen)
         self.canvas.scene().addItem(self.yAxisLine)
 
-        self.titleObject = self.canvas.scene().addText(self.title)
+        self.titleObject = self.canvas.scene().addText('<center>' + self.title + '</center>')
+
+        self.testLine = QGraphicsLineItem(0, 0, 0, 0)
+        self.canvas.scene().addItem(self.testLine)
 
         self.titleObject.setParent(self)
         self.dataSetList = list()
-        self.yAxis = canvas.yAxis
+        self.yAxis = self.canvas.yAxis
         self.redrawLabels()
 
-    def remove(self):
+    def remove(self): # Not Working
         self.canvas.scene().removeItem(self.minYAxisObject)
         self.canvas.scene().removeItem(self.maxYAxisObject)
         self.canvas.scene().removeItem(self.titleObject)
         self.canvas.scene().removeItem(self.yAxisLine)
-        for dataSet in self.dataSetList:
-            self.canvas.chart.removeSeries(dataSet)
-            dataSet.deleteLater()
+        self.Clear_Lines()
         self.yAxis.updateAxis()
 
     def setTitle(self, newTitle):
         self.title = newTitle
-        #self.titleObject.setTransformOriginPoint(self.titleObject.boundingRect().center())
         self.redrawLabels()
 
     def updateXMinMax(self, xdata):
@@ -64,8 +74,17 @@ class SequencePlot(QObject):
         for dataSet in self.dataSetList:
             dataSet.redrawSet()
 
+    def Clear_Lines(self):
+        for dataSet in self.dataSetList:
+            dataSet.clear()
+
     def Add_Line(self, xdata, ydata):
         self.updateXMinMax(xdata)
+        xdata = np.insert(xdata, 0, -900)
+        xdata = np.append(xdata, 900)
+
+        ydata = np.insert(ydata, 0, ydata[0])
+        ydata = np.append(ydata, ydata[-1])
 
         newLine = DSLineSeries(self.canvas, self, xdata, ydata)
         self.updateYMinMax(newLine)
@@ -76,6 +95,14 @@ class SequencePlot(QObject):
         self.yAxis.updateAxis()
         newLine.attachAxies()
         self.redrawLabels()
+        self.canvas.update()
+
+    def Is_Range(self, point):
+        point2 = QPointF(point)
+        point2.setX(point.x() * self.canvas.pixelToUnitsX())
+        point2.setY(point.y() * self.canvas.pixelToUnitsY())
+        if (self.getYMin() < point2.y()) and (self.getYMax() > point2.y()):
+            self.canvas.mouseRightClick(self, point)
 
     def getYMin(self):
         try:
@@ -89,23 +116,32 @@ class SequencePlot(QObject):
 
     def redrawLabels(self):
         self.minYAxisObject.setHtml("{:.1f}".format(self.yMin))
-        xMin = 34 - self.minYAxisObject.boundingRect().width()
+        xMin = 42 - self.minYAxisObject.boundingRect().width()
         yMin = 1/self.canvas.pixelToUnitsY() * self.getYMax() - self.minYAxisObject.boundingRect().height()
         self.minYAxisObject.setPos(xMin, yMin)
+        yMin = yMin + self.minYAxisObject.boundingRect().height()
 
         self.maxYAxisObject.setHtml("{:.1f}".format(self.yMax))
-        xMax = 34 - self.maxYAxisObject.boundingRect().width()
+        xMax = 42 - self.maxYAxisObject.boundingRect().width()
         yMax = 1/self.canvas.pixelToUnitsY() * self.getYMin()
         self.maxYAxisObject.setPos(xMax, yMax)
 
-        self.yAxisLine.setLine(32, yMin+ self.minYAxisObject.boundingRect().height(), 32, yMax +2)
+        self.yAxisLine.setLine(40, yMin-10, 40, yMax+10)
 
-        self.titleObject.setHtml(self.title)
+        self.titleObject.setHtml('<center>' + self.title + '</center>')
+        self.titleObject.setRotation(0)
+        self.titleObject.setTextWidth((yMin-yMax)-26)
         ytitle = (yMin + yMax)/2
+        center = self.titleObject.boundingRect().center()
+        goal = QPointF(self.titleObject.boundingRect().height()/2, ytitle)
+        trans = goal - center
+        height = self.titleObject.boundingRect().height()
+        width = self.titleObject.boundingRect().width()
+        self.titleObject.setPos(trans)
         self.titleObject.setTransformOriginPoint(self.titleObject.boundingRect().center())
-        self.titleObject.boundingRect().moveCenter(QPointF(0, ytitle))
-        self.titleObject.setPos(-self.titleObject.boundingRect().center().x() + 8, ytitle)
         self.titleObject.setRotation(-90)
+
+        self.testLine.setLine(8, ytitle, 8, ytitle)
 
 class DSLineSeries(QLineSeries):
     def __init__(self, canvas, plot, xdata, ydata):
@@ -126,7 +162,7 @@ class DSLineSeries(QLineSeries):
 
     def redrawSet(self):
         self.clear()
-        self.appen
+        self.append(self.series_to_polyline(self.xdata, self.ydata))
 
     def attachAxies(self):
         self.attachAxis(self.canvas.xAxis)
@@ -145,7 +181,8 @@ class DSLineSeries(QLineSeries):
     def series_to_polyline(self, xdata, ydata):
         self.seriesMin = ydata.min()
         self.seriesMax = ydata.max()
-        ydata *= 1/ydata.max()
+        if ydata.max() != 0:
+            ydata *= 1/ydata.max()
         ydata += self.plot.getYMin()
         #ydata += self.getYMin()
 
@@ -162,6 +199,7 @@ class DSLineSeries(QLineSeries):
         return polyline
 
 class SequenceCanvas(QChartView):
+    rightClicked = pyqtSignal(object, object) # QPoint, PlotObject
 
 ##### EXTERNAL FUNCTIONS #####
     def Add_Plot(self):
@@ -171,18 +209,27 @@ class SequenceCanvas(QChartView):
         self.redrawLabels()
         return plot
 
-    def Remove_Plot(self, plot):
+    def Clear_Plots(self):
+        for plot in self.plotList:
+            plot.remove()
+
+        self.plotList = list()
+
+    def Remove_Plot(self, plot): # Not Working
+        for plot in self.plotList:
+            plot.remove()
+
         self.plotList.remove(plot)
-        plot.remove()
 
         for plot in self.plotList:
-
+            plot.createObjects()
+            plot.Redraw_Lines()
 
 ##### INTERNAL USE ONLY #####
     def __init__(self):
         super().__init__()
         self.chart = DSChart()
-        self.chart.setMargins(QMargins(16, 0, 0, 0))
+        self.chart.setMargins(QMargins(24, 0, 0, 0))
         self.chart.legend().hide()
         self.plotList = list()
 
@@ -190,6 +237,7 @@ class SequenceCanvas(QChartView):
 
         self.xAxis = QValueAxis()
         self.xAxis.setTickCount(11)
+        self.xAxis.setTitleText('Time (s)')
         self.chart.addAxis(self.xAxis, Qt.AlignBottom)
 
         self.yAxis = DSSequenceYAxis(self)
@@ -221,6 +269,13 @@ class SequenceCanvas(QChartView):
         if(mouseEvent.buttons() & Qt.LeftButton):
             self.mousePressLoc = mouseEvent.screenPos()
 
+        if(mouseEvent.buttons() & Qt.RightButton):
+            for plot in self.plotList:
+                plot.Is_Range(mouseEvent.pos())
+
+    def mouseRightClick(self, plot, point):
+        self.rightClicked.emit(plot, point)
+
     def mouseMoveEvent(self, mouseEvent):
         if(mouseEvent.buttons() & Qt.LeftButton):
             if(self.mousePressLoc is None):
@@ -240,7 +295,10 @@ class SequenceCanvas(QChartView):
             self.zoomPlot(wheelAngleDelta/360, wheelAngleDelta/360, self.screenToPlotPoint(wheelEvent.pos()))
             
     def mouseDoubleClickEvent(self, mouseEvent):
-        self.restoreZoom()
+        if(mouseEvent.buttons() & Qt.LeftButton):
+            self.restoreZoom()
+        else:
+            mouseEvent.ignore()
 
 ##### HELPER FUNCTIONS #####
     def getPlotIndex(self, plot):
@@ -347,30 +405,34 @@ class DSChart(QChart):
     def mouseDoubleclickEvent(self, mouseEvent):
         pass
 
-class TestWindow(QMainWindow):
-    def __init__(self, parent=None):
-        super(TestWindow, self).__init__(parent=parent)
-        self.mainWidget = SequenceCanvas()
-        self.setCentralWidget(self.mainWidget)
+# class TestWindow(QMainWindow):
+#     def __init__(self, parent=None):
+#         super(TestWindow, self).__init__(parent=parent)
+#         self.mainWidget = SequenceCanvas()
+#         self.setCentralWidget(self.mainWidget)
 
-        a = self.mainWidget.Add_Plot()
-        a.Add_Line(np.linspace(0., 100., 500000), np.random.random_sample(500000))
-        a.setTitle('a')
+#         a = self.mainWidget.Add_Plot()
+#         a.Add_Line
+#         a.setTitle('a')
 
-        b = self.mainWidget.Add_Plot()
-        b.Add_Line(np.linspace(0., 100., 5000), np.random.random_sample(5000))
-        b.setTitle('b')
+#         b = self.mainWidget.Add_Plot()
+#         b.Add_Line(np.linspace(0., 100., 5000), np.random.random_sample(5000))
+#         b.setTitle('b')
 
-        c = self.mainWidget.Add_Plot()
-        c.Add_Line(np.linspace(0., 100., 5000), np.random.random_sample(5000))
-        c.Add_Line(np.linspace(0., 100., 5000), np.random.random_sample(5000))
+#         c = self.mainWidget.Add_Plot()
+#         c.Add_Line(np.linspace(0., 100., 5000), np.random.random_sample(5000))
+#         c.Add_Line(np.linspace(0., 100., 5000), np.random.random_sample(5000))
 
-        self.mainWidget.Remove_Plot(b)
+#         self.mainWidget.Clear_Plots()
+#         d = self.mainWidget.Add_Plot()
+#         d.Add_Line(np.linspace(0., 100., 5000), np.random.random_sample(5000))
+#         d.Add_Line(np.linspace(0., 100., 5000), np.random.random_sample(5000))
+#         #self.mainWidget.Remove_Plot(c)
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
+# if __name__ == '__main__':
+#     app = QApplication(sys.argv)
 
-    window = TestWindow()
-    window.show()
-    window.resize(500, 400)
-    sys.exit(app.exec_())
+#     window = TestWindow()
+#     window.show()
+#     window.resize(500, 400)
+#     sys.exit(app.exec_())

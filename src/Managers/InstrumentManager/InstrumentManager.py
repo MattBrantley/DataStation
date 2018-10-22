@@ -22,10 +22,12 @@ class InstrumentManager(QObject):
     Component_Added = pyqtSignal(object, object) # Instrument, Component
     Component_Removed = pyqtSignal(object, object) # Instrument, Component
     Component_Programming_Modified = pyqtSignal(object, object) # Instrument, Component
+    Component_Standard_Field_Changed = pyqtSignal(object, object, str) # Instrument, Component, Field
+    Component_Custom_Field_Changed = pyqtSignal(object, object, str) # Instrument, Component, Field
 
 ##### Signals: Sequence #####
-    Sequence_Loaded = pyqtSignal(object) # Instrument, Sequence Path
-    Sequence_Saved = pyqtSignal(object) # Instrument, Sequence Path
+    Sequence_Loaded = pyqtSignal(object) # Instrument
+    Sequence_Saved = pyqtSignal(object) # Instrument
 
 ##### Signals: Events #####
     Event_Added = pyqtSignal(object, object, object) # Instrument, Component, Event
@@ -97,6 +99,7 @@ class InstrumentManager(QObject):
         # Called after all managers are created so they can connect to each other's signals
 
 ##### Functions Called Internally By Factoried Instruments #####
+    ##### Instrument #####
     def instrumentModified(self, instrument):
         pass
 
@@ -106,12 +109,26 @@ class InstrumentManager(QObject):
     def instrumentConfigModified(self, instrument):
         self.Instrument_Config_Changed.emit(instrument)
 
+    def instrumentSaved(self, instrument):
+        self.Instrument_Saved.emit(instrument)
+
+    def instrumentFileLoaded(self, instrument):
+        self.Instrument_File_Loaded.emit(instrument)
+
+    ##### Component #####
     def componentAdded(self, instrument, component):
         self.Component_Added.emit(instrument, component)
 
     def componentRemoved(self, instrument, component):
         self.Component_Removed.emit(instrument, component)
 
+    def componentStandardFieldChanged(self, instrument, component, field):
+        self.Component_Standard_Field_Changed.emit(instrument, component, field)
+
+    def componentCustomFieldChanged(self, instrument, component, field):
+        self.Component_Custom_Field_Changed.emit(instrument, component, field)
+
+    ##### Socket #####
     def socketAttached(self, instrument, component, socket):
         self.Socket_Attached.emit(instrument, component, socket)
 
@@ -121,6 +138,7 @@ class InstrumentManager(QObject):
     def socketAdded(self, instrument, component, socket):
         self.Socket_Added.emit(instrument, component, socket)
 
+    ##### Event #####
     def eventAdded(self, instrument, component, event):
         self.Event_Added.emit(instrument, component, event)
 
@@ -130,23 +148,19 @@ class InstrumentManager(QObject):
     def eventModified(self, instrument, component, event): ## Not used?
         self.Event_Modified.emit(instrument, component, event)
 
+    ##### Sequence #####
     def sequenceLoaded(self, instrument):
         self.Sequence_Loaded.emit(instrument)
 
     def sequenceSaved(self, instrument):
         self.Sequence_Saved.emit(instrument)
 
+    ##### Component Programming #####
     def programmingModified(self, instrument, component):
         self.Component_Programming_Modified.emit(instrument, component)
 
     def measurementRecieved(self, instrument, component, socket, measurementPacket):
         self.Socket_Measurement_Packet_Recieved.emit(instrument, component, socket, measurementPacket)
-
-    def instrumentSaved(self, instrument):
-        self.Instrument_Saved.emit(instrument)
-
-    def instrumentFileLoaded(self, instrument):
-        self.Instrument_File_Loaded.emit(instrument)
         
 ##### Search Functions ######
 

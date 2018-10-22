@@ -95,16 +95,21 @@ class Instrument(QObject):
         self.readyChickList.append({'Trace': trace, 'Msg': msg})
 
 ##### Functions Called By Factoried Components #####
+    ##### Component #####
+    def componentReadyCheckInterrupt(self, component, socket, msg):
+        readyCheckMsg = dict()
+        readyCheckMsg['Trace']  = [component, socket, msg]
+        readyCheckMsg['msg'] = msg
+        self.readyCheckFails.append(readyCheckMsg)
+        self.ready = False
 
-    def eventAdded(self, component, event):
-        self.iM.eventAdded(self, component, event)
+    def componentStandardFieldChanged(self, component, field):
+        self.iM.componentStandardFieldChanged(self, component, field)
 
-    def eventRemoved(self, component, event):
-        self.iM.eventRemoved(self, component, event)
+    def componentCustomFieldChanged(self, component, field):
+        self.iM.componentCustomFieldChanged(self, component, field)
 
-    def eventModified(self, component, event):
-        self.iM.eventModified(self, component, event)
-
+    ##### Socket #####
     def socketAdded(self, component, socket):
         self.iM.socketAdded(self, component, socket)
 
@@ -114,18 +119,22 @@ class Instrument(QObject):
     def socketDetatched(self, component, socket):
         self.iM.socketDetatched(self, component, socket)
 
+    ##### Event #####
+    def eventAdded(self, component, event):
+        self.iM.eventAdded(self, component, event)
+
+    def eventRemoved(self, component, event):
+        self.iM.eventRemoved(self, component, event)
+
+    def eventModified(self, component, event):
+        self.iM.eventModified(self, component, event)
+
+    ##### Component Programming #####
     def programmingModified(self, component):
         self.iM.programmingModified(self, component)
 
     def measurementRecieved(self, component, socket, measurementPacket):
         self.iM.measurementRecieved(self, component, socket, measurementPacket)
-
-    def componentReadyCheckInterrupt(self, component, socket, msg):
-        readyCheckMsg = dict()
-        readyCheckMsg['Trace']  = [component, socket, msg]
-        readyCheckMsg['msg'] = msg
-        self.readyCheckFails.append(readyCheckMsg)
-        self.ready = False
 
 ##### Functions Called By Sequence #####
 
