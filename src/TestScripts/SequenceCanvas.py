@@ -192,13 +192,13 @@ class TestWindow(QMainWindow):
         self.mainWidget = SequenceCanvas()
         self.setCentralWidget(self.mainWidget)
 
-        self.mainWidget.Add_Plot(np.linspace(0., 100., 500000), np.random.random_sample(500000))
-        self.mainWidget.Add_Plot(np.linspace(0., 100., 5000), np.random.random_sample(5000))
-        self.mainWidget.Add_Plot(np.linspace(0., 100., 5000), np.random.random_sample(5000))
-        self.mainWidget.Add_Plot(np.linspace(0., 100., 5000), np.random.random_sample(5000))
-        self.mainWidget.Add_Plot(np.linspace(0., 100., 5000), np.random.random_sample(5000))
-        self.mainWidget.Add_Plot(np.linspace(0., 100., 5000), np.random.random_sample(5000))
-        self.mainWidget.Add_Plot(np.linspace(0., 100., 5000), np.random.random_sample(5000))
+        self.mainWidget.Add_Plot(np.linspace(0., 100., 50000), np.random.random_sample(50000))
+        #self.mainWidget.Add_Plot(np.linspace(0., 100., 5000), np.random.random_sample(5000))
+        #self.mainWidget.Add_Plot(np.linspace(0., 100., 5000), np.random.random_sample(5000))
+        #self.mainWidget.Add_Plot(np.linspace(0., 100., 5000), np.random.random_sample(5000))
+        #self.mainWidget.Add_Plot(np.linspace(0., 100., 5000), np.random.random_sample(5000))
+        #self.mainWidget.Add_Plot(np.linspace(0., 100., 5000), np.random.random_sample(5000))
+        #self.mainWidget.Add_Plot(np.linspace(0., 100., 5000), np.random.random_sample(5000))
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -8,8 +8,7 @@ from PyQt5.QtCore import *
 import numpy as np
 
 class DSLinePlotWidget(QChartView):
-    xMinChanged = pyqtSignal(object, float)
-    xMaxChanged = pyqtSignal(object, float)
+    xAxisChanged = pyqtSignal(object, float, float)
 
 ##### EXTERNAL FUNCTIONS #####
     def Add_Line(self, xdata, ydata):
@@ -22,8 +21,7 @@ class DSLinePlotWidget(QChartView):
         curve.attachAxis(self.yAxis)
 
     def Link_X_Axis_To_Group(self, axisGroup):
-        axisGroup.xMinChanged.connect(self.linkedAxisXMin)
-        axisGroup.xMaxChanged.connect(self.linkedAxisXMax)
+        axisGroup.xAxisChanged.connect(self.linkedXAxisChanged)
         axisGroup.registerToGroup(self)
 
 ##### INTERNAL USE ONLY #####
@@ -32,14 +30,14 @@ class DSLinePlotWidget(QChartView):
         self.name = name
         self.chart = DSChart()
         self.chart.legend().hide()
-
-        self.setFrameStyle(QFrame.NoFrame)
-
         self.xAxis = QValueAxis()
         self.yAxis = QValueAxis()
 
+
         self.chart.addAxis(self.xAxis, Qt.AlignBottom)
         self.chart.addAxis(self.yAxis, Qt.AlignLeft)
+
+        self.setFrameStyle(QFrame.NoFrame)
 
         self.setChart(self.chart)
         self.setRenderHint(QPainter.Antialiasing)
@@ -83,8 +81,8 @@ class DSLinePlotWidget(QChartView):
 
         if(wheelAngleDelta < 0):
             wheelAngleDelta = wheelAngleDelta * 1.5
-
-        self.zoomPlot(wheelAngleDelta/360, wheelAngleDelta/360, self.screenToPlotPoint(wheelEvent.pos()))
+        if(self.screenToPlotPoint(wheelEvent.pos()) is not False):
+            self.zoomPlot(wheelAngleDelta/360, wheelAngleDelta/360, self.screenToPlotPoint(wheelEvent.pos()))
 
 ##### HELPER FUNCTIONS #####
     def pixelToUnitsX(self):
@@ -117,58 +115,44 @@ class DSLinePlotWidget(QChartView):
         return polyline    
     
 ##### PLOT AXIS MANIPULATIONS #####
-    def linkedAxisXMin(self, source, xMin):
-        if(source is not self):
-            self.xAxis.setMin(xMin)
-
-    def linkedAxisXMax(self, source, xMax):
-        if(source is not self):
-            self.xAxis.setMax(xMax)
+    def linkedXAxisChanged(self, source, xMin, xMax):
+        if source is not self:
+            self.xAxis.setRange(xMin, xMax)
 
     def zoomPlot(self, dX, dY, point): # dX and dY in percentage
+        print('zoom')
         if(self.xZoom is True):
             widthL = (point.x() - self.xAxis.min()) * (dX * self.zoomSpeed)
             widthR = (self.xAxis.max() - point.x()) * (dX * self.zoomSpeed)
-            self.xAxis.setMin(self.xAxis.min() + widthL)
-            self.xAxis.setMax(self.xAxis.max() - widthR)
-
-            self.xMinChanged.emit(self, self.xAxis.min())
-            self.xMaxChanged.emit(self, self.xAxis.max())
+            self.xAxis.setRange(self.xAxis.min() + widthL, self.xAxis.max() - widthR)
+            self.xAxisChanged.emit(self, self.xAxis.min(), self.xAxis.max())
 
         if(self.yZoom is True):
             heightT = (point.y() - self.yAxis.min()) * (dY * self.zoomSpeed)
             heightB = (self.yAxis.max() - point.y()) * (dY * self.zoomSpeed)
-            self.yAxis.setMin(self.yAxis.min() + heightT)
-            self.yAxis.setMax(self.yAxis.max() - heightB)
+            self.yAxis.setRange(self.yAxis.min() + heightT, self.yAxis.max() - heightB)
 
     def panPlot(self, dX, dY):
         if(self.xPan is True):
-            self.xAxis.setMin(self.xAxis.min() + dX)
-            self.xAxis.setMax(self.xAxis.max() + dX)
-
-            self.xMinChanged.emit(self, self.xAxis.min())
-            self.xMaxChanged.emit(self, self.xAxis.max())
+            self.xAxis.setRange(self.xAxis.min() + dX, self.xAxis.max() + dX)
+            self.xAxisChanged.emit(self, self.xAxis.min(), self.xAxis.max())
 
         if(self.yPan is True):
             self.yAxis.setMin(self.yAxis.min() - dY)
             self.yAxis.setMax(self.yAxis.max() - dY)
 
 class DSLinePlotAxisGroup(QObject):
-    xMinChanged = pyqtSignal(object, float)
-    xMaxChanged = pyqtSignal(object, float)
+    xAxisChanged = pyqtSignal(object, float, float)
 
     def __init__(self):
         super().__init__()
+        
 
-    def signalXMinChanged(self, source, val):
-        self.xMinChanged.emit(source, val)
-
-    def signalXMaxChanged(self, source, val):
-        self.xMaxChanged.emit(source, val)
+    def signalXAxisChanged(self, source, xMin, xMax):
+        self.xAxisChanged.emit(source, xMin, xMax)
 
     def registerToGroup(self, plot):
-        plot.xMinChanged.connect(self.signalXMinChanged)
-        plot.xMaxChanged.connect(self.signalXMaxChanged)
+        plot.xAxisChanged.connect(self.signalXAxisChanged)
 
 class DSChart(QChart):
     def __init__(self):
@@ -199,36 +183,22 @@ class TestWindow(QMainWindow):
 
         self.xAxisGroup = DSLinePlotAxisGroup()
 
-        self.plot = DSLinePlotWidget("1")
-        #self.plot.Link_X_Axis_To_Group(self.xAxisGroup)
-        #self.plot.xAxis.setLabelsVisible(False)
-        self.plot2 = DSLinePlotWidget("2")
-        #self.plot2.Link_X_Axis_To_Group(self.xAxisGroup)
-        #self.plot2.xAxis.setLabelsVisible(False)
-        self.plot3 = DSLinePlotWidget("3")
-        #self.plot3.Link_X_Axis_To_Group(self.xAxisGroup)
-        self.plot4 = DSLinePlotWidget("4")
-        #self.plot4.Link_X_Axis_To_Group(self.xAxisGroup)
-        self.plot5 = DSLinePlotWidget("5")
-        #self.plot5.Link_X_Axis_To_Group(self.xAxisGroup)
-        self.plot6 = DSLinePlotWidget("6")
-        #self.plot6.Link_X_Axis_To_Group(self.xAxisGroup)
+        self.addPlot(500)
+        self.addPlot(500)
+        self.addPlot(500)
+        self.addPlot(500)
+        self.addPlot(500)
+        self.addPlot(500)
 
-        self.mainLayout.addWidget(self.plot)
-        self.mainLayout.addWidget(self.plot2)
-        self.mainLayout.addWidget(self.plot3)
-        self.mainLayout.addWidget(self.plot4)
-        self.mainLayout.addWidget(self.plot5)
-        self.mainLayout.addWidget(self.plot6)
 
         self.setCentralWidget(self.mainWidget)
 
-        self.plot.Add_Line(np.linspace(0., 100., 500000), np.random.random_sample(500000))
-        self.plot2.Add_Line(np.linspace(0., 100., 5000), np.random.random_sample(5000))
-        self.plot3.Add_Line(np.linspace(0., 100., 5000), np.random.random_sample(5000))
-        self.plot4.Add_Line(np.linspace(0., 100., 5000), np.random.random_sample(5000))
-        self.plot5.Add_Line(np.linspace(0., 100., 5000), np.random.random_sample(5000))
-        self.plot6.Add_Line(np.linspace(0., 100., 5000), np.random.random_sample(5000))
+
+    def addPlot(self, n):
+        plot = DSLinePlotWidget("Plot")
+        plot.Link_X_Axis_To_Group(self.xAxisGroup)
+        self.mainLayout.addWidget(plot)
+        plot.Add_Line(np.linspace(0., 100., n), np.random.random_sample(n))
 
 
 if __name__ == '__main__':
