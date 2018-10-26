@@ -53,7 +53,8 @@ class instrumentView(pg.GraphicsWindow):
 
         tempCustomFields = {'iViewSettings': {'x': dropX, 'y': dropY, 'r': 0}}
 
-        self.iM.Add_Component(self.iM.Get_Component_Model_By_Index(index), customFields=tempCustomFields)
+        if self.module.targetInstrument is not None:
+            self.module.targetInstrument.Add_Component(self.iM.Get_Component_Model_By_Index(index), customFields=tempCustomFields)
 
     def loadTargetInstrument(self):
         self.clearView()

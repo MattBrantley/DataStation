@@ -64,21 +64,27 @@ class SequencePlot(QObject):
         if tMax > self.canvas.xMax:
             self.canvas.xMax = tMax
 
-    def updateYMinMax(self, line):
-        if line.seriesMin < self.yMin:
-            self.yMin = line.seriesMin
-        if line.seriesMax > self.yMax:
-            self.yMax = line.seriesMax
+    def updateYMinMax(self):
+        self.yMin = 90000
+        self.yMax = -90000
+        for line in self.dataSetList:
+            if line.seriesMin < self.yMin:
+                self.yMin = line.seriesMin
+            if line.seriesMax > self.yMax:
+                self.yMax = line.seriesMax
 
     def Redraw_Lines(self):
         for dataSet in self.dataSetList:
             dataSet.redrawSet()
+        self.updateYMinMax()
+        self.redrawLabels()
 
     def Clear_Lines(self):
         for dataSet in self.dataSetList:
             dataSet.clear()
+        self.dataSetList = list()
 
-    def Add_Line(self, xdata, ydata):
+    def Add_Line(self, xdata, ydata, stepped=False):
         self.updateXMinMax(xdata)
         xdata = np.insert(xdata, 0, -900)
         xdata = np.append(xdata, 900)
@@ -86,22 +92,24 @@ class SequencePlot(QObject):
         ydata = np.insert(ydata, 0, ydata[0])
         ydata = np.append(ydata, ydata[-1])
 
-        newLine = DSLineSeries(self.canvas, self, xdata, ydata)
-        self.updateYMinMax(newLine)
+        newLine = DSLineSeries(self.canvas, self, xdata, ydata, stepped)
+        #self.updateYMinMax(newLine)
 
         newLine.setParent(self.titleObject)
         self.dataSetList.append(newLine)
+        self.updateYMinMax()
         self.canvas.chart.addSeries(newLine)
         self.yAxis.updateAxis()
         newLine.attachAxies()
         self.redrawLabels()
         self.canvas.update()
+        self.canvas.restoreZoom()
 
     def Is_Range(self, point):
-        point2 = QPointF(point)
-        point2.setX(point.x() * self.canvas.pixelToUnitsX())
-        point2.setY(point.y() * self.canvas.pixelToUnitsY())
-        if (self.getYMin() < point2.y()) and (self.getYMax() > point2.y()):
+        point2 = point
+        yMax = self.canvas.chart.plotArea().height() - 1/self.canvas.pixelToUnitsY() * self.getYMin()
+        yMin = self.canvas.chart.plotArea().height() - 1/self.canvas.pixelToUnitsY() * self.getYMax()
+        if (yMin < point2.y()) and (yMax > point2.y()):
             self.canvas.mouseRightClick(self, point)
 
     def getYMin(self):
@@ -116,18 +124,22 @@ class SequencePlot(QObject):
 
     def redrawLabels(self):
         self.minYAxisObject.setHtml("{:.1f}".format(self.yMin))
-        xMin = 42 - self.minYAxisObject.boundingRect().width()
-        yMin = 1/self.canvas.pixelToUnitsY() * self.getYMax() - self.minYAxisObject.boundingRect().height()
-        self.minYAxisObject.setPos(xMin, yMin)
-        yMin = yMin + self.minYAxisObject.boundingRect().height()
-
         self.maxYAxisObject.setHtml("{:.1f}".format(self.yMax))
-        xMax = 42 - self.maxYAxisObject.boundingRect().width()
-        yMax = 1/self.canvas.pixelToUnitsY() * self.getYMin()
-        self.maxYAxisObject.setPos(xMax, yMax)
 
-        self.yAxisLine.setLine(40, yMin-10, 40, yMax+10)
+        yMin = self.canvas.chart.plotArea().height() - 1/self.canvas.pixelToUnitsY() * self.getYMin()
+        yMax = self.canvas.chart.plotArea().height() - 1/self.canvas.pixelToUnitsY() * self.getYMax()
+        xPoint = 42 - self.minYAxisObject.boundingRect().width()
 
+        ##### Min Number #####
+        self.minYAxisObject.setPos(xPoint, yMin - self.minYAxisObject.boundingRect().height())
+
+        ##### Max Number #####
+        self.maxYAxisObject.setPos(xPoint, yMax)
+
+        ##### Y-Axis Line #####
+        self.yAxisLine.setLine(41, yMin, 41, yMax)
+
+        ##### Label #####
         self.titleObject.setHtml('<center>' + self.title + '</center>')
         self.titleObject.setRotation(0)
         self.titleObject.setTextWidth((yMin-yMax)-26)
@@ -135,16 +147,12 @@ class SequencePlot(QObject):
         center = self.titleObject.boundingRect().center()
         goal = QPointF(self.titleObject.boundingRect().height()/2, ytitle)
         trans = goal - center
-        height = self.titleObject.boundingRect().height()
-        width = self.titleObject.boundingRect().width()
         self.titleObject.setPos(trans)
         self.titleObject.setTransformOriginPoint(self.titleObject.boundingRect().center())
         self.titleObject.setRotation(-90)
 
-        self.testLine.setLine(8, ytitle, 8, ytitle)
-
 class DSLineSeries(QLineSeries):
-    def __init__(self, canvas, plot, xdata, ydata):
+    def __init__(self, canvas, plot, xdata, ydata, stepped=True, color=Qt.black, width=2):
         super().__init__()
         self.canvas = canvas
         self.plot = plot
@@ -152,13 +160,19 @@ class DSLineSeries(QLineSeries):
         self.pressed.connect(self.onPressed)
         self.doubleClicked.connect(self.onDoubleClicked)
         self.setUseOpenGL(True)
+
+        self.stepped = stepped
+
+        self.pen = QPen(color)
+        self.pen.setWidth(width)
+        self.setPen(self.pen)
+
+        self.seriesMin = ydata.min()
+        self.seriesMax = ydata.max()
         self.append(self.series_to_polyline(xdata, ydata))
         
         self.xdata = xdata
         self.ydata = ydata
-
-        self.seriesMin = 0
-        self.seriesMax = 1
 
     def redrawSet(self):
         self.clear()
@@ -172,19 +186,32 @@ class DSLineSeries(QLineSeries):
         pass
 
     def onDoubleClicked(self, event):
-        self.canvas.mouseDoubleClickEvent(event)
+        self.canvas.mouseDoubleClickEvent(event, force=True)
 
     def onPressed(self, point):
         cursor = QCursor()
         self.canvas.mousePressLoc = cursor.pos()   
 
     def series_to_polyline(self, xdata, ydata):
+
+        if self.stepped is True:
+            xdata_exp = np.empty((xdata.size + xdata.size), dtype=xdata.dtype)
+            xdata_exp[0::2] = xdata
+            xdata_exp[1::2] = xdata
+            xdata = xdata_exp[1:]
+
+            ydata_exp = np.empty((ydata.size + ydata.size), dtype=ydata.dtype)
+            ydata_exp[0::2] = ydata
+            ydata_exp[1::2] = ydata
+            ydata = ydata_exp[:-1]
+
         self.seriesMin = ydata.min()
         self.seriesMax = ydata.max()
+        ydata -= ydata.min()
         if ydata.max() != 0:
             ydata *= 1/ydata.max()
+            
         ydata += self.plot.getYMin()
-        #ydata += self.getYMin()
 
         ### CODE ADOPTED FROM MIT SOURCE ###
         size = len(xdata)
@@ -201,9 +228,10 @@ class DSLineSeries(QLineSeries):
 class SequenceCanvas(QChartView):
     rightClicked = pyqtSignal(object, object) # QPoint, PlotObject
 
-##### EXTERNAL FUNCTIONS #####
+    ##### EXTERNAL FUNCTIONS #####
     def Add_Plot(self):
         plot = SequencePlot(self)
+        #self.plotList.insert(0, plot)
         self.plotList.append(plot)
 
         self.redrawLabels()
@@ -225,7 +253,7 @@ class SequenceCanvas(QChartView):
             plot.createObjects()
             plot.Redraw_Lines()
 
-##### INTERNAL USE ONLY #####
+    ##### INTERNAL USE ONLY #####
     def __init__(self):
         super().__init__()
         self.chart = DSChart()
@@ -262,7 +290,7 @@ class SequenceCanvas(QChartView):
         self.yMin = 0
         self.yMax = 1
 
-        self.padBetweenPlots = 5 # in percent
+        self.padBetweenPlots = 10 # in percent
 
 ##### MOUSE EVENTS #####
     def mousePressEvent(self, mouseEvent):
@@ -294,7 +322,11 @@ class SequenceCanvas(QChartView):
         if(self.screenToPlotPoint(wheelEvent.pos()) is not False):
             self.zoomPlot(wheelAngleDelta/360, wheelAngleDelta/360, self.screenToPlotPoint(wheelEvent.pos()))
             
-    def mouseDoubleClickEvent(self, mouseEvent):
+    def mouseDoubleClickEvent(self, mouseEvent, force=False):
+        if force is True:
+            self.restoreZoom()
+            return
+
         if(mouseEvent.buttons() & Qt.LeftButton):
             self.restoreZoom()
         else:

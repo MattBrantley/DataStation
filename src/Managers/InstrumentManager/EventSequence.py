@@ -63,6 +63,7 @@ class EventSequence():
         #    if(retval == QMessageBox.No):
         #        return False
 
+        self.path = path
         self.Clear_All_Events()
 
         for datum in data['eventData']:

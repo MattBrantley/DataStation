@@ -35,6 +35,7 @@ class eventListWidget(QDockWidget):
         self.iM.Sequence_Loaded.connect(self.refreshTable)
 
     def updateTitle(self):
+        intstr = self.comp.Get_Instrument()
         self.setWindowTitle('Sequence: ' + self.comp.Get_Standard_Field('name'))
 
     def getEvents(self):
@@ -96,6 +97,7 @@ class eventListWidget(QDockWidget):
 
     def refreshTable(self):
         self.clearTable()
+        self.updateTitle()
         self.getEvents()
 
     def updateButtonPressed(self):

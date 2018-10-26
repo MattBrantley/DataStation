@@ -113,7 +113,7 @@ class pulseEvent(eventType):
         return params[1].value()
 
     def toCommand(self, v0):
-        pairs = np.arange(self.time, self.time+self.eventParams['Duration']) 
+        pairs = np.arange(self.time, self.time+self.eventParams['Duration'].v()) 
         command = AnalogSparseCommand(pairs)
         return command
 
