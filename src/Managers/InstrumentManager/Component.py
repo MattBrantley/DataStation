@@ -33,6 +33,9 @@ class Component(QObject):
         self.instr.componentCustomFieldChanged(self, field)
         return True
 
+    def Get_Name(self):
+        return self.Get_Standard_Field('name')
+
     def Remove_Component(self):
         self.instr.Remove_Component(self)
 
@@ -94,7 +97,8 @@ class Component(QObject):
 ##### Datastation Reserved Functions #####
 
     def readyCheck(self, traceIn):
-        trace = list(traceIn).append(self)
+        trace = traceIn.copy()
+        trace.append(self)
         for socket in self.socketList:
             socket.readyCheck(trace)
         for event in self.eventList:

@@ -75,7 +75,8 @@ class Filter():
         return self.filterSettings['uuid']
 
     def readyCheck(self, traceIn):
-        trace = list(traceIn).append(self)
+        trace = traceIn.copy()
+        trace.append(self)
 
         if self.getInputObject() is not None:
             self.getInputObject().readyCheck(trace)

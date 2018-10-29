@@ -37,7 +37,7 @@ class EventSequence():
         self.modified = False
         
     def readyCheck(self, traceIn):
-        trace = list(traceIn).append(self)
+        trace = traceIn.copy().append(self)
 
     def clearAllEvents(self):
         for comp in self.instr.Get_Components():

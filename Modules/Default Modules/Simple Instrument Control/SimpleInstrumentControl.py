@@ -12,6 +12,15 @@ class SimpleInstrumentControl(DSModule):
     Module_Name = 'Simple Instrument Control'
     Module_Flags = []
 
+    STATUS_NOT_READY = 200
+    STATUS_READY = 201
+    STATUS_CONFIGURING = 202
+    STATUS_RUNNING = 203
+    STATUS_PROCESSING = 204
+    STATUS_UNKNOWN = 205
+    STATUS_WAITING = 206
+    STATUS_READY_CHECKING = 207
+
     def __init__(self, ds, handler):
         super().__init__(ds, handler)
         self.ds = ds
@@ -51,9 +60,14 @@ class SimpleInstrumentControl(DSModule):
         self.iM.Instrument_New.connect(self.readyChecks)
         self.iM.Socket_Attached.connect(self.readyChecks)
 
-        self.startReadyCheckTimer()
+        self.iM.Instrument_Removed.connect(self.populateInstrumentList)
+        self.iM.Instrument_New.connect(self.populateInstrumentList)
+        self.iM.Instrument_Name_Changed.connect(self.populateInstrumentList)
 
-    def populateInstrumentList(self, instrument):
+        self.startReadyCheckTimer()
+        self.populateInstrumentList()
+
+    def populateInstrumentList(self):
         self.instrumentSelectionBox.clear()
         self.instrumentSelectionBox.addItem('')
         for idx, instrument in enumerate(self.iM.Get_Instruments()):
@@ -74,13 +88,13 @@ class SimpleInstrumentControl(DSModule):
         self.targetInstrument = instrument
 
         if(instrument is not None):
-            self.setWindowTitle('Instrument View (' + instrument.Get_Name() + ')')
+            self.setWindowTitle('Instrument Control (' + instrument.Get_Name() + ')')
             self.Write_Setting('Instrument_Path', instrument.Get_Path())
+
         else:
-            self.setWindowTitle('Instrument View (None)')
+            self.setWindowTitle('Instrument Control (None)')
             self.Write_Setting('Instrument_Path', None)
 
-        self.instrumentView.loadTargetInstrument()
 
     def startReadyCheckTimer(self):
         self.timer = QTimer()
@@ -148,21 +162,50 @@ class SimpleInstrumentControl(DSModule):
 
         messageListAction = QWidgetAction(self)
         messageList = QListWidget(self)
+        messageList.itemClicked.connect(self.readyCheckInfoSelectionChanged)
         messageList.setMinimumWidth(400)
         messageListAction.setDefaultWidget(messageList)
 
-        for message in self.readyCheckMessages:
-            msgItem = QListWidgetItem(message.msg)
-            if(message.status == DSConstants.READY_CHECK_ERROR):
-                msgItem.setBackground(QColor(255, 70, 70))
-            if(message.status == DSConstants.READY_CHECK_WARNING):
-                msgItem.setBackground(QColor(255, 221, 173))
-            messageList.addItem(msgItem)
+        #for message in self.readyCheckMessages:
+        #    msgItem = QListWidgetItem(message.msg)
+        #    if(message.status == DSConstants.READY_CHECK_ERROR):
+        #        msgItem.setBackground(QColor(255, 70, 70))
+        #    if(message.status == DSConstants.READY_CHECK_WARNING):
+        #        msgItem.setBackground(QColor(255, 221, 173))
+        #    messageList.addItem(msgItem)
 
-        if(len(self.readyCheckMessages) == 0):
+        if self.targetInstrument is not None:
+            for checkItem in self.targetInstrument.Ready_Check_List():
+                msgItem = QListWidgetItem(checkItem['Msg'])
+                msgItem.trace = checkItem['Trace']
+                if(checkItem['Level'] == DSConstants.READY_CHECK_ERROR):
+                    msgItem.setBackground(QColor(255, 70, 70))
+                if(checkItem['Level'] == DSConstants.READY_CHECK_WARNING):
+                    msgItem.setBackground(QColor(255, 221, 173))
+                messageList.addItem(msgItem)                
+
+        if(messageList.count() == 0):
             messageList.addItem("No Errors or Warnings Thrown")
 
         menu.addAction(messageListAction)
+        action = menu.exec_(QCursor().pos())
+
+    def readyCheckInfoSelectionChanged(self, item):
+        menu = QMenu()
+        traceAction = QWidgetAction(self)
+        traceList = QListWidget(self)
+        traceList.setMinimumWidth(500)
+        traceAction.setDefaultWidget(traceList)
+
+        headerItem = QListWidgetItem('STACK TRACE')
+        headerItem.setBackground(QColor(255, 221, 173))
+        traceList.addItem(headerItem)
+
+        for traceItem in item.trace:
+            msgItem = QListWidgetItem(traceItem.Get_Name() + ': ' + traceItem.__str__())
+            traceList.addItem(msgItem)
+
+        menu.addAction(traceAction)
         action = menu.exec_(QCursor().pos())
 
     def configChanged(self):
@@ -177,6 +220,15 @@ class SimpleInstrumentControl(DSModule):
         self.readyCheckMessages.clear()
         ready = True
 
+        if self.targetInstrument is None:
+            return False
+        else:
+            self.targetInstrument.Ready_Check()
+            if self.targetInstrument.Ready_Check_Status() is True:
+                return True
+            else:
+                return False
+
         #iMResults = self.iM.Do_Ready_Check()
         #if(iMResults.readyStatus is DSConstants.READY_CHECK_ERROR):
         #    ready = False
@@ -189,7 +241,7 @@ class SimpleInstrumentControl(DSModule):
         #for msg in hMResults.generateMessages(-1):
         #    self.addReadyCheckMessage(msg)
 
-        return ready
+        #return ready
 
     def setStatus(self, state):
         self.statusDisplayWidget.changeStatus(state)

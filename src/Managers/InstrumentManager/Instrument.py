@@ -44,6 +44,9 @@ class Instrument(QObject):
     def Load_Sequence(self, path):
         self.Get_Sequence().Load_Sequence_File(path)
 
+    def Run_Sequence(self):
+        self.Get_Hardware
+
     def Save_Instrument(self, name=None, path=None):
         if(name is not None):
             self.Set_Name(name)
@@ -57,17 +60,20 @@ class Instrument(QObject):
     def Get_Sequence_Directory(self):
         return os.path.join(self.iM.Sequences_Save_Directory, self.Get_Name())
 
+    def Ready_Check(self):
+        self.readyCheck()
+
     def Ready_Check_Status(self):
-        if self.readyCheckFails is False:
+        if self.readyCheckList is False:
             return True
         else:
             return False
 
     def Ready_Check_List(self):
-        return self.readyCheckFails
+        return self.readyCheckList
 
-    def Fail_Ready_Check(self, trace, msg):
-        self.readyCheckFail(trace, msg)
+    def Fail_Ready_Check(self, trace, msg, warningLevel=DSConstants.READY_CHECK_ERROR):
+        self.readyCheckFail(trace, msg, warningLevel)
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -86,13 +92,14 @@ class Instrument(QObject):
 
     def readyCheck(self):
         self.readyCheckList = list()
-        trace = [self]
+        trace = list()
+        trace.append(self)
         for comp in self.componentList:
             comp.readyCheck(trace)
         self.sequence.readyCheck(trace)
 
-    def readyCheckFail(self, trace, msg):
-        self.readyChickList.append({'Trace': trace, 'Msg': msg})
+    def readyCheckFail(self, trace, msg, warningLevel):
+        self.readyCheckList.append({'Trace': trace, 'Msg': msg, 'Level': warningLevel})
 
 ##### Functions Called By Factoried Components #####
     ##### Component #####

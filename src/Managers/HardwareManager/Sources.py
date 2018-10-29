@@ -4,6 +4,7 @@ from PyQt5.QtGui import *
 import os, sys, imp, math, uuid, numpy as np
 from src.Constants import DSConstants as DSConstants
 from src.Managers.InstrumentManager.Sockets import *
+from src.Managers.HardwareManager.PacketCommands import *
 
 class Source():
 ############################################################################################
@@ -44,19 +45,23 @@ class Source():
 ##### DataStation Interface Functions #####
 
     def readyCheck(self, traceIn):
-        trace = list(traceIn).append(self)
+        trace = traceIn.copy()
+        trace.append(self)
         drivingSocketCount = 0
         for socket in self.getSockets():
             if socket.socketSettings['drivingSocket'] == True:
                 drivingSocketCount = drivingSocketCount + 1
 
         if drivingSocketCount > 1:
-            self.iM.Fail_Ready_Check(trace, 'Source Has More Than One Driving Socket!')
+            trace[0].Fail_Ready_Check(trace, 'Source Has More Than One Driving Socket!')
+            return False
 
         if self.programmingPacket is None:
-            self.iM.Fail_Ready_Check(trace, 'Active Source Has No Programming Packet')
+            trace[0].Fail_Ready_Check(trace, 'Active Source Has No Programming Packet')
+            return False
 
         self.hWare.readyCheck(trace)
+        return True
 
     def getUUID(self):
         return self.sourceSettings['uuid']
@@ -146,6 +151,8 @@ class Source():
     def program(self):
         self.hWare.program(self)
 
+
+
 class AISource(Source):
     def __init__(self, name, vMin, vMax, prec, physConID, trigger=False):
         super().__init__(name, physConID, trigger=trigger)
@@ -154,13 +161,16 @@ class AISource(Source):
         self.sourceSettings['prec'] = prec
 
     def readyCheck(self, traceIn):
-        trace = list(traceIn).append(self)
-        super().readyCheck(traceIn)
-        if(isinstance(self.programmingPacket, waveformPacket) is False):
-            self.iM.Fail_Ready_Check(trace, 'Analog Input Source Recieved Unknown Programming Packet Type!')
-        
-        if(self.packetInSourceRange(self.programmingPacket) is False):
-            self.iM.Fail_Ready_Check(trace, 'Analog Input Source Programming Packet Out Of Source Range')
+        if super().readyCheck(traceIn) is False:
+            return
+        trace = traceIn.copy()
+        trace.append(self)
+
+        if(isinstance(self.programmingPacket, AnalogAcquisitionCommand) is False):
+            trace[0].Fail_Ready_Check(trace, 'Analog Input Source Recieved Unknown Programming Packet Type!')
+        else:
+            if(self.packetInSourceRange(self.programmingPacket) is False):
+                trace[0].Fail_Ready_Check(trace, 'Analog Input Source Programming Packet Out Of Source Range')
 
     def parsePacket(self, packetIn):
         self.programmingPacket = packetIn
@@ -168,6 +178,8 @@ class AISource(Source):
 
     def packetInSourceRange(self, packetIn):
         return True
+
+
 
 class AOSource(Source):
     def __init__(self, name, vMin, vMax, prec, physConID):
@@ -177,13 +189,16 @@ class AOSource(Source):
         self.sourceSettings['prec'] = prec
 
     def readyCheck(self, traceIn):
-        trace = list(traceIn).append(self)
-        super().readyCheck(traceIn)
-        if(isinstance(self.programmingPacket, waveformPacket) is False):
-            self.iM.Fail_Ready_Check(trace, 'Analog Input Source Recieved Unknown Programming Packet Type!')
-        
-        if(self.packetInSourceRange(self.programmingPacket) is False):
-            self.iM.Fail_Ready_Check(trace, 'Analog Input Source Programming Packet Out Of Source Range')
+        if super().readyCheck(traceIn) is False:
+            return
+        trace = traceIn.copy()
+        trace.append(self)
+
+        if(isinstance(self.programmingPacket, (AnalogWaveformCommand, AnalogSparseCommand)) is False):
+            trace[0].Fail_Ready_Check(trace, 'Analog Output Source Recieved Unknown Programming Packet Type!')
+        else:
+            if(self.packetInSourceRange(self.programmingPacket) is False):
+                trace[0].Fail_Ready_Check(trace, 'Analog Output Source Programming Packet Out Of Source Range')
 
     def parsePacket(self, packetIn):
         self.programmingPacket = packetIn
@@ -200,18 +215,24 @@ class AOSource(Source):
 
         return True
 
-class DOSource(Source):
-    def __init__(self, name, physConID):
-        super().__init__(name, physConID)
+
+
+class DISource(Source):
+    def __init__(self, name, physConID, trigger=False):
+        super().__init__(name, physConID, trigger=trigger)
 
     def readyCheck(self, traceIn):
-        trace = list(traceIn).append(self)
+        if super().readyCheck(traceIn) is False:
+            return
+        trace = traceIn.copy()
+        trace.append(self)
         super().readyCheck(traceIn)
-        if(isinstance(self.programmingPacket, waveformPacket) is False):
-            self.iM.Fail_Ready_Check(trace, 'Analog Input Source Recieved Unknown Programming Packet Type!')
-        
-        if(self.packetInSourceRange(self.programmingPacket) is False):
-            self.iM.Fail_Ready_Check(trace, 'Analog Input Source Programming Packet Out Of Source Range')
+
+        if(isinstance(self.programmingPacket, DigitalAcquisitionCommand) is False):
+            trace[0].Fail_Ready_Check(trace, 'Digital Input Source Recieved Unknown Programming Packet Type!')
+        else:
+            if(self.packetInSourceRange(self.programmingPacket) is False):
+                trace[0].Fail_Ready_Check(trace, 'Digital Input Source Programming Packet Out Of Source Range')
 
     def parsePacket(self, packetIn):
         self.programmingPacket = packetIn
@@ -220,18 +241,23 @@ class DOSource(Source):
     def packetInSourceRange(self, packetIn):
         return True
 
-class DISource(Source):
-    def __init__(self, name, physConID, trigger=False):
-        super().__init__(name, physConID, trigger=trigger)
+
+
+class DOSource(Source):
+    def __init__(self, name, physConID):
+        super().__init__(name, physConID)
 
     def readyCheck(self, traceIn):
-        trace = list(traceIn).append(self)
-        super().readyCheck(traceIn)
-        if(isinstance(self.programmingPacket, waveformPacket) is False):
-            self.iM.Fail_Ready_Check(trace, 'Analog Input Source Recieved Unknown Programming Packet Type!')
-        
-        if(self.packetInSourceRange(self.programmingPacket) is False):
-            self.iM.Fail_Ready_Check(trace, 'Analog Input Source Programming Packet Out Of Source Range')
+        if super().readyCheck(traceIn) is False:
+            return
+        trace = traceIn.copy()
+        trace.append(self)
+
+        if(isinstance(self.programmingPacket, (DigitalWaveformCommand, DigitalSparseCommand)) is False):
+            trace[0].Fail_Ready_Check(trace, 'Digital Output Source Recieved Unknown Programming Packet Type!')
+        else:
+            if(self.packetInSourceRange(self.programmingPacket) is False):
+                trace[0].Fail_Ready_Check(trace, 'Digital Output Source Programming Packet Out Of Source Range')
 
     def parsePacket(self, packetIn):
         self.programmingPacket = packetIn

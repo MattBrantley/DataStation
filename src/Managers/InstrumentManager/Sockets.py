@@ -10,7 +10,7 @@ class Socket():
 #################################### EXTERNAL FUNCTIONS ####################################
 
     def Get_Name(self):
-        return self.socketSettings['name']
+        return self.socketSettings['tag'] + ' ' + self.socketSettings['name']
 
     def Get_Source(self):
         return self.getSource()
@@ -80,11 +80,12 @@ class Socket():
 ##### Instrument Ready Check #####
 
     def readyCheck(self, traceIn):
-        trace = list(traceIn).append(self)
+        trace = traceIn.copy()
+        trace.append(self)
         if(self.Get_Source() is None):
-            self.iM.Fail_Ready_Check(trace, 'Socket has no route to a source!')
+            trace[0].Fail_Ready_Check(trace, 'Socket has no route to a source!')
         else:
-            self.getInputObject().readyCheck(trace)
+            self.getInputObject()[0].readyCheck(trace)
 
 ##### Search Functions #####
 

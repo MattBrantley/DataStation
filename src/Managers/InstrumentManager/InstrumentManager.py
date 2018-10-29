@@ -167,7 +167,6 @@ class InstrumentManager(QObject):
         self.Socket_Measurement_Packet_Recieved.emit(instrument, component, socket, measurementPacket)
         
 ##### Search Functions ######
-
     def getInstruments(self, name, path, uuid):
         outList = list()
         for instrument in self.instruments:

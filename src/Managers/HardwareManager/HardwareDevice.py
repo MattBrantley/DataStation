@@ -25,6 +25,9 @@ class HardwareDeviceHandler(QObject):
         else:
             return None
 
+    def Get_Name(self):
+        return self.Get_Standard_Field('deviceName')
+
     def Get_Available_Devices(self):
         return self.deviceList
 
@@ -177,9 +180,10 @@ class HardwareDeviceHandler(QObject):
         self.softTrigger.emit()
 
     def readyCheck(self, traceIn):
-        trace = list(traceIn).append(self)
+        trace = traceIn.copy()
+        trace.append(self)
         if self.hardwareReadyStatus is False:
-            self.iM.Fail_Ready_Check(trace, 'Device Not Ready!')
+            trace[0].Fail_Ready_Check(trace, 'Device Not Ready!')
  
     def programDataReceived(self, source):
         self.hM.programmingModified(self, source)

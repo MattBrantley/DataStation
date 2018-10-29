@@ -157,7 +157,7 @@ class instrumentEditor(DSModule):
         savePath = None
         item = self.instrumentNavigator.selectionModel().selectedIndexes()
         if(len(item) > 0):
-            savePath = self.instrumentNavigator.model.filePath(item[0])
+            savePath = self.instrumentNavigator.model().filePath(item[0])
         else:
             savePath = self.rootPath
 
