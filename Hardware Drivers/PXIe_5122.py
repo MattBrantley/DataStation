@@ -17,7 +17,7 @@ class PXIe_5122(HardwareDevice):
     def scan(self):
         for device in self.systemDeviceInfo['NI-SCOPE']:
             if(device['Device Model'] == 'NI PXIe-5122'):
-                self.addDevice(device['Device Name'])
+                self.Add_Device(device['Device Name'])
         self.scanned.emit()
 
     def initialize(self, deviceName):

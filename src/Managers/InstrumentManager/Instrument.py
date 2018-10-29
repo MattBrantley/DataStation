@@ -46,9 +46,9 @@ class Instrument(QObject):
 
     def Save_Instrument(self, name=None, path=None):
         if(name is not None):
-            self.currentInstrument.Set_Name(name)
+            self.Set_Name(name)
         if(path is not None):
-            self.currentInstrument.Set_Path(path)
+            self.Set_Path(path)
         self.saveInstrument()
 
     def Load_Instrument_File(self, path):
@@ -169,13 +169,11 @@ class Instrument(QObject):
 
     #### Save Instrument ####
     def saveInstrument(self):
-        if(self.currentInstrument is not None):
-            self.ds.postLog('VI_Save', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
-            self.writeInstrumentToFile()
-            self.iM.instrumentSaved(self)
-            self.ds.postLog(' ...Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
-        else:
-            self.ds.postLog('VI_Save_No_VI', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
+        self.ds.postLog('VI_Save', DSConstants.LOG_PRIORITY_HIGH, textKey=True)
+        self.iM.instrumentSaving(self)
+        self.writeInstrumentToFile()
+        self.iM.instrumentSaved(self)
+        self.ds.postLog(' ...Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
 
     def writeInstrumentToFile(self): ### Implement swap ASAP
         fullPath = self.Get_Path()

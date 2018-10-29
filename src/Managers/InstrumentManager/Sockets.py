@@ -152,10 +152,13 @@ class Socket():
         filtersAttached = self.hM.Get_Filters(inputUUID = uuid, pathNo=pathNumber)
         for Filter in filtersAttached:
             Filter.Detatch_Input()
-        if(self.iM.Get_Instrument() is not None):
-            socketsAttached = self.iM.Get_Instrument().Get_Sockets(inputUUID = uuid, pathNo=pathNumber)
-            for Socket in socketsAttached:
-                Socket.Detatch_Input()
+        
+        socketsAttached = list()
+        for instrument in self.iM.Get_Instruments():
+            socketsAttached += instrument.Get_Sockets(inputUUID = uuid, pathNo=pathNumber)
+            
+        for Socket in socketsAttached:
+            Socket.Detatch_Input()
 
         self.socketSettings['inputSource'] = uuid
         self.socketSettings['inputSourcePathNo'] = pathNumber

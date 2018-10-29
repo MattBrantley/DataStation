@@ -12,7 +12,7 @@ class NI_DAQmx(HardwareDevice):
 ##################################### MANDATORY FUNCS ######################################
     def initialize(self):
         for device in self.systemDeviceInfo['NI-SCOPE']:
-            self.addDevice(device)
+            self.Add_Device(device)
         self.initialized.emit()
 
     def device(self, deviceName):

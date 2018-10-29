@@ -4,8 +4,8 @@ from PyQt5.QtGui import *
 import os, sys, imp, math, copy
 from src.Constants import DSConstants as DSConstants
 from src.Managers.HardwareManager.Filter import Filter
-from src.Managers.InstrumentManager.Sockets import Socket
-from src.Managers.HardwareManager.Sources import Source
+from src.Managers.InstrumentManager.Sockets import *
+from src.Managers.HardwareManager.Sources import *
 
 class filterStackWidget(QDockWidget):
     doNotAutoPopulate = True
@@ -122,7 +122,6 @@ class filterView(QGraphicsView):
         return drawObjects
     
     def walkColumn(self, obj, offset, new=False):    
-
         columnList = list()
         branchList = list()
         columnList.append(obj)
@@ -157,8 +156,8 @@ class filterView(QGraphicsView):
     def getRefObjects(self, obj):
         refList = list()
         if(obj is not None):
-            if(self.iM.Get_Instrument() is not None):
-                refList += self.iM.Get_Instrument().Get_Sockets(inputUUID=obj.Get_UUID())
+            for instrument in self.iM.Get_Instruments():
+                refList += instrument.Get_Sockets(inputUUID=obj.Get_UUID())
             refList += self.hM.Get_Filters(inputUUID=obj.Get_UUID())
         return refList
 
@@ -206,7 +205,6 @@ class filterViewColumn():
             child.drawAtDepth()
 
 class filterScene(QGraphicsScene):
-
     def __init__(self, widget, transform):
         super().__init__()
         self.widget = widget
@@ -434,14 +432,24 @@ class socketSelectionWidget(QWidgetAction):
 
         self.populateBox()
 
+    def getModelType(self):
+        if(isinstance(self.parent.sourceObject, AOSource)):
+            return AOSocket
+        if(isinstance(self.parent.sourceObject, AISource)):
+            return AISource
+        if(isinstance(self.parent.sourceObject, DOSource)):
+            return DOSocket
+        if(isinstance(self.parent.sourceObject, DISource)):
+            return DISocket
+
     def itemClicked(self):
         curItem = self.pSpinBox.currentItem()
         self.parent.addSocket(curItem, self.pathNo)
         self.menu.close()
 
     def populateBox(self):
-        if(self.iM.Get_Instrument() is not None):
-            for socket in self.iM.Get_Instrument().Get_Sockets():
+        for instrument in self.iM.Get_Instruments():
+            for socket in instrument.Get_Sockets(socketType=self.getModelType()):
                 item = socketSelectionItem(socket.Get_Name(), socket) ##This is where we would alert if they are connect!
                 self.pSpinBox.addItem(item)
 

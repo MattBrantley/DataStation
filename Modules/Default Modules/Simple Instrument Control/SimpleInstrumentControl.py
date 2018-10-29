@@ -18,6 +18,9 @@ class SimpleInstrumentControl(DSModule):
         self.iM = ds.iM
         self.hM = ds.hM
         self.readyCheckMessages = list()
+        self.targetUUID = None
+        self.targetPath = None
+        self.targetInstrument = None
 
         self.mainLayout = QHBoxLayout()
         self.mainWidget = QWidget()
@@ -26,10 +29,16 @@ class SimpleInstrumentControl(DSModule):
 
         self.initButtons()
 
+        self.instrumentSelectionBox = QComboBox()
+        self.instrumentSelectionBox.setMinimumWidth(200)
+        self.instrumentSelectionBox.currentIndexChanged.connect(self.instrumentSelectionChanged)
+
         self.mainLayout.addWidget(self.runOnceButton)
         self.mainLayout.addWidget(self.runMultipleButton)
         self.mainLayout.addWidget(self.runStopButton)
         self.mainLayout.addWidget(self.runSettingsButton)
+        self.mainLayout.addWidget(self.instrumentSelectionBox)
+
         self.mainLayout.addStretch()
         self.mainLayout.addWidget(QLabel("Status:"))
         self.mainLayout.addWidget(self.statusDisplayWidget)
@@ -39,10 +48,39 @@ class SimpleInstrumentControl(DSModule):
         self.setStatus(DSConstants.STATUS_NOT_READY)
 
         self.iM.Sequence_Loaded.connect(self.readyChecks)
-        self.iM.Instrument_Loaded.connect(self.readyChecks)
+        self.iM.Instrument_New.connect(self.readyChecks)
         self.iM.Socket_Attached.connect(self.readyChecks)
 
         self.startReadyCheckTimer()
+
+    def populateInstrumentList(self, instrument):
+        self.instrumentSelectionBox.clear()
+        self.instrumentSelectionBox.addItem('')
+        for idx, instrument in enumerate(self.iM.Get_Instruments()):
+            self.instrumentSelectionBox.addItem(instrument.Get_Name())
+            self.instrumentSelectionBox.setItemData(idx+1, instrument.Get_UUID(), role=Qt.UserRole)
+            if(instrument.Get_UUID() == self.targetUUID):
+                self.instrumentSelectionBox.setCurrentIndex(idx+1)
+
+    def instrumentSelectionChanged(self, index):
+        uuid = self.instrumentSelectionBox.itemData(index, role=Qt.UserRole)
+        instrument = self.iM.Get_Instruments(uuid=uuid)
+
+        if not instrument:
+            instrument = None
+        else:
+            instrument = instrument[0]
+
+        self.targetInstrument = instrument
+
+        if(instrument is not None):
+            self.setWindowTitle('Instrument View (' + instrument.Get_Name() + ')')
+            self.Write_Setting('Instrument_Path', instrument.Get_Path())
+        else:
+            self.setWindowTitle('Instrument View (None)')
+            self.Write_Setting('Instrument_Path', None)
+
+        self.instrumentView.loadTargetInstrument()
 
     def startReadyCheckTimer(self):
         self.timer = QTimer()
@@ -139,17 +177,17 @@ class SimpleInstrumentControl(DSModule):
         self.readyCheckMessages.clear()
         ready = True
 
-        iMResults = self.iM.Do_Ready_Check()
-        if(iMResults.readyStatus is DSConstants.READY_CHECK_ERROR):
-            ready = False
-        for msg in iMResults.generateMessages(-1):
-            self.addReadyCheckMessage(msg)
+        #iMResults = self.iM.Do_Ready_Check()
+        #if(iMResults.readyStatus is DSConstants.READY_CHECK_ERROR):
+        #    ready = False
+        #for msg in iMResults.generateMessages(-1):
+        #    self.addReadyCheckMessage(msg)
 
-        hMResults = self.hM.Do_Ready_Check()
-        if(hMResults.readyStatus is DSConstants.READY_CHECK_ERROR):
-            ready = False
-        for msg in hMResults.generateMessages(-1):
-            self.addReadyCheckMessage(msg)
+        #hMResults = self.hM.Do_Ready_Check()
+        #if(hMResults.readyStatus is DSConstants.READY_CHECK_ERROR):
+        #    ready = False
+        #for msg in hMResults.generateMessages(-1):
+        #    self.addReadyCheckMessage(msg)
 
         return ready
 

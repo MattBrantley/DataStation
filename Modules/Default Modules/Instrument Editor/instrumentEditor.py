@@ -161,12 +161,12 @@ class instrumentEditor(DSModule):
         else:
             savePath = self.rootPath
 
-        self.iM.Save_Instrument(path=savePath)
+        self.targetInstrument.Save_Instrument(path=savePath)
 
-        if(self.iM.Get_Instrument().Get_Path is None):
-            self.saveAsInstrument(savePath)
-        else:
-            self.saveInstrument(savePath)
+        #if(self.iM.Get_Instrument().Get_Path is None):
+        #    self.saveAsInstrument(savePath)
+        #else:
+        #    self.saveInstrument(savePath)
 
     def saveAs(self):
         savePath = None
@@ -193,7 +193,7 @@ class instrumentEditor(DSModule):
         self.iM.Save_Instrument(name=fname, path=savePath)
 
     def saveInstrument(self, savePath):
-        if(self.iM.Get_Instrument().Get_Name() == 'Default Instrument'):
+        if(self.targetInstrument.Get_Name() == 'Default Instrument'):
             fname, ok = QInputDialog.getText(self.ds, "Virtual Instrument Name", "Virtual Instrument Name")
             if(ok):
                 self.iM.Get_Instruemnt().Set_Name(fname)

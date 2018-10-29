@@ -1,6 +1,6 @@
 from src.Managers.HardwareManager.HardwareDevice import HardwareDevice
 from src.Managers.HardwareManager.PacketCommands import *
-import niscope, time, sys, glob, serial, re, numpy as np
+import time, sys, glob, serial, re, numpy as np
 
 ms = lambda: int(round(time.time() * 1000))
 

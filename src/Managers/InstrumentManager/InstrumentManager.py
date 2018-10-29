@@ -14,6 +14,7 @@ class InstrumentManager(QObject):
     Instrument_File_Loaded = pyqtSignal(object) # Instrument
     Instrument_Removed = pyqtSignal(object) # Instrument
     Instrument_Saving = pyqtSignal(object) # Instrument
+    Instrument_Saved = pyqtSignal(object) # Instrument
     Instrument_New = pyqtSignal(object) # Instrument
     Instrument_Config_Changed = pyqtSignal(object) # Instrument
     Instrument_Name_Changed = pyqtSignal(object) # Instrument
@@ -38,7 +39,7 @@ class InstrumentManager(QObject):
     Socket_Added = pyqtSignal(object, object, object) # Instrument, Component, Socket
     Socket_Attached = pyqtSignal(object, object, object) # Instrument, Component, Socket
     Socket_Detatched = pyqtSignal(object, object, object) # Instrument, Component, Socket
-    Socket_Measurement_Packet_Recieved = pyqtSignal(object, object, object, object) # Instrument, Component, Socket, measurementPacket
+    Socket_Measurement_Packet_Recieved = pyqtSignal(object, object, object, object) # Instrument, Component, Socket, Measurement Packet
 
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
@@ -108,6 +109,9 @@ class InstrumentManager(QObject):
 
     def instrumentConfigModified(self, instrument):
         self.Instrument_Config_Changed.emit(instrument)
+
+    def instrumentSaving(self, instrument):
+        self.Instrument_Saving.emit(instrument)
 
     def instrumentSaved(self, instrument):
         self.Instrument_Saved.emit(instrument)

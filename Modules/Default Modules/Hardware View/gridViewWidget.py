@@ -36,7 +36,6 @@ class gridViewWidget(QWidget):
         self.gridCombo.addItem('Sockets: Digital Output')
         self.gridCombo.addItem('Sockets: Digital Input')
         self.gridCombo.currentTextChanged.connect(self.drawScene)
-
         self.mainLayout.addWidget(self.gridCombo)
 
         self.gridWidget = QGraphicsView()
@@ -48,9 +47,7 @@ class gridViewWidget(QWidget):
         self.gridWidget.setScene(self.iScene)
 
         self.mainLayout.addWidget(self.gridWidget)
-
-        self.iM.Instrument_Unloaded.connect(self.drawScene)
-        self.iM.Instrument_Loaded.connect(self.drawScene)
+        
         self.iM.Socket_Attached.connect(self.drawScene)
         self.iM.Socket_Detatched.connect(self.drawScene)
         self.iM.Socket_Added.connect(self.drawScene)
@@ -59,22 +56,21 @@ class gridViewWidget(QWidget):
         self.drawScene()
 
     def repopulateSocketsAndPlugs(self):
-        if(self.iM.currentInstrument is not None):
+        self.socketList = list()
+        self.sourceList = list()
+        for instrument in self.iM.Get_Instruments():
             if(self.gridCombo.currentText() == 'Sockets: Analog Output'):
-                self.socketList = self.iM.Get_Instrument().Get_Sockets(socketType=AOSocket)
+                self.socketList += instrument.Get_Sockets(socketType=AOSocket)
                 self.sourceList = self.hM.Get_Sources(sourceType=AOSource)
             if(self.gridCombo.currentText() == 'Sockets: Analog Input'):
-                self.socketList = self.iM.Get_Instrument().Get_Sockets(socketType=AISocket)
+                self.socketList += instrument.Get_Sockets(socketType=AISocket)
                 self.sourceList = self.hM.Get_Sources(sourceType=AISource)
             if(self.gridCombo.currentText() == 'Sockets: Digital Output'):
-                self.socketList = self.iM.Get_Instrument().Get_Sockets(socketType=DOSocket)
+                self.socketList += instrument.Get_Sockets(socketType=DOSocket)
                 self.sourceList = self.hM.Get_Sources(sourceType=DOSource)
             if(self.gridCombo.currentText() == 'Sockets: Digital Input'):
-                self.socketList = self.iM.Get_Instrument().Get_Sockets(socketType=DISocket)
+                self.socketList += instrument.Get_Sockets(socketType=DISocket)
                 self.sourceList = self.hM.Get_Sources(sourceType=DISource)
-        else:
-            self.socketList = list()
-            self.sourceList = list()
 
     def drawScene(self):
         self.repopulateSocketsAndPlugs()
@@ -106,8 +102,9 @@ class gridViewWidget(QWidget):
 
         offsetY = self.iScene.marginTop
         self.iScene.addLine(self.iScene.marginLeft, offsetY, self.iScene.marginLeft+totalWidth, offsetY)
-        for socket in self.sourceList:
-            text = self.iScene.addText(socket.Get_Name())
+
+        for source in self.sourceList:
+            text = self.iScene.addText(source.Get_Name())
             text.setPos(self.iScene.marginLeft - text.boundingRect().width(), offsetY)
             
             offsetY = offsetY + self.iScene.cellWidth
@@ -117,8 +114,9 @@ class gridViewWidget(QWidget):
         self.iScene.addLine(offsetX, self.iScene.marginTop, offsetX, self.iScene.marginTop+totalHeight)
         transformTopText = QTransform()
         transformTopText.rotate(270)
-        for source in self.socketList:
-            text = self.iScene.addText(source.Get_Name())
+
+        for socket in self.socketList:
+            text = self.iScene.addText(socket.Get_Name())
             text.setTransform(transformTopText)
             text.setPos(offsetX + text.boundingRect().height() - self.iScene.cellWidth, self.iScene.marginTop)
 

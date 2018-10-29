@@ -84,12 +84,10 @@ class Source():
 
 ##### Search Functions #####
     def getSockets(self):
-        if(self.iM is None):
-            return list()
-        if(self.iM.Get_Instrument() is None):
-            return list()
+        outputSockets = list()
         outputFilters = self.hM.Get_Filters(inputUUID = self.sourceSettings['uuid'])
-        outputSockets = self.iM.Get_Instrument().Get_Sockets(inputUUID = self.sourceSettings['uuid'])
+        for instrument in self.iM.Get_Instruments():
+            outputSockets += instrument.Get_Sockets(inputUUID = self.sourceSettings['uuid'])
 
         for Filter in outputFilters:
             outputSockets += Filter.Get_Sockets()

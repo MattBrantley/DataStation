@@ -25,7 +25,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "d494bcf6-735e-4e6e-8802-6d07486e3908",
+                    "inputSource": "5b4272f4-97fc-4a17-8b3c-28dbbbbe1204",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "prec": 0.1,
@@ -133,7 +133,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "be983f63-b05e-469f-9dfe-13a197daa87d",
+                    "inputSource": "4871765b-377b-4252-984c-d9606a96f536",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Excitation Plates",
                     "prec": 0.1,
