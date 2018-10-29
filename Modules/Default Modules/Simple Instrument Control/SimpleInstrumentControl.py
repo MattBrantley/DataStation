@@ -180,7 +180,7 @@ class SimpleInstrumentControl(DSModule):
         #iMResults = self.iM.Do_Ready_Check()
         #if(iMResults.readyStatus is DSConstants.READY_CHECK_ERROR):
         #    ready = False
-        #for msg in iMResults.generateMessages(-1):
+        #for msg in iMResults.generateMessages(-1): 
         #    self.addReadyCheckMessage(msg)
 
         #hMResults = self.hM.Do_Ready_Check()
