@@ -12,7 +12,7 @@ from src.Constants import moduleFlags as mfs
 
 class hardwareView(DSModule):
     Module_Name = 'Hardware View'
-    Module_Flags = []
+    Module_Flags = [mfs.CAN_DELETE]
 
     def __init__(self, ds, handler):
         super().__init__(ds, handler)
@@ -26,10 +26,8 @@ class hardwareView(DSModule):
         #self.hide()
         self.window = window
         self.resize(800, 800)
-        self.toolbar = QToolBar()
 
         self.mainContainer = QMainWindow()
-        self.mainContainer.addToolBar(self.toolbar)
 
         self.hardwareWidget = hardwareListWidget(self, self.ds)
         self.connectorGridWidget = gridViewWidget(self, self.ds)

@@ -28,6 +28,9 @@ class DSModule(QDockWidget):
     def Read_Setting(self, key):
         return self.readSetting(key)
 
+    def Get_Handler(self):
+        return self.handler
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
     def __init__(self, ds, handler):
@@ -41,17 +44,26 @@ class DSModule(QDockWidget):
         self.modSettingsPathSwap = os.path.join(self.modSettingsFolder,  self.handler.Get_UUID()+'.json_swap')
 
         self.setFeatures(QDockWidget.DockWidgetMovable)
+        #self.setFeatures(QDockWidget.AllDockWidgetFeatures)
 
         if(self.Has_Flag(mfs.CAN_DELETE) or self.Has_Flag(mfs.CAN_HIDE)):
             self.setFeatures(self.features() | QDockWidget.DockWidgetClosable)
         if(self.Has_Flag(mfs.CAN_FLOAT)):
             self.setFeatures(self.features() | QDockWidget.DockWidgetFloatable)
 
+        #self.visibilityChanged.connect(self.visibilityModified)
+
+    def visibilityModified(self, visible):
+        if self.isVisible() and self.isHidden():
+            self.Get_Handler().removeHandler()
+            self.deleteLater()
+
     def configureWidget(self, window):
         pass #OVewrride this
 
     def closeEvent(self, event):
         if(self.Has_Flag(mfs.CAN_DELETE)):
+            self.Get_Handler().removeHandler()
             self.deleteLater()
         elif(self.Has_Flag(mfs.CAN_HIDE)):
             self.hide()

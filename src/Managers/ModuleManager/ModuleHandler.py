@@ -12,11 +12,15 @@ class ModuleHandler(QObject):
     def Get_UUID(self):
         return self.uuid
 
+    def Get_Module(self):
+        return self.modInstance
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
-    def __init__(self, modObject, window, ds, uuid):
+    def __init__(self, modObject, window, ds, mM, uuid):
         super().__init__()
         self.ds = ds
+        self.mM = mM
         self.modObject = modObject
         self.window = window
         self.uuid = uuid
@@ -32,3 +36,7 @@ class ModuleHandler(QObject):
     def assignToWindow(self, window):
         self.window.transferModule(self)
         self.modInstance.configureWidget(self.window)
+
+    def removeHandler(self):
+        self.window.Remove_Module(self)
+        self.mM.Remove_Module_Instance(self)

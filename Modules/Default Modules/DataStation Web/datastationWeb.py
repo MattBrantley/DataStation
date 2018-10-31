@@ -6,7 +6,7 @@ from src.Constants import moduleFlags as mfs
 
 class datastationWeb(DSModule):
     Module_Name = 'DataStation Web'
-    Module_Flags = []
+    Module_Flags = [mfs.CAN_DELETE]
 
     def __init__(self, ds, handler):
         super().__init__(ds, handler)

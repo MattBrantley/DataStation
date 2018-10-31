@@ -12,7 +12,7 @@ from SequenceCanvas import SequenceCanvas
 
 class Sequencer(DSModule):
     Module_Name = 'Sequencer'
-    Module_Flags = []
+    Module_Flags = [mfs.CAN_DELETE]
     ITEM_GUID = Qt.UserRole
 
     def __init__(self, ds, handler):
@@ -40,6 +40,8 @@ class Sequencer(DSModule):
 
         self.updateToolbarState()
 
+        self.prevInstrumentPath = self.Read_Setting('Instrument_Path')
+
         self.iM.Sequence_Loaded.connect(self.sequenceLoaded) 
         #self.iM.Sequence_Saved.connect(self.sequenceLoaded)
 
@@ -65,7 +67,11 @@ class Sequencer(DSModule):
             #if(instrument.Get_UUID() == self.targetUUID):
             #    self.instrumentSelectionBox.setCurrentIndex(idx+1)
 
-            self.loadedInstruments.addInstrument(instrument)
+            self.loadedInstruments.addInstrument(instrument)        
+            if self.prevInstrumentPath == instrument.Get_Path():
+                self.instrumentSelectionBox.setCurrentIndex(idx+1)
+                #if isinstance(prevInstrumentPath, str):
+                #    self.openInstrument(prevInstrumentPath)
 
     def initActionsAndToolbar(self):
         self.newAction = QAction('New', self)
@@ -124,12 +130,12 @@ class Sequencer(DSModule):
             self.setWindowTitle('Sequencer (' + instrument.Get_Name() + ')')
             self.sequenceView.loadInstrument(instrument)
             self.sequenceNavigator.setEnabled(True)
-            #self.Write_Setting('Instrument_Path', instrument.Get_Path())
+            self.Write_Setting('Instrument_Path', instrument.Get_Path())
         else:
             self.sequenceView.clearAllPlots()
             self.setWindowTitle('Sequencer (None)')
             self.sequenceNavigator.setEnabled(False)
-            #self.Write_Setting('Instrument_Path', None)
+            self.Write_Setting('Instrument_Path', None)
 
     def initLayout(self):
         self.mainContainer = QMainWindow()
@@ -240,7 +246,6 @@ class sequencerPlot(QWidget):
     def componentStandardFieldChanged(self, instrument, component, field):
         if instrument is self.module.targetInstrument:
             if field == 'name':
-                print('NAME')
                 for plot in self.plotList:
                     if plot.component is component:
                         plot.setTitle(component.Get_Standard_Field('name'))

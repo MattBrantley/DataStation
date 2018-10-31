@@ -9,9 +9,21 @@ from src.Managers.ModuleManager.mainWindow import mainWindow
 from PyQt5.Qt import *
 
 class ModuleManager(QObject):
-
+    
 ############################################################################################
 ##################################### EXTERNAL SIGNALS #####################################
+
+##### Signals: Windows #####
+    Window_Added = pyqtSignal(object) # Window
+    Window_Removed = pyqtSignal(object) # Window
+
+##### Signals: Modules #####
+    Module_Instantiated = pyqtSignal(object) # Module
+    Module_Deleted = pyqtSignal(object) # Module
+    Module_Transfered_To_Window = pyqtSignal(object, object) # Module, Window
+
+############################################################################################
+#################################### EXTERNAL FUNCTIONS ####################################
     
     def Close_Window(self, window):
         self.windowClosing(window)
@@ -27,9 +39,6 @@ class ModuleManager(QObject):
 
     def Hide_Main_Window(self):
         self.hideMainWindow()
-
-############################################################################################
-#################################### EXTERNAL FUNCTIONS ####################################
 
     ##### Manager Widget #####
     def Show_Manager_Widget(self):
@@ -47,6 +56,9 @@ class ModuleManager(QObject):
 
     def Add_Module_Instance(self, module, window, uuid=str(uuid.uuid4())):
         self.addModuleInstance(module, window, uuid)
+
+    def Remove_Module_Instance(self, moduleHandler):
+        self.removeModuleInstance(moduleHandler)
 
     ##### Windows #####
     def Add_New_Window(self):
@@ -70,11 +82,14 @@ class ModuleManager(QObject):
         self.isShutdown = False
         self.defaultModules = ['Default Loading Screen', 'Profile Selection']
 
+        self.focusLock = False
+
         self.populateMenu()
         self.scanModules()
         self.DSLoading()
 
         self.ds.DataStation_Closing.connect(self.DSClosing)
+        self.ds.app.focusWindowChanged.connect(self.focusWindowChanged)
 
 ##### DataStation Reserved Functions #####
     def connections(self):
@@ -89,7 +104,7 @@ class ModuleManager(QObject):
         for modName in self.defaultModules:
             widget = self.getModByModName(modName)
             if(widget is not None):
-                self.addModuleInstance(widget, self.mainWindow, '')
+                self.Add_Module_Instance(widget, self.mainWindow, uuid='')
 
         self.mainWindow.centerWindow()
 
@@ -119,8 +134,12 @@ class ModuleManager(QObject):
         self.showWidgetAction = QAction('Show Module Widget')
         self.showWidgetAction.triggered.connect(self.Show_Manager_Widget)
 
+        self.lockFocusAction = QAction('Shared Window Focus', checkable=True)
+        self.lockFocusAction.setChecked(True)
+
         self.menu = QMenu('Modules')
         self.menu.addAction(self.showWidgetAction)
+        self.menu.addAction(self.lockFocusAction)
 
         return self.menu
 
@@ -158,6 +177,7 @@ class ModuleManager(QObject):
 
     def windowClosing(self, window):
         self.mainWindows.remove(window)
+        self.Window_Removed.emit(window)
 
     def closeAllWindows(self):
         for window in self.mainWindows:
@@ -178,10 +198,26 @@ class ModuleManager(QObject):
         if(len(self.mainWindows) == 0):
             self.addWindow()
 
+    def focusWindowChanged(self, window):
+        if self.focusLock is False:
+            self.focusLock = True
+            if self.lockFocusAction.isChecked():
+                for window in self.mainWindows:
+                    window.show()
+                    window.raise_()
+                    #window.setWindowState(window.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
+                    #window.activateWindow()
+
+            self.focusLock = False
+
+
 ##### Modules #####
     def addModuleInstance(self, module, window, uuid):
-        modHandler = ModuleHandler(module, window, self.ds, uuid)
+        modHandler = ModuleHandler(module, window, self.ds, self, uuid)
         self.modules.append(modHandler)
+
+    def removeModuleInstance(self, modHandler):
+        self.modules.remove(modHandler)
 
     def restoreModules(self, modDataList, window):
         for modData in modDataList:

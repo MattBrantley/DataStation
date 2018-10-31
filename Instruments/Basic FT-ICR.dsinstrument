@@ -25,7 +25,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "5b4272f4-97fc-4a17-8b3c-28dbbbbe1204",
+                    "inputSource": "71985489-285b-42dd-8305-44d9be03c50e",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "prec": 0.1,
@@ -62,7 +62,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "5185ba98-a757-4080-b521-ffb8768231ff",
+                    "inputSource": "ec526669-d1c4-4b70-978b-dba99b74b348",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "prec": 0.1,
@@ -99,7 +99,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "c1636b8c-7bb8-4dd0-827a-a7adee2eed9a",
+                    "inputSource": "497d13bb-f4ac-41b3-a99b-8d01b2cef3ac",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Penning Trap",
                     "prec": 0.1,
@@ -133,7 +133,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "4871765b-377b-4252-984c-d9606a96f536",
+                    "inputSource": "c0e00f80-902f-4f1e-aa54-b840a75e3439",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Excitation Plates",
                     "prec": 0.1,
@@ -167,7 +167,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "ce940115-4334-464b-988b-333f0cef8480",
+                    "inputSource": "9fbe3f63-8ce2-4289-b14e-776e5019298b",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Detection Plates",
                     "prec": 0.1,
@@ -201,7 +201,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "e43d718e-c007-4de2-93b7-bf657d6add87",
+                    "inputSource": "9e77d723-dfd6-48cd-96fc-c52c51616e3d",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Basic Trigger",
                     "tag": "[DO]",
@@ -232,7 +232,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "7fb9ee41-a983-4651-8aad-5a489ace7855",
+                    "inputSource": "77f632e2-7857-4368-9933-f2a78da53d09",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Basic Trigger",
                     "tag": "[DO]",
@@ -266,7 +266,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "a8458622-bf4c-48c8-9971-713a75edb120",
+                    "inputSource": "a1c07385-ff6c-46a1-a003-8e15641b4406",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Filament",
                     "prec": 0.1,
@@ -300,7 +300,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "89ead9b4-bd58-49f5-b93c-c6dd0126e7d5",
+                    "inputSource": "e83a8362-a0a8-4391-b6ed-60f4c3a1515e",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Pulse Valve",
                     "tag": "[DO]",

@@ -40,12 +40,13 @@ class loadingScreen(DSModule):
 
         self.ds.Log_Posted.connect(self.postLog)
 
-    def postLog(self, text, **kwargs):
+    def postLog(self, log, **kwargs):
         if('newline' in kwargs):
             if(kwargs['newline'] == False):
-                self.logWindow.insertPlainText(text)
+                self.logTextEdit.insertPlainText(log.text)
                 return
 
-        self.logWindow.appendPlainText(time.strftime('[%m/%d/%Y %H:%M:%S] ') + text)
+        self.logWindow.appendPlainText(log.timeText() + log.text)
+        #self.logWindow.appendPlainText(time.strftime('[%m/%d/%Y %H:%M:%S] ') + text)
         self.logWindow.verticalScrollBar().setValue(self.logWindow.verticalScrollBar().maximum())
     

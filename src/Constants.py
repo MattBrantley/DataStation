@@ -1,3 +1,5 @@
+import time
+
 class DSConstants():
     MW_STATE_NO_WORKSPACE = 0
     MW_STATE_WORKSPACE_LOADED = 1
@@ -98,3 +100,13 @@ class readyCheckMsg():
     def __init__(self, msg, status):
         self.msg = msg
         self.status = status
+
+class logObject():
+    def __init__(self, source, text, warningLevel):
+        self.source = source
+        self.text = text
+        self.warningLevel = warningLevel
+        self.timeStamp = time.localtime()
+
+    def timeText(self):
+        return time.strftime('[%m/%d/%Y %H:%M:%S] ', self.timeStamp)

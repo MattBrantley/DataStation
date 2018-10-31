@@ -1,4 +1,4 @@
-import sys, uuid, pickle, numpy as np, sqlite3, os, matplotlib.pyplot as plt, random, psutil, imp, multiprocessing, copy, queue, json
+import sys, uuid, pickle, numpy as np, sqlite3, os, matplotlib.pyplot as plt, random, psutil, imp, multiprocessing, copy, queue, json, time
 from pathlib import Path
 from xml.dom.minidom import *
 from xml.etree.ElementTree import *
@@ -32,6 +32,7 @@ import warnings
 warnings.warn = warn
 
 from src.Constants import DSConstants as DSConstants
+from src.Constants import logObject
 from src.Managers.WorkspaceManager.WorkspaceManager import WorkspaceManager
 from src.Managers.InstrumentManager.InstrumentManager import InstrumentManager
 from src.Managers.HardwareManager.HardwareManager import HardwareManager
@@ -57,7 +58,7 @@ class DataStation_Core(QMainWindow):
     DataStation_Closing_Final = pyqtSignal()
 
 ##### Signals: Logs #####
-    Log_Posted = pyqtSignal(str) # text
+    Log_Posted = pyqtSignal(object) # Log Object
 
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
@@ -69,6 +70,7 @@ class DataStation_Core(QMainWindow):
         self.rootDir = os.path.dirname(__file__)
         self.srcDir = os.path.join(self.rootDir, 'src')
         self.ssDir = os.path.join(self.rootDir, 'Stylesheets')
+        self.logText = list()
 
         self.setAppIcons()
         self.initManagers()
@@ -89,7 +91,7 @@ class DataStation_Core(QMainWindow):
         self.trayIcon = QSystemTrayIcon(self.app_icon, self)
         self.trayIcon.show()
 
-    def initTrayMenu(self):
+    def initTrayMenu(self): 
         self.trayMenu = QMenu()
         self.exitAction = QAction('Shutdown DataStation')
         self.exitAction.triggered.connect(self.softExit)
@@ -110,17 +112,19 @@ class DataStation_Core(QMainWindow):
         self.hM.connections()
         self.mM.connections()
 
-    def postLog(self, key, level, **kwargs):
+    def postLog(self, key, level, source=None, **kwargs):
         useKey = kwargs.get('textKey', False)
         if(useKey):
             text = self.DSC.getLogText(key)
         else:
             text = key
 
-        if(DSConstants.LOG_PRIORITY_MED >= level):
-            self.Log_Posted.emit(text)
-            #print(text)
-            app.processEvents()
+        log = logObject(source, text, level)
+
+        self.Log_Posted.emit(log)
+        self.logText.append(log)
+        #print(text)
+        app.processEvents()
 
     def softExit(self):
         self.postLog('Shutting down Datastation!', DSConstants.LOG_PRIORITY_HIGH)
@@ -133,7 +137,6 @@ class DataStation_Core(QMainWindow):
 
     def lastWindowClosed(self):
         self.trayIcon.showMessage('DataStation Still Running!', 'All windows were closed but DataStation is still running in the background!', QSystemTrayIcon.Information)
-        pass
 
     def closeEvent(self, event):
         self.softExit()

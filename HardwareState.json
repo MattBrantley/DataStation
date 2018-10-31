@@ -343,6 +343,76 @@
                     "uuid": "95f42077-8868-4239-9bed-9ecbbd50f9d6"
                 }
             ]
+        },
+        {
+            "hardwareIdentifier": "MRB_PXIe5122",
+            "hardwareSettings": {
+                "deviceName": "DIGITIZER",
+                "hardwareIdentifier": "MRB_PXIe5122",
+                "hardwareType": "NI PXIe-5122",
+                "name": "",
+                "physID": "",
+                "triggerCompUUID": "",
+                "triggerMode": "",
+                "uuid": "0080eacb-b63c-42f5-b4a5-e0cf0948ba0e"
+            },
+            "sourceList": [
+                {
+                    "enabled": false,
+                    "name": "[DIGITIZER] 0",
+                    "physConID": "0",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "9fbe3f63-8ce2-4289-b14e-776e5019298b",
+                    "vMax": 10,
+                    "vMin": -10
+                },
+                {
+                    "enabled": false,
+                    "name": "[DIGITIZER] 1",
+                    "physConID": "1",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "7a61692a-98fd-49c2-9c32-73f968559ad4",
+                    "vMax": 10,
+                    "vMin": -10
+                }
+            ]
+        },
+        {
+            "hardwareIdentifier": "MRB_PXIe5451",
+            "hardwareSettings": {
+                "deviceName": "ARB",
+                "hardwareIdentifier": "MRB_PXIe5451",
+                "hardwareType": "NI PXIe-5451",
+                "name": "",
+                "physID": "",
+                "triggerCompUUID": "",
+                "triggerMode": "",
+                "uuid": "86550370-cea3-4eb0-99a3-735fbd9c7589"
+            },
+            "sourceList": [
+                {
+                    "enabled": false,
+                    "name": "[ARB] 0",
+                    "physConID": "0",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "d2f9a458-7e98-4350-b58c-411f6fe5abd5",
+                    "vMax": 1,
+                    "vMin": 1
+                },
+                {
+                    "enabled": false,
+                    "name": "[ARB] 1",
+                    "physConID": "1",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "3d620b2c-30ae-4f45-b847-74410b5a71c0",
+                    "vMax": 1,
+                    "vMin": 1
+                }
+            ]
         }
     ]
 }

@@ -6,7 +6,7 @@ from src.Constants import moduleFlags as mfs
 
 class processStatus(DSModule):
     Module_Name = 'Process Status'
-    Module_Flags = []
+    Module_Flags = [mfs.CAN_DELETE]
 
     def __init__(self, ds, handler):
         super().__init__(ds, handler)

@@ -436,7 +436,7 @@ class socketSelectionWidget(QWidgetAction):
         if(isinstance(self.parent.sourceObject, AOSource)):
             return AOSocket
         if(isinstance(self.parent.sourceObject, AISource)):
-            return AISource
+            return AISocket
         if(isinstance(self.parent.sourceObject, DOSource)):
             return DOSocket
         if(isinstance(self.parent.sourceObject, DISource)):

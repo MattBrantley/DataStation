@@ -2,6 +2,7 @@ from PyQt5.Qt import *
 import time
 from src.Managers.ModuleManager.DSModule import DSModule
 from src.Constants import moduleFlags as mfs
+from src.Constants import logObject
 
 class logView(DSModule):
     Module_Name = 'Log View'
@@ -26,12 +27,16 @@ class logView(DSModule):
 
         self.logTextEdit.setFont(font)
 
-    def postLog(self, text, **kwargs):
+        for logItem in self.ds.logText:
+            self.postLog(logItem)
+
+    def postLog(self, log, **kwargs):
         if('newline' in kwargs):
             if(kwargs['newline'] == False):
-                self.logTextEdit.insertPlainText(text)
+                self.logTextEdit.insertPlainText(log.text)
                 return
 
-        self.logTextEdit.appendPlainText(time.strftime('[%m/%d/%Y %H:%M:%S] ') + text)
+        self.logTextEdit.appendPlainText(log.timeText() + log.text)
+        #self.logTextEdit.appendPlainText(time.strftime('[%m/%d/%Y %H:%M:%S] ') + text)
         self.logTextEdit.verticalScrollBar().setValue(self.logTextEdit.verticalScrollBar().maximum())
         

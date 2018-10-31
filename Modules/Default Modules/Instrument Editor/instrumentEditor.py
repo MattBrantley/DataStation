@@ -11,7 +11,7 @@ from treeView import treeView
 
 class instrumentEditor(DSModule):
     Module_Name = 'Instrument Editor'
-    Module_Flags = []
+    Module_Flags = [mfs.CAN_DELETE]
 
     def __init__(self, ds, handler):
         super().__init__(ds, handler)

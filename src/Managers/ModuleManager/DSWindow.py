@@ -9,6 +9,12 @@ class DSWindow(QMainWindow):
     def Widget_Closing(self, widget):
         pass
 
+    def Transfer_Module(self, moduleHandler):
+        self.transferModule(moduleHandler)
+
+    def Remove_Module(self, moduleHandler):
+        self.removeModule(moduleHandler)
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
     def __init__(self, core):
@@ -54,6 +60,10 @@ class DSWindow(QMainWindow):
     def transferModule(self, moduleHandler):
         self.moduleHandlers.append(moduleHandler)
         self.addDockWidget(Qt.LeftDockWidgetArea, moduleHandler.modInstance)
+
+    def removeModule(self, moduleHandler):
+        self.moduleHandlers.remove(moduleHandler)
+        self.removeDockWidget(moduleHandler.modInstance)
 
 ##### Window State Info #####
     def saveWindowState(self):

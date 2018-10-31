@@ -10,7 +10,7 @@ from pathlib import Path
 
 class SimpleInstrumentControl(DSModule):
     Module_Name = 'Simple Instrument Control'
-    Module_Flags = []
+    Module_Flags = [mfs.CAN_DELETE]
 
     STATUS_NOT_READY = 200
     STATUS_READY = 201
