@@ -133,7 +133,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "c0e00f80-902f-4f1e-aa54-b840a75e3439",
+                    "inputSource": "d2f9a458-7e98-4350-b58c-411f6fe5abd5",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Excitation Plates",
                     "prec": 0.1,
@@ -201,7 +201,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "9e77d723-dfd6-48cd-96fc-c52c51616e3d",
+                    "inputSource": "8c30b3b3-d993-4ae9-89b1-acec74fa5e53",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Basic Trigger",
                     "tag": "[DO]",
@@ -232,7 +232,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "77f632e2-7857-4368-9933-f2a78da53d09",
+                    "inputSource": "666527b4-de2f-4bf6-a202-bc1cc91dbb47",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Basic Trigger",
                     "tag": "[DO]",

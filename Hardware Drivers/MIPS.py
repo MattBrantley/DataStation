@@ -84,7 +84,7 @@ class MIPS(HardwareDevice):
         except:
             pass
 
-            self.initialized.emit()
+        self.initialized.emit()
         
     def configure(self):
 
@@ -146,7 +146,6 @@ class MIPS(HardwareDevice):
                     self.Send_Status_Message('Running...')
                     self.reportTime = ms()
 
-
 ############################################################################################
 ###################################### INTERNAL FUNCS ######################################
 
@@ -163,8 +162,12 @@ class MIPS(HardwareDevice):
                     channelToken = ord(programData['source'].Get_Connector_ID()[4:])
 
                 dataAdded = list()
+
                 for cmd in programData['programmingPacket'].Get_Commands(commandType=AnalogSparseCommand):
                     dataAdded.append(cmd.pairs)
+                for cmd in programData['programmingPacket'].Get_Commands(commandType=DigitalSparseCommand):
+                    dataAdded.append(cmd.pairs)
+
                 if(dataAdded):
                     sparseData = np.vstack(dataAdded)
 

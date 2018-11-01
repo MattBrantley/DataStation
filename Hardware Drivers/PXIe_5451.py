@@ -42,7 +42,6 @@ class PXIe_5451(HardwareDevice):
 
     def program(self, programmingPackets):
         self.Set_Ready_Status(False)
-        print(programmingPackets) # Issue seems to be with the programming packets here - maybe an issue with AnalogSparseCommand?
         if(programmingPackets):
             self.session.abort()
             self.session.clear_arb_memory()

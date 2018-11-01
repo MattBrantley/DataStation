@@ -181,8 +181,6 @@ class hardwareObject():
 
 ##### Search Functions #####
 
-
-
     def getEvents(self):
         programDataList = list()
         for source in self.sourceList:
