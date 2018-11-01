@@ -123,7 +123,6 @@ class DataStation_Core(QMainWindow):
 
         self.Log_Posted.emit(log)
         self.logText.append(log)
-        #print(text)
         app.processEvents()
 
     def softExit(self):

@@ -201,9 +201,10 @@ class SimpleInstrumentControl(DSModule):
         headerItem.setBackground(QColor(255, 221, 173))
         traceList.addItem(headerItem)
 
-        for traceItem in item.trace:
-            msgItem = QListWidgetItem(traceItem.Get_Name() + ': ' + traceItem.__str__())
-            traceList.addItem(msgItem)
+        if(hasattr(item, 'trace')):
+            for traceItem in item.trace:
+                msgItem = QListWidgetItem(traceItem.Get_Name() + ': ' + traceItem.__str__())
+                traceList.addItem(msgItem)
 
         menu.addAction(traceAction)
         action = menu.exec_(QCursor().pos())

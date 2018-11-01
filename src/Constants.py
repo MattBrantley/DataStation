@@ -56,6 +56,8 @@ class moduleFlags():
     SINGLE_INSTANCE = 300
     DEFAULT_MODULE = 301
 
+    LATE_CLOSE = 400
+
 class DSLogTexts():
 
     def __init__(self, language):

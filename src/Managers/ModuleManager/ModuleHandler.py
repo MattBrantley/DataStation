@@ -37,6 +37,6 @@ class ModuleHandler(QObject):
         self.window.transferModule(self)
         self.modInstance.configureWidget(self.window)
 
-    def removeHandler(self):
+    def removeHandler(self, late=False):
         self.window.Remove_Module(self)
         self.mM.Remove_Module_Instance(self)

@@ -72,6 +72,7 @@ class AnalogWaveformCommand(Command):
 
 class AnalogSparseCommand(Command):
     def __init__(self, pairs):
+        super().__init__()
         self.pairs = pairs # numpy array: column 1 = time (second), column 2 = voltage (V)
 
 class AnalogAcquisitionCommand(Command):

@@ -67,8 +67,11 @@ class ModuleManager(QObject):
     def Get_Windows(self):
         return self.mainWindows
 
-    def Set_Stylesheet(self, path):
+    def Set_StyleSheet(self, path):
         self.setStylesheet(path)
+
+    def Get_StyleSheet(self):
+        return self.styleSheet
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -76,6 +79,7 @@ class ModuleManager(QObject):
         super().__init__()
         self.ds = ds
         self.moduleDir = os.path.join(self.ds.rootDir, 'Modules')
+        self.styleSheet = ''
         self.modulesAvailable = list()
         self.modules = list()
         self.mainWindows = list()
@@ -89,6 +93,7 @@ class ModuleManager(QObject):
         self.DSLoading()
 
         self.ds.DataStation_Closing.connect(self.DSClosing)
+        self.ds.DataStation_Closing_Final.connect(self.DSLateClosing)
         self.ds.app.focusWindowChanged.connect(self.focusWindowChanged)
 
 ##### DataStation Reserved Functions #####
@@ -100,6 +105,7 @@ class ModuleManager(QObject):
 
     def DSLoading(self):
         self.mainWindow = mainWindow(self.ds)
+        self.mainWindow.setStyleSheet(self.styleSheet)
 
         for modName in self.defaultModules:
             widget = self.getModByModName(modName)
@@ -110,21 +116,17 @@ class ModuleManager(QObject):
 
     def DSLoaded(self):
         pass
-        #tSaveURL = os.path.join(self.ds.srcDir, 'testSave.json')
-        #if(os.path.isfile(tSaveURL)):
-        #    with open(tSaveURL, 'r+') as file:
-        #        #try:
-        #        windowData = json.load(file)
-        #        self.loadWindowStates(windowData)
-                #except:
-                #    print('ERROR OCCURED LOADING')
 
     def DSClosing(self):
-        #tSaveURL = os.path.join(self.ds.srcDir, 'testSave.json')
-        #with open(tSaveURL, 'w') as file:
-        #    json.dump(self.saveWindowStates(), file, sort_keys=True, indent=4)
+        for window in self.mainWindows:
+            window.close()
 
-        self.closeAllWindows()
+    def DSLateClosing(self):
+        pass
+        #for modHandler in self.modules:
+        #    modHandler.removeHandler(late=True)
+        #for window in self.mainWindows:
+        #    window.close()
 
     def closeDataStation(self, window):
         self.isShutdown = True
@@ -156,14 +158,17 @@ class ModuleManager(QObject):
 ##### Stylesheets #####
     def setStylesheet(self, path):
         try:
-            with open(os.path.join(path)) as file:
-                ssTxt = file.read()
-                self.setStyleSheet(ssTxt)
+            if path is None:
+                self.styleSheet = ''
+            else:
+                with open(path) as file:
+                    ssTxt = file.read()
+                    self.styleSheet = ssTxt
+
+            for window in self.mainWindows:
+                window.setStyleSheet(self.styleSheet)
         except:
-            print('Could not load stylesheet')
-        #with open(os.path.join(self.ssDir, 'darkorange.stylesheet')) as file:
-        #    ssTxt = file.read()
-            #self.setStyleSheet(ssTxt)
+            self.ds.postLog('Could not load styleSheet: ' + path, DSConstants.LOG_PRIORITY_HIGH)
 
 ##### Windows #####
     def hideMainWindow(self):
@@ -172,16 +177,13 @@ class ModuleManager(QObject):
     def addWindow(self):
         newWindow = DSWindow(self.ds)
         newWindow.setWindowTitle('DataStation Expansion Window #' + str(len(self.mainWindows)+1))
+        newWindow.setStyleSheet(self.styleSheet)
         self.mainWindows.append(newWindow)
         return newWindow
 
     def windowClosing(self, window):
         self.mainWindows.remove(window)
         self.Window_Removed.emit(window)
-
-    def closeAllWindows(self):
-        for window in self.mainWindows:
-            window.close()
 
     def saveWindowStates(self):
         windowStates = list()
@@ -205,11 +207,8 @@ class ModuleManager(QObject):
                 for window in self.mainWindows:
                     window.show()
                     window.raise_()
-                    #window.setWindowState(window.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
-                    #window.activateWindow()
 
             self.focusLock = False
-
 
 ##### Modules #####
     def addModuleInstance(self, module, window, uuid):

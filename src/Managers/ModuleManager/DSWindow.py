@@ -1,5 +1,6 @@
 from PyQt5.Qt import *
 import json as json
+from src.Constants import moduleFlags as mfs
 
 class DSWindow(QMainWindow):
 
@@ -54,7 +55,6 @@ class DSWindow(QMainWindow):
     def closeDataStation(self):
         self.mM.Close_DataStation(self)
         #event.accept()
-
 
 ##### Modules #####
     def transferModule(self, moduleHandler):

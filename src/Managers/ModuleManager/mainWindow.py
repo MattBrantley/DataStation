@@ -5,11 +5,13 @@ import os, time
 class mainWindow(QMainWindow):
 
     def __init__(self, ds):
-        super().__init__(ds)
+        super().__init__(None)
         self.ds = ds
         self.setWindowTitle('DataStation is Loading..')
         self.centerWindow()
         self.show()
+        self.ds.app.processEvents()
+        #self.setWindowFlags(Qt.WindowStaysOnTopHint)
 
     def centerWindow(self):
         frameGm = self.frameGeometry()

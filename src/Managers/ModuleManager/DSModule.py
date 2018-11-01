@@ -53,6 +53,9 @@ class DSModule(QDockWidget):
 
         #self.visibilityChanged.connect(self.visibilityModified)
 
+    def onDataStationClose(self):
+        pass
+
     def visibilityModified(self, visible):
         if self.isVisible() and self.isHidden():
             self.Get_Handler().removeHandler()

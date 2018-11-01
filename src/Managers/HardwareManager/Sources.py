@@ -166,17 +166,18 @@ class AISource(Source):
         trace = traceIn.copy()
         trace.append(self)
 
-        if(isinstance(self.programmingPacket, AnalogAcquisitionCommand) is False):
-            trace[0].Fail_Ready_Check(trace, 'Analog Input Source Recieved Unknown Programming Packet Type!')
-        else:
-            if(self.packetInSourceRange(self.programmingPacket) is False):
-                trace[0].Fail_Ready_Check(trace, 'Analog Input Source Programming Packet Out Of Source Range')
+        for command in self.programmingPacket.Get_Commands():
+            if(isinstance(command, AnalogAcquisitionCommand) is False):
+                trace[0].Fail_Ready_Check(trace, 'Analog Input Source Recieved Unknown Programming Packet Type! ' + command.__str__())
+            else:
+                if(self.commandInSourceRange(command) is False):
+                    trace[0].Fail_Ready_Check(trace, 'Analog Input Source Programming Packet Out Of Source Range')
 
     def parsePacket(self, packetIn):
         self.programmingPacket = packetIn
         self.programmingPacket.physicalConnectorID = self.physicalConnectorID
 
-    def packetInSourceRange(self, packetIn):
+    def commandInSourceRange(self, cmd):
         return True
 
 
@@ -194,24 +195,25 @@ class AOSource(Source):
         trace = traceIn.copy()
         trace.append(self)
 
-        if(isinstance(self.programmingPacket, (AnalogWaveformCommand, AnalogSparseCommand)) is False):
-            trace[0].Fail_Ready_Check(trace, 'Analog Output Source Recieved Unknown Programming Packet Type!')
-        else:
-            if(self.packetInSourceRange(self.programmingPacket) is False):
-                trace[0].Fail_Ready_Check(trace, 'Analog Output Source Programming Packet Out Of Source Range')
+        for command in self.programmingPacket.Get_Commands():
+            if(isinstance(command, (AnalogWaveformCommand, AnalogSparseCommand)) is False):
+                trace[0].Fail_Ready_Check(trace, 'Analog Output Source Recieved Unknown Programming Packet Type! ' + command.__str__())
+            else:
+                if(self.commandInSourceRange(command) is False):
+                    trace[0].Fail_Ready_Check(trace, 'Analog Output Source Programming Packet Out Of Source Range')
 
     def parsePacket(self, packetIn):
         self.programmingPacket = packetIn
         self.programmingPacket.physicalConnectorID = self.physicalConnectorID
             
-    def packetInSourceRange(self, packetIn):
-        if(packetIn.waveformData is None):
-            return True
-        yAxis = packetIn.waveformData[:,1]
-        if(yAxis.max() > self.vMax):
-            return False
-        if(yAxis.min() < self.vMin):
-            return False
+    def commandInSourceRange(self, cmd):
+        #if(cmd.waveformData is None):
+        #    return True
+        #yAxis = cmd.waveformData[:,1]
+        #if(yAxis.max() > self.vMax):
+        #    return False
+        #if(yAxis.min() < self.vMin):
+        #    return False
 
         return True
 
@@ -228,17 +230,18 @@ class DISource(Source):
         trace.append(self)
         super().readyCheck(traceIn)
 
-        if(isinstance(self.programmingPacket, DigitalAcquisitionCommand) is False):
-            trace[0].Fail_Ready_Check(trace, 'Digital Input Source Recieved Unknown Programming Packet Type!')
-        else:
-            if(self.packetInSourceRange(self.programmingPacket) is False):
-                trace[0].Fail_Ready_Check(trace, 'Digital Input Source Programming Packet Out Of Source Range')
+        for command in self.programmingPacket.Get_Commands():
+            if(isinstance(command, DigitalAcquisitionCommand) is False):
+                trace[0].Fail_Ready_Check(trace, 'Digital Input Source Recieved Unknown Programming Packet Type! ' + command.__str__())
+            else:
+                if(self.commandInSourceRange(command) is False):
+                    trace[0].Fail_Ready_Check(trace, 'Digital Input Source Programming Packet Out Of Source Range')
 
     def parsePacket(self, packetIn):
         self.programmingPacket = packetIn
         self.programmingPacket.physicalConnectorID = self.physicalConnectorID
 
-    def packetInSourceRange(self, packetIn):
+    def commandInSourceRange(self, cmd):
         return True
 
 
@@ -253,15 +256,16 @@ class DOSource(Source):
         trace = traceIn.copy()
         trace.append(self)
 
-        if(isinstance(self.programmingPacket, (DigitalWaveformCommand, DigitalSparseCommand)) is False):
-            trace[0].Fail_Ready_Check(trace, 'Digital Output Source Recieved Unknown Programming Packet Type!')
-        else:
-            if(self.packetInSourceRange(self.programmingPacket) is False):
-                trace[0].Fail_Ready_Check(trace, 'Digital Output Source Programming Packet Out Of Source Range')
+        for command in self.programmingPacket.Get_Commands():
+            if(isinstance(command, (DigitalWaveformCommand, DigitalSparseCommand)) is False):
+                trace[0].Fail_Ready_Check(trace, 'Digital Output Source Recieved Unknown Programming Packet Type! ' + command.__str__())
+            else:
+                if(self.commandInSourceRange(command) is False):
+                    trace[0].Fail_Ready_Check(trace, 'Digital Output Source Programming Packet Out Of Source Range')
 
     def parsePacket(self, packetIn):
         self.programmingPacket = packetIn
         self.programmingPacket.physicalConnectorID = self.physicalConnectorID
 
-    def packetInSourceRange(self, packetIn):
+    def commandInSourceRange(self, cmd):
         return True

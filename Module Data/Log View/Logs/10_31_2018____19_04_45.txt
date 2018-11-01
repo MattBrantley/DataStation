@@ -1,0 +1,77 @@
+[10/31/2018 19:03:29] Searching For Modules... 
+[10/31/2018 19:03:30]    Found Module: codeEditor.py
+[10/31/2018 19:03:30]    Found Module: Console.py
+[10/31/2018 19:03:30]    Found Module: datastationWeb.py
+[10/31/2018 19:03:30]    Found Module: hardwareView.py
+[10/31/2018 19:03:30]    Found Module: instrumentEditor.py
+[10/31/2018 19:03:30]    Found Module: loadingScreen.py
+[10/31/2018 19:03:30]    Found Module: logView.py
+[10/31/2018 19:03:30]    Found Module: processStatus.py
+[10/31/2018 19:03:30]    Found Module: profileSelection.py
+[10/31/2018 19:03:30]    Found Module: Sequencer.py
+[10/31/2018 19:03:30]    Found Module: SimpleInstrumentControl.py
+[10/31/2018 19:03:30] Finished Searching For Modules!
+[10/31/2018 19:03:31] Loading User Profiles... 
+[10/31/2018 19:03:31] Done!
+[10/31/2018 19:03:31] Loading Component Models... 
+[10/31/2018 19:03:31]    Found Component Script: d:/InstrPlatform/DataStation\Components\Basic_Trigger.py
+[10/31/2018 19:03:31]   (Success!)
+[10/31/2018 19:03:31]    Found Component Script: d:/InstrPlatform/DataStation\Components\Circular_Lens.py
+[10/31/2018 19:03:31]   (Success!)
+[10/31/2018 19:03:31]    Found Component Script: d:/InstrPlatform/DataStation\Components\DC_Electrode.py
+[10/31/2018 19:03:31]   (Success!)
+[10/31/2018 19:03:31]    Found Component Script: d:/InstrPlatform/DataStation\Components\Detection_Plates.py
+[10/31/2018 19:03:31]   (Success!)
+[10/31/2018 19:03:31]    Found Component Script: d:/InstrPlatform/DataStation\Components\Excitation_Plates.py
+[10/31/2018 19:03:31]   (Success!)
+[10/31/2018 19:03:31]    Found Component Script: d:/InstrPlatform/DataStation\Components\Filament.py
+[10/31/2018 19:03:31]   (Success!)
+[10/31/2018 19:03:31]    Found Component Script: d:/InstrPlatform/DataStation\Components\Penning_Trap.py
+[10/31/2018 19:03:31]   (Success!)
+[10/31/2018 19:03:31]    Found Component Script: d:/InstrPlatform/DataStation\Components\Pulse_Valve.py
+[10/31/2018 19:03:31]   (Success!)
+[10/31/2018 19:03:31]    Found Component Script: d:/InstrPlatform/DataStation\Components\Quadrupole.py
+[10/31/2018 19:03:31]   (Success!)
+[10/31/2018 19:03:31] Finished Loading Component Models!
+[10/31/2018 19:03:31] Loading User Filters... 
+[10/31/2018 19:03:31]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Signal_Splitter_2Way.py
+[10/31/2018 19:03:31]   (Success!)
+[10/31/2018 19:03:31]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Signal_Splitter_3Way.py
+[10/31/2018 19:03:31]   (Success!)
+[10/31/2018 19:03:31]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Simple_Amplifier.py
+[10/31/2018 19:03:31]   (Success!)
+[10/31/2018 19:03:31] Finished Loading User Filters!
+[10/31/2018 19:03:31] Loading Hardware Drivers... 
+[10/31/2018 19:03:31]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\MIPS.py
+[10/31/2018 19:03:31]   (Success!)
+[10/31/2018 19:03:31]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\NI_DAQmx.py
+[10/31/2018 19:03:31]   (Success!)
+[10/31/2018 19:03:31]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5122.py
+[10/31/2018 19:03:31]   (Success!)
+[10/31/2018 19:03:31]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5451.py
+[10/31/2018 19:03:31]   (Success!)
+[10/31/2018 19:03:31]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\Test_Driver.py
+[10/31/2018 19:03:31]   (Success!)
+[10/31/2018 19:03:31]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\__MIPSY.py
+[10/31/2018 19:03:31]  (Failed!)
+[10/31/2018 19:03:31]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\__NI_DAQmx.py
+[10/31/2018 19:03:31]  (Failed!)
+[10/31/2018 19:03:31]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\__NI_FGen.py
+[10/31/2018 19:03:31]  (Failed!)
+[10/31/2018 19:03:31]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\__NI_Scope.py
+[10/31/2018 19:03:31]  (Failed!)
+[10/31/2018 19:03:31] Finished Loading Hardware Drivers!
+[10/31/2018 19:03:31] Initializing DataStation Labview Interface... 
+[10/31/2018 19:03:35] Done!
+[10/31/2018 19:03:35] Loading Hardware State Data.. 
+[10/31/2018 19:03:35] Done!
+[10/31/2018 19:04:44] Loading User Instrument (D:/InstrPlatform/DataStation/Instruments\Basic FT-ICR.dsinstrument)... 
+[10/31/2018 19:04:44] Added New Component to Instrument: Circular Lens
+[10/31/2018 19:04:44] Added New Component to Instrument: Circular Lens
+[10/31/2018 19:04:44] Added New Component to Instrument: Penning Trap
+[10/31/2018 19:04:44] Added New Component to Instrument: Excitation Plates
+[10/31/2018 19:04:44] Added New Component to Instrument: Detection Plates
+[10/31/2018 19:04:44] Added New Component to Instrument: Basic Trigger
+[10/31/2018 19:04:44] Added New Component to Instrument: Basic Trigger
+[10/31/2018 19:04:45] Added New Component to Instrument: Filament
+[10/31/2018 19:04:45] Added New Component to Instrument: Pulse Valve

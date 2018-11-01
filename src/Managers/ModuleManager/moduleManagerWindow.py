@@ -9,6 +9,7 @@ class moduleManagerWindow(QMainWindow):
         self.setWindowTitle('Module Manager')
         self.ds = ds
         self.mM = ds.mM
+        self.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         self.mainWidget = QTabWidget()
         self.setCentralWidget(self.mainWidget)
@@ -19,13 +20,62 @@ class moduleManagerWindow(QMainWindow):
         self.windowsTab = windowsTab(self.ds)
         self.mainWidget.addTab(self.windowsTab, 'Windows')
 
+        self.stylesTab = stylesTab(self.ds)
+        self.mainWidget.addTab(self.stylesTab, 'Styles')
+
         self.ds.DataStation_Closing.connect(self.closing)
 
     def closing(self):
         self.close()
         
-class windowsTab(QWidget):
+class stylesTab(QWidget):
+    def __init__(self, ds):
+        super().__init__()
+        self.ds = ds
+        self.mM = ds.mM
+        self.initWindow()
 
+    def initWindow(self):
+        self.mainLayout = QVBoxLayout()
+        self.setLayout(self.mainLayout)
+
+        self.listBox = QListWidget()
+        self.listBox.itemClicked.connect(self.listBoxChanged)
+        self.populateStyles()
+        self.mainLayout.addWidget(self.listBox)
+
+        self.applyButton = QPushButton('Apply Style')
+        self.applyButton.pressed.connect(self.applyPressed)
+        self.applyButton.setEnabled(False)
+        self.mainLayout.addWidget(self.applyButton)
+
+    def listBoxChanged(self):
+        if self.listBox.currentIndex != -1:
+            self.applyButton.setEnabled(True)
+
+    def populateStyles(self):
+        self.listBox.clear()
+        listItem = QListWidgetItem('Default')
+        self.listBox.addItem(listItem)
+        listItem.ssPath = None
+
+        stylesPath = os.path.join(self.ds.rootDir, 'Stylesheets')
+
+        for root, dirs, files in os.walk(stylesPath):
+            for file in files:
+                url = os.path.join(root, file)
+                name, ext = os.path.splitext(file)
+                if ext == '.stylesheet':
+                    listItem = QListWidgetItem(name, parent=self.listBox)
+                    #listItem = self.listBox.addItem(listItem)
+                    listItem.ssPath = url
+
+    def applyPressed(self):
+        ssPath = self.listBox.selectedItems()[0].ssPath
+        self.mM.Set_StyleSheet(ssPath)
+
+
+class windowsTab(QWidget):
     def __init__(self, ds):
         super().__init__()
         self.ds = ds
@@ -52,7 +102,6 @@ class windowsTab(QWidget):
         self.mM.Add_New_Window()
 
 class modulesTab(QWidget):
-
     def __init__(self, ds):
         super().__init__()
         self.showFolders = False

@@ -126,11 +126,12 @@ class profileSelection(DSModule):
 
     def updateUserProfile(self):
         if(self.activeUser is not None):
-            self.ds.postLog('Updating User Profile... (' + self.activeUser['url'] + ').. ', DSConstants.LOG_PRIORITY_HIGH)     
-            self.activeUser['windowStates'] = self.ds.mM.Save_Window_States()    
+            self.ds.postLog('Updating User Profile... (' + self.activeUser['url'] + ').. ', DSConstants.LOG_PRIORITY_HIGH)
+            self.activeUser['windowStates'] = self.ds.mM.Save_Window_States()
+            self.activeUser['styleSheet'] = self.ds.mM.Get_StyleSheet()
             with open(self.activeUser['url'], 'w') as file:
                 json.dump(self.activeUser, file)
-                time.sleep(1) #NOT ELEGANT - NEED CROSS PLATFORM SOLUTION   
+                time.sleep(1) #NOT ELEGANT - NEED CROSS PLATFORM SOLUTION
 
     def setActiveUser(self):
         self.activeUser = self.userProfiles[self.userList.currentRow()]
@@ -138,6 +139,9 @@ class profileSelection(DSModule):
             self.ds.mM.Load_Window_States(self.activeUser['windowStates'])
         else:
             self.ds.mM.Load_Window_States(list())
+
+        if('styleSheet' in self.activeUser):
+            self.ds.mM.Set_StyleSheet(self.activeUser['styleSheet'])
 
     def finish(self):
         self.setActiveUser()

@@ -44,7 +44,7 @@ class goHigh(eventType):
 
     def toCommand(self):
         pairs = np.array([[self.time, 1]])
-        command = AnalogSparseCommand(pairs)
+        command = DigitalSparseCommand(pairs)
         return command
 
 class goLow(eventType):
@@ -58,7 +58,7 @@ class goLow(eventType):
 
     def toCommand(self):
         pairs = np.array([[self.time, 0]])
-        command = AnalogSparseCommand(pairs)
+        command = DigitalSparseCommand(pairs)
         return command
 
 class pulse(eventType):
@@ -73,5 +73,5 @@ class pulse(eventType):
 
     def toCommand(self):
         pairs = np.array([[self.time, 1], [self.time+self.eventParams['Width'].v(), 0]])
-        command = AnalogSparseCommand(pairs)
+        command = DigitalSparseCommand(pairs)
         return command

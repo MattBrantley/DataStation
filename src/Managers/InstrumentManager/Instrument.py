@@ -64,7 +64,7 @@ class Instrument(QObject):
         self.readyCheck()
 
     def Ready_Check_Status(self):
-        if self.readyCheckList is False:
+        if not self.readyCheckList:
             return True
         else:
             return False
