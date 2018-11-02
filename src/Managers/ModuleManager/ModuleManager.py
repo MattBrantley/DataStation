@@ -85,6 +85,9 @@ class ModuleManager(QObject):
         self.mainWindows = list()
         self.isShutdown = False
         self.defaultModules = ['Default Loading Screen', 'Profile Selection']
+        url = os.path.join(self.ds.srcDir, 'icons5/zoom-in.png')
+        #self.defaultSS = 'QDockWidget::close-button {image: url(' + url + ');}'
+        self.defaultSS = 'QPushButton {color:#b1b1b1; }'
 
         self.focusLock = False
 
@@ -166,7 +169,7 @@ class ModuleManager(QObject):
                     self.styleSheet = ssTxt
 
             for window in self.mainWindows:
-                window.setStyleSheet(self.styleSheet)
+                window.setStyleSheet(self.styleSheet + self.defaultSS)
         except:
             self.ds.postLog('Could not load styleSheet: ' + path, DSConstants.LOG_PRIORITY_HIGH)
 

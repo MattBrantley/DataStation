@@ -5,6 +5,7 @@ from src.Constants import moduleFlags as mfs
 from src.Managers.HardwareManager.PacketMeasurements import AnalogWaveformMeasurement
 from PyQt5.QtChart import *
 import numpy as np
+import os
 
 class measurementPreview(DSModule):
     Module_Name = 'Measurement Preview'
@@ -18,28 +19,54 @@ class measurementPreview(DSModule):
         self.wM = ds.wM
 
         self.initWindow()
-        self.initToolbar()
+        #self.initTitleBar()
 
         self.iM.Socket_Measurement_Packet_Recieved.connect(self.newMeasurement)
-        self.iM.Socket_Added.connect(self.populateSocketSelection)
+        #self.iM.Socket_Added.connect(self.populateSocketSelection)
+
+    def initTitleBar(self):
+        self.titleBarWidget = QWidget()
+        self.titleBarLayout = QHBoxLayout()
+        self.titleBarWidget.setLayout(self.titleBarLayout)
+
+        self.titleBarWidget.setAutoFillBackground(True)
+
+        self.configPixmap = QPixmap(os.path.join(self.ds.srcDir, 'icons5/zoom-in.png'))
+        self.configIcon = QIcon(self.configPixmap)
+        self.configButton = QPushButton()
+        self.configButton.setIcon(self.configIcon)
+        self.configButton.setFixedSize(20,20)
+
+        self.titleBarLayout.addStretch()
+        self.titleBarLayout.addWidget(self.configButton)
+
+        self.setTitleBarWidget(self.titleBarWidget)
 
     def initWindow(self):
-        self.container = QMainWindow()
+        self.container = QWidget()
+        self.layerLayout = QStackedLayout()
+        self.container.setLayout(self.layerLayout)
         self.setWidget(self.container)
 
-        self.widget = QWidget()
-        self.container.setCentralWidget(self.widget)
+        #### Overlay ####
+        self.overlayWidget = QWidget()
+        self.overlayLayout = QVBoxLayout()
+        self.overlayLayout.setContentsMargins(0, 0, 0, 0)
+        self.overlayWidget.setLayout(self.overlayLayout)
+
+        #self.configPixmap = QPixmap(os.path.join(self.ds.srcDir, 'icons5/zoom-in.png'))
+        #self.configIcon = QIcon(self.configPixmap)
+        #self.configButton = QPushButton()
+        #self.configButton.setIcon(self.configIcon)
+        #self.configButton.setFixedSize(20,20)
+        #self.overlayLayout.addWidget(self.configButton)
+        #self.overlayLayout.addStretch()
+
+        #self.layerLayout.addWidget(self.overlayWidget)
+
+        #### Measurement ####
         self.measurementViewer = measurementView()
-        self.setWidget(self.measurementViewer)
-
-    def initToolbar(self):
-        self.toolbar = QToolBar()
-        self.socketSelectionBox = QComboBox(self.toolbar)
-        self.socketSelectionBox.setMinimumWidth(200)
-
-        self.toolbar.addWidget(self.socketSelectionBox)
-        self.container.addToolBar(self.toolbar)
-        
+        self.layerLayout.addWidget(self.measurementViewer)
 
     def newMeasurement(self, instrument, component, socket, packet):
         print(instrument)
