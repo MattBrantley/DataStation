@@ -44,9 +44,6 @@ class Instrument(QObject):
     def Load_Sequence(self, path):
         self.Get_Sequence().Load_Sequence_File(path)
 
-    def Run_Sequence(self):
-        self.Get_Hardware
-
     def Save_Instrument(self, name=None, path=None):
         if(name is not None):
             self.Set_Name(name)
@@ -75,6 +72,15 @@ class Instrument(QObject):
     def Fail_Ready_Check(self, trace, msg, warningLevel=DSConstants.READY_CHECK_ERROR):
         self.readyCheckFail(trace, msg, warningLevel)
 
+    def Get_Hardware_Devices(self):
+        return self.getHardwareDevices()
+
+    def Run_Instrument(self):
+        self.runInstrument()
+
+    def Get_Run_ID(self):
+        return self.runID
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
     def __init__(self, ds):
@@ -87,9 +93,9 @@ class Instrument(QObject):
         self.sequence = EventSequence(self.ds, self)
         self.componentList = list()
         self.uuid = str(uuid.uuid4())
+        self.runID = ''
 
 ##### Instrument Ready Check #####
-
     def readyCheck(self):
         self.readyCheckList = list()
         trace = list()
@@ -144,15 +150,35 @@ class Instrument(QObject):
         self.iM.measurementRecieved(self, component, socket, measurementPacket)
 
 ##### Functions Called By Sequence #####
-
     def sequenceSaved(self):
         self.iM.sequenceSaved(self)
 
     def sequenceLoaded(self):
         self.iM.sequenceLoaded(self)
 
-##### Instrument Manipulations #####
+##### Hardware Manipulations ####
+    def runInstrument(self):
+        self.generateNewRunID()
 
+        for handler in self.Get_Hardware_Devices():
+            handler.onRun()
+        self.iM.instrumentSequenceRunning(self)
+
+    def generateNewRunID(self):
+        self.runID = str(uuid.uuid4())
+
+    def getHardwareDevices(self):
+        hardwareHandlerList = list()
+        for component in self.Get_Components():
+            for socket in component.Get_Sockets():
+                source = socket.Get_Source()
+                if source is not None:
+                    hardwareHandlerList.append(source.Get_Handler())
+
+        hardwareHandlerSet = set(hardwareHandlerList)
+        return list(hardwareHandlerSet)
+
+##### Instrument Manipulations #####
     def savePacket(self):
         saveData = dict()
         saveData['name'] = self.Get_Name()
@@ -226,7 +252,6 @@ class Instrument(QObject):
         return True
 
 ##### Component Manipulations #####
-
     def addComponent(self, compModel, customFields=dict(), loadData=None):
         newComp = type(compModel)(self.ds)
         newComp.instr = self

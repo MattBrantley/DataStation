@@ -18,6 +18,7 @@ class InstrumentManager(QObject):
     Instrument_New = pyqtSignal(object) # Instrument
     Instrument_Config_Changed = pyqtSignal(object) # Instrument
     Instrument_Name_Changed = pyqtSignal(object) # Instrument
+    Instrument_Sequence_Running = pyqtSignal(object) # Instrument
     
 ##### Signals: Components #####
     Component_Added = pyqtSignal(object, object) # Instrument, Component
@@ -118,6 +119,9 @@ class InstrumentManager(QObject):
 
     def instrumentFileLoaded(self, instrument):
         self.Instrument_File_Loaded.emit(instrument)
+
+    def instrumentSequenceRunning(self, instrument):
+        self.Instrument_Sequence_Running.emit(instrument)
 
     ##### Component #####
     def componentAdded(self, instrument, component):

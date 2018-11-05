@@ -63,10 +63,6 @@ class HardwareManager(QObject):
     def Ready_Check_Status(self):
         return self.readyStatus
 
-    def Run_Sequence(self):
-        for handler in self.deviceHandlerList:
-            handler.onRun()
-
     def Fail_Ready_Check(self, trace, msg):
         if(isinstance(trace[0], Instrument)):
             trace[0].Fail_Ready_Check(trace, msg)
@@ -340,7 +336,7 @@ class HardwareManager(QObject):
 
         if (py_mod != None):
             if(hasattr(py_mod, mod_name) is True):
-                class_temp = getattr(py_mod, mod_name)(dict(), dict(), list(), list())
+                class_temp = getattr(py_mod, mod_name)(None, dict(), dict(), list(), list())
                 if issubclass(type(class_temp), HardwareDevice):  # verify that driver inherits the correct class
                     class_inst = class_temp
                     loaded = True

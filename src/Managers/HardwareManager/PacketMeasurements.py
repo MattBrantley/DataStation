@@ -57,12 +57,23 @@ class AnalogWaveformMeasurement(Measurement):
         self.f = f # is in units of Hertz (Hz)
         self.wave = wave # is in units of voltage (V)
 
-    def toPairs(self):
-        len = self.wave.shape[0]/self.f
-        x = np.arange(self.t0, self.t0 + len, 1/self.f)
-        y = self.wave
-        res = np.vstack([x, y]).transpose()
-        return res
+    def xData(self, zeroOrigin=False):
+        if zeroOrigin:
+            return np.arange(0, self.seconds() - self.stepSize(), self.stepSize())
+        else:
+            return np.arange(self.t0, self.t0 + self.seconds() - self.stepSize(), self.stepSize())
+
+    def yData(self):
+        return self.wave
+
+    def seconds(self):
+        return self.wave.shape[0]/self.f
+
+    def stepSize(self):
+        return 1/self.f
+
+    def toPairs(self, zeroOrigin=False):
+        return np.vstack([self.xData(zeroOrigin=zeroOrigin), self.yData()]).transpose()
 
 #class AnalogSparseCommand(Command):
 #    def __init__(self, pairs):

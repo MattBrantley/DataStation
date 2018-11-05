@@ -30,10 +30,14 @@ class Source():
     def Push_Measurement_Packet(self, measurementPacket):
         self.pushMeasurementPacket(measurementPacket)
 
+    def Get_Handler(self):
+        return self.handler
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
-    def __init__(self, name, physConID, trigger=False):
+    def __init__(self, handler, name, physConID, trigger=False):
         self.iM = None
+        self.handler = handler
         self.sourceSettings = dict()
         self.sourceSettings['name'] = name
         self.sourceSettings['uuid'] = str(uuid.uuid4())
@@ -154,8 +158,8 @@ class Source():
 
 
 class AISource(Source):
-    def __init__(self, name, vMin, vMax, prec, physConID, trigger=False):
-        super().__init__(name, physConID, trigger=trigger)
+    def __init__(self, handler, name, vMin, vMax, prec, physConID, trigger=False):
+        super().__init__(handler, name, physConID, trigger=trigger)
         self.sourceSettings['vMin'] = vMin
         self.sourceSettings['vMax'] = vMax
         self.sourceSettings['prec'] = prec
@@ -183,8 +187,8 @@ class AISource(Source):
 
 
 class AOSource(Source):
-    def __init__(self, name, vMin, vMax, prec, physConID):
-        super().__init__(name, physConID)
+    def __init__(self, handler, name, vMin, vMax, prec, physConID):
+        super().__init__(handler, name, physConID)
         self.sourceSettings['vMin'] = vMin
         self.sourceSettings['vMax'] = vMax
         self.sourceSettings['prec'] = prec
@@ -220,8 +224,8 @@ class AOSource(Source):
 
 
 class DISource(Source):
-    def __init__(self, name, physConID, trigger=False):
-        super().__init__(name, physConID, trigger=trigger)
+    def __init__(self, handler, name, physConID, trigger=False):
+        super().__init__(handler, name, physConID, trigger=trigger)
 
     def readyCheck(self, traceIn):
         if super().readyCheck(traceIn) is False:
@@ -247,8 +251,8 @@ class DISource(Source):
 
 
 class DOSource(Source):
-    def __init__(self, name, physConID):
-        super().__init__(name, physConID)
+    def __init__(self, handler, name, physConID):
+        super().__init__(handler, name, physConID)
 
     def readyCheck(self, traceIn):
         if super().readyCheck(traceIn) is False:

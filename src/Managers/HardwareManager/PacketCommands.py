@@ -12,6 +12,9 @@ class commandPacket():
     def Set_Origin_Socket(self, socket):
         self.originSocket = socket
 
+    def Get_Origin_Socket(self):
+        return self.originSocket
+
     def Get_Commands(self, commandType=None):
         return self.getCommands(commandType)
 

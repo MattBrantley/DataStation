@@ -143,7 +143,8 @@ class SimpleInstrumentControl(DSModule):
 
     def runOncePressed(self):
         if(self.readyChecks()):
-            self.hM.Run_Sequence()
+            if(self.targetInstrument is not None):
+                self.targetInstrument.Run_Instrument()
 
     def addReadyCheckMessage(self, message):
         self.readyCheckMessages.append(message)

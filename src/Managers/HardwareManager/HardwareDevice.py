@@ -43,6 +43,9 @@ class HardwareDeviceHandler(QObject):
     def Set_Ready_Status(self, bool):
         self.readyStatus(bool)
 
+    def Set_Active_Instrument(self, instrument):
+        self.setActiveInstrument(instrument)
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
     def __init__(self, ds, deviceModel, loadData):
@@ -58,6 +61,8 @@ class HardwareDeviceHandler(QObject):
         self.hM = ds.hM
         self.wM = ds.wM
 
+        self.activeInstrument = None
+
         self.hardwareSettings = dict()
         self.deviceList = list()
         self.sourceList = list()
@@ -67,7 +72,7 @@ class HardwareDeviceHandler(QObject):
         self.ds.DataStation_Closing.connect(self.shutdown)
 
     def initDeviceThread(self, deviceInformation):
-        self.deviceThread = self.deviceModel(deviceInformation, self.hardwareSettings, self.deviceList, self.sourceList)
+        self.deviceThread = self.deviceModel(self, deviceInformation, self.hardwareSettings, self.deviceList, self.sourceList)
         self.thread = QThread()
 
         ##### Incoming Messages #####
@@ -140,6 +145,9 @@ class HardwareDeviceHandler(QObject):
 
 ##################################### INTERNAL FUNCS #####################################
 
+    def setActiveInstrument(self, instrument):
+        self.activeInstrument = instrument
+
     def toggleDeferredProgrammingOn(self):
         self.deferredProgramming = True
 
@@ -192,8 +200,25 @@ class HardwareDeviceHandler(QObject):
         for source in self.sourceList:
             if(source.programmingPacket is not None and source.isConnected()):
                 self.programPackets.append({'source': source, 'programmingPacket': source.programmingPacket})
-        
+                self.activeInstrument = source.programmingPacket.Get_Origin_Socket().Get_Component().Get_Instrument()
+
         self.pushProgramming()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 class HardwareDevice(QObject):
     hardwareType = 'HardwareDevice'
@@ -249,22 +274,22 @@ class HardwareDevice(QObject):
         self.statusMessage.emit(msg)
 
     def Add_AISource(self, name, vMin, vMax, prec):
-        source = AISource('['+self.hardwareSettings['deviceName']+'] '+name, vMin, vMax, prec, name)
+        source = AISource(self.handler, '['+self.hardwareSettings['deviceName']+'] '+name, vMin, vMax, prec, name)
         self.addSource(source)
         return source
 
     def Add_AOSource(self, name, vMin, vMax, prec):
-        source = AOSource('['+self.hardwareSettings['deviceName']+'] '+name, vMin, vMax, prec, name)
+        source = AOSource(self.handler, '['+self.hardwareSettings['deviceName']+'] '+name, vMin, vMax, prec, name)
         self.addSource(source)
         return source
 
     def Add_DISource(self, name, trigger=True):
-        source = DISource('['+self.hardwareSettings['deviceName']+'] '+name, name, trigger=True)
+        source = DISource(self.handler, '['+self.hardwareSettings['deviceName']+'] '+name, name, trigger=True)
         self.addSource(source)
         return source
 
     def Add_DOSource(self, name):
-        source = DOSource('['+self.hardwareSettings['deviceName']+'] '+name, name)
+        source = DOSource(self.handler, '['+self.hardwareSettings['deviceName']+'] '+name, name)
         self.addSource(source)
         return source
 
@@ -281,10 +306,14 @@ class HardwareDevice(QObject):
     def Push_Measurements_Packet(self, source, measurementPacket):
         self.measurementPacket.emit(source, measurementPacket)
 
+    def Get_Handler(self):
+        return self.handler
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
-    def __init__(self, systemDeviceInfo, hardwareSettings, deviceList, sourceList):
+    def __init__(self, handler, systemDeviceInfo, hardwareSettings, deviceList, sourceList):
         super().__init__()
+        self.handler = handler
         self.systemDeviceInfo = systemDeviceInfo
         self.hardwareSettings = hardwareSettings
         self.hardwareSettings['name'] = ''

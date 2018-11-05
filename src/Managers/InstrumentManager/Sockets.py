@@ -43,7 +43,11 @@ class Socket():
         return self.programmingPacket
 
     def Set_Programming_Packet(self, packet):
+        packet.Set_Origin_Socket(self)
         self.programmingPacket = packet
+
+    def Get_Component(self):
+        return self.comp
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################

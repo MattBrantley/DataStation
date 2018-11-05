@@ -44,20 +44,16 @@ class DSModule(QDockWidget):
         self.modSettingsPathSwap = os.path.join(self.modSettingsFolder,  self.handler.Get_UUID()+'.json_swap')
 
         self.setFeatures(QDockWidget.DockWidgetMovable)
-        #self.setFeatures(QDockWidget.AllDockWidgetFeatures)
 
         if(self.Has_Flag(mfs.CAN_DELETE) or self.Has_Flag(mfs.CAN_HIDE)):
             self.setFeatures(self.features() | QDockWidget.DockWidgetClosable)
-        #if(self.Has_Flag(mfs.CAN_FLOAT)):
-        self.setFeatures(self.features() | QDockWidget.DockWidgetFloatable)
-
-        #self.setWindowFlags(Qt.Window | Qt.WindowMinimizeButtonHint)
+        if(self.Has_Flag(mfs.CAN_FLOAT)):
+            self.setFeatures(self.features() | QDockWidget.DockWidgetFloatable)
 
         #self.visibilityChanged.connect(self.visibilityModified)
 
-        url = os.path.join(self.ds.srcDir, 'icons5/zoom-in.png')
 
-        self.setStyleSheet('QDockWidget::close-button {image: url(' + url + ');}')
+
 
     def onDataStationClose(self):
         pass

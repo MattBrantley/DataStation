@@ -4,6 +4,7 @@ from src.Managers.ModuleManager.DSModule import DSModule
 from src.Constants import moduleFlags as mfs
 from src.Managers.HardwareManager.PacketMeasurements import AnalogWaveformMeasurement
 from PyQt5.QtChart import *
+from functools import partial
 import numpy as np
 import os
 
@@ -17,6 +18,8 @@ class measurementPreview(DSModule):
         self.iM = ds.iM
         self.hM = ds.hM
         self.wM = ds.wM
+
+        self.targetSocket = None
 
         self.initWindow()
         #self.initTitleBar()
@@ -45,32 +48,26 @@ class measurementPreview(DSModule):
     def initWindow(self):
         self.container = QWidget()
         self.layerLayout = QStackedLayout()
+        self.layerLayout.setStackingMode(QStackedLayout.StackAll)
         self.container.setLayout(self.layerLayout)
         self.setWidget(self.container)
 
         #### Overlay ####
-        self.overlayWidget = QWidget()
-        self.overlayLayout = QVBoxLayout()
-        self.overlayLayout.setContentsMargins(0, 0, 0, 0)
-        self.overlayWidget.setLayout(self.overlayLayout)
-
-        #self.configPixmap = QPixmap(os.path.join(self.ds.srcDir, 'icons5/zoom-in.png'))
-        #self.configIcon = QIcon(self.configPixmap)
-        #self.configButton = QPushButton()
-        #self.configButton.setIcon(self.configIcon)
-        #self.configButton.setFixedSize(20,20)
-        #self.overlayLayout.addWidget(self.configButton)
-        #self.overlayLayout.addStretch()
-
-        #self.layerLayout.addWidget(self.overlayWidget)
+        self.overlayWidget = overlayWidget(self)
+        self.layerLayout.addWidget(self.overlayWidget)
 
         #### Measurement ####
         self.measurementViewer = measurementView()
         self.layerLayout.addWidget(self.measurementViewer)
 
+    def setTargetSocket(self, socket):
+        self.targetSocket = socket
+        self.setWindowTitle(self.Module_Name + ' [' + self.targetSocket.Get_Name() + ']')
+
     def newMeasurement(self, instrument, component, socket, packet):
-        print(instrument)
-        print('new measurement')
+        if socket is self.targetSocket:
+            self.measurementViewer.clearData()
+            self.measurementViewer.addData(packet)
 
     def populateSocketSelection(self):
         self.socketSelectionBox.clear()
@@ -79,6 +76,61 @@ class measurementPreview(DSModule):
             for socket in instrument.Get_Sockets():
                 self.socketSelectionBox.addItem(socket.Get_Name())
 
+class overlayWidget(QWidget):
+    def __init__(self, module):
+        super().__init__()
+        self.module = module
+        self.ds = module.ds
+        self.iM = self.ds.iM
+        self.initWidget()
+
+    def initWidget(self):
+        self.overlayLayout = QVBoxLayout()
+        self.overlayLayout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(self.overlayLayout)
+
+        self.configPixmap = QPixmap(os.path.join(self.ds.srcDir, 'icons5/zoom-in.png'))
+        self.configIcon = QIcon(self.configPixmap)
+        self.configButton = QPushButton()
+        self.configButton.setIcon(self.configIcon)
+        self.configButton.setFixedSize(20,20)
+        self.configButton.pressed.connect(self.configPressed)
+        self.overlayLayout.addWidget(self.configButton)
+        self.overlayLayout.addStretch()
+
+    def mousePressEvent(self, mouseEvent):
+        self.module.measurementViewer.mousePressEvent(mouseEvent)
+
+    def mouseReleaseEvent(self, mouseEvent):
+        self.module.measurementViewer.mouseReleaseEvent(mouseEvent)
+
+    def mouseMoveEvent(self, mouseMoveEvent):
+        self.module.measurementViewer.mouseMoveEvent(mouseMoveEvent)
+
+    def configureMenu(self):
+        self.menuItems = list() # Keeps everytihng in memory - otherwise the menu doesn't work.
+        self.configMenu = QMenu()
+        self.socketSelection = QMenu('Select Socket')
+        for instrument in self.iM.Get_Instruments():
+            instrumentMenu = QMenu(instrument.Get_Name())
+            self.menuItems.append(instrumentMenu)
+            self.socketSelection.addMenu(instrumentMenu)
+            for socket in instrument.Get_Sockets():
+                socketMenu = QAction(socket.Get_Name())
+                #socketMenu.triggered[()].connect(lambda socket=socket: self.setTargetSocket(socket))
+                socketMenu.triggered.connect(partial(self.module.setTargetSocket, socket))
+                self.menuItems.append(socketMenu)
+                instrumentMenu.addAction(socketMenu)
+
+        self.configMenu.addMenu(self.socketSelection)
+
+    def configPressed(self):
+        self.configureMenu()
+        action = self.configMenu.exec_(QCursor().pos())
+        if(action is None):
+            pass
+
+
 class measurementView(QChartView):
     def __init__(self):
         super().__init__()
@@ -86,18 +138,30 @@ class measurementView(QChartView):
         self.initView()
 
     def initChart(self):
-        self.chart = QChart()
-        self.chart.setMargins(QMargins(0, 0, 0, 0))
-        self.chart.layout().setContentsMargins(0, 0, 0, 0)
-        self.chart.setBackgroundRoundness(0)
-        self.chart.setPlotAreaBackgroundVisible(False)
-        self.chart.setMargins(QMargins(24, 0, 0, 0))
-        self.chart.legend().hide()
+        self.chart = measurementChart()
+        self.setChart(self.chart)
+
+        self.xValueAxis = QValueAxis()
+        self.xValueAxis.setTitleText('Time (s)')
+        self.chart.addAxis(self.xValueAxis, Qt.AlignBottom)
+
+        self.yValueAxis = QValueAxis()
+        self.yValueAxis.setTitleText('Voltage (V)')
+        self.chart.addAxis(self.yValueAxis, Qt.AlignLeft)
 
     def initView(self):
+        self.setRubberBand(QChartView.HorizontalRubberBand)
+        self.setRenderHint(QPainter.Antialiasing)
         self.setFrameStyle(QFrame.NoFrame)
 
-    def addData(self, xdata, ydata, color=None):
+    def clearData(self):
+        self.chart.removeAllSeries()
+
+    def addData(self, packet, color=None):
+        for measurement in packet.Get_Measurements():
+            self.createLine(measurement.xData(zeroOrigin=True), measurement.yData(), color=color)
+
+    def createLine(self, xdata, ydata, color=None):
         curve = QLineSeries()
         pen = curve.pen()
         if color is not None:
@@ -107,7 +171,10 @@ class measurementView(QChartView):
         curve.setUseOpenGL(True)
         curve.append(self.series_to_polyline(xdata, ydata))
         self.chart.addSeries(curve)
-        self.chart.createDefaultAxes()
+
+        curve.attachAxis(self.xValueAxis)
+        curve.attachAxis(self.yValueAxis)
+        #self.chart.createDefaultAxes()
 
     def series_to_polyline(self, xdata, ydata):
         size = len(xdata)
@@ -118,4 +185,27 @@ class measurementView(QChartView):
         memory = np.frombuffer(pointer, dtype)
         memory[:(size-1)*2+1:2] = xdata
         memory[1:(size-1)*2+2:2] = ydata
-        return polyline    
+        return polyline        
+        
+    def mousePressEvent(self, mouseEvent):
+        if(mouseEvent.buttons() & Qt.RightButton):
+            mouseEvent.accept()
+        else:
+            super().mousePressEvent(mouseEvent)
+
+    def mouseReleaseEvent(self, mouseEvent):
+        if(mouseEvent.button() & Qt.RightButton):
+            self.chart.zoomReset()
+            mouseEvent.accept()
+        else:
+            super().mouseReleaseEvent(mouseEvent)
+
+class measurementChart(QChart):
+    def __init__(self):
+        super().__init__()
+        self.legend().hide()
+        self.setMargins(QMargins(0, 0, 0, 0))
+        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.setBackgroundRoundness(0)
+        self.setPlotAreaBackgroundVisible(False)
+        self.setMargins(QMargins(24, 0, 0, 0))
