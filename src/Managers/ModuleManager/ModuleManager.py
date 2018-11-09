@@ -22,6 +22,10 @@ class ModuleManager(QObject):
     Module_Deleted = pyqtSignal(object) # Module
     Module_Transfered_To_Window = pyqtSignal(object, object) # Module, Window
 
+##### Signals: Module Resources #####
+    Resource_Added = pyqtSignal(object, object) # Module, Resource
+    Resource_Removed = pyqtSignal(object) # Module
+
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
     
@@ -63,8 +67,8 @@ class ModuleManager(QObject):
     def Remove_Module_Instance(self, moduleHandler):
         self.removeModuleInstance(moduleHandler)
 
-    def Get_Module_Resources(self, module=-1, types=[], tags=[]):
-        self.getModuleResources(module, tags)
+    def Get_Module_Resources(self, module=-1, type=-1, tags=[]):
+        return self.getModuleResources(module, type, tags)
 
     ##### Windows #####
     def Add_New_Window(self):
@@ -153,6 +157,13 @@ class ModuleManager(QObject):
         self.menu.addAction(self.lockFocusAction)
 
         return self.menu
+
+##### Functions Called By Module Instances #####
+    def resourceAdded(self, module, resource):
+        self.Resource_Added.emit(module, resource)
+
+    def resourceRemoved(self, module):
+        self.Resource_Removed.emit(module)
 
 ##### Module Manager Settings Window #####
     def initModuleSettingsWindow(self):
@@ -291,14 +302,15 @@ class ModuleManager(QObject):
 
         return False
 
-    def getModuleResources(self, module, types, tags):
+    def getModuleResources(self, module, type, tags):
         outList = list()
         for moduleIn in self.Get_Module_Instances():
+            moduleIn = moduleIn.Get_Module()
             if module != -1:
                 if moduleIn is module:
-                    outList.append(moduleIn.Get_Resources(types, tags))
+                    outList = outList + moduleIn.Get_Resources(type, tags)
             else:
-                outList.append(moduleIn.Get_Resources(types, tags))
+                outList = outList + moduleIn.Get_Resources(type, tags)
 
         return outList
 

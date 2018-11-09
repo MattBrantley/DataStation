@@ -3,6 +3,7 @@ from PyQt5.QtGui import *
 from src.Managers.ModuleManager.DSModule import DSModule
 from src.Constants import moduleFlags as mfs
 from src.Managers.HardwareManager.PacketMeasurements import AnalogWaveformMeasurement
+from src.Managers.ModuleManager.ModuleResource import *
 from PyQt5.QtChart import *
 from functools import partial
 import numpy as np
@@ -64,6 +65,10 @@ class measurementPreview(DSModule):
         self.targetSocket = socket
         self.setWindowTitle(self.Module_Name + ' [' + self.targetSocket.Get_Name() + ']')
 
+    def loadPacketResource(self, measurementPacket):
+        self.measurementViewer.clearData()
+        self.measurementViewer.addData(measurementPacket)
+
     def newMeasurement(self, instrument, component, socket, packet):
         if socket is self.targetSocket:
             self.measurementViewer.clearData()
@@ -82,6 +87,7 @@ class overlayWidget(QWidget):
         self.module = module
         self.ds = module.ds
         self.iM = self.ds.iM
+        self.mM = self.ds.mM
         self.initWidget()
 
     def initWidget(self):
@@ -117,11 +123,22 @@ class overlayWidget(QWidget):
             self.socketSelection.addMenu(instrumentMenu)
             for socket in instrument.Get_Sockets():
                 socketMenu = QAction(socket.Get_Name())
-                #socketMenu.triggered[()].connect(lambda socket=socket: self.setTargetSocket(socket))
                 socketMenu.triggered.connect(partial(self.module.setTargetSocket, socket))
                 self.menuItems.append(socketMenu)
                 instrumentMenu.addAction(socketMenu)
 
+        self.resourceSelection = QMenu('Resource Packets')
+        for module in self.mM.Get_Module_Instances():
+            moduleMenu = QMenu(module.Get_Module().Module_Name)
+            self.menuItems.append(moduleMenu)
+            self.resourceSelection.addMenu(moduleMenu)
+            for resource in module.Get_Module().Get_Resources(type=MeasurementPacketResource):
+                resourceMenu = QAction(resource.Get_Name())
+                resourceMenu.triggered.connect(partial(self.module.loadPacketResource, resource.Get_Measurement_Packet()))
+                self.menuItems.append(resourceMenu)
+                moduleMenu.addAction(resourceMenu)
+
+        self.configMenu.addMenu(self.resourceSelection)
         self.configMenu.addMenu(self.socketSelection)
 
     def configPressed(self):
@@ -129,7 +146,6 @@ class overlayWidget(QWidget):
         action = self.configMenu.exec_(QCursor().pos())
         if(action is None):
             pass
-
 
 class measurementView(QChartView):
     def __init__(self):

@@ -1,20 +1,19 @@
 from PyQt5.Qt import *
 import time, os, json
 from src.Constants import moduleFlags as mfs
+from src.Managers.ModuleManager.ModuleResource import *
 
 class DSModule(QDockWidget):
     Module_Name = 'Default'
     Module_Flags = []
     
 ############################################################################################
-##################################### EXTERNAL SIGNALS #####################################
-    
-
-############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
-
     def Get_Window(self):
         return self.window
+
+    def Get_Name(self):
+        return self.Module_Name
 
     def Has_Flag(self, flag):
         if flag in self.Module_Flags:
@@ -31,11 +30,20 @@ class DSModule(QDockWidget):
     def Get_Handler(self):
         return self.handler
 
-    def Get_Resources(self, types=-1, tags=-1):
-        self.getResources(types, tags)
+    def Get_Resources(self, type=-1, tags=[]):
+        return self.getResources(type, tags)
 
-    def Add_Data_Resource(self, dataResource):
-        self.addDataResource(dataResource)
+    def Add_Arbitrary_Data_Resource(self, name, tags=[], data=None):
+        self.addArbitraryDataResource(name, tags, data)
+
+    def Add_Measurement_Packet_Resource(self, name, tags=[], measurementPacket=None):
+        self.addMeasurementPacketResource(name, tags, measurementPacket)
+
+    def Remove_Resource(self, resourceObject):
+        self.removeResource(resourceObject)
+
+    def Remove_All_Resources(self):
+        self.removeAllResources()
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -56,11 +64,6 @@ class DSModule(QDockWidget):
             self.setFeatures(self.features() | QDockWidget.DockWidgetClosable)
         if(self.Has_Flag(mfs.CAN_FLOAT)):
             self.setFeatures(self.features() | QDockWidget.DockWidgetFloatable)
-
-        #self.visibilityChanged.connect(self.visibilityModified)
-
-
-
 
     def onDataStationClose(self):
         pass
@@ -85,12 +88,35 @@ class DSModule(QDockWidget):
     def getResources(self, type, tags):
         outList = list()
         for resource in self.resourceList:
-            if(issubclass(resource, type) is False and type != -1):
-                continue
-            if(resource.Has_Tag(tags) is False and tags != -1):
-                continue
+            if(type != -1):
+                if(isinstance(resource, type) is False):
+                    continue
+
+            if len(tags) != 0:
+                if(resource.Has_Tags(tags) is False):
+                    continue
+
             outList.append(resource)
+
         return outList
+
+    def addArbitraryDataResource(self, name, tags, data):
+        newResource = ArbitraryDataResource(self, name, tags, data)
+        self.resourceList.append(newResource)
+        self.ds.mM.resourceAdded(self, newResource)
+
+    def addMeasurementPacketResource(self, name, tags, measurementPacket):
+        newResource = MeasurementPacketResource(self, name, tags, measurementPacket)
+        self.resourceList.append(newResource)
+        self.ds.mM.resourceAdded(self, newResource)
+
+    def removeResource(self, resourceObject):
+        self.resourceList.remove(resourceObject)
+        self.ds.mM.resourceRemoved(self)
+
+    def removeAllResources(self):
+        self.resourceList = list()
+        self.ds.mM.resourceRemoved(self)
 
 ##### Settings File #####
 

@@ -70,3 +70,10 @@
 [11/08/2018 10:57:53] Added New Component to Instrument: Filament
 [11/08/2018 10:57:53] Added New Component to Instrument: Pulse Valve
 [11/08/2018 10:57:54] Could not load styleSheet: 
+[11/09/2018 09:11:32] Shutting down Datastation!
+[11/09/2018 09:11:32] Updating User Profile... (d:/InstrPlatform/DataStation\Module Data\Profile Selection\Profiles\Brantley_Matthew1.dsprofile).. 
+[11/09/2018 09:11:33] Recording Hardware State... 
+[11/09/2018 09:11:33] Updating Settings File... 
+[11/09/2018 09:11:33] Done!
+[11/09/2018 09:11:33] Done!
+[11/09/2018 09:11:33] Datastation successfully closed!

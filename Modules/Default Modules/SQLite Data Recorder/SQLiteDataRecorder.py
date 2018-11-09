@@ -181,6 +181,8 @@ class SQLiteDataRecorder_TreeWidget(QTreeWidget):
         self.setColumnCount(5)
 
     def populateIndexes(self):
+        self.clear()
+        self.module.Remove_All_Resources()
         self.module.Populate_Preview.emit()
 
     def addIndex(self, runObject):
@@ -189,6 +191,7 @@ class SQLiteDataRecorder_TreeWidget(QTreeWidget):
         for measurement in runObject.measurementList:
             childItem = QTreeWidgetItem(['Measurement: ' + str(measurement['rowID'])])
             indexItem.addChild(childItem)
+            self.module.Add_Measurement_Packet_Resource('Test', measurementPacket=measurement['packet'])
 
 class SQLiteDataRecorder_SQLComm(QObject):
     Comm_Opened = pyqtSignal(bool)
@@ -256,8 +259,8 @@ class SQLiteDataRecorder_SQLComm(QObject):
             try:
                 for row in self.cursor.execute('SELECT run_ID, instrument_name, timestamp FROM instrumentRuns'):
                     record = Database_Run_Record(row[0], row[1], row[2])
-                    for row2 in rowCursor.execute('SELECT rowid, run_id FROM measurementPackets where run_ID=?', (row[0],)):
-                        record.Add_Measurement(row2[0])
+                    for row2 in rowCursor.execute('SELECT rowid, run_id, measurement_packet FROM measurementPackets where run_ID=?', (row[0],)):
+                        record.Add_Measurement(row[0], row[1], pickle.loads(row2[2]))
                     
                     self.Found_Instrument_Run.emit(record)
             except Exception as e:
@@ -273,8 +276,10 @@ class Database_Run_Record():
 
         self.measurementList = list()
 
-    def Add_Measurement(self, rowID):
+    def Add_Measurement(self, rowID, run_id, measurementPacket):
         measurement = dict()
         measurement['rowID'] = rowID
+        measurement['run_id'] = run_id
+        measurement['packet'] = measurementPacket
 
         self.measurementList.append(measurement)
