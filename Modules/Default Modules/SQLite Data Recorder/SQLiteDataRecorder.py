@@ -1,23 +1,79 @@
 from PyQt5.Qt import *
-import time, os
+from PyQt5.QtCore import QThread
+import time, os, sqlite3
+from src.Constants import DSConstants as DSConstants
 from src.Managers.ModuleManager.DSModule import DSModule
 from src.Constants import moduleFlags as mfs
 from src.Constants import logObject
-from PyQt5.QtSql import *
+import pickle
+
 
 class SQLiteDataRecorder(DSModule):
     Module_Name = 'SQLite Data Recorder'
     Module_Flags = [mfs.CAN_DELETE]
+
+    Instrument_Sequence_Running = pyqtSignal(object) # instrument
+    Socket_Measurement_Packet_Recieved = pyqtSignal(object, object, object, object) # instrument, component, socket, measurementPacket
+    Open_Connections = pyqtSignal()
+    Populate_Preview = pyqtSignal()
 
     def __init__(self, ds, handler):
         super().__init__(ds, handler)
         self.ds = ds
         self.iM = ds.iM
         self.handler = handler
-        self.SQLComm = SQLiteDataRecorder_SQLComm(self)
+        self.SQLComm = None
+        self.commStarted = False
         self.initLayout()
-
         self.iM.Instrument_Sequence_Running.connect(self.instrumentSequenceRunning)
+        self.iM.Socket_Measurement_Packet_Recieved.connect(self.socketMeasurementPacketRecieved)
+        self.commThread = None
+
+    def connectDatabase(self, url):
+        if self.commThread is not None:
+            self.commThread.exit()
+        self.SQLComm = SQLiteDataRecorder_SQLComm(self, url)
+        self.commThread = QThread()
+
+        self.SQLComm.Comm_Opened.connect(self.commOpened)
+        self.SQLComm.Error_Message.connect(self.commErrorMessage)
+        self.SQLComm.Comm_Writing.connect(self.commWriting)
+        self.SQLComm.Comm_Reading.connect(self.commReading)
+        self.SQLComm.Found_Instrument_Run.connect(self.foundInstrumentRun)
+
+        self.SQLComm.moveToThread(self.commThread)
+
+        self.Instrument_Sequence_Running.connect(self.SQLComm.Record_Instrument_Run)
+        self.Socket_Measurement_Packet_Recieved.connect(self.SQLComm.Record_Measurement_Packet)
+        self.Open_Connections.connect(self.SQLComm.Open_Connections)
+        self.Populate_Preview.connect(self.SQLComm.Get_Instrument_Runs)
+
+        self.commThread.start()
+        self.Open_Connections.emit()
+
+    def foundInstrumentRun(self, runObject):
+        self.bottomWidget.treeWidget.addIndex(runObject)
+
+    def commOpened(self, toggle):
+        self.commStarted = toggle
+        if toggle is True:
+            self.bottomWidget.treeWidget.populateIndexes()
+
+    def commWriting(self, toggle):
+        if toggle is True:
+            self.topWidget.dbLabel.setText('SQLite Database: Writing..')
+        else:
+            self.topWidget.dbLabel.setText('SQLite Database: Idle..')
+
+    def commReading(self, toggle):
+        if toggle is True:
+            self.topWidget.dbLabel.setText('SQLite Database: Reading..')
+        else:
+            self.topWidget.dbLabel.setText('SQLite Database: Idle..')
+
+    def commErrorMessage(self, string, errorObject):
+        self.ds.postLog(string, DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('    ->' + repr(errorObject), DSConstants.LOG_PRIORITY_HIGH)
 
     def initLayout(self):
         self.mainWidget = QWidget()
@@ -31,10 +87,11 @@ class SQLiteDataRecorder(DSModule):
         self.setWidget(self.mainWidget)
 
     def instrumentSequenceRunning(self, instrument):
-        print('running')
-        print(instrument)
-        print(instrument.runID)
+        self.Instrument_Sequence_Running.emit(instrument)
         
+    def socketMeasurementPacketRecieved(self, instrument, component, socket, measurementPacket):
+        self.Socket_Measurement_Packet_Recieved.emit(instrument, component, socket, measurementPacket)
+
 class SQLiteDataRecorder_Top(QWidget):
     def __init__(self, module):
         super().__init__()
@@ -49,7 +106,7 @@ class SQLiteDataRecorder_Top(QWidget):
         self.spanTop = QWidget()
         self.spanTopLayout = QHBoxLayout()
         self.spanTop.setLayout(self.spanTopLayout)
-        self.dbLabel = QLabel('SQLite Database:')
+        self.dbLabel = QLabel('SQLite Database: Idle..')
 
         self.newIcon = QIcon(QPixmap(os.path.join(self.module.ds.srcDir, 'icons6/002-add.png')))
         self.newButton = QPushButton()
@@ -79,7 +136,7 @@ class SQLiteDataRecorder_Top(QWidget):
         ##### Second Row #####
         self.spanBottom = QLineEdit()
         self.spanBottom.setEnabled(False)
-        self.spanBottom.setText('SOMETHING HERE')
+        self.spanBottom.setText('No SQLite File Selected!')
 
         self.layout.addWidget(self.spanBottom)
 
@@ -88,7 +145,7 @@ class SQLiteDataRecorder_Top(QWidget):
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getSaveFileName(self,"Create New SQLite Database","","SQLite Database (*.sqlite)", options=options)
         if fileName:
-            self.module.SQLComm.New_Database(fileName + '.sqlite')
+            self.module.connectDatabase(fileName + '.sqlite')
             self.module.bottomWidget.treeWidget.populateIndexes()
             self.spanBottom.setText(fileName + '.sqlite')
 
@@ -97,8 +154,7 @@ class SQLiteDataRecorder_Top(QWidget):
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"Select Existing SQLite Database", "","SQLite Database (*.sqlite)", options=options)
         if fileName:
-            self.module.SQLComm.Set_Current_Database(fileName)
-            self.module.bottomWidget.treeWidget.populateIndexes()
+            self.module.connectDatabase(fileName)
             self.spanBottom.setText(fileName)
 
     def refreshButtonPressed(self):
@@ -124,60 +180,101 @@ class SQLiteDataRecorder_TreeWidget(QTreeWidget):
         self.setHeaderLabels(['Name', 'Instrument', 'Timestamp', 'Sequence', 'User'])
         self.setColumnCount(5)
 
-        self.populateIndexes()
-
     def populateIndexes(self):
-        for instrumentRunID in self.module.SQLComm.Get_Instrument_Runs():
-            self.addIndex(instrumentRunID)
+        self.module.Populate_Preview.emit()
 
-    def addIndex(self, instrumentRunID):
-        indexItem = QTreeWidgetItem([title])
+    def addIndex(self, runObject):
+        indexItem = QTreeWidgetItem(['', runObject.instrumentName, runObject.timeStamp])
         self.addTopLevelItem(indexItem)
+        for measurement in runObject.measurementList:
+            childItem = QTreeWidgetItem(['Measurement: ' + str(measurement['rowID'])])
+            indexItem.addChild(childItem)
 
-        for measurementPacket in self.module.SQLComm.Get_Measurement_Packets(instrumentRunID):
-            measurementItem = QTreeWidgetItem(['ITEM'])
-            indexItem.addChild(measurementItem)
+class SQLiteDataRecorder_SQLComm(QObject):
+    Comm_Opened = pyqtSignal(bool)
+    Error_Message = pyqtSignal(str, object)
+    Comm_Writing = pyqtSignal(bool)
+    Comm_Reading = pyqtSignal(bool)
+    Found_Instrument_Run = pyqtSignal(object) # Database_Run_Object
 
-class SQLiteDataRecorder_SQLComm():
-    def __init__(self, module):
+    def __init__(self, module, databaseURL):
+        super().__init__()
         self.module = module
-        self.databaseURL = None
-        self.db = None
+        self.databaseURL = databaseURL
 
-    def Set_Current_Database(self, url):
-        if self.db is not None:
-            self.db.close()
+    def Open_Connections(self):
+        self.conn = sqlite3.connect(self.databaseURL)
+        self.cursor = self.conn.cursor()
 
-        self.databaseURL = url
-        self.db = QSqlDatabase.addDatabase('QSQLITE')
-        self.db.setDatabaseName(url)
-        self.Create_Tables()
+        self.Init_Tables()
+        self.Comm_Opened.emit(True)
 
-    def New_Database(self, url):
-        new_db = QSqlDatabase.addDatabase('QSQLITE')
-        new_db.setDatabaseName(url)
+    def Init_Tables(self):
+        with self.conn:
+            try:
+                self.cursor.execute("CREATE TABLE IF NOT EXISTS instrumentRuns(run_ID varchar(36), instrument_name varchar(100), timestamp varchar(100))")
+                self.cursor.execute("CREATE TABLE IF NOT EXISTS measurementPackets(run_ID varchar(36), measurement_packet BLOB)")
+            except Exception as e:
+                self.Error_Message.emit('ERROR Configuring Tables: ' + self.databaseURL, e)
 
-        if not new_db.open():
-            new_db.close()
-            self.module.ds.postLog('Error Creating SQLite Database At: ' + url)
-        else:
-            new_db.close()
-            self.Set_Current_Database(url)
+    def Record_Instrument_Run(self, instrument):
+        self.Comm_Writing.emit(True)
+        timeStamp = time.strftime('%m/%d/%Y %H:%M:%S', time.localtime())
+        with self.conn:
+            try:
+                self.cursor.execute('INSERT INTO instrumentRuns (run_id, instrument_name, timestamp) VALUES (?, ?, ?)', (instrument.Get_Run_ID(), instrument.Get_Name(), timeStamp))
+            except Exception as e:
+                self.Error_Message.emit('ERROR Writing Instrument Run To: ' + self.databaseURL, e)
+        self.Comm_Writing.emit(False)
 
-    def Create_Tables(self):
-        if self.db.open():
-            print('query')
-            query = QSqlQuery()
-            query.exec_("CREATE TABLE IF NOT EXISTS instrumentRuns(id int primary key, run_ID varchar(36), instrument_name varchar(100)")
+    def Record_Measurement_Packet(self, instrument, component, socket, measurementPacket):
+        self.Comm_Writing.emit(True)
+        with self.conn:
+            try:
+                packetData = pickle.dumps(measurementPacket, pickle.HIGHEST_PROTOCOL)
+                self.cursor.execute('INSERT INTO measurementPackets VALUES (?, ?)', (instrument.Get_Run_ID(), sqlite3.Binary(packetData)))
+            except Exception as e:
+                self.Error_Message.emit('ERROR Writing Measurement Packet To: ' + self.databaseURL, e)
+        self.Comm_Writing.emit(False)
 
-    def Get_Measurement_Packets(self, instrumentRunID):
-        if self.databaseURL is not None:
-            return list()
-        else:
-            return list()
+    def Get_Measurement_Packets(self, rowID):
+        self.Comm_Reading.emit(True)
+        with self.conn:
+            try:
+                for result in self.cursor.execute('SELECT run_id, instrument_name, timestamp FROM measurementPackets WHERE rowid=?', rowID):
+                    pass
+            except Exception as e:
+                self.Error_Message.emit('ERROR Reading Measurement Packet From: ' + self.databaseURL, e)
+
+        self.Comm_Reading.emit(False)
+        return result
 
     def Get_Instrument_Runs(self):
-        if self.databaseURL is not None:
-            return list()
-        else:
-            return list()
+        self.Comm_Reading.emit(True)
+        rowCursor = self.conn.cursor()
+        with self.conn:
+            try:
+                for row in self.cursor.execute('SELECT run_ID, instrument_name, timestamp FROM instrumentRuns'):
+                    record = Database_Run_Record(row[0], row[1], row[2])
+                    for row2 in rowCursor.execute('SELECT rowid, run_id FROM measurementPackets where run_ID=?', (row[0],)):
+                        record.Add_Measurement(row2[0])
+                    
+                    self.Found_Instrument_Run.emit(record)
+            except Exception as e:
+                self.Error_Message.emit('ERROR Reading Instrument Run From: ' + self.databaseURL, e)
+
+        self.Comm_Reading.emit(False)
+
+class Database_Run_Record():
+    def __init__(self, runID, instrumentName, timeStamp):
+        self.runID = runID
+        self.instrumentName = instrumentName
+        self.timeStamp = timeStamp
+
+        self.measurementList = list()
+
+    def Add_Measurement(self, rowID):
+        measurement = dict()
+        measurement['rowID'] = rowID
+
+        self.measurementList.append(measurement)

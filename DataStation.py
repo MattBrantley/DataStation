@@ -150,4 +150,3 @@ if __name__ == '__main__':
     except:
         core.postLog("Datastation successfully closed!", DSConstants.LOG_PRIORITY_HIGH)
 
- 

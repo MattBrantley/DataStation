@@ -35,6 +35,8 @@ class logView(DSModule):
         for logItem in self.ds.logText:
             self.postLog(logItem)
 
+        self.ds.Log_Posted.connect(self.postLog)
+
     def writeToLogFile(self, logText):
 
         with open(self.currentLogFile, 'a') as file:

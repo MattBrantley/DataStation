@@ -31,12 +31,19 @@ class DSModule(QDockWidget):
     def Get_Handler(self):
         return self.handler
 
+    def Get_Resources(self, types=-1, tags=-1):
+        self.getResources(types, tags)
+
+    def Add_Data_Resource(self, dataResource):
+        self.addDataResource(dataResource)
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
     def __init__(self, ds, handler):
         super().__init__()
         self.ds = ds
         self.handler = handler
+        self.resourceList = list()
         self.modDataPath = os.path.join(os.path.join(ds.rootDir, 'Module Data'), self.Module_Name)
         self.modSettingsFolder = os.path.join(self.modDataPath, 'settings')
         self.modSettingsPath = os.path.join(self.modSettingsFolder, self.handler.Get_UUID()+'.json')
@@ -72,6 +79,18 @@ class DSModule(QDockWidget):
             self.deleteLater()
         elif(self.Has_Flag(mfs.CAN_HIDE)):
             self.hide()
+
+##### Data Resources #####
+
+    def getResources(self, type, tags):
+        outList = list()
+        for resource in self.resourceList:
+            if(issubclass(resource, type) is False and type != -1):
+                continue
+            if(resource.Has_Tag(tags) is False and tags != -1):
+                continue
+            outList.append(resource)
+        return outList
 
 ##### Settings File #####
 

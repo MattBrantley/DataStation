@@ -54,11 +54,17 @@ class ModuleManager(QObject):
     def Scan_Modules(self):
         self.scanModules()
 
+    def Get_Module_Instances(self):
+        return self.modules
+
     def Add_Module_Instance(self, module, window, uuid=str(uuid.uuid4())):
         self.addModuleInstance(module, window, uuid)
 
     def Remove_Module_Instance(self, moduleHandler):
         self.removeModuleInstance(moduleHandler)
+
+    def Get_Module_Resources(self, module=-1, types=[], tags=[]):
+        self.getModuleResources(module, tags)
 
     ##### Windows #####
     def Add_New_Window(self):
@@ -284,6 +290,17 @@ class ModuleManager(QObject):
             return False
 
         return False
+
+    def getModuleResources(self, module, types, tags):
+        outList = list()
+        for moduleIn in self.Get_Module_Instances():
+            if module != -1:
+                if moduleIn is module:
+                    outList.append(moduleIn.Get_Resources(types, tags))
+            else:
+                outList.append(moduleIn.Get_Resources(types, tags))
+
+        return outList
 
 class ModuleDirectory():
     def __init__(self, dirStructure, folderName, folderPath):
