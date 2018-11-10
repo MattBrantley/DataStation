@@ -20,6 +20,8 @@ class FTStudio(DSModule):
 
         self.initWindow()
 
+        self.selectedPacket = None
+
         self.mM.Resource_Added.connect(self.populateTreeWidget)
         self.mM.Resource_Removed.connect(self.populateTreeWidget)
 
@@ -42,6 +44,8 @@ class FTStudio(DSModule):
     def initConfigWidgets(self):
         self.TreeWidget = QTreeWidget()
         self.TreeWidget.setHeaderLabels(['Resources'])
+        self.TreeWidget.currentItemChanged.connect(self.treeSelectionChanged)
+
         self.configWidget = QWidget()
         self.configContainer.addTab(self.TreeWidget, 'Resources')
         self.configContainer.addTab(self.configWidget, 'Config')
@@ -56,6 +60,7 @@ class FTStudio(DSModule):
                 self.TreeWidget.addTopLevelItem(moduleItem)
                 for resource in resources:
                     resourceItem = QTreeWidgetItem(['Measurement'])
+                    resourceItem.packetResource = resource
                     moduleItem.addChild(resourceItem)
 
     def initFTContainer(self):
@@ -66,6 +71,17 @@ class FTStudio(DSModule):
 
         self.FTContainer.addWidget(self.spectrumWindow)
         self.FTContainer.addWidget(self.transientWindow)
+
+    def treeSelectionChanged(self, item, oldItem):
+        if hasattr(item, 'packetResource'):
+            self.selectedPacket = item.packetResource
+            self.processPacket()
+
+    def processPacket(self):
+        if self.selectedPacket is not None:
+            self.transientWindow.clearData()
+            self.transientWindow.addData(self.selectedPacket.Get_Measurement_Packet())
+
 
 class measurementView(QChartView):
     def __init__(self):

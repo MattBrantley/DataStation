@@ -41,6 +41,7 @@ class Sequencer(DSModule):
         self.updateToolbarState()
 
         self.prevInstrumentPath = self.Read_Setting('Instrument_Path')
+        self.prevSequencePath = self.Read_Setting('Sequence_Path')
 
         self.iM.Sequence_Loaded.connect(self.sequenceLoaded) 
         #self.iM.Sequence_Saved.connect(self.sequenceLoaded)
@@ -70,6 +71,7 @@ class Sequencer(DSModule):
             self.loadedInstruments.addInstrument(instrument)        
             if self.prevInstrumentPath == instrument.Get_Path():
                 self.instrumentSelectionBox.setCurrentIndex(idx+1)
+                #instrument.Load_Sequence(self.prevSequencePath)
                 #if isinstance(prevInstrumentPath, str):
                 #    self.openInstrument(prevInstrumentPath)
 
@@ -150,6 +152,7 @@ class Sequencer(DSModule):
         self.mainContainer.setCentralWidget(self.sequencerContainer)
 
     def sequenceLoaded(self, instrument): #Update when Sequence has been fixed in iM
+        self.Write_Setting('Sequence_Path', instrument.Get_Sequence().Get_Path())
         seqInfo = instrument.Get_Sequence()
         self.setWindowTitle('Sequencer (' + seqInfo.Get_Path() + ')')
         self.getInstrumentBoxInstrument()

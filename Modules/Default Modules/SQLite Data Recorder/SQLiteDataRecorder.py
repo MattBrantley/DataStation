@@ -29,7 +29,13 @@ class SQLiteDataRecorder(DSModule):
         self.iM.Socket_Measurement_Packet_Recieved.connect(self.socketMeasurementPacketRecieved)
         self.commThread = None
 
+        url = self.Read_Setting('db_url')
+        if url is not None:
+            self.connectDatabase(url)
+
     def connectDatabase(self, url):
+        self.Write_Setting('db_url', url)
+
         if self.commThread is not None:
             self.commThread.exit()
         self.SQLComm = SQLiteDataRecorder_SQLComm(self, url)
@@ -50,6 +56,9 @@ class SQLiteDataRecorder(DSModule):
 
         self.commThread.start()
         self.Open_Connections.emit()
+
+        #self.bottomWidget.treeWidget.populateIndexes()
+        self.topWidget.spanBottom.setText(url)
 
     def foundInstrumentRun(self, runObject):
         self.bottomWidget.treeWidget.addIndex(runObject)
@@ -146,8 +155,6 @@ class SQLiteDataRecorder_Top(QWidget):
         fileName, _ = QFileDialog.getSaveFileName(self,"Create New SQLite Database","","SQLite Database (*.sqlite)", options=options)
         if fileName:
             self.module.connectDatabase(fileName + '.sqlite')
-            self.module.bottomWidget.treeWidget.populateIndexes()
-            self.spanBottom.setText(fileName + '.sqlite')
 
     def openButtonPressed(self):
         options = QFileDialog.Options()
@@ -155,7 +162,6 @@ class SQLiteDataRecorder_Top(QWidget):
         fileName, _ = QFileDialog.getOpenFileName(self,"Select Existing SQLite Database", "","SQLite Database (*.sqlite)", options=options)
         if fileName:
             self.module.connectDatabase(fileName)
-            self.spanBottom.setText(fileName)
 
     def refreshButtonPressed(self):
         self.module.bottomWidget.treeWidget.populateIndexes()

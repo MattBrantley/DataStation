@@ -1,0 +1,85 @@
+[11/10/2018 13:34:49] Searching For Modules... 
+[11/10/2018 13:34:49]    Found Module: codeEditor.py
+[11/10/2018 13:34:50]    Found Module: Console.py
+[11/10/2018 13:34:50]    Found Module: datastationWeb.py
+[11/10/2018 13:34:50]    Found Module: FTStudio.py
+[11/10/2018 13:34:50]    Found Module: hardwareView.py
+[11/10/2018 13:34:50]    Found Module: instrumentEditor.py
+[11/10/2018 13:34:50]    Found Module: loadingScreen.py
+[11/10/2018 13:34:50]    Found Module: logView.py
+[11/10/2018 13:34:50]    Found Module: measurementPreview.py
+[11/10/2018 13:34:50]    Found Module: processStatus.py
+[11/10/2018 13:34:50]    Found Module: profileSelection.py
+[11/10/2018 13:34:50]    Found Module: Sequencer.py
+[11/10/2018 13:34:50]    Found Module: SimpleInstrumentControl.py
+[11/10/2018 13:34:50]    Found Module: SQLiteDataRecorder.py
+[11/10/2018 13:34:50] Finished Searching For Modules!
+[11/10/2018 13:34:50] Loading User Profiles... 
+[11/10/2018 13:34:50] Done!
+[11/10/2018 13:34:50] Loading Component Models... 
+[11/10/2018 13:34:50]    Found Component Script: d:/InstrPlatform/DataStation\Components\Basic_Trigger.py
+[11/10/2018 13:34:50]   (Success!)
+[11/10/2018 13:34:50]    Found Component Script: d:/InstrPlatform/DataStation\Components\Circular_Lens.py
+[11/10/2018 13:34:50]   (Success!)
+[11/10/2018 13:34:50]    Found Component Script: d:/InstrPlatform/DataStation\Components\DC_Electrode.py
+[11/10/2018 13:34:50]   (Success!)
+[11/10/2018 13:34:50]    Found Component Script: d:/InstrPlatform/DataStation\Components\Detection_Plates.py
+[11/10/2018 13:34:50]   (Success!)
+[11/10/2018 13:34:50]    Found Component Script: d:/InstrPlatform/DataStation\Components\Excitation_Plates.py
+[11/10/2018 13:34:50]   (Success!)
+[11/10/2018 13:34:50]    Found Component Script: d:/InstrPlatform/DataStation\Components\Filament.py
+[11/10/2018 13:34:50]   (Success!)
+[11/10/2018 13:34:50]    Found Component Script: d:/InstrPlatform/DataStation\Components\Penning_Trap.py
+[11/10/2018 13:34:50]   (Success!)
+[11/10/2018 13:34:50]    Found Component Script: d:/InstrPlatform/DataStation\Components\Pulse_Valve.py
+[11/10/2018 13:34:50]   (Success!)
+[11/10/2018 13:34:50]    Found Component Script: d:/InstrPlatform/DataStation\Components\Quadrupole.py
+[11/10/2018 13:34:50]   (Success!)
+[11/10/2018 13:34:50] Finished Loading Component Models!
+[11/10/2018 13:34:50] Loading User Filters... 
+[11/10/2018 13:34:50]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Signal_Splitter_2Way.py
+[11/10/2018 13:34:50]   (Success!)
+[11/10/2018 13:34:50]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Signal_Splitter_3Way.py
+[11/10/2018 13:34:50]   (Success!)
+[11/10/2018 13:34:50]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Simple_Amplifier.py
+[11/10/2018 13:34:50]   (Success!)
+[11/10/2018 13:34:50] Finished Loading User Filters!
+[11/10/2018 13:34:50] Loading Hardware Drivers... 
+[11/10/2018 13:34:50]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\MIPS.py
+[11/10/2018 13:34:50]   (Success!)
+[11/10/2018 13:34:50]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\NI_DAQmx.py
+[11/10/2018 13:34:51]   (Success!)
+[11/10/2018 13:34:51]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5122.py
+[11/10/2018 13:34:51]   (Success!)
+[11/10/2018 13:34:51]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5451.py
+[11/10/2018 13:34:51]   (Success!)
+[11/10/2018 13:34:51]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\Test_Driver.py
+[11/10/2018 13:34:51]   (Success!)
+[11/10/2018 13:34:51] Finished Loading Hardware Drivers!
+[11/10/2018 13:34:51] Initializing DataStation Labview Interface... 
+[11/10/2018 13:34:54] Done!
+[11/10/2018 13:34:54] Loading Hardware State Data.. 
+[11/10/2018 13:34:54] Done!
+[11/10/2018 13:34:56] Could not load styleSheet: 
+[11/10/2018 13:35:04] Loading User Instrument (D:/InstrPlatform/DataStation/Instruments/Basic FT-ICR.dsinstrument)... 
+[11/10/2018 13:35:04] Opening Sequence File (D:/InstrPlatform/DataStation/Sequences/Basic FT-ICR/Test Sequence.dssequence)... 
+[11/10/2018 13:35:04] Applying sequence to instrument... 
+[11/10/2018 13:35:04] Sequence data for comp with uuid (c330fd81-ae6b-4e08-a8a6-3e5cd19889d3) cannot be assigned! Possibly from different instrument.
+[11/10/2018 13:35:04] Sequence data for comp with uuid (e54d3171-4888-4639-aa43-fab25145473f) cannot be assigned! Possibly from different instrument.
+[11/10/2018 13:35:04] Sequence data for comp with uuid (e6a8589e-cb19-4953-9f94-9d9866ab6795) cannot be assigned! Possibly from different instrument.
+[11/10/2018 13:35:04] Sequence data for comp with uuid (594d2479-ae28-4106-9191-c4d09b224e7a) cannot be assigned! Possibly from different instrument.
+[11/10/2018 13:35:04] Sequence data for comp with uuid (ea30b3f6-2f85-4a1d-ae67-c2d60c990543) cannot be assigned! Possibly from different instrument.
+[11/10/2018 13:35:04] Sequence data for comp with uuid (26fcabe4-7def-4be5-ba16-d38c83fbb095) cannot be assigned! Possibly from different instrument.
+[11/10/2018 13:35:04] Sequence data for comp with uuid (533d7fbe-5769-4d4d-b3e1-a3933d8639fb) cannot be assigned! Possibly from different instrument.
+[11/10/2018 13:35:04] Sequence applied to instrument!
+[11/10/2018 13:35:05] Added New Component to Instrument: Circular Lens
+[11/10/2018 13:35:05] Added New Component to Instrument: Circular Lens
+[11/10/2018 13:35:05] Added New Component to Instrument: Penning Trap
+[11/10/2018 13:35:05] Added New Component to Instrument: Excitation Plates
+[11/10/2018 13:35:05] Added New Component to Instrument: Detection Plates
+[11/10/2018 13:35:05] Added New Component to Instrument: Basic Trigger
+[11/10/2018 13:35:05] Added New Component to Instrument: Basic Trigger
+[11/10/2018 13:35:05] Added New Component to Instrument: Filament
+[11/10/2018 13:35:05] Added New Component to Instrument: Pulse Valve
+[11/10/2018 13:35:09] Opening Sequence File (D:/InstrPlatform/DataStation/Sequences/Basic FT-ICR/Test Sequence.dssequence)... 
+[11/10/2018 13:35:09] Applying sequence to instrument... 
