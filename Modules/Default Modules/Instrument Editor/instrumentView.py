@@ -221,7 +221,16 @@ class iViewObject(pg.GraphicsObject, ParamObj):
 
     def clicked(self):
         if(self.instrComp is not None):
-            self.instrComp.onLeftClick(QCursor.pos())
+            self.configMenu = QMenu()
+            self.configWidget = ComponentConfigWidget(self.instrComp)
+            self.widgetAction = QWidgetAction(self.configMenu)
+            self.widgetAction.setDefaultWidget(self.configWidget)
+            self.configMenu.addAction(self.widgetAction)
+
+            action = self.configMenu.exec_(QCursor().pos())
+            if(action is None):
+                self.configWidget.onClose()
+
 
     def updateTransform(self):
         self.resetTransform()
@@ -295,3 +304,29 @@ class iViewComponent(iViewObject):
         iViewSaveData['r'] = self.roi.angle()
 
         return iViewSaveData
+
+
+
+
+
+        
+
+class ComponentConfigWidget(QWidget):
+
+    def __init__(self, compParent):
+        super().__init__()
+        self.compParent = compParent
+        self.layout = QFormLayout()
+
+        self.typeInput = QLineEdit(self.compParent.Get_Component_Type())
+        self.typeInput.setEnabled(False)
+
+        self.nameInput = QLineEdit(self.compParent.Get_Name())
+
+        self.layout.addRow('Type: ', self.typeInput)
+        self.layout.addRow('Name: ', self.nameInput)
+        
+        self.setLayout(self.layout)
+
+    def onClose(self):
+        self.compParent.Set_Name(self.nameInput.text())

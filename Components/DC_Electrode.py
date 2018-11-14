@@ -21,13 +21,13 @@ class DC_Electrode(Component):
     valid = False
 
     def onCreation(self):
-        self.compSettings['name'] = 'Unnamed ' + self.componentType
+        #self.compSettings['name'] = 'Unnamed ' + self.componentType
         self.compSettings['layoutGraphicSrc'] = self.iconGraphicSrc
         self.compSettings['vMin'] = 0.0
         self.compSettings['vMax'] = 10.0
         self.compSettings['granularity'] = 0.0001
         self.containerWidget = self.configWidgetContent()
-        self.configWidget.setWidget(self.containerWidget)
+        #self.configWidget.setWidget(self.containerWidget)
         self.socket = self.addAOSocket(self.compSettings['name'])
 
         self.addEventType(stepEvent)
@@ -113,7 +113,10 @@ class pulseEvent(eventType):
         return params[1].value()
 
     def toCommand(self, v0):
-        pairs = np.arange(self.time, self.time+self.eventParams['Duration'].v()) 
+        pairs = np.array([[self.time, v0],
+        [self.time, self.eventParams['Voltage'].v()],
+        [self.time + self.eventParams['Duration'].v(), self.eventParams['Voltage'].v()],
+        [self.time + self.eventParams['Duration'].v(), v0]])
         command = AnalogSparseCommand(pairs)
         return command
 

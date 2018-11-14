@@ -15,7 +15,7 @@ class NI_DAQmx(HardwareDevice):
             self.Add_Device(device)
         self.initialized.emit()
 
-    def device(self, deviceName):
+    def device(self, deviceName, triggerMode):
         with niscope.Session(deviceName) as session:
             self.maxRate = session.max_real_time_sampling_rate
             for i in range(0, session.channel_count):

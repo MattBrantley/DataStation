@@ -16,7 +16,6 @@ class Excitation_Plates(Component):
     valid = False
 
     def onCreation(self):
-        self.compSettings['name'] = 'Unnamed ' + self.componentType
         self.compSettings['layoutGraphicSrc'] = self.iconGraphicSrc
 
         self.socket = self.addAOSocket(self.compSettings['name'])

@@ -100,6 +100,7 @@ class SQLiteDataRecorder(DSModule):
         
     def socketMeasurementPacketRecieved(self, instrument, component, socket, measurementPacket):
         self.Socket_Measurement_Packet_Recieved.emit(instrument, component, socket, measurementPacket)
+        self.bottomWidget.treeWidget.populateIndexes()
 
 class SQLiteDataRecorder_Top(QWidget):
     def __init__(self, module):

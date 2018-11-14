@@ -16,6 +16,9 @@ class Component(QObject):
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
 
+    def Get_Component_Type(self):
+        return self.componentType
+
     def Get_Standard_Field(self, field):
         if(field in self.compSettings):
             return self.compSettings[field]
@@ -32,6 +35,10 @@ class Component(QObject):
         self.compSettings['customFields'][field] = data
         self.instr.componentCustomFieldChanged(self, field)
         return True
+
+    def Set_Name(self, name):
+        self.compSettings['name'] = name
+        self.instr.componentStandardFieldChanged(self, 'name')
 
     def Get_Name(self):
         return self.Get_Standard_Field('name')
@@ -67,7 +74,7 @@ class Component(QObject):
         return self.instr
 
     def Serialize_Events(self):
-        return self.saveEventsPacket
+        return self.saveEventsPacket()
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -86,7 +93,7 @@ class Component(QObject):
         self.iM = None              #Factory does not write this. It's in the very next line in Instrument though.
         self.valid = False
         self.isTriggerComponent = False
-        self.name = kwargs.get('name', self.componentType)
+        #self.name = kwargs.get('name', self.componentType)
         self.socketList = list()
         self.pathDataPackets = list()
         self.pathDataPackets.append(None)
@@ -183,13 +190,10 @@ class Component(QObject):
         if(compSettings is not None):
             for key, value in compSettings.items():
                 self.compSettings[key] = value
-                self.instr.componentStandardFieldChanged(self, 'name')
+                self.instr.componentStandardFieldChanged(self, key)
 
     def setPathDataPacket(self, pathNo, packet):
         self.pathDataPackets[pathNo-1] = packet
-
-    def setupWidgets(self):
-        self.configWidget = ComponentConfigWidget(self)
 
     def loadCustomFields(self, customFields):
         for key, val in customFields.items():
@@ -357,29 +361,3 @@ class Component(QObject):
         index = 0
         for socket in sockets:
             self.socketList[index].loadPacket(socket)
-
-##### Config Widget #####
-
-    def hideConfigWindow(self):
-        self.configWidget.hide()
-
-    def updateConfigContent(self):
-        pass
-
-    def onLeftClick(self, eventPos):
-        self.configWidget.move(eventPos + QPoint(2, 2))
-        if(self.configWidget.isHidden()):
-            self.updateConfigContent()
-            self.configWidget.show()
-        else:
-            self.configWidget.hide()
-
-class ComponentConfigWidget(QDockWidget):
-    doNotAutoPopulate = True
-
-    def __init__(self, compParent):
-        super().__init__('Config: ' + compParent.name)
-        self.compParent = compParent
-        self.setFeatures(QDockWidget.DockWidgetClosable)
-        self.setFloating(True)
-        self.hide()

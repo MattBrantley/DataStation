@@ -33,7 +33,7 @@ class MIPS(HardwareDevice):
                 pass
         self.scanned.emit()
 
-    def initialize(self, deviceName):
+    def initialize(self, deviceName, triggerMode):
         try:
             if(deviceName != ''):
                 self.reportTime = ms()

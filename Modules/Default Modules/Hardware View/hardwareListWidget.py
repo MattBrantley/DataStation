@@ -415,8 +415,24 @@ class hardwareConfigWidget(QWidget):
         deviceSelection.currentTextChanged.connect(self.deviceSelectionChanged)
         layout.addRow("Device:", deviceSelection)
 
+        triggerSelection = QComboBox()
+        triggerSelection.addItem('')
+        index = 0
+        for trig in self.deviceHandler.Get_Trigger_Modes():
+            index = index + 1
+            triggerSelection.addItem(trig)
+            if(trig == deviceHandler.Get_Current_Trigger_Mode()):
+                triggerSelection.setCurrentIndex(index)
+        
+        triggerSelection.currentTextChanged.connect(self.deviceTriggerChanged)
+        layout.addRow("Trigger Mode:", triggerSelection)
+
+
         configLayout.addWidget(hardwareConfig)
 
     def deviceSelectionChanged(self, newSelection):
         self.deviceHandler.Load_Device(newSelection)
+
+    def deviceTriggerChanged(self, newSelection):
+        self.deviceHandler.Set_Trigger_Mode(newSelection)
 

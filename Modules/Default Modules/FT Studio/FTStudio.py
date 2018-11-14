@@ -106,7 +106,7 @@ class spectrumView(QChartView):
         self.chart.addAxis(self.yValueAxis, Qt.AlignLeft)
 
     def initView(self):
-        self.setRubberBand(QChartView.HorizontalRubberBand)
+        self.setRubberBand(QChartView.RectangleRubberBand)
         self.setRenderHint(QPainter.Antialiasing)
         self.setFrameStyle(QFrame.NoFrame)
 
@@ -115,7 +115,9 @@ class spectrumView(QChartView):
 
     def addData(self, packet, color=None):
         for measurement in packet.Get_Measurements():
-            xData, yData = self.doFFT(measurement.xData(zeroOrigin=True), measurement.stepSize())
+            xData, yData = self.doFFT(measurement.yData(), measurement.stepSize())
+            print(xData.shape)
+            print(yData.shape)
             self.createLine(xData, yData, color=color)
             #self.createLine(measurement.xData(zeroOrigin=True), measurement.yData(), color=color)
 
@@ -125,6 +127,8 @@ class spectrumView(QChartView):
         self.chart.add
 
     def createLine(self, xdata, ydata, color=None):
+        length = xdata.shape[0]
+        ydata = ydata[0:length]
         curve = QLineSeries()
         pen = curve.pen()
         if color is not None:
@@ -134,6 +138,10 @@ class spectrumView(QChartView):
         curve.setUseOpenGL(True)
         curve.append(self.series_to_polyline(xdata, ydata))
         self.chart.addSeries(curve)
+
+        #self.xValueAxis.setRange(xdata.min(), xdata.max())
+        self.xValueAxis.setRange(20, 2000)
+        self.yValueAxis.setRange(ydata.min(), ydata.max())
 
         curve.attachAxis(self.xValueAxis)
         curve.attachAxis(self.yValueAxis)
@@ -154,11 +162,13 @@ class spectrumView(QChartView):
     def doFFT(self, data, dT):
         yData = np.fft.rfft(data)
         yData = np.abs(yData)**2
-        xData = np.fft.rfftfreq(data.shape[0], dT)
+        xData = np.fft.rfftfreq(data.shape[0], d=dT)
         vfunc = np.vectorize(self.ftomz)
         xData = vfunc(xData[1:], 9.34)
 
         return xData, yData[1:]
+
+        #return xData, yData
 
     def ftomz(self, f, b):
         return (spc.e*b) / (2*spc.pi*f) / 1.660539e-27
@@ -175,8 +185,6 @@ class spectrumView(QChartView):
             mouseEvent.accept()
         else:
             super().mouseReleaseEvent(mouseEvent)
-
-
 
 class transientView(QChartView):
     def __init__(self):
@@ -214,6 +222,8 @@ class transientView(QChartView):
         self.chart.add
 
     def createLine(self, xdata, ydata, color=None):
+        length = xdata.shape[0]
+        ydata = ydata[0:length]
         curve = QLineSeries()
         pen = curve.pen()
         if color is not None:
@@ -223,6 +233,9 @@ class transientView(QChartView):
         curve.setUseOpenGL(True)
         curve.append(self.series_to_polyline(xdata, ydata))
         self.chart.addSeries(curve)
+
+        self.xValueAxis.setRange(xdata.min(), xdata.max())
+        self.yValueAxis.setRange(ydata.min(), ydata.max())
 
         curve.attachAxis(self.xValueAxis)
         curve.attachAxis(self.yValueAxis)

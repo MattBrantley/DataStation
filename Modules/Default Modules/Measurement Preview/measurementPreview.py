@@ -178,6 +178,8 @@ class measurementView(QChartView):
             self.createLine(measurement.xData(zeroOrigin=True), measurement.yData(), color=color)
 
     def createLine(self, xdata, ydata, color=None):
+        length = xdata.shape[0]
+        ydata = ydata[0:length]
         curve = QLineSeries()
         pen = curve.pen()
         if color is not None:
@@ -185,9 +187,12 @@ class measurementView(QChartView):
         pen.setWidthF(.1)
         curve.setPen(pen)
         curve.setUseOpenGL(True)
-        curve.append(self.series_to_polyline(xdata, ydata))
+        #curve.append(self.series_to_polyline(xdata, ydata))
+        curve.replace(self.series_to_polyline(xdata, ydata))
         self.chart.addSeries(curve)
 
+        self.xValueAxis.setRange(xdata.min(), xdata.max())
+        self.yValueAxis.setRange(ydata.min(), ydata.max())
         curve.attachAxis(self.xValueAxis)
         curve.attachAxis(self.yValueAxis)
         #self.chart.createDefaultAxes()

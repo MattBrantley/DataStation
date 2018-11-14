@@ -18,7 +18,6 @@ class Quadrupole(Component):
     valid = True
 
     def onCreation(self):
-        self.compSettings['name'] = ''
         self.compSettings['layoutGraphicSrc'] = self.iconGraphicSrc
         self.compSettings['showSequencer'] = False
         self.compSettings['uuid'] = str(uuid.uuid4())

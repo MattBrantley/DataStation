@@ -15,6 +15,7 @@ class HardwareDeviceHandler(QObject):
     idleState = pyqtSignal()
 
     deviceChanged = pyqtSignal(str)
+    triggerChanged = pyqtSignal(str)
     loadPacket = pyqtSignal(dict)
 
 ############################################################################################
@@ -28,14 +29,23 @@ class HardwareDeviceHandler(QObject):
     def Get_Name(self):
         return self.Get_Standard_Field('deviceName')
 
+    def Get_Current_Trigger_Mode(self):
+        return self.Get_Standard_Field('triggerMode')
+
     def Get_Available_Devices(self):
         return self.deviceList
+
+    def Get_Trigger_Modes(self):
+        return self.triggerModeList
 
     def Get_Sources(self):
         return self.sourceList
 
     def Load_Device(self, deviceName):
         self.loadDevice(deviceName)
+
+    def Set_Trigger_Mode(self, triggerModeName):
+        self.setTriggerMode(triggerModeName)
 
     def Ready_Status(self):
         return self.hardwareReadyStatus
@@ -55,6 +65,8 @@ class HardwareDeviceHandler(QObject):
         self.deferredProgramming = True
         self.programPackets = list()
         self.hardwareReadyStatus = False
+        self.triggerModeList = list()
+        self.deviceComponents = list()
 
         self.ds = ds
         self.iM = ds.iM
@@ -86,7 +98,11 @@ class HardwareDeviceHandler(QObject):
         self.deviceThread.statusMessage.connect(self.statusMessage)
         self.deviceThread.readyStatus.connect(self.readyStatus)
         self.deviceThread.sourceAdded.connect(self.sourceAdded)
+        self.deviceThread.triggerModeAdded.connect(self.triggerModeAdded)
         self.deviceThread.deviceFound.connect(self.deviceFound)
+
+        self.deviceThread.addDOSocket.connect(self.addDOSocket)
+        self.deviceThread.clearHardwareSockets.connect(self.clearHardwareSockets)
 
         self.deviceThread.moveToThread(self.thread)
 
@@ -100,6 +116,7 @@ class HardwareDeviceHandler(QObject):
         self.idleState.connect(self.deviceThread.idleState)
 
         self.deviceChanged.connect(self.deviceThread.deviceChanged)
+        self.triggerChanged.connect(self.deviceThread.triggerChanged)
         self.loadPacket.connect(self.deviceThread.loadPacket)
 
         self.thread.start()
@@ -130,6 +147,10 @@ class HardwareDeviceHandler(QObject):
         source.registerHWare(self)
         self.hM.sourceAdded(self, source)
 
+    def triggerModeAdded(self, triggerModeName):
+        self.triggerModeList.append(triggerModeName)
+        self.hM.triggerModeAdded(self, triggerModeName)
+
     def deviceFound(self, deviceName):
         self.hM.hardwareDeviceFound(self, deviceName)
 
@@ -142,6 +163,12 @@ class HardwareDeviceHandler(QObject):
     def readyStatus(self, bool):
         self.hardwareReadyStatus = bool
         self.hM.hardwareReadyStatusChanged(self, bool)
+
+    def addDOSocket(self, name):
+        print('add socket')
+
+    def clearHardwareSockets(self):
+        print('clear sockets')
 
 ##################################### INTERNAL FUNCS #####################################
 
@@ -179,6 +206,11 @@ class HardwareDeviceHandler(QObject):
 
         self.hardwareSettings['deviceName'] = deviceName
         self.deviceChanged.emit(deviceName)
+
+    def setTriggerMode(self, triggerModeName):
+        self.triggerMode = triggerModeName
+        self.hardwareSettings['triggerMode'] = triggerModeName
+        self.triggerChanged.emit(triggerModeName)
 
     def onRemove(self):
         pass # safetly shut down the hardware device
@@ -237,14 +269,18 @@ class HardwareDevice(QObject):
     statusMessage = pyqtSignal(str)
     readyStatus = pyqtSignal(bool)
     sourceAdded = pyqtSignal(object)
+    triggerModeAdded = pyqtSignal(str) # name
     deviceFound = pyqtSignal(str)
+
+    addDOSocket = pyqtSignal(str) # socket name
+    clearHardwareSockets = pyqtSignal()
 
 ############################################################################################
 ###################################### OVERRIDE THESE ######################################
     def scan(self):
         pass
 
-    def initialize(self, deviceName):
+    def initialize(self, deviceName, triggerMode):
         pass
 
     def configure(self):
@@ -272,6 +308,15 @@ class HardwareDevice(QObject):
 
     def Send_Status_Message(self, msg):
         self.statusMessage.emit(msg)
+
+    def Add_Trigger_Mode(self, name):
+        self.triggerModeAdded.emit(name)
+
+    def Get_Device_Name(self):
+        return self.Get_Standard_Field('deviceName')
+
+    def Get_Trigger_Mode(self):
+        return self.Get_Standard_Field('triggerMode')
 
     def Add_AISource(self, name, vMin, vMax, prec):
         source = AISource(self.handler, '['+self.hardwareSettings['deviceName']+'] '+name, vMin, vMax, prec, name)
@@ -309,6 +354,12 @@ class HardwareDevice(QObject):
     def Get_Handler(self):
         return self.handler
 
+    def Add_Digital_Socket(self, name):
+        self.addDigitalSocket(name)
+
+    def Clear_Hardware_Sockets(self):
+        self.clearHardwareSockets.emit()
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
     def __init__(self, handler, systemDeviceInfo, hardwareSettings, deviceList, sourceList):
@@ -335,9 +386,16 @@ class HardwareDevice(QObject):
         self.idle()
         QTimer().singleShot(1, self.idleState)
 
+    def addDigitalSocket(self, name):
+        self.addDOSocket.emit(name)
+
     def deviceChanged(self, deviceName):
         self.hardwareSettings['deviceName'] = deviceName
-        self.initialize(deviceName)
+        self.initialize(deviceName, self.Get_Trigger_Mode())
+
+    def triggerChanged(self, triggerModeName):
+        self.hardwareSettings['triggerMode'] = triggerModeName
+        self.initialize(self.Get_Device_Name(), triggerModeName)
 
     def addSource(self, source):
         self.sourceList.append(source)
@@ -351,7 +409,7 @@ class HardwareDevice(QObject):
         for key, val in loadPacket['hardwareSettings'].items():
             self.hardwareSettings[key] = val
 
-        self.initialize(self.hardwareSettings['deviceName'])
+        self.initialize(self.hardwareSettings['deviceName'], self.hardwareSettings['triggerMode'])
 
         if('sourceList' in loadPacket):
             self.loadSourceData(loadPacket['sourceList'])

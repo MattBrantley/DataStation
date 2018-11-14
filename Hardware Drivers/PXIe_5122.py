@@ -18,10 +18,15 @@ class PXIe_5122(HardwareDevice):
         for device in self.systemDeviceInfo['NI-SCOPE']:
             if(device['Device Model'] == 'NI PXIe-5122'):
                 self.Add_Device(device['Device Name'])
+
+        self.Add_Trigger_Mode('Software')
+        self.Add_Trigger_Mode('Front Digital Trigger')
         self.scanned.emit()
 
-    def initialize(self, deviceName):
+    def initialize(self, deviceName, triggerMode):
         try:
+            self.Clear_Hardware_Sockets()
+
             if(deviceName != ''):
                 self.session = None
                 self.wfm_handles = list()
@@ -32,6 +37,9 @@ class PXIe_5122(HardwareDevice):
                     self.source1 = self.Add_AISource('1', -10, 10, 0.1)
 
                 self.session = niscope.Session(deviceName)
+
+            if(triggerMode == 'Front Digital Trigger'):
+                self.Add_Digital_Socket('PXIe-5122 Trigger')
         except:
             pass
 
@@ -44,28 +52,30 @@ class PXIe_5122(HardwareDevice):
     def program(self, programmingPackets):
         self.Set_Ready_Status(False)
         if(programmingPackets):
-            packet = programmingPackets[0]['programmingPacket'].Get_Commands(commandType=AnalogAcquisitionCommand)[0]
-            if(packet is not None):
-                self.session.abort()
-                self.session.vertical_range = packet.acqMax-packet.acqMin
-                self.session.vertical_coupling = niscope.VerticalCoupling.AC
-                self.session.vertical_offset = (packet.acqMin + packet.acqMax) / 2
-                self.session.probe_attenuation = 1
-                self.session.channels[0].channel_enabled = True
-                self.session.channels[1].channel_enabled = False
+            packet = programmingPackets[0]['programmingPacket'].Get_Commands(commandType=AnalogAcquisitionCommand)
+            if packet:
+                packet = packet[0]
+                if(packet is not None):
+                    self.session.abort()
+                    self.session.vertical_range = packet.acqMax-packet.acqMin
+                    self.session.vertical_coupling = niscope.VerticalCoupling.AC
+                    self.session.vertical_offset = (packet.acqMin + packet.acqMax) / 2
+                    self.session.probe_attenuation = 1
+                    self.session.channels[0].channel_enabled = True
+                    self.session.channels[1].channel_enabled = False
 
-                self.session.min_sample_rate = packet.rate
-                self.session.horz_min_num_pts = packet.noSamples
-                self.session.horz_record_ref_position = 0
-                self.session.horz_num_records = 1
-                self.session.horz_enforce_realtime = True
+                    self.session.min_sample_rate = packet.rate
+                    self.session.horz_min_num_pts = packet.noSamples
+                    self.session.horz_record_ref_position = 0
+                    self.session.horz_num_records = 1
+                    self.session.horz_enforce_realtime = True
 
-                self.session.trigger_type = niscope.TriggerType.EDGE
-                self.session.trigger_level = 1.0
-                self.session.trigger_source = 'TRIG' 
+                    self.session.trigger_type = niscope.TriggerType.EDGE
+                    self.session.trigger_level = 1.0
+                    self.session.trigger_source = 'TRIG' 
 
 
-                self.readArray = np.ndarray(packet.noSamples, dtype=np.float64)
+                    self.readArray = np.ndarray(packet.noSamples, dtype=np.float64)
 
 
         self.Set_Ready_Status(True)
@@ -89,7 +99,6 @@ class PXIe_5122(HardwareDevice):
                         if(self.Ready_Status() is False):
                             self.Send_Status_Message('Triggered!')
                             self.Set_Ready_Status(True)
-                            #npar = np.ndarray(500, dtype=np.float64)
                             wfmInfo = self.session.channels[0].fetch_into(self.readArray)
                             self.writeToPacket(self.readArray, wfmInfo[0])
 

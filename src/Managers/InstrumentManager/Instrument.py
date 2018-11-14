@@ -44,6 +44,9 @@ class Instrument(QObject):
     def Load_Sequence(self, path):
         self.Get_Sequence().Load_Sequence_File(path)
 
+    def Save_Sequence(self, filepath):
+        self.Get_Sequence().Save_Sequence(filepath)
+
     def Save_Instrument(self, name=None, path=None):
         if(name is not None):
             self.Set_Name(name)
@@ -55,7 +58,7 @@ class Instrument(QObject):
         self.loadInstrumentFile(path)
 
     def Get_Sequence_Directory(self):
-        return os.path.join(self.iM.Sequences_Save_Directory, self.Get_Name())
+        return os.path.join(self.iM.Sequences_Save_Directory(), self.Get_Name())
 
     def Ready_Check(self):
         self.readyCheck()
@@ -257,8 +260,7 @@ class Instrument(QObject):
         newComp.instr = self
         newComp.iM = self.iM
         newComp.ds = self.ds
-        newComp.setupWidgets()
-        newComp.name = 'Unnamed Component'
+        #newComp.name = 'Unnamed Component'
         newComp.loadCustomFields(customFields)
         newComp.loadCompSettings(loadData)
         newComp.onCreationParent()

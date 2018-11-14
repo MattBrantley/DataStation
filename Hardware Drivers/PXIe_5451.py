@@ -19,7 +19,7 @@ class PXIe_5451(HardwareDevice):
                 self.Add_Device(device['Device Name'])
         self.scanned.emit()
 
-    def initialize(self, deviceName):
+    def initialize(self, deviceName, triggerMode):
         try:
             if(deviceName != ''):
                 self.session = None
@@ -48,16 +48,17 @@ class PXIe_5451(HardwareDevice):
             self.wfm_handles = list()
 
             t0, f, wave = self.parsePacket(programmingPackets)
-            self.session.output_mode = nifgen.OutputMode.ARB
-            self.session.arb_sample_rate = f
-            self.session.channels[0].wait_value = 0
-            self.session.wait_behavior = nifgen.WaitBehavior.JUMP_TO
+            if t0 is not None:
+                self.session.output_mode = nifgen.OutputMode.ARB
+                self.session.arb_sample_rate = f
+                self.session.channels[0].wait_value = 0
+                self.session.wait_behavior = nifgen.WaitBehavior.JUMP_TO
 
-            self.wfm = self.session.channels[0].create_waveform(wave)
-            self.session.trigger_mode = nifgen.TriggerMode.SINGLE
-            self.session.start_trigger_type = nifgen.StartTriggerType.DIGITAL_EDGE
-            self.session.digital_edge_start_trigger_source = 'PFI0'
-            self.session.channels[0].configure_arb_waveform(self.wfm, 1, 0.0)
+                self.wfm = self.session.channels[0].create_waveform(wave)
+                self.session.trigger_mode = nifgen.TriggerMode.SINGLE
+                self.session.start_trigger_type = nifgen.StartTriggerType.DIGITAL_EDGE
+                self.session.digital_edge_start_trigger_source = 'PFI0'
+                self.session.channels[0].configure_arb_waveform(self.wfm, 1, 0.0)
         
         self.Set_Ready_Status(True)
         self.programmed.emit()
@@ -92,8 +93,12 @@ class PXIe_5451(HardwareDevice):
 
     def parsePacket(self, packet):
         fst = packet[0]
-        cmd = fst['programmingPacket'].Get_Commands(commandType=AnalogWaveformCommand)[0]
-        if(cmd.wave.shape[0] % 2 == 0):
-            return cmd.t0, cmd.f, cmd.wave
+        cmd = fst['programmingPacket'].Get_Commands(commandType=AnalogWaveformCommand)
+        if cmd:
+            cmd = cmd[0]
+            if(cmd.wave.shape[0] % 2 == 0):
+                return cmd.t0, cmd.f, cmd.wave
+            else:
+                return cmd.t0, cmd.f, cmd.wave[:-1]
         else:
-            return cmd.t0, cmd.f, cmd.wave[:-1]
+            return None, None, None

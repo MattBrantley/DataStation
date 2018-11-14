@@ -16,7 +16,6 @@ class Detection_Plates(Component):
     valid = True
     
     def onCreation(self):
-        self.compSettings['name'] = 'Unnamed ' + self.componentType
         self.compSettings['layoutGraphicSrc'] = self.iconGraphicSrc
 
         self.socket = self.addAISocket(self.compSettings['name'])

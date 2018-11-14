@@ -15,7 +15,7 @@
                 },
                 "granularity": 0.0001,
                 "layoutGraphicSrc": "lens.png",
-                "name": "Unnamed Circular Lens",
+                "name": "Quad Trap Plate",
                 "triggerComp": false,
                 "uuid": "c330fd81-ae6b-4e08-a8a6-3e5cd19889d3",
                 "vMax": 10.0,
@@ -25,7 +25,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "71985489-285b-42dd-8305-44d9be03c50e",
+                    "inputSource": "d14e19ee-622f-4cc2-af8a-1c2b2eb0a13f",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "prec": 0.1,
@@ -43,7 +43,7 @@
                 "customFields": {
                     "iViewSettings": {
                         "r": 0,
-                        "x": -368.0,
+                        "x": -343.0,
                         "y": 1044.0
                     },
                     "sequencerSettings": {
@@ -52,7 +52,7 @@
                 },
                 "granularity": 0.0001,
                 "layoutGraphicSrc": "lens.png",
-                "name": "Unnamed Circular Lens",
+                "name": "Fil Trap Plate",
                 "triggerComp": false,
                 "uuid": "e54d3171-4888-4639-aa43-fab25145473f",
                 "vMax": 10.0,
@@ -62,7 +62,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "ec526669-d1c4-4b70-978b-dba99b74b348",
+                    "inputSource": "2ace5719-f3bd-45bd-8513-eb768bcc8933",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "prec": 0.1,
@@ -89,7 +89,7 @@
                 },
                 "granularity": 0.0001,
                 "layoutGraphicSrc": "Penning_Trap.png",
-                "name": "Unnamed Penning Trap",
+                "name": "Inner Trapping Rings",
                 "triggerComp": false,
                 "uuid": "e6a8589e-cb19-4953-9f94-9d9866ab6795",
                 "vMax": 10.0,
@@ -99,7 +99,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "497d13bb-f4ac-41b3-a99b-8d01b2cef3ac",
+                    "inputSource": "bc655578-db2c-404b-b7de-c8d5579a9feb",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Penning Trap",
                     "prec": 0.1,
@@ -125,7 +125,7 @@
                     }
                 },
                 "layoutGraphicSrc": "Excitation_Plates.png",
-                "name": "Unnamed Excitation Plates",
+                "name": "Excitation",
                 "triggerComp": false,
                 "uuid": "594d2479-ae28-4106-9191-c4d09b224e7a"
             },
@@ -133,7 +133,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "d2f9a458-7e98-4350-b58c-411f6fe5abd5",
+                    "inputSource": "9bb531c5-edb2-4d56-bcf5-80952b38cefd",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Excitation Plates",
                     "prec": 0.1,
@@ -159,7 +159,7 @@
                     }
                 },
                 "layoutGraphicSrc": "Detection_Plates.png",
-                "name": "Unnamed Detection Plates",
+                "name": "Detection",
                 "triggerComp": false,
                 "uuid": "ea30b3f6-2f85-4a1d-ae67-c2d60c990543"
             },
@@ -167,7 +167,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "9fbe3f63-8ce2-4289-b14e-776e5019298b",
+                    "inputSource": "f40b5759-f92e-45a1-95f0-c0eaedb3f160",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Detection Plates",
                     "prec": 0.1,
@@ -193,7 +193,7 @@
                     }
                 },
                 "layoutGraphicSrc": "Trigger.png",
-                "name": "Unnamed Basic Trigger",
+                "name": "Excite Trigger",
                 "triggerComp": false,
                 "uuid": "26fcabe4-7def-4be5-ba16-d38c83fbb095"
             },
@@ -201,7 +201,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "8c30b3b3-d993-4ae9-89b1-acec74fa5e53",
+                    "inputSource": "913ab23a-5d40-4673-abc9-af5a5fa9e1bf",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Basic Trigger",
                     "tag": "[DO]",
@@ -224,7 +224,7 @@
                     }
                 },
                 "layoutGraphicSrc": "Trigger.png",
-                "name": "Unnamed Basic Trigger",
+                "name": "Detect Trigger",
                 "triggerComp": false,
                 "uuid": "533d7fbe-5769-4d4d-b3e1-a3933d8639fb"
             },
@@ -232,7 +232,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "666527b4-de2f-4bf6-a202-bc1cc91dbb47",
+                    "inputSource": "be70a92f-d6a2-4ad2-a21a-7097f5122518",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Basic Trigger",
                     "tag": "[DO]",
@@ -256,7 +256,7 @@
                 },
                 "granularity": 0.0001,
                 "layoutGraphicSrc": "Filament.png",
-                "name": "Unnamed Filament",
+                "name": "EI Filament",
                 "triggerComp": false,
                 "uuid": "65d26fd1-fd48-4bdd-9d8f-2b2ee2752ff8",
                 "vMax": 10.0,
@@ -266,7 +266,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "a1c07385-ff6c-46a1-a003-8e15641b4406",
+                    "inputSource": "ab80f764-9b4f-41a4-9b4d-95e2b22d2478",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Filament",
                     "prec": 0.1,
@@ -292,7 +292,7 @@
                     }
                 },
                 "layoutGraphicSrc": "Pulse_Valve.png",
-                "name": "Unnamed Pulse Valve",
+                "name": "Cell Pulse Valve",
                 "triggerComp": false,
                 "uuid": "c23c13b6-e51f-48ab-acd8-c96f3c5aa5c1"
             },
@@ -300,7 +300,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "e83a8362-a0a8-4391-b6ed-60f4c3a1515e",
+                    "inputSource": "0a1a9a52-6718-4ed7-8f8c-d495dfc9bd9d",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Pulse Valve",
                     "tag": "[DO]",

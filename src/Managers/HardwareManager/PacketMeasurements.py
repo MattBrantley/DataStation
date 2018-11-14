@@ -71,7 +71,7 @@ class AnalogWaveformMeasurement(Measurement):
         return self.wave.shape[0]/self.f
 
     def stepSize(self):
-        return 1/self.f
+        return 1./self.f
 
     def toPairs(self, zeroOrigin=False):
         return np.vstack([self.xData(zeroOrigin=zeroOrigin), self.yData()]).transpose()

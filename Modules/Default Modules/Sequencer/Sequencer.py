@@ -83,7 +83,7 @@ class Sequencer(DSModule):
 
         self.saveAction = QAction('Save', self)
         self.saveAction.setStatusTip('Save')
-        #self.saveAction.triggered.connect(self.iM.saveSequence)
+        self.saveAction.triggered.connect(self.saveSeq)
 
         self.saveAsAction = QAction('Save As', self)
         self.saveAsAction.setStatusTip('Save As')
@@ -112,6 +112,28 @@ class Sequencer(DSModule):
         self.instrumentSelectionBox.currentIndexChanged.connect(self.instrumentSelectionChanged)
         
         self.toolbar.addWidget(self.instrumentSelectionBox)
+
+    def saveSeq(self):
+        if self.targetInstrument is not None:
+            if self.targetInstrument.Get_Sequence().Get_Path() is None:
+                # Sequence is new
+                seqDir = self.targetInstrument.Get_Sequence_Directory()
+                options = QFileDialog.Options()
+                options |= QFileDialog.DontUseNativeDialog
+                fileName, _ = QFileDialog.getSaveFileName(self,"Save Sequence", seqDir,"Sequence File (*.dssequence)", options=options)
+                if fileName:
+                    self.targetInstrument.Save_Sequence(fileName)
+            else:
+                self.targetInstrument.Save_Sequence(self.targetInstrument.Get_Sequence().Get_Path())
+
+    def saveAsSeq(self):
+        if self.targetInstrument is not None:
+            seqDir = self.targetInstrument.Get_Sequence_Directory()
+            options = QFileDialog.Options()
+            options |= QFileDialog.DontUseNativeDialog
+            fileName, _ = QFileDialog.getSaveFileName(self,"Save Sequence", seqDir,"Sequence File (*.dssequence)", options=options)
+            if fileName:
+                self.targetInstrument.Save_Sequence(fileName)
 
     def instrumentSelectionChanged(self, index):
         self.getInstrumentBoxInstrument()
@@ -229,22 +251,33 @@ class sequencerPlot(QWidget):
                         packet = socket.Get_Programming_Packet()
                         if(packet is not None):
                             data = list()
+
+                            #### Analog Sparse
                             for cmd in packet.Get_Commands(commandType=AnalogSparseCommand):
                                 data.append(cmd.pairs)
                             if(data):
                                 plotData = np.vstack(data)
-                                plot.Add_Line(plotData[:,0], plotData[:,1])
-                            #else:
-                            #    plot.Add_Line(np.zeros(1), np.zeros(1))
+                                plot.Add_Line(plotData[:,0], plotData[:,1], stepped=True)
+
+                            #### Analog Waveform
                             for cmd in packet.Get_Commands(commandType=AnalogWaveformCommand):
                                 data.append(cmd.toPairs())
                             if(data):
                                 plotData = np.vstack(data)
                                 plot.Add_Line(plotData[:,0], plotData[:,1], stepped=False)
-                            else:
-                                plot.Add_Line(np.zeros(1), np.zeros(1), stepped=False)
+                            #else:
+                            #    plot.Add_Line(np.zeros(1), np.zeros(1), stepped=False)
+
+                            #### Digital Sprase
+                            for cmd in packet.Get_Commands(commandType=DigitalSparseCommand):
+                                data.append(cmd.pairs)
+                            if(data):
+                                plotData = np.vstack(data)
+                                plot.Add_Line(plotData[:,0], plotData[:,1], stepped=True)
+
                         else:
-                            plot.Add_Line(np.zeros(1), np.zeros(1))
+                            pass
+                            #plot.Add_Line(np.zeros(1), np.zeros(1))
 
     def componentStandardFieldChanged(self, instrument, component, field):
         if instrument is self.module.targetInstrument:

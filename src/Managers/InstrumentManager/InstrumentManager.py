@@ -1,6 +1,7 @@
 import os, sys, imp, time, inspect
 from src.Managers.InstrumentManager.Instrument import *
-from src.Managers.InstrumentManager.Digital_Trigger_Component import Digital_Trigger_Component
+#from src.Managers.InstrumentManager.Digital_Trigger_Component import Digital_Trigger_Component
+from src.Managers.InstrumentManager.Device_Triggers import Device_Digital_Trigger
 from src.Constants import DSConstants as DSConstants
 from src.Constants import readyCheckPacket
 import json as json
@@ -89,6 +90,7 @@ class InstrumentManager(QObject):
         self.sequencesDir = os.path.join(self.ds.rootDir, 'Sequences')
         self.currentSequenceURL = None
         self.componentsAvailable = list()
+        self.deviceTriggerComponentsAvailable = list()
         self.instruments = list()
 
         self.loadComponents()
@@ -223,6 +225,9 @@ class InstrumentManager(QObject):
                 compHolder = self.loadComponentFromFile(url)
                 if (compHolder != None):
                     self.componentsAvailable.append(compHolder)
+
+        ### Load Device Triggers
+        self.deviceTriggerComponentsAvailable.append(Device_Digital_Trigger(self.ds))
 
         self.ds.postLog('Finished Loading Component Models!', DSConstants.LOG_PRIORITY_HIGH)
 

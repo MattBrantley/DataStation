@@ -39,6 +39,8 @@ class HardwareManager(QObject):
     Hardware_Device_Removed = pyqtSignal(object) # hardware
     Hardware_Device_Found = pyqtSignal(object, str) # hardware, device name
 
+    Hardware_Device_Trigger_Mode_Added = pyqtSignal(object, str) # hardware, trigger name
+
 ##### Signals: Sequence #####
     Sequence_Started = pyqtSignal()
     Sequence_Finished = pyqtSignal()
@@ -176,6 +178,9 @@ class HardwareManager(QObject):
 
     def sourceAdded(self, hardwareObj, sourceObj): # Source_Added
         self.Source_Added.emit(hardwareObj, sourceObj)
+
+    def triggerModeAdded(self, hardwareObj, triggerModeName): #Trigger_Mode_Name
+        self.Hardware_Device_Trigger_Mode_Added.emit(hardwareObj, triggerModeName)
 
     def sourceRemoved(self, hardwareObj, sourceObj): # Source_Removed
         self.Source_Removed.emit(hardwareObj, sourceObj)

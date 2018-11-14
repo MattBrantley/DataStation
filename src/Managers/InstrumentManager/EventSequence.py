@@ -52,17 +52,6 @@ class EventSequence():
             self.ds.postLog('Sequence data was empty - aborting!', DSConstants.LOG_PRIORITY_HIGH)
             return False
 
-        #if(data['instrument'] != self.Get_Name() and showWarning is True):
-        #    msg = QMessageBox()
-        #    msg.setIcon(QMessageBox.Warning)
-        #    msg.setText("The sequence is for a different instrument (" + data['instrument'] + ") than what is currently loaded it (" + self.Get_Name() + "). It is unlikely this sequence will load.. Continue?")
-        #    msg.setWindowTitle("Sequence/Instrument Compatibability Warning")
-        #    msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-
-        #    retval = msg.exec_()
-        #    if(retval == QMessageBox.No):
-        #        return False
-
         self.path = path
         self.Clear_All_Events()
 
@@ -100,18 +89,19 @@ class EventSequence():
     
     #### Save Sequence ####    
     def saveSequence(self, path):
-        self.ds.postLog('Saving Sequence (' + self.Get_Path() + ')... ', DSConstants.LOG_PRIORITY_HIGH)
+        self.ds.postLog('Saving Sequence (' + path + ')... ', DSConstants.LOG_PRIORITY_HIGH)
 
-        self.filename = os.path.basename(self.path)
-        self.path = os.path.join(os.path.join(self.ds.Sequences_Save_Directory(), self.instr.Get_Name()), self.Get_File_Name())
+        self.filename = os.path.basename(path)
+        self.path = os.path.join(os.path.join(self.ds.iM.Sequences_Save_Directory(), self.instr.Get_Name()), self.Get_File_Name())
         os.makedirs(os.path.dirname(self.path), exist_ok=True)
 
         if(os.path.exists(self.Get_Path())):
             os.remove(self.Get_Path())
         with open(self.Get_Path(), 'w') as file:
-            json.dump(self.getSequenceSaveData(), file, sort_keys=True, indent=4)
+            savePacket = self.getSequenceSaveData()
+            json.dump(savePacket, file, sort_keys=True, indent=4)
             
-        self.instr.sequenceSaved(self)
+        self.instr.sequenceSaved()
         self.ds.postLog('Done!', DSConstants.LOG_PRIORITY_HIGH, newline=False)
         
     def getSequenceSaveData(self):
