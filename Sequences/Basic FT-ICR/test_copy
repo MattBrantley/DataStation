@@ -1,0 +1,196 @@
+{
+    "eventData": [
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Voltage": 5.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "params": {
+                        "Duration": 0.001,
+                        "Voltage": 30.0
+                    },
+                    "time": 0.01,
+                    "type": "Pulse"
+                }
+            ],
+            "name": "Quad Trap Plate",
+            "type": "Circular Lens",
+            "uuid": "c330fd81-ae6b-4e08-a8a6-3e5cd19889d3"
+        },
+        {
+            "compID": "circLens_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Voltage": 5.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "params": {
+                        "Duration": 0.001,
+                        "Voltage": -30.0
+                    },
+                    "time": 0.01,
+                    "type": "Pulse"
+                }
+            ],
+            "name": "Fil Trap Plate",
+            "type": "Circular Lens",
+            "uuid": "e54d3171-4888-4639-aa43-fab25145473f"
+        },
+        {
+            "compID": "penTrap_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Voltage": 2.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "params": {
+                        "Duration": 0.001,
+                        "Voltage": -9.0
+                    },
+                    "time": 0.01,
+                    "type": "Pulse"
+                }
+            ],
+            "name": "Inner Trapping Rings",
+            "type": "Penning Trap",
+            "uuid": "e6a8589e-cb19-4953-9f94-9d9866ab6795"
+        },
+        {
+            "compID": "excPlates_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Amplitude": 0.2,
+                        "Duration": 0.004,
+                        "End": 1000000.0,
+                        "Rate": 50000000.0,
+                        "Start": 8000000.0
+                    },
+                    "time": 0.0,
+                    "type": "Chirp"
+                }
+            ],
+            "name": "Excitation",
+            "type": "Excitation Plates",
+            "uuid": "594d2479-ae28-4106-9191-c4d09b224e7a"
+        },
+        {
+            "compID": "detecPlates_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Num. Points": 10000000,
+                        "Range-Max": 10.0,
+                        "Range-Min": -10.0,
+                        "Rate": 16000000.0
+                    },
+                    "time": 0.0,
+                    "type": "N-Count Collection"
+                }
+            ],
+            "name": "Detection",
+            "type": "Detection Plates",
+            "uuid": "ea30b3f6-2f85-4a1d-ae67-c2d60c990543"
+        },
+        {
+            "compID": "trig_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Width": 0.05
+                    },
+                    "time": 12.0,
+                    "type": "Pulse High"
+                },
+                {
+                    "params": {},
+                    "time": 13.0,
+                    "type": "Go Low"
+                }
+            ],
+            "name": "Excite Trigger",
+            "type": "Basic Trigger",
+            "uuid": "26fcabe4-7def-4be5-ba16-d38c83fbb095"
+        },
+        {
+            "compID": "trig_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Width": 0.05
+                    },
+                    "time": 12.004,
+                    "type": "Pulse High"
+                }
+            ],
+            "name": "Detect Trigger",
+            "type": "Basic Trigger",
+            "uuid": "533d7fbe-5769-4d4d-b3e1-a3933d8639fb"
+        },
+        {
+            "compID": "fil_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Duration": 8.0,
+                        "Voltage": 70.0
+                    },
+                    "time": 2.0,
+                    "type": "Pulse"
+                }
+            ],
+            "name": "EI Filament",
+            "type": "Filament",
+            "uuid": "65d26fd1-fd48-4bdd-9d8f-2b2ee2752ff8"
+        },
+        {
+            "compID": "pulsevalve_mrb",
+            "events": [
+                {
+                    "params": {},
+                    "time": 0.0,
+                    "type": "Go Low"
+                },
+                {
+                    "params": {
+                        "Width": 0.01
+                    },
+                    "time": 2.5,
+                    "type": "Pulse High"
+                },
+                {
+                    "params": {
+                        "Width": 0.01
+                    },
+                    "time": 3.5,
+                    "type": "Pulse High"
+                },
+                {
+                    "params": {
+                        "Width": 0.01
+                    },
+                    "time": 4.5,
+                    "type": "Pulse High"
+                }
+            ],
+            "name": "Cell Pulse Valve",
+            "type": "Pulse Valve",
+            "uuid": "c23c13b6-e51f-48ab-acd8-c96f3c5aa5c1"
+        }
+    ],
+    "instrument": "Basic FT-ICR"
+}

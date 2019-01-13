@@ -116,8 +116,6 @@ class spectrumView(QChartView):
     def addData(self, packet, color=None):
         for measurement in packet.Get_Measurements():
             xData, yData = self.doFFT(measurement.yData(), measurement.stepSize())
-            print(xData.shape)
-            print(yData.shape)
             self.createLine(xData, yData, color=color)
             #self.createLine(measurement.xData(zeroOrigin=True), measurement.yData(), color=color)
 

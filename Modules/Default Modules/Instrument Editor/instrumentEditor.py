@@ -148,7 +148,7 @@ class instrumentEditor(DSModule):
         self.ds.postLog('Creating new instrument', DSConstants.LOG_PRIORITY_HIGH)
         fname, ok = QInputDialog.getText(self.ds, "Virtual Instrument Name", "Virtual Instrument Name")
         if(ok):
-            self.iM.New_Instrument(name=fname, path=self.rootPath)
+            self.iM.New_Instrument(name=fname, directory=self.rootPath)
         else:
             return
         self.updateTitle()

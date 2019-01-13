@@ -1,4 +1,5 @@
 {
     "Instrument_Path": "D:/InstrPlatform/DataStation/Instruments\\Basic FT-ICR.dsinstrument",
+    "Instrument_UUID": "b3c26652-7c14-412b-8092-78225a08d589",
     "Sequence_Path": "D:/InstrPlatform/DataStation/Sequences/Basic FT-ICR/test"
 }

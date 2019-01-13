@@ -12,13 +12,15 @@ class InstrumentManager(QObject):
 ##################################### EXTERNAL SIGNALS #####################################
 
 ##### Signals: Instrument #####
-    Instrument_File_Loaded = pyqtSignal(object) # Instrument
+    #Instrument_File_Loaded = pyqtSignal(object) # Instrument
+    Instrument_Loaded = pyqtSignal(object) # Instrument
     Instrument_Removed = pyqtSignal(object) # Instrument
     Instrument_Saving = pyqtSignal(object) # Instrument
     Instrument_Saved = pyqtSignal(object) # Instrument
     Instrument_New = pyqtSignal(object) # Instrument
     Instrument_Config_Changed = pyqtSignal(object) # Instrument
     Instrument_Name_Changed = pyqtSignal(object) # Instrument
+    Instrument_UUID_Changed = pyqtSignal(object) # Instrument
     Instrument_Sequence_Running = pyqtSignal(object) # Instrument
     
 ##### Signals: Components #####
@@ -107,8 +109,14 @@ class InstrumentManager(QObject):
     def instrumentModified(self, instrument):
         pass
 
+    def instrumentLoaded(self, instrument):
+        self.Instrument_Loaded.emit(instrument)
+
     def instrumentNameChanged(self, instrument):
         self.Instrument_Name_Changed.emit(instrument)
+
+    def instrumentUUIDChanged(self, instrument):
+        self.Instrument_UUID_Changed.emit(instrument)
 
     def instrumentConfigModified(self, instrument):
         self.Instrument_Config_Changed.emit(instrument)
@@ -119,8 +127,8 @@ class InstrumentManager(QObject):
     def instrumentSaved(self, instrument):
         self.Instrument_Saved.emit(instrument)
 
-    def instrumentFileLoaded(self, instrument):
-        self.Instrument_File_Loaded.emit(instrument)
+    #def instrumentFileLoaded(self, instrument):
+    #    self.Instrument_File_Loaded.emit(instrument)
 
     def instrumentSequenceRunning(self, instrument):
         self.Instrument_Sequence_Running.emit(instrument)

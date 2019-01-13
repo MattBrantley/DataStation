@@ -63,8 +63,17 @@ class DataStation_Core(QMainWindow):
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################
 
+    def Is_Loaded(self):
+        if self.isLoaded is True:
+            return True
+        else:
+            return False
+
+############################################################################################
+#################################### INTERNAL USE ONLY ####################################
     def __init__(self, app):
         super().__init__()
+        self.isLoaded = False
         self.app = app
         self.DSC = DSConstants()
         self.rootDir = os.path.dirname(__file__)
@@ -77,6 +86,7 @@ class DataStation_Core(QMainWindow):
         self.initTrayMenu()
 
         self.DataStation_Loaded.emit()
+        self.isLoaded = True
         self.app.lastWindowClosed.connect(self.lastWindowClosed)
 
     def setAppIcons(self):

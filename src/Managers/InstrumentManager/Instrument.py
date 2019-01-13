@@ -15,6 +15,11 @@ class Instrument(QObject):
         self.iM.instrumentNameChanged(self)
         return True
 
+    def Set_UUID(self, uuid):
+        self.uuid = uuid
+        self.iM.instrumentUUIDChanged(self)
+        return True
+
     def Get_Path(self):
         return self.getPath()
 
@@ -100,12 +105,18 @@ class Instrument(QObject):
 
 ##### Instrument Ready Check #####
     def readyCheck(self):
-        self.readyCheckList = list()
-        trace = list()
-        trace.append(self)
-        for comp in self.componentList:
-            comp.readyCheck(trace)
-        self.sequence.readyCheck(trace)
+        if self.ds.Is_Loaded() is True:
+            self.readyCheckList = list()
+            trace = list()
+            trace.append(self)
+            if(self.Get_Components() == []):
+                trace[0].Fail_Ready_Check(trace, 'Instrument Has No Components!')
+            for comp in self.componentList:
+                comp.readyCheck(trace)
+            self.sequence.readyCheck(trace)
+        else:
+            self.ds.postLog('Cannot Ready Check Instrument (' + self.name + ') While DataStation is Loading ', DSConstants.LOG_PRIORITY_HIGH)
+
 
     def readyCheckFail(self, trace, msg, warningLevel):
         self.readyCheckList.append({'Trace': trace, 'Msg': msg, 'Level': warningLevel})
@@ -185,6 +196,7 @@ class Instrument(QObject):
     def savePacket(self):
         saveData = dict()
         saveData['name'] = self.Get_Name()
+        saveData['UUID'] = self.Get_UUID()
         saveCompList = list()
         for component in self.componentList:
             saveCompList.append(component.onSaveParent())
@@ -238,6 +250,8 @@ class Instrument(QObject):
     def processInstrumentData(self, instrumentData):
         if('name' in instrumentData):
             self.Set_Name(instrumentData['name'])
+        if('UUID' in instrumentData):
+            self.Set_UUID(instrumentData['UUID'])
         else:
             return False
 
@@ -252,6 +266,8 @@ class Instrument(QObject):
                         if('sockets' in comp):
                             if(isinstance(comp['sockets'], list)):
                                 result.loadSockets(comp['sockets'])
+
+        self.iM.instrumentLoaded(self)
         return True
 
 ##### Component Manipulations #####

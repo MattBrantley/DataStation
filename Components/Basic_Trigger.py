@@ -23,6 +23,7 @@ class Basic_Trigger(Component):
         self.addEventType(pulse)
         self.addEventType(goHigh)
         self.addEventType(goLow)
+        self.addEventType(pulseTrain)
 
     def onProgram(self):
         self.packet = commandPacket()
@@ -74,3 +75,28 @@ class pulse(eventType):
         pairs = np.array([[self.time, 1], [self.time+self.eventParams['Width'].v(), 0]])
         command = DigitalSparseCommand(pairs)
         return command
+
+class pulseTrain(eventType):
+    name = 'Pulse Train'
+
+    def __init__(self):
+        super().__init__()
+        self.Add_Parameter(eventParameterInt('Count', allowZero=False, allowNegative=False, defaultVal=3))
+        self.Add_Parameter(eventParameterDouble('On Time', allowNegative=False, defaultVal=0.001))
+        self.Add_Parameter(eventParameterDouble('Off Time', allowNegative=False, defaultVal=0.001))
+
+    def getLength(self, params):
+        return 1
+
+    def toCommand(self):
+        pairs = None
+        for n in range(0, self.eventParams['Count'].v()):
+            offset = self.time + (n * (self.eventParams['On Time'].v() + self.eventParams['Off Time'].v()))
+            newEventStep = np.array([[offset, 1], [offset + self.eventParams['On Time'].v(), 0]])
+            if(pairs is None):
+                pairs = newEventStep
+            else:
+                pairs = np.vstack((pairs, newEventStep))
+        command = DigitalSparseCommand(pairs)
+        return command
+

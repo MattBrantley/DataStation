@@ -77,3 +77,10 @@
 [11/14/2018 16:35:52] Sequence applied to instrument!
 [11/14/2018 17:03:49] Saving Sequence (D:/InstrPlatform/DataStation/Sequences/Basic FT-ICR/test)... 
 [11/14/2018 17:03:49] Done!
+[11/15/2018 09:04:29] Shutting down Datastation!
+[11/15/2018 09:04:29] Updating User Profile... (d:/InstrPlatform/DataStation\Module Data\Profile Selection\Profiles\Brantley_Matthew1.dsprofile).. 
+[11/15/2018 09:04:30] Recording Hardware State... 
+[11/15/2018 09:04:30] Updating Settings File... 
+[11/15/2018 09:04:30] Done!
+[11/15/2018 09:04:30] Done!
+[11/15/2018 09:04:30] Datastation successfully closed!

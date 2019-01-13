@@ -33,11 +33,18 @@ class Source():
     def Get_Handler(self):
         return self.handler
 
+    def Is_Registered(self):
+        if self.isRegistered is True:
+            return True
+        else:
+            return False
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
     def __init__(self, handler, name, physConID, trigger=False):
         self.iM = None
         self.handler = handler
+        self.isRegistered = False
         self.sourceSettings = dict()
         self.sourceSettings['name'] = name
         self.sourceSettings['uuid'] = str(uuid.uuid4())
@@ -49,6 +56,9 @@ class Source():
 ##### DataStation Interface Functions #####
 
     def readyCheck(self, traceIn):
+        if self.Is_Registered() is False:
+            return False
+
         trace = traceIn.copy()
         trace.append(self)
         drivingSocketCount = 0
@@ -75,6 +85,7 @@ class Source():
         self.ds = hWare.ds
         self.iM = hWare.ds.iM
         self.hM = hWare.ds.hM
+        self.isRegistered = True
 
     def getProgrammingPacket(self, programmingPacket):
         self.programmingPacket = programmingPacket

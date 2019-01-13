@@ -41,12 +41,14 @@ class Sequencer(DSModule):
         self.updateToolbarState()
 
         self.prevInstrumentPath = self.Read_Setting('Instrument_Path')
+        self.prevInstrumentUUID = self.Read_Setting('Instrument_UUID')
         self.prevSequencePath = self.Read_Setting('Sequence_Path')
 
         self.iM.Sequence_Loaded.connect(self.sequenceLoaded) 
         #self.iM.Sequence_Saved.connect(self.sequenceLoaded)
 
         self.iM.Instrument_Removed.connect(self.populateInstrumentList)
+        self.iM.Instrument_Loaded.connect(self.populateInstrumentList)
         self.iM.Instrument_New.connect(self.populateInstrumentList)
         self.iM.Instrument_Name_Changed.connect(self.populateInstrumentList)
 
@@ -68,7 +70,10 @@ class Sequencer(DSModule):
             #if(instrument.Get_UUID() == self.targetUUID):
             #    self.instrumentSelectionBox.setCurrentIndex(idx+1)
 
-            self.loadedInstruments.addInstrument(instrument)        
+            self.loadedInstruments.addInstrument(instrument)
+
+            #if self.prevInstrumentUUID == instrument.Get_UUID():
+            #    self.instrumentSelectionBox.setCurrentIndex(idx+1)
             if self.prevInstrumentPath == instrument.Get_Path():
                 self.instrumentSelectionBox.setCurrentIndex(idx+1)
                 #instrument.Load_Sequence(self.prevSequencePath)
@@ -155,11 +160,13 @@ class Sequencer(DSModule):
             self.sequenceView.loadInstrument(instrument)
             self.sequenceNavigator.setEnabled(True)
             self.Write_Setting('Instrument_Path', instrument.Get_Path())
+            self.Write_Setting('Instrument_UUID', instrument.Get_UUID())
         else:
             self.sequenceView.clearAllPlots()
             self.setWindowTitle('Sequencer (None)')
             self.sequenceNavigator.setEnabled(False)
             self.Write_Setting('Instrument_Path', None)
+            self.Write_Setting('Instrument_UUID', None)
 
     def initLayout(self):
         self.mainContainer = QMainWindow()
@@ -258,6 +265,7 @@ class sequencerPlot(QWidget):
                             if(data):
                                 plotData = np.vstack(data)
                                 plot.Add_Line(plotData[:,0], plotData[:,1], stepped=True)
+                                data.clear()
 
                             #### Analog Waveform
                             for cmd in packet.Get_Commands(commandType=AnalogWaveformCommand):
@@ -265,6 +273,7 @@ class sequencerPlot(QWidget):
                             if(data):
                                 plotData = np.vstack(data)
                                 plot.Add_Line(plotData[:,0], plotData[:,1], stepped=False)
+                                data.clear()
                             #else:
                             #    plot.Add_Line(np.zeros(1), np.zeros(1), stepped=False)
 
@@ -274,6 +283,7 @@ class sequencerPlot(QWidget):
                             if(data):
                                 plotData = np.vstack(data)
                                 plot.Add_Line(plotData[:,0], plotData[:,1], stepped=True)
+                                data.clear()
 
                         else:
                             pass

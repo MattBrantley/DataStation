@@ -165,10 +165,12 @@ class HardwareDeviceHandler(QObject):
         self.hM.hardwareReadyStatusChanged(self, bool)
 
     def addDOSocket(self, name):
-        print('add socket')
+        pass
+        #print('add socket')
 
     def clearHardwareSockets(self):
-        print('clear sockets')
+        pass
+        #print('clear sockets')
 
 ##################################### INTERNAL FUNCS #####################################
 

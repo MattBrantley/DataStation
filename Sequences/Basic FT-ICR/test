@@ -2,21 +2,69 @@
     "eventData": [
         {
             "compID": "circLens_mrb",
-            "events": [],
+            "events": [
+                {
+                    "params": {
+                        "Voltage": 5.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "params": {
+                        "Duration": 0.001,
+                        "Voltage": 30.0
+                    },
+                    "time": 0.01,
+                    "type": "Pulse"
+                }
+            ],
             "name": "Quad Trap Plate",
             "type": "Circular Lens",
             "uuid": "c330fd81-ae6b-4e08-a8a6-3e5cd19889d3"
         },
         {
             "compID": "circLens_mrb",
-            "events": [],
+            "events": [
+                {
+                    "params": {
+                        "Voltage": 5.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "params": {
+                        "Duration": 0.001,
+                        "Voltage": -30.0
+                    },
+                    "time": 0.01,
+                    "type": "Pulse"
+                }
+            ],
             "name": "Fil Trap Plate",
             "type": "Circular Lens",
             "uuid": "e54d3171-4888-4639-aa43-fab25145473f"
         },
         {
             "compID": "penTrap_mrb",
-            "events": [],
+            "events": [
+                {
+                    "params": {
+                        "Voltage": 2.0
+                    },
+                    "time": 0.0,
+                    "type": "Step"
+                },
+                {
+                    "params": {
+                        "Duration": 0.001,
+                        "Voltage": -9.0
+                    },
+                    "time": 0.01,
+                    "type": "Pulse"
+                }
+            ],
             "name": "Inner Trapping Rings",
             "type": "Penning Trap",
             "uuid": "e6a8589e-cb19-4953-9f94-9d9866ab6795"
@@ -26,11 +74,11 @@
             "events": [
                 {
                     "params": {
-                        "Amplitude": 1.0,
-                        "Duration": 0.05,
-                        "End": 10000.0,
-                        "Rate": 100000.0,
-                        "Start": 1000.0
+                        "Amplitude": 0.2,
+                        "Duration": 0.004,
+                        "End": 2000000.0,
+                        "Rate": 50000000.0,
+                        "Start": 4000000.0
                     },
                     "time": 0.0,
                     "type": "Chirp"
@@ -45,10 +93,10 @@
             "events": [
                 {
                     "params": {
-                        "Num. Points": 5000,
-                        "Range-Max": 10.0,
-                        "Range-Min": -10.0,
-                        "Rate": 10000.0
+                        "Num. Points": 400000,
+                        "Range-Max": 0.1,
+                        "Range-Min": -0.1,
+                        "Rate": 16000000.0
                     },
                     "time": 0.0,
                     "type": "N-Count Collection"
@@ -65,8 +113,13 @@
                     "params": {
                         "Width": 0.05
                     },
-                    "time": 1.0,
+                    "time": 12.0,
                     "type": "Pulse High"
+                },
+                {
+                    "params": {},
+                    "time": 13.0,
+                    "type": "Go Low"
                 }
             ],
             "name": "Excite Trigger",
@@ -80,7 +133,7 @@
                     "params": {
                         "Width": 0.05
                     },
-                    "time": 1.0,
+                    "time": 12.005,
                     "type": "Pulse High"
                 }
             ],
@@ -90,14 +143,38 @@
         },
         {
             "compID": "fil_mrb",
-            "events": [],
+            "events": [
+                {
+                    "params": {
+                        "Duration": 8.0,
+                        "Voltage": -70.0
+                    },
+                    "time": 2.0,
+                    "type": "Pulse"
+                }
+            ],
             "name": "EI Filament",
             "type": "Filament",
             "uuid": "65d26fd1-fd48-4bdd-9d8f-2b2ee2752ff8"
         },
         {
             "compID": "pulsevalve_mrb",
-            "events": [],
+            "events": [
+                {
+                    "params": {},
+                    "time": 0.0,
+                    "type": "Go Low"
+                },
+                {
+                    "params": {
+                        "Count": 5,
+                        "Off Time": 0.5,
+                        "On Time": 0.001
+                    },
+                    "time": 1.0,
+                    "type": "Pulse Train"
+                }
+            ],
             "name": "Cell Pulse Valve",
             "type": "Pulse Valve",
             "uuid": "c23c13b6-e51f-48ab-acd8-c96f3c5aa5c1"

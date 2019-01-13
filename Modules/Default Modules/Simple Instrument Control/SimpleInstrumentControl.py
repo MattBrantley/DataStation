@@ -27,9 +27,11 @@ class SimpleInstrumentControl(DSModule):
         self.iM = ds.iM
         self.hM = ds.hM
         self.readyCheckMessages = list()
-        self.targetUUID = None
+        self.targetUUID = self.Read_Setting('Instrument_UUID')
+        self.backgroundUUID = self.Read_Setting('Background_UUID')
         self.targetPath = None
         self.targetInstrument = None
+        self.backgroundInstrument = None
 
         self.mainLayout = QHBoxLayout()
         self.mainWidget = QWidget()
@@ -61,8 +63,10 @@ class SimpleInstrumentControl(DSModule):
         self.iM.Socket_Attached.connect(self.readyChecks)
 
         self.iM.Instrument_Removed.connect(self.populateInstrumentList)
+        self.iM.Instrument_Loaded.connect(self.populateInstrumentList)
         self.iM.Instrument_New.connect(self.populateInstrumentList)
         self.iM.Instrument_Name_Changed.connect(self.populateInstrumentList)
+        #self.iM.Instrument_UUID_Changed.connect(self.populateInstrumentList)
 
         self.startReadyCheckTimer()
         self.populateInstrumentList()
@@ -90,11 +94,12 @@ class SimpleInstrumentControl(DSModule):
         if(instrument is not None):
             self.setWindowTitle('Instrument Control (' + instrument.Get_Name() + ')')
             self.Write_Setting('Instrument_Path', instrument.Get_Path())
+            self.Write_Setting('Instrument_UUID', uuid)
 
         else:
             self.setWindowTitle('Instrument Control (None)')
             self.Write_Setting('Instrument_Path', None)
-
+            self.Write_Setting('Instrument_UUID', None)
 
     def startReadyCheckTimer(self):
         self.timer = QTimer()
@@ -156,7 +161,12 @@ class SimpleInstrumentControl(DSModule):
         print('run stop')
 
     def runSettingsPressed(self):
-        print('settings')
+        menu = QMenu()
+        settingsConfig = QWidgetAction(self.ds)
+        settingsConfig.setDefaultWidget(settingsConfigWidget(self, self.ds))
+        menu.addAction(settingsConfig)
+
+        action = menu.exec_(QCursor().pos())
 
     def readyCheckInfoPressed(self):
         menu = QMenu()
@@ -358,3 +368,63 @@ class statusDisplayWidget(QLineEdit):
             return
             
         self.setText('UNKNOWN!')
+
+class settingsConfigWidget(QWidget):
+    def __init__(self, module, ds):
+        super().__init__()
+        self.module = module
+        self.ds = ds
+        self.iM = ds.iM
+        self.configLayout = QVBoxLayout()
+        self.setLayout(self.configLayout)
+        self.setMinimumWidth(200)
+
+        self.backgroundInstrmentLabel = QLabel('Background Instrument:')
+        self.configLayout.addWidget(self.backgroundInstrmentLabel)
+
+        self.backgroundInstrumentBox = QComboBox()
+        self.backgroundInstrumentBox.setMinimumWidth(200)
+        self.backgroundInstrumentBox.currentIndexChanged.connect(self.instrumentSelectionChanged)
+        self.populateInstrumentList()
+
+        self.configLayout.addWidget(self.backgroundInstrumentBox)
+        
+        self.backgroundSettingWidget = QWidget()
+        self.backgroundSettingWidgetLayout = QFormLayout()
+        self.backgroundSettingWidget.setLayout(self.backgroundSettingWidgetLayout)
+
+        self.incrementBox = QSpinBox()
+        self.incrementBox.setRange(250, 20000)
+        self.backgroundSettingWidgetLayout.addRow('Interval (ms)', self.incrementBox)
+
+        self.enabledBox = QCheckBox()
+        self.backgroundSettingWidgetLayout.addRow('Enabled', self.enabledBox)
+
+        self.configLayout.addWidget(self.backgroundSettingWidget)
+
+    def instrumentSelectionChanged(self, index):
+        uuid = self.backgroundInstrumentBox.itemData(index, role=Qt.UserRole)
+        instrument = self.iM.Get_Instruments(uuid=uuid)
+
+        if not instrument:
+            instrument = None
+        else:
+            instrument = instrument[0]
+
+        self.module.backgroundInstrument = instrument
+
+        if(instrument is not None):
+            self.module.Write_Setting('Background_UUID', uuid)
+
+        else:
+            self.module.Write_Setting('Background_UUID', None)
+
+    def populateInstrumentList(self):
+        self.backgroundInstrumentBox.clear()
+        self.backgroundInstrumentBox.addItem('--NONE--')
+        for idx, instrument in enumerate(self.iM.Get_Instruments()):
+            #if(instrument is not self.module.targetInstrument): # Stops target instrument from being background instrument
+            self.backgroundInstrumentBox.addItem(instrument.Get_Name())
+            self.backgroundInstrumentBox.setItemData(idx+1, instrument.Get_UUID(), role=Qt.UserRole)
+            if(instrument.Get_UUID() == self.module.backgroundUUID):
+                self.backgroundInstrumentBox.setCurrentIndex(idx+1)

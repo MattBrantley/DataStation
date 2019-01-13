@@ -1,0 +1,73 @@
+[01/09/2019 14:50:57] Searching For Modules... 
+[01/09/2019 14:50:58]    Found Module: codeEditor.py
+[01/09/2019 14:50:58]    Found Module: Console.py
+[01/09/2019 14:50:58]    Found Module: datastationWeb.py
+[01/09/2019 14:50:58]    Found Module: FTStudio.py
+[01/09/2019 14:50:58]    Found Module: hardwareView.py
+[01/09/2019 14:50:59]    Found Module: instrumentEditor.py
+[01/09/2019 14:50:59]    Found Module: loadingScreen.py
+[01/09/2019 14:50:59]    Found Module: logView.py
+[01/09/2019 14:50:59]    Found Module: measurementPreview.py
+[01/09/2019 14:50:59]    Found Module: processStatus.py
+[01/09/2019 14:50:59]    Found Module: profileSelection.py
+[01/09/2019 14:50:59]    Found Module: Sequencer.py
+[01/09/2019 14:50:59]    Found Module: SimpleInstrumentControl.py
+[01/09/2019 14:50:59]    Found Module: SQLiteDataRecorder.py
+[01/09/2019 14:50:59] Finished Searching For Modules!
+[01/09/2019 14:50:59] Loading User Profiles... 
+[01/09/2019 14:50:59] Done!
+[01/09/2019 14:50:59] Loading Component Models... 
+[01/09/2019 14:50:59]    Found Component Script: d:/InstrPlatform/DataStation\Components\Basic_Trigger.py
+[01/09/2019 14:50:59]   (Success!)
+[01/09/2019 14:50:59]    Found Component Script: d:/InstrPlatform/DataStation\Components\Circular_Lens.py
+[01/09/2019 14:50:59]   (Success!)
+[01/09/2019 14:50:59]    Found Component Script: d:/InstrPlatform/DataStation\Components\DC_Electrode.py
+[01/09/2019 14:50:59]   (Success!)
+[01/09/2019 14:50:59]    Found Component Script: d:/InstrPlatform/DataStation\Components\Detection_Plates.py
+[01/09/2019 14:50:59]   (Success!)
+[01/09/2019 14:50:59]    Found Component Script: d:/InstrPlatform/DataStation\Components\Excitation_Plates.py
+[01/09/2019 14:50:59]   (Success!)
+[01/09/2019 14:50:59]    Found Component Script: d:/InstrPlatform/DataStation\Components\Filament.py
+[01/09/2019 14:50:59]   (Success!)
+[01/09/2019 14:50:59]    Found Component Script: d:/InstrPlatform/DataStation\Components\Penning_Trap.py
+[01/09/2019 14:50:59]   (Success!)
+[01/09/2019 14:50:59]    Found Component Script: d:/InstrPlatform/DataStation\Components\Pulse_Valve.py
+[01/09/2019 14:50:59]   (Success!)
+[01/09/2019 14:50:59]    Found Component Script: d:/InstrPlatform/DataStation\Components\Quadrupole.py
+[01/09/2019 14:50:59]   (Success!)
+[01/09/2019 14:50:59] Finished Loading Component Models!
+[01/09/2019 14:50:59] Loading User Filters... 
+[01/09/2019 14:50:59]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Signal_Splitter_2Way.py
+[01/09/2019 14:50:59]   (Success!)
+[01/09/2019 14:50:59]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Signal_Splitter_3Way.py
+[01/09/2019 14:50:59]   (Success!)
+[01/09/2019 14:50:59]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Simple_Amplifier.py
+[01/09/2019 14:50:59]   (Success!)
+[01/09/2019 14:50:59] Finished Loading User Filters!
+[01/09/2019 14:50:59] Loading Hardware Drivers... 
+[01/09/2019 14:50:59]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\MIPS.py
+[01/09/2019 14:50:59]   (Success!)
+[01/09/2019 14:50:59]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\NI_DAQmx.py
+[01/09/2019 14:50:59]   (Success!)
+[01/09/2019 14:50:59]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5122.py
+[01/09/2019 14:50:59]   (Success!)
+[01/09/2019 14:50:59]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5451.py
+[01/09/2019 14:50:59]   (Success!)
+[01/09/2019 14:50:59]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\Test_Driver.py
+[01/09/2019 14:50:59]   (Success!)
+[01/09/2019 14:50:59] Finished Loading Hardware Drivers!
+[01/09/2019 14:50:59] Initializing DataStation Labview Interface... 
+[01/09/2019 14:51:03] Done!
+[01/09/2019 14:51:03] Loading Hardware State Data.. 
+[01/09/2019 14:51:03] Done!
+[01/09/2019 14:51:04] Loading User Instrument (D:/InstrPlatform/DataStation/Instruments\Basic FT-ICR.dsinstrument)... 
+[01/09/2019 14:51:05] Added New Component to Instrument: Circular Lens
+[01/09/2019 14:51:05] Added New Component to Instrument: Circular Lens
+[01/09/2019 14:51:05] Added New Component to Instrument: Penning Trap
+[01/09/2019 14:51:05] Added New Component to Instrument: Excitation Plates
+[01/09/2019 14:51:05] Added New Component to Instrument: Detection Plates
+[01/09/2019 14:51:05] Added New Component to Instrument: Basic Trigger
+[01/09/2019 14:51:05] Added New Component to Instrument: Basic Trigger
+[01/09/2019 14:51:05] Added New Component to Instrument: Filament
+[01/09/2019 14:51:05] Added New Component to Instrument: Pulse Valve
+[01/09/2019 14:51:05] Could not load styleSheet: 

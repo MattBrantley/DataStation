@@ -1,0 +1,72 @@
+[01/11/2019 16:55:03] Searching For Modules... 
+[01/11/2019 16:55:03]    Found Module: codeEditor.py
+[01/11/2019 16:55:04]    Found Module: Console.py
+[01/11/2019 16:55:04]    Found Module: datastationWeb.py
+[01/11/2019 16:55:04]    Found Module: FTStudio.py
+[01/11/2019 16:55:04]    Found Module: hardwareView.py
+[01/11/2019 16:55:04]    Found Module: instrumentEditor.py
+[01/11/2019 16:55:04]    Found Module: loadingScreen.py
+[01/11/2019 16:55:04]    Found Module: logView.py
+[01/11/2019 16:55:04]    Found Module: measurementPreview.py
+[01/11/2019 16:55:04]    Found Module: MultiInstrumentControl.py
+[01/11/2019 16:55:04]    Found Module: processStatus.py
+[01/11/2019 16:55:04]    Found Module: profileSelection.py
+[01/11/2019 16:55:04]    Found Module: Sequencer.py
+[01/11/2019 16:55:04]    Found Module: SimpleInstrumentControl.py
+[01/11/2019 16:55:04]    Found Module: SQLiteDataRecorder.py
+[01/11/2019 16:55:04] Finished Searching For Modules!
+[01/11/2019 16:55:04] Loading User Profiles... 
+[01/11/2019 16:55:04] Done!
+[01/11/2019 16:55:04] Loading Component Models... 
+[01/11/2019 16:55:04]    Found Component Script: d:/InstrPlatform/DataStation\Components\Basic_Trigger.py
+[01/11/2019 16:55:05]   (Success!)
+[01/11/2019 16:55:05]    Found Component Script: d:/InstrPlatform/DataStation\Components\Circular_Lens.py
+[01/11/2019 16:55:05]   (Success!)
+[01/11/2019 16:55:05]    Found Component Script: d:/InstrPlatform/DataStation\Components\DC_Electrode.py
+[01/11/2019 16:55:05]   (Success!)
+[01/11/2019 16:55:05]    Found Component Script: d:/InstrPlatform/DataStation\Components\Detection_Plates.py
+[01/11/2019 16:55:05]   (Success!)
+[01/11/2019 16:55:05]    Found Component Script: d:/InstrPlatform/DataStation\Components\Excitation_Plates.py
+[01/11/2019 16:55:05]   (Success!)
+[01/11/2019 16:55:05]    Found Component Script: d:/InstrPlatform/DataStation\Components\Filament.py
+[01/11/2019 16:55:05]   (Success!)
+[01/11/2019 16:55:05]    Found Component Script: d:/InstrPlatform/DataStation\Components\Penning_Trap.py
+[01/11/2019 16:55:05]   (Success!)
+[01/11/2019 16:55:05]    Found Component Script: d:/InstrPlatform/DataStation\Components\Pulse_Valve.py
+[01/11/2019 16:55:05]   (Success!)
+[01/11/2019 16:55:05]    Found Component Script: d:/InstrPlatform/DataStation\Components\Quadrupole.py
+[01/11/2019 16:55:05]   (Success!)
+[01/11/2019 16:55:05] Finished Loading Component Models!
+[01/11/2019 16:55:05] Loading User Filters... 
+[01/11/2019 16:55:05]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Signal_Splitter_2Way.py
+[01/11/2019 16:55:05]   (Success!)
+[01/11/2019 16:55:05]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Signal_Splitter_3Way.py
+[01/11/2019 16:55:05]   (Success!)
+[01/11/2019 16:55:05]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Simple_Amplifier.py
+[01/11/2019 16:55:05]   (Success!)
+[01/11/2019 16:55:05] Finished Loading User Filters!
+[01/11/2019 16:55:05] Loading Hardware Drivers... 
+[01/11/2019 16:55:05]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\MIPS.py
+[01/11/2019 16:55:05]   (Success!)
+[01/11/2019 16:55:05]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\NI_DAQmx.py
+[01/11/2019 16:55:05]   (Success!)
+[01/11/2019 16:55:05]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5122.py
+[01/11/2019 16:55:05]   (Success!)
+[01/11/2019 16:55:05]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5451.py
+[01/11/2019 16:55:05]   (Success!)
+[01/11/2019 16:55:05]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\Test_Driver.py
+[01/11/2019 16:55:05]   (Success!)
+[01/11/2019 16:55:05] Finished Loading Hardware Drivers!
+[01/11/2019 16:55:05] Initializing DataStation Labview Interface... 
+[01/11/2019 16:55:08] Done!
+[01/11/2019 16:55:08] Loading Hardware State Data.. 
+[01/11/2019 16:55:08] Done!
+[01/11/2019 16:55:10] Loading User Instrument (D:/InstrPlatform/DataStation/Instruments\Something2.dsinstrument)... 
+[01/11/2019 16:55:11] Could not load styleSheet: 
+[01/11/2019 16:57:30] Shutting down Datastation!
+[01/11/2019 16:57:30] Updating User Profile... (d:/InstrPlatform/DataStation\Module Data\Profile Selection\Profiles\Brantley_Matthew1.dsprofile).. 
+[01/11/2019 16:57:31] Recording Hardware State... 
+[01/11/2019 16:57:31] Updating Settings File... 
+[01/11/2019 16:57:31] Done!
+[01/11/2019 16:57:31] Done!
+[01/11/2019 16:57:31] Datastation successfully closed!

@@ -1,4 +1,5 @@
 {
+    "UUID": "b3c26652-7c14-412b-8092-78225a08d589",
     "compList": [
         {
             "compIdentifier": "circLens_mrb",
@@ -25,7 +26,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "d14e19ee-622f-4cc2-af8a-1c2b2eb0a13f",
+                    "inputSource": "b6e05193-9b18-4c4c-8a4e-f0f837c17c29",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "prec": 0.1,
@@ -62,7 +63,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "2ace5719-f3bd-45bd-8513-eb768bcc8933",
+                    "inputSource": "a71ada98-fd7c-4c63-985d-e81a40e9d550",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Circular Lens",
                     "prec": 0.1,
@@ -99,7 +100,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "bc655578-db2c-404b-b7de-c8d5579a9feb",
+                    "inputSource": "1cfa69f9-e49e-403e-a39f-e4711ec0668c",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Penning Trap",
                     "prec": 0.1,
@@ -167,7 +168,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "f40b5759-f92e-45a1-95f0-c0eaedb3f160",
+                    "inputSource": "6facb6fe-b3f4-428b-ade3-6f599992bbe2",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Detection Plates",
                     "prec": 0.1,
@@ -266,7 +267,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "ab80f764-9b4f-41a4-9b4d-95e2b22d2478",
+                    "inputSource": "d14e19ee-622f-4cc2-af8a-1c2b2eb0a13f",
                     "inputSourcePathNo": 1,
                     "name": "Unnamed Filament",
                     "prec": 0.1,
