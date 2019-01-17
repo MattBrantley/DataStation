@@ -8,7 +8,7 @@ from PyQt5.QtGui import *
 # NOTES FOR FUTURE INSTALLS
 # pyqtgraph has an import warning that is solved by running "conda install h5py==2.8.0"
 # nidaqmx - pip install nidaqmx
-# nifgen - pip install nifgen
+# nifgen - pip install nifgenpip 
 # niscope - pip install niscope
 # proctitle - pip install setproctitle -- NOT USED?
 # pyserial - pip install pyserial
@@ -19,6 +19,7 @@ from PyQt5.QtGui import *
 #   -> Had to redowngrade to 5.10.1
 #   -> Downgraded pyqtchart to 5.10.1
 # labview runtime is automatically polled and link provided - thanks NI!
+# pip install sphinx // This is for the docs system
 
 
 # --- In case of bug: break glass! ---
