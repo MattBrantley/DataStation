@@ -53,10 +53,11 @@ class instrumentEditor(DSModule):
         self.iM.Instrument_Name_Changed.connect(self.newInstrument)
         self.iM.Instrument_New.connect(self.populateInstrumentList)
         self.iM.Instrument_Name_Changed.connect(self.populateInstrumentList)
+        self.iM.Instrument_UUID_Changed.connect(self.populateInstrumentList)
 
-        prevInstrumentPath = self.Read_Setting('Instrument_Path')
-        if isinstance(prevInstrumentPath, str):
-            self.openInstrument(prevInstrumentPath)
+        #prevInstrumentPath = self.Read_Setting('Instrument_Path')
+        #if isinstance(prevInstrumentPath, str):
+        #    self.openInstrument(prevInstrumentPath)
 
     def initActions(self):
         self.newAction = QAction('New', self)
@@ -93,14 +94,14 @@ class instrumentEditor(DSModule):
     def populateInstrumentList(self, instrument):
         self.instrumentSelectionBox.clear()
         self.loadedInstruments.clear()
-        self.instrumentSelectionBox.addItem('')
-        for idx, instrument in enumerate(self.iM.Get_Instruments()):
-            self.instrumentSelectionBox.addItem(instrument.Get_Name())
-            self.instrumentSelectionBox.setItemData(idx+1, instrument.Get_UUID(), role=Qt.UserRole)
-            if(instrument.Get_UUID() == self.targetUUID):
-                self.instrumentSelectionBox.setCurrentIndex(idx+1)
+        #self.instrumentSelectionBox.addItem('')
+        for idx, instr in enumerate(self.iM.Get_Instruments()):
+            self.instrumentSelectionBox.addItem(instr.Get_Name())
+            self.instrumentSelectionBox.setItemData(idx, instr.Get_UUID(), role=Qt.UserRole)
+            if(instr.Get_UUID() == instrument.Get_UUID()):
+                self.instrumentSelectionBox.setCurrentIndex(idx)
 
-            self.loadedInstruments.addInstrument(instrument)
+            self.loadedInstruments.addInstrument(instr)
 
     def newInstrument(self, instrument):
         if os.path.abspath(instrument.Get_Path()) == os.path.abspath(self.targetPath):
@@ -133,10 +134,10 @@ class instrumentEditor(DSModule):
 
         if(instrument is not None):
             self.setWindowTitle('Instrument View (' + instrument.Get_Name() + ')')
-            self.Write_Setting('Instrument_Path', instrument.Get_Path())
+            #self.Write_Setting('Instrument_Path', instrument.Get_Path())
         else:
             self.setWindowTitle('Instrument View (None)')
-            self.Write_Setting('Instrument_Path', None)
+            #self.Write_Setting('Instrument_Path', None)
 
         self.instrumentView.loadTargetInstrument()
 
@@ -151,7 +152,7 @@ class instrumentEditor(DSModule):
             self.iM.New_Instrument(name=fname, directory=self.rootPath)
         else:
             return
-        self.updateTitle()
+        #self.updateTitle()
 
     def save(self):
         savePath = None

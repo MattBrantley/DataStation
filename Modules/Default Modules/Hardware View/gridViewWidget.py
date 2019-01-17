@@ -21,7 +21,7 @@ class gridViewWidget(QWidget):
         self.socketList = list()
         self.sourceList = list()
 
-        self.filterStackWidget = filterStackWidget(dockWidget, self.ds)
+        self.filterStackWidget = filterStackWidget(dockWidget, self, self.ds)
         self.filterStackWidget.setObjectName('filterStackWidget')
         self.dockWidget.Get_Window().addDockWidget(Qt.BottomDockWidgetArea, self.filterStackWidget)
         self.filterStackWidget.hide()
@@ -29,6 +29,16 @@ class gridViewWidget(QWidget):
 
         self.mainLayout = QVBoxLayout()
         self.setLayout(self.mainLayout)
+
+        self.instrumentSelectionBox = QComboBox()
+        self.instrumentSelectionBox.currentIndexChanged.connect(self.drawScene)
+        self.instrumentSelectionBox.currentIndexChanged.connect(self.filterStackWidget.drawScene)
+        self.mainLayout.addWidget(self.instrumentSelectionBox)
+
+        self.iM.Instrument_Removed.connect(self.populateInstrumentList)
+        self.iM.Instrument_Loaded.connect(self.populateInstrumentList)
+        self.iM.Instrument_New.connect(self.populateInstrumentList)
+        self.iM.Instrument_Name_Changed.connect(self.populateInstrumentList)
 
         self.gridCombo = QComboBox()
         self.gridCombo.addItem('Sockets: Analog Output')
@@ -39,6 +49,7 @@ class gridViewWidget(QWidget):
         self.mainLayout.addWidget(self.gridCombo)
 
         self.gridWidget = QGraphicsView()
+        #self.gridWidget.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform | QPainter.TextAntialiasing)
         self.gridTransform = QTransform()
         self.gridWidget.setTransform(self.gridTransform)
         self.iScene = iScene(self, self.gridTransform, self.ds)
@@ -53,12 +64,13 @@ class gridViewWidget(QWidget):
         self.iM.Socket_Added.connect(self.drawScene)
         self.hM.Source_Added.connect(self.drawScene)
 
+        self.populateInstrumentList()
         self.drawScene()
 
     def repopulateSocketsAndPlugs(self):
         self.socketList = list()
         self.sourceList = list()
-        for instrument in self.iM.Get_Instruments():
+        for instrument in self.iM.Get_Instruments(uuid=self.getCurrentInstrumentUUID()):
             if(self.gridCombo.currentText() == 'Sockets: Analog Output'):
                 self.socketList += instrument.Get_Sockets(socketType=AOSocket)
                 self.sourceList = self.hM.Get_Sources(sourceType=AOSource)
@@ -113,17 +125,37 @@ class gridViewWidget(QWidget):
         offsetX = self.iScene.marginLeft
         self.iScene.addLine(offsetX, self.iScene.marginTop, offsetX, self.iScene.marginTop+totalHeight)
         transformTopText = QTransform()
-        transformTopText.rotate(270)
+        transformTopText.rotate(310)
 
         for socket in self.socketList:
-            text = self.iScene.addText(socket.Get_Name())
+            text = self.iScene.addText(socket.Get_Name() + '(' + socket.Get_Component().Get_Name() + ')')
             text.setTransform(transformTopText)
-            text.setPos(offsetX + text.boundingRect().height() - self.iScene.cellWidth, self.iScene.marginTop)
+            text.setPos(offsetX + text.boundingRect().height() - self.iScene.cellWidth - 4, self.iScene.marginTop - 10)
 
             offsetX = offsetX + self.iScene.cellHeight
             self.iScene.addLine(offsetX, self.iScene.marginTop, offsetX, self.iScene.marginTop+totalHeight)
 
         self.iScene.connectPlugsAndSockets()
+
+    def getCurrentInstrumentUUID(self):
+        return self.instrumentSelectionBox.currentData(role=Qt.UserRole)
+
+    def getCurrentInstrumentName(self):
+        instruments = self.iM.Get_Instruments(uuid=self.getCurrentInstrumentUUID())
+
+        for instrument in instruments:
+            return instrument.Get_Name()
+
+        return 'No Instrument Selected'
+
+    def populateInstrumentList(self):
+        self.instrumentSelectionBox.clear()
+        self.instrumentSelectionBox.addItem('')
+        for idx, instrument in enumerate(self.iM.Get_Instruments()):
+            self.instrumentSelectionBox.addItem(instrument.Get_Name())
+            self.instrumentSelectionBox.setItemData(idx+1, instrument.Get_UUID(), role=Qt.UserRole)
+            #if(instrument.Get_UUID() == self.targetUUID):
+            #    self.instrumentSelectionBox.setCurrentIndex(idx+1)
 
 class iScene(QGraphicsScene):
     marginLeft = 150

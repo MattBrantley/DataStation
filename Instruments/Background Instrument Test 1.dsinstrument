@@ -1,0 +1,68 @@
+{
+    "UUID": "6ff72f0d-159f-4aef-b71c-1eba9c75bc04",
+    "compList": [
+        {
+            "compIdentifier": "trig_mrb",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": -81.06148867313925,
+                        "y": 1067.7209302325582
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Trigger.png",
+                "name": "Test Trigger",
+                "triggerComp": false,
+                "uuid": "22eb4212-7179-4f54-bf3c-d3bc32f04657"
+            },
+            "compType": "Basic Trigger",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "0a1a9a52-6718-4ed7-8f8c-d495dfc9bd9d",
+                    "inputSourcePathNo": 1,
+                    "name": "",
+                    "tag": "[DO]",
+                    "uuid": "2c7f9f7a-5cff-4e1a-9c85-2de13b251c1b"
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "trig_mrb",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": 260.1078748651563,
+                        "y": 1096.3215172725222
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Trigger.png",
+                "name": "Test Trigger 2",
+                "triggerComp": false,
+                "uuid": "4136b7a8-83b2-49cb-94f1-5ca7c2cf4bf4"
+            },
+            "compType": "Basic Trigger",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "43f23c8f-df16-4eaf-96ee-49a046ef1dac",
+                    "inputSourcePathNo": 1,
+                    "name": "",
+                    "tag": "[DO]",
+                    "uuid": "9ce917ab-e69d-4496-8c45-c5cf46e1fd3c"
+                }
+            ],
+            "triggerComp": false
+        }
+    ],
+    "name": "Background Instrument Test 1"
+}

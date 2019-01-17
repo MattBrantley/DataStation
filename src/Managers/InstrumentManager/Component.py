@@ -32,13 +32,14 @@ class Component(QObject):
             return None
 
     def Set_Custom_Field(self, field, data):
-        self.compSettings['customFields'][field] = data
-        self.instr.componentCustomFieldChanged(self, field)
+        self.changeCustomField(field, data)
         return True
 
+    def Set_Standard_Field(self, field, data):
+        self.changeStandardField(field, data)
+
     def Set_Name(self, name):
-        self.compSettings['name'] = name
-        self.instr.componentStandardFieldChanged(self, 'name')
+        self.changeStandardField('name', name)
 
     def Get_Name(self):
         return self.Get_Standard_Field('name')
@@ -168,6 +169,12 @@ class Component(QObject):
     def onRun(self):  ### OVERRIDE ME!! ####
         return readyCheckPacket('Component', DSConstants.READY_CHECK_ERROR, msg='User Component Does Not Override onRun()!')
 
+    def onStandardFieldChanged(self, field):
+        pass
+
+    def onCustomFieldChanged(self, field):
+        pass
+
 ##### Component Programming #####
 
     def pushProgramming(self):
@@ -175,6 +182,18 @@ class Component(QObject):
             socket.pushProgramming()
 
 ##### Component Modifications #####
+
+    def changeStandardField(self, field, value):
+        self.compSettings[field] = value
+        self.instr.componentStandardFieldChanged(self, field)
+
+        self.onStandardFieldChanged(field)
+
+    def changeCustomField(self, field, value):
+        self.compSettings['customFields'][field] = value
+        self.instr.componentCustomFieldChanged(self, field)
+
+        self.onCustomFieldChanged(field)
 
     def onSaveParent(self):
         savePacket = dict()
@@ -189,9 +208,8 @@ class Component(QObject):
     def loadCompSettings(self, compSettings):
         if(compSettings is not None):
             for key, value in compSettings.items():
-                self.compSettings[key] = value
-                self.instr.componentStandardFieldChanged(self, key)
-
+                self.Set_Standard_Field(key, value)
+                
     def setPathDataPacket(self, pathNo, packet):
         self.pathDataPackets[pathNo-1] = packet
 

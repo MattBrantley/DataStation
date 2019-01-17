@@ -28,6 +28,8 @@ class Sequencer(DSModule):
         self.plotList = list()
         self.resize(1000, 800)
 
+        self.firstLoad = True
+
         self.xMin = 0
         self.xMax = 1
 
@@ -39,10 +41,6 @@ class Sequencer(DSModule):
         self.initLayout()
 
         self.updateToolbarState()
-
-        self.prevInstrumentPath = self.Read_Setting('Instrument_Path')
-        self.prevInstrumentUUID = self.Read_Setting('Instrument_UUID')
-        self.prevSequencePath = self.Read_Setting('Sequence_Path')
 
         self.iM.Sequence_Loaded.connect(self.sequenceLoaded) 
         #self.iM.Sequence_Saved.connect(self.sequenceLoaded)
@@ -74,8 +72,8 @@ class Sequencer(DSModule):
 
             #if self.prevInstrumentUUID == instrument.Get_UUID():
             #    self.instrumentSelectionBox.setCurrentIndex(idx+1)
-            if self.prevInstrumentPath == instrument.Get_Path():
-                self.instrumentSelectionBox.setCurrentIndex(idx+1)
+            #if self.prevInstrumentPath == instrument.Get_Path():
+            #    self.instrumentSelectionBox.setCurrentIndex(idx)
                 #instrument.Load_Sequence(self.prevSequencePath)
                 #if isinstance(prevInstrumentPath, str):
                 #    self.openInstrument(prevInstrumentPath)
@@ -156,17 +154,18 @@ class Sequencer(DSModule):
         self.targetInstrument = instrument
 
         if(instrument is not None):
+            self.sequenceView.clearAllPlots()
             self.setWindowTitle('Sequencer (' + instrument.Get_Name() + ')')
             self.sequenceView.loadInstrument(instrument)
             self.sequenceNavigator.setEnabled(True)
-            self.Write_Setting('Instrument_Path', instrument.Get_Path())
-            self.Write_Setting('Instrument_UUID', instrument.Get_UUID())
+            #self.Write_Setting('Instrument_Path', instrument.Get_Path())
+            #self.Write_Setting('Instrument_UUID', instrument.Get_UUID())
         else:
             self.sequenceView.clearAllPlots()
             self.setWindowTitle('Sequencer (None)')
             self.sequenceNavigator.setEnabled(False)
-            self.Write_Setting('Instrument_Path', None)
-            self.Write_Setting('Instrument_UUID', None)
+            #self.Write_Setting('Instrument_Path', None)
+            #self.Write_Setting('Instrument_UUID', None)
 
     def initLayout(self):
         self.mainContainer = QMainWindow()
@@ -181,7 +180,7 @@ class Sequencer(DSModule):
         self.mainContainer.setCentralWidget(self.sequencerContainer)
 
     def sequenceLoaded(self, instrument): #Update when Sequence has been fixed in iM
-        self.Write_Setting('Sequence_Path', instrument.Get_Sequence().Get_Path())
+        #self.Write_Setting('Sequence_Path', instrument.Get_Sequence().Get_Path())
         seqInfo = instrument.Get_Sequence()
         self.setWindowTitle('Sequencer (' + seqInfo.Get_Path() + ')')
         self.getInstrumentBoxInstrument()

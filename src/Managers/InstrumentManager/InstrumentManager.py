@@ -62,10 +62,12 @@ class InstrumentManager(QObject):
     def Get_Instruments(self, name=-1, path=-1, uuid=-1):
         return self.getInstruments(name, path, uuid)
 
-    def Load_Instrument(self, path):
+    def Load_Instrument(self, path, sequencePath=None):
         newInstrument = self.New_Instrument()
         if newInstrument is not None:
             newInstrument.Load_Instrument_File(path)
+            if sequencePath is not None:
+                newInstrument.Load_Sequence(sequencePath)
 
     def Close_Instrument(self, instrument):
         self.closeInstrument(instrument)

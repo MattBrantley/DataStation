@@ -61,18 +61,30 @@ class Source():
 
         trace = traceIn.copy()
         trace.append(self)
-        drivingSocketCount = 0
+
+        socketInstrumentUUIDList = list()
         for socket in self.getSockets():
             if socket.socketSettings['drivingSocket'] == True:
-                drivingSocketCount = drivingSocketCount + 1
-
-        if drivingSocketCount > 1:
-            trace[0].Fail_Ready_Check(trace, 'Source Has More Than One Driving Socket!')
+                socketInstrumentUUIDList.append(socket.Get_Component().Get_Instrument().Get_UUID())
+        if len(socketInstrumentUUIDList) != len(set(socketInstrumentUUIDList)):
+            trace[0].Fail_Ready_Check(trace, 'Source Has More Than One Driving Socket From An Instrument!')
             return False
+
+        #drivingSocketCount = 0
+        #for socket in self.getSockets():
+        #    if socket.socketSettings['drivingSocket'] == True:
+        #        drivingSocketCount = drivingSocketCount + 1
+
+        #if drivingSocketCount > 1:
+        #    trace[0].Fail_Ready_Check(trace, 'Source Has More Than One Driving Socket!')
+        #    return False
 
         if self.programmingPacket is None:
             trace[0].Fail_Ready_Check(trace, 'Active Source Has No Programming Packet')
             return False
+        else:
+            if self.programmingPacket.Get_Origin_Socket().Get_Component().Get_Instrument().Get_UUID() != trace[0].Get_UUID():
+                trace[0].Warning_Ready_Check(trace, 'Source Is Currently Programmed For Another Instrument')
 
         self.hWare.readyCheck(trace)
         return True

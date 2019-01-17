@@ -27,23 +27,32 @@ class MultiInstrumentControl(DSModule):
         self.mainWidget.setLayout(self.mainLayout)
         self.setWidget(self.mainWidget)
 
-
-
         #self.iM.Instrument_Removed.connect(self.updateInstrumentList)
-        #self.iM.Instrument_Loaded.connect(self.populateInstrumentList)
+        #self.iM.Instrument_Loaded.connect(self.populateInstrumentWidgets)
         self.iM.Instrument_New.connect(self.addInstrumentItem)
-        #self.iM.Instrument_Name_Changed.connect(self.populateInstrumentList)
+        self.iM.Instrument_Removed.connect(self.removedInstrumentItem)
+        #self.iM.Instrument_Name_Changed.connect(self.populateInstrumentWidgets)
 
-        self.populateInstrumentList()
-
-    def populateInstrumentList(self):
-        for idx, instrument in enumerate(self.iM.Get_Instruments()):
-            self.addInstrumentItem(instrument)
+        self.populateInstrumentWidgets()
 
     def addInstrumentItem(self, instrument):
         newInstrumentWidget = instrumentControlItem(self.ds, instrument)
         self.instrumentWidgetList.append(newInstrumentWidget)
         self.mainLayout.addWidget(newInstrumentWidget)
+
+    def removedInstrumentItem(self, instrument):
+        for instrumentWidget in self.instrumentWidgetList:
+            self.mainLayout.removeWidget(instrumentWidget)
+            instrumentWidget.deleteLater()
+
+        self.instrumentWidgetList.clear()
+
+        self.populateInstrumentWidgets
+
+    def populateInstrumentWidgets(self):
+        for instrument in self.iM.Get_Instruments():
+            self.addInstrumentItem(instrument)
+
 
 class instrumentControlItem(QWidget):
     STATUS_NOT_READY = 200
@@ -193,7 +202,7 @@ class instrumentControlItem(QWidget):
                 if(checkItem['Level'] == DSConstants.READY_CHECK_ERROR):
                     msgItem.setBackground(QColor(255, 70, 70))
                 if(checkItem['Level'] == DSConstants.READY_CHECK_WARNING):
-                    msgItem.setBackground(QColor(255, 221, 173))
+                    msgItem.setBackground(QColor(246, 255, 0))
                 messageList.addItem(msgItem)                
 
         if(messageList.count() == 0):
@@ -253,6 +262,13 @@ class instrumentControlItem(QWidget):
             self.runStopButton.setEnabled(False)
             self.runSettingsButton.setEnabled(True)
             self.readyCheckInfoButton.setToError()
+
+        if(self.statusDisplayWidget.status == DSConstants.STATUS_WARNING):
+            self.runOnceButton.setEnabled(True)
+            self.runMultipleButton.setEnabled(True)
+            self.runStopButton.setEnabled(False)
+            self.runSettingsButton.setEnabled(True)
+            self.readyCheckInfoButton.setToWarning()
 
         if(self.statusDisplayWidget.status == DSConstants.STATUS_READY):
             self.runOnceButton.setEnabled(True)
@@ -336,8 +352,12 @@ class readyCheckButton(QPushButton):
         self.messageCount = 0
         self.readyCheckInfoIcon = QIcon(os.path.join(dir, 'icons5\information.png'))
         self.readyCheckErrorIcon = QIcon(os.path.join(dir, 'icons5\warning.png'))
+        self.readyCheckWarningIcon = QIcon(os.path.join(dir, 'icons5\warning2.png'))
         self.setIcon(self.readyCheckInfoIcon)
         self.setIconSize(QSize(14, 14))
+
+    def setToWarning(self):
+        self.setIcon(self.readyCheckWarningIcon)
 
     def setToError(self):
         self.setIcon(self.readyCheckErrorIcon)

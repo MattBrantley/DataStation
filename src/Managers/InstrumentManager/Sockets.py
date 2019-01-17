@@ -43,11 +43,13 @@ class Socket():
         return self.programmingPacket
 
     def Set_Programming_Packet(self, packet):
-        packet.Set_Origin_Socket(self)
-        self.programmingPacket = packet
+        self.setProgrammingPacket(packet)
 
     def Get_Component(self):
         return self.comp
+
+    def Set_Name(self, name):
+        self.socketSettings['name'] = name
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -80,6 +82,10 @@ class Socket():
 
     def getMeasurementPacket(self, measurementPacket):
         self.comp.measurementReceived(self, measurementPacket)
+
+    def setProgrammingPacket(self, packet):
+        packet.Set_Origin_Socket(self)
+        self.programmingPacket = packet
 
 ##### Instrument Ready Check #####
 
@@ -159,7 +165,7 @@ class Socket():
             Filter.Detatch_Input()
         
         socketsAttached = list()
-        for instrument in self.iM.Get_Instruments():
+        for instrument in self.iM.Get_Instruments(uuid = self.Get_Component().Get_Instrument().Get_UUID()):
             socketsAttached += instrument.Get_Sockets(inputUUID = uuid, pathNo=pathNumber)
             
         for Socket in socketsAttached:

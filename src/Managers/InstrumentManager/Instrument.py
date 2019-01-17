@@ -80,6 +80,9 @@ class Instrument(QObject):
     def Fail_Ready_Check(self, trace, msg, warningLevel=DSConstants.READY_CHECK_ERROR):
         self.readyCheckFail(trace, msg, warningLevel)
 
+    def Warning_Ready_Check(self, trace, msg, warningLevel=DSConstants.READY_CHECK_WARNING):
+        self.readyCheckFail(trace, msg, warningLevel)
+
     def Get_Hardware_Devices(self):
         return self.getHardwareDevices()
 
@@ -116,7 +119,6 @@ class Instrument(QObject):
             self.sequence.readyCheck(trace)
         else:
             self.ds.postLog('Cannot Ready Check Instrument (' + self.name + ') While DataStation is Loading ', DSConstants.LOG_PRIORITY_HIGH)
-
 
     def readyCheckFail(self, trace, msg, warningLevel):
         self.readyCheckList.append({'Trace': trace, 'Msg': msg, 'Level': warningLevel})

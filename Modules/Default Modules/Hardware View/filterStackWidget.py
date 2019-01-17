@@ -10,14 +10,16 @@ from src.Managers.HardwareManager.Sources import *
 class filterStackWidget(QDockWidget):
     doNotAutoPopulate = True
 
-    def __init__(self, dockWidget, ds):
+    def __init__(self, dockWidget, gridView, ds):
         super().__init__('Filter Stack Editor', parent=dockWidget)
         self.dockWidget = dockWidget
+        self.gridView = gridView
         self.ds = ds
         self.hM = ds.hM
         self.iM = ds.iM
         self.wM = ds.wM
         self.rootSource = None
+        self.rootSourceName = 'NA'
         self.hide()
         self.setAllowedAreas(Qt.NoDockWidgetArea)
 
@@ -37,9 +39,11 @@ class filterStackWidget(QDockWidget):
 
     def setSource(self, rootSource):
         self.rootSource = rootSource
-        self.setWindowTitle('Filter Stack: '+ rootSource.Get_Name())
+        self.rootSourceName = rootSource.Get_Name()
+        #self.setWindowTitle('Filter Stack: '+ rootSource.Get_Name())
 
     def drawScene(self):
+        self.setWindowTitle('Filter Stack: '+ self.rootSourceName + '  [' + self.gridView.getCurrentInstrumentName() + ']')
         self.filterView.drawScene(self.rootSource)
 
 class filterView(QGraphicsView):
@@ -51,12 +55,13 @@ class filterView(QGraphicsView):
     colBuffer = QPointF(0, 20)
     colGap = QPointF(10, 0)
 
-    def __init__(self, ds, scene, transform):
+    def __init__(self, stackWidget, scene, transform):
         super().__init__()
-        self.ds = ds
-        self.hM = ds.hM
-        self.iM = ds.iM
-        self.wM = ds.wM
+        self.ds = stackWidget.ds
+        self.hM = stackWidget.ds.hM
+        self.iM = stackWidget.ds.iM
+        self.wM = stackWidget.ds.wM
+        self.stackWidget = stackWidget
         self.mainScene = scene
         self.setScene(scene)
         self.mainTransform = transform
@@ -104,8 +109,11 @@ class filterView(QGraphicsView):
                 drawObj = filterWidgetObject(self.ds, obj, self, self.mainScene)
                 self.filterObjList.append(drawObj)
             if(issubclass(type(obj), Socket)):
-                drawObj = socketWidgetObject(self.ds, obj, self, self.mainScene)
-                self.filterObjList.append(drawObj)
+                if obj.Get_Component().Get_Instrument().Get_UUID() == self.stackWidget.gridView.getCurrentInstrumentUUID():
+                    drawObj = socketWidgetObject(self.ds, obj, self, self.mainScene)
+                    self.filterObjList.append(drawObj)
+                else:
+                    break
             drawObjects.append(drawObj)
             if(drawObj.rect.width() > maxWidth):
                 maxWidth = drawObj.rect.width()
@@ -156,7 +164,7 @@ class filterView(QGraphicsView):
     def getRefObjects(self, obj):
         refList = list()
         if(obj is not None):
-            for instrument in self.iM.Get_Instruments():
+            for instrument in self.iM.Get_Instruments(uuid = self.stackWidget.gridView.getCurrentInstrumentUUID()):
                 refList += instrument.Get_Sockets(inputUUID=obj.Get_UUID())
             refList += self.hM.Get_Filters(inputUUID=obj.Get_UUID())
         return refList
@@ -220,7 +228,6 @@ class filterScene(QGraphicsScene):
             vbar.setValue(vbar.value() + deltaPoint.y())
 
 class widgetObject():
-
     def __init__(self, ds, sourceObject, view, scene, color, topRound=False, botRound=False, topRadius=5, botRadius=5):
         self.ds = ds
         self.hM = ds.hM
@@ -448,7 +455,7 @@ class socketSelectionWidget(QWidgetAction):
         self.menu.close()
 
     def populateBox(self):
-        for instrument in self.iM.Get_Instruments():
+        for instrument in self.iM.Get_Instruments(uuid=self.parent.view.stackWidget.gridView.getCurrentInstrumentUUID()):
             for socket in instrument.Get_Sockets(socketType=self.getModelType()):
                 item = socketSelectionItem(socket.Get_Name(), socket) ##This is where we would alert if they are connect!
                 self.pSpinBox.addItem(item)

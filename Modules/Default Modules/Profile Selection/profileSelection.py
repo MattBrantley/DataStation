@@ -65,6 +65,8 @@ class profileSelection(DSModule):
         self.hide()
 
     def showWidget(self):
+        self.iM = self.ds.iM
+
         self.setFloating(True)
         self.resize(400, 400)
         self.show()
@@ -124,11 +126,25 @@ class profileSelection(DSModule):
             self.acceptButton.setEnabled(False)
             self.editButton.setEnabled(False)
 
+    def serializeInstrumentStates(self):
+        instrumentData = list()
+        for instrument in self.iM.Get_Instruments():
+            instrumentInfo = {
+                'path': instrument.Get_Path(),
+                'uuid': instrument.Get_UUID(),
+                'sequence_path': instrument.Get_Sequence().Get_Path()
+            }
+            instrumentData.append(instrumentInfo)
+        
+        return instrumentData
+
     def updateUserProfile(self):
         if(self.activeUser is not None):
             self.ds.postLog('Updating User Profile... (' + self.activeUser['url'] + ').. ', DSConstants.LOG_PRIORITY_HIGH)
             self.activeUser['windowStates'] = self.ds.mM.Save_Window_States()
             self.activeUser['styleSheet'] = self.ds.mM.Get_StyleSheet()
+            self.activeUser['instrumentData'] = self.serializeInstrumentStates()
+
             with open(self.activeUser['url'], 'w') as file:
                 json.dump(self.activeUser, file)
                 time.sleep(1) #NOT ELEGANT - NEED CROSS PLATFORM SOLUTION
@@ -142,6 +158,13 @@ class profileSelection(DSModule):
 
         if('styleSheet' in self.activeUser):
             self.ds.mM.Set_StyleSheet(self.activeUser['styleSheet'])
+
+        if('instrumentData' in self.activeUser):
+            self.restoreInstrumentStates(self.activeUser['instrumentData'])
+
+    def restoreInstrumentStates(self, instrumentData):
+        for instrument in instrumentData:
+            self.iM.Load_Instrument(instrument['path'], sequencePath=instrument['sequence_path'])
 
     def finish(self):
         self.setActiveUser()

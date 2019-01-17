@@ -18,7 +18,7 @@ class Basic_Trigger(Component):
     def onCreation(self):
         self.compSettings['layoutGraphicSrc'] = self.iconGraphicSrc
 
-        self.socket = self.addDOSocket(self.compSettings['name'])
+        self.socket = self.addDOSocket('Trigger')
 
         self.addEventType(pulse)
         self.addEventType(goHigh)
