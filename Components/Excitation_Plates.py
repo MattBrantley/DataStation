@@ -41,8 +41,8 @@ class chirpEvent(eventType):
         self.Add_Parameter(eventParameterDouble('End', allowZero=False, allowNegative=False, defaultVal=10000))
         self.Add_Parameter(eventParameterDouble('Amplitude', allowZero=False, allowNegative=False, defaultVal=1))
     
-    def getLength(self, params):
-        return 1
+    def getLength(self):
+        return self.eventParams['Duration']
 
     def toCommand(self):
         times = np.arange(self.time, self.time + self.eventParams['Duration'].v(), 1/self.eventParams['Rate'].v())

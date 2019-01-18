@@ -88,6 +88,15 @@ class PXIe_5451(HardwareDevice):
                 except:
                     pass
         
+    def stop(self):
+        self.Send_Status_Message('Sending Stop Command...')
+        if(hasattr(self, 'session')):
+            if(self.session is not None):
+                try:
+                    self.session.abort()
+                except:
+                    pass
+                    
 ############################################################################################
 ###################################### INTERNAL FUNCS ######################################
 

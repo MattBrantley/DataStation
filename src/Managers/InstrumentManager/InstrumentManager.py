@@ -22,6 +22,7 @@ class InstrumentManager(QObject):
     Instrument_Name_Changed = pyqtSignal(object) # Instrument
     Instrument_UUID_Changed = pyqtSignal(object) # Instrument
     Instrument_Sequence_Running = pyqtSignal(object) # Instrument
+    Instrument_Ready_Checked = pyqtSignal(object) # Instrument
     
 ##### Signals: Components #####
     Component_Added = pyqtSignal(object, object) # Instrument, Component
@@ -35,9 +36,9 @@ class InstrumentManager(QObject):
     Sequence_Saved = pyqtSignal(object) # Instrument
 
 ##### Signals: Events #####
-    Event_Added = pyqtSignal(object, object, object) # Instrument, Component, Event
-    Event_Removed = pyqtSignal(object, object, object) # Instrument, Component, Event
-    Event_Modified = pyqtSignal(object, object, object) # Instrument, Component, Event
+    #Event_Added = pyqtSignal(object, object, object) # Instrument, Component, Event
+    #Event_Removed = pyqtSignal(object, object, object) # Instrument, Component, Event
+    Events_Modified = pyqtSignal(object, object) # Instrument, Component
 
 ##### Signals: Sockets #####
     Socket_Added = pyqtSignal(object, object, object) # Instrument, Component, Socket
@@ -135,6 +136,9 @@ class InstrumentManager(QObject):
     def instrumentSequenceRunning(self, instrument):
         self.Instrument_Sequence_Running.emit(instrument)
 
+    def instrumentReadyChecked(self, instrument):
+        self.Instrument_Ready_Checked.emit(instrument)
+
     ##### Component #####
     def componentAdded(self, instrument, component):
         self.Component_Added.emit(instrument, component)
@@ -159,14 +163,14 @@ class InstrumentManager(QObject):
         self.Socket_Added.emit(instrument, component, socket)
 
     ##### Event #####
-    def eventAdded(self, instrument, component, event):
-        self.Event_Added.emit(instrument, component, event)
+    #def eventAdded(self, instrument, component, event):
+    #    self.Event_Added.emit(instrument, component, event)
 
-    def eventRemoved(self, instrument, component, event):
-        self.Event_Removed.emit(instrument, component, event)
+    #def eventRemoved(self, instrument, component, event):
+    #    self.Event_Removed.emit(instrument, component, event)
 
-    def eventModified(self, instrument, component, event): ## Not used?
-        self.Event_Modified.emit(instrument, component, event)
+    def eventsModified(self, instrument, component):
+        self.Events_Modified.emit(instrument, component)
 
     ##### Sequence #####
     def sequenceLoaded(self, instrument):

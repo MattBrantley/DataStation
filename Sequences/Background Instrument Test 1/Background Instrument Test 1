@@ -1,0 +1,56 @@
+{
+    "eventData": [
+        {
+            "compID": "trig_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Width": 0.05
+                    },
+                    "time": 0.0,
+                    "type": "Pulse High"
+                },
+                {
+                    "params": {
+                        "Width": 0.05
+                    },
+                    "time": 1.0,
+                    "type": "Pulse High"
+                },
+                {
+                    "params": {
+                        "Width": 0.05
+                    },
+                    "time": 2.0,
+                    "type": "Pulse High"
+                }
+            ],
+            "name": "Test Trigger",
+            "type": "Basic Trigger",
+            "uuid": "22eb4212-7179-4f54-bf3c-d3bc32f04657"
+        },
+        {
+            "compID": "trig_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Width": 0.05
+                    },
+                    "time": 0.0,
+                    "type": "Pulse High"
+                },
+                {
+                    "params": {
+                        "Width": 0.05
+                    },
+                    "time": 1.0,
+                    "type": "Pulse High"
+                }
+            ],
+            "name": "Test Trigger 2",
+            "type": "Basic Trigger",
+            "uuid": "4136b7a8-83b2-49cb-94f1-5ca7c2cf4bf4"
+        }
+    ],
+    "instrument": "Background Instrument Test 1"
+}

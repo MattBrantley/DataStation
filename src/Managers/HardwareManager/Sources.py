@@ -21,6 +21,15 @@ class Source():
     def Get_Source(self):
         return self
 
+    def Get_Hardware_Device(self):
+        return self.handler
+
+    def Get_Programming_Instrument(self):
+        return self.getProgrammingInstrument()
+
+    def Get_Handler(self):
+        return self.Get_Hardware_Device()
+
     def Get_UUID(self):
         return self.sourceSettings['uuid']
 
@@ -29,9 +38,6 @@ class Source():
 
     def Push_Measurement_Packet(self, measurementPacket):
         self.pushMeasurementPacket(measurementPacket)
-
-    def Get_Handler(self):
-        return self.handler
 
     def Is_Registered(self):
         if self.isRegistered is True:
@@ -83,7 +89,7 @@ class Source():
             trace[0].Fail_Ready_Check(trace, 'Active Source Has No Programming Packet')
             return False
         else:
-            if self.programmingPacket.Get_Origin_Socket().Get_Component().Get_Instrument().Get_UUID() != trace[0].Get_UUID():
+            if self.Get_Programming_Instrument().Get_UUID() != trace[0].Get_UUID():
                 trace[0].Warning_Ready_Check(trace, 'Source Is Currently Programmed For Another Instrument')
 
         self.hWare.readyCheck(trace)
@@ -101,6 +107,7 @@ class Source():
 
     def getProgrammingPacket(self, programmingPacket):
         self.programmingPacket = programmingPacket
+        self.hWare.Set_Active_Instrument(self.Get_Programming_Instrument())
         self.hWare.programDataReceived(self)
 
     def isConnected(self):
@@ -113,6 +120,12 @@ class Source():
         sockets = self.Get_Sockets()
         if(sockets):
             sockets[0].getMeasurementPacket(measurementPacket)
+
+    def getProgrammingInstrument(self):
+        if self.programmingPacket is not None:
+            return self.programmingPacket.Get_Origin_Socket().Get_Component().Get_Instrument()
+        else:
+            return None
 
 ##### Search Functions #####
     def getSockets(self):

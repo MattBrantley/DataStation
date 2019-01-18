@@ -45,6 +45,9 @@ class Socket():
     def Set_Programming_Packet(self, packet):
         self.setProgrammingPacket(packet)
 
+    def Push_Programming(self):
+        self.pushProgramming()
+
     def Get_Component(self):
         return self.comp
 

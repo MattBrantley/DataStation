@@ -1,7 +1,8 @@
 from src.Managers.InstrumentManager.Component import *
 from src.Managers.InstrumentManager.EventSequence import EventSequence
+from src.Managers.InstrumentManager.ReadyCheck import ReadyCheckList
 from copy import deepcopy
-import json, os
+import datetime, json, os
 
 class Instrument(QObject):
 ############################################################################################
@@ -48,6 +49,7 @@ class Instrument(QObject):
 
     def Load_Sequence(self, path):
         self.Get_Sequence().Load_Sequence_File(path)
+        self.readyCheck()
 
     def Save_Sequence(self, filepath):
         self.Get_Sequence().Save_Sequence(filepath)
@@ -69,19 +71,16 @@ class Instrument(QObject):
         self.readyCheck()
 
     def Ready_Check_Status(self):
-        if not self.readyCheckList:
-            return True
-        else:
-            return False
+        return self.readyCheckStatus()
 
     def Ready_Check_List(self):
         return self.readyCheckList
 
     def Fail_Ready_Check(self, trace, msg, warningLevel=DSConstants.READY_CHECK_ERROR):
-        self.readyCheckFail(trace, msg, warningLevel)
+        self.readyCheckMessage(trace, msg, warningLevel)
 
     def Warning_Ready_Check(self, trace, msg, warningLevel=DSConstants.READY_CHECK_WARNING):
-        self.readyCheckFail(trace, msg, warningLevel)
+        self.readyCheckMessage(trace, msg, warningLevel)
 
     def Get_Hardware_Devices(self):
         return self.getHardwareDevices()
@@ -89,8 +88,23 @@ class Instrument(QObject):
     def Run_Instrument(self):
         self.runInstrument()
 
+    def Stop_Instrument(self):
+        self.stopInstrument()
+
+    def Reset_Instrument(self):
+        self.resetInstrument()
+
     def Get_Run_ID(self):
         return self.runID
+
+    def Can_Run(self):
+        return self.canRun
+
+    def Is_Running(self):
+        return self.isRunning
+
+    def Get_Run_Time(self):
+        return self.getRunTime()
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -99,17 +113,22 @@ class Instrument(QObject):
         self.ds = ds
         self.iM = ds.iM
         self.name = 'Default Instrument'
-        self.readyCheckList = list()
+        self.canRun = False
+        self.isStarting = False
+        self.isRunning = False
+        self.readyCheckList = ReadyCheckList()
         self.directory = None
         self.sequence = EventSequence(self.ds, self)
         self.componentList = list()
         self.uuid = str(uuid.uuid4())
         self.runID = ''
 
+        self.startReadyCheckTimer()
+
 ##### Instrument Ready Check #####
     def readyCheck(self):
         if self.ds.Is_Loaded() is True:
-            self.readyCheckList = list()
+            self.readyCheckList = ReadyCheckList()
             trace = list()
             trace.append(self)
             if(self.Get_Components() == []):
@@ -117,11 +136,29 @@ class Instrument(QObject):
             for comp in self.componentList:
                 comp.readyCheck(trace)
             self.sequence.readyCheck(trace)
+
+            self.canRun = self.readyCheckList.Can_Run()
+            if self.canRun is False and self.isStarting is True:
+                self.isStarting = False
+                self.isRunning = True
+
+            if self.canRun is True and self.isRunning is True:
+                self.isRunning = False
+
+            self.iM.instrumentReadyChecked(self)
         else:
             self.ds.postLog('Cannot Ready Check Instrument (' + self.name + ') While DataStation is Loading ', DSConstants.LOG_PRIORITY_HIGH)
 
-    def readyCheckFail(self, trace, msg, warningLevel):
+    def readyCheckStatus(self):
+        self.readyCheckList.Get_Status()
+
+    def readyCheckMessage(self, trace, msg, warningLevel):
         self.readyCheckList.append({'Trace': trace, 'Msg': msg, 'Level': warningLevel})
+        
+    def startReadyCheckTimer(self):
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.readyCheck)
+        self.timer.start(25)
 
 ##### Functions Called By Factoried Components #####
     ##### Component #####
@@ -129,59 +166,111 @@ class Instrument(QObject):
         readyCheckMsg = dict()
         readyCheckMsg['Trace']  = [component, socket, msg]
         readyCheckMsg['msg'] = msg
-        self.readyCheckFails.append(readyCheckMsg)
         self.ready = False
+        self.readyCheck()
 
     def componentStandardFieldChanged(self, component, field):
         self.iM.componentStandardFieldChanged(self, component, field)
+        self.readyCheck()
 
     def componentCustomFieldChanged(self, component, field):
         self.iM.componentCustomFieldChanged(self, component, field)
+        self.readyCheck()
 
     ##### Socket #####
     def socketAdded(self, component, socket):
         self.iM.socketAdded(self, component, socket)
+        self.readyCheck()
 
     def socketAttached(self, component, socket):
         self.iM.socketAttached(self, component, socket)
+        self.readyCheck()
 
     def socketDetatched(self, component, socket):
         self.iM.socketDetatched(self, component, socket)
+        self.readyCheck()
 
     ##### Event #####
-    def eventAdded(self, component, event):
-        self.iM.eventAdded(self, component, event)
-
-    def eventRemoved(self, component, event):
-        self.iM.eventRemoved(self, component, event)
-
-    def eventModified(self, component, event):
-        self.iM.eventModified(self, component, event)
+    def eventsModified(self, component):
+        self.iM.eventsModified(self, component)
+        self.readyCheck()
 
     ##### Component Programming #####
     def programmingModified(self, component):
         self.iM.programmingModified(self, component)
+        self.readyCheck()
 
     def measurementRecieved(self, component, socket, measurementPacket):
         self.iM.measurementRecieved(self, component, socket, measurementPacket)
+        self.readyCheck()
 
 ##### Functions Called By Sequence #####
     def sequenceSaved(self):
         self.iM.sequenceSaved(self)
+        self.readyCheck()
 
     def sequenceLoaded(self):
         self.iM.sequenceLoaded(self)
 
-##### Hardware Manipulations ####
-    def runInstrument(self):
-        self.generateNewRunID()
+        for hardware in self.Get_Hardware_Devices():
+            hardware.Push_Programming()
 
-        for handler in self.Get_Hardware_Devices():
-            handler.onRun()
-        self.iM.instrumentSequenceRunning(self)
+        self.readyCheck()
+
+##### Hardware Manipulations ####
+    def runTimeFraction(self):
+        return self.Get_Run_Time() / self.Get_Sequence().Get_Sequence_Length()
+
+    def runInstrument(self):
+        if self.Can_Run():
+            self.isStarting = True
+            self.canRun = False
+            self.generateNewRunID()
+
+            self.checkProgramming()
+
+            for handler in self.Get_Hardware_Devices():
+                handler.onRun()
+
+            self.iM.instrumentSequenceRunning(self)
+        else:
+            self.ds.postLog('Instrument (' + self.name + ') Run Request Denied - Failed Ready Check ', DSConstants.LOG_PRIORITY_HIGH)
+
+    def stopInstrument(self): # Not really implemented yet..
+        if self.Is_Running():
+            for handler in self.Get_Hardware_Devices():
+                handler.onStop()
+
+    def resetInstrument(self):
+        for component in self.Get_Components():
+            component.Reset_Component()
+
+        for hardware in self.Get_Hardware_Devices():
+            hardware.Push_Programming()
 
     def generateNewRunID(self):
         self.runID = str(uuid.uuid4())
+        self.runStart = datetime.datetime.now()
+
+    def getRunTime(self):
+        if self.isRunning:
+            return (datetime.datetime.now() - self.runStart).total_seconds()
+        else:
+            return 0
+
+    def checkProgramming(self):
+        hardwareHandlerList = list()
+
+        for component in self.Get_Components():
+            for socket in component.Get_Sockets():
+                if socket.Get_Source().Get_Programming_Instrument() is not self:
+                    socket.Push_Programming()
+                    source = socket.Get_Source()
+                    if source is not None:
+                        hardwareHandlerList.append(source.Get_Handler())
+
+        for hardware in set(hardwareHandlerList):
+            hardware.Push_Programming()
 
     def getHardwareDevices(self):
         hardwareHandlerList = list()
@@ -232,6 +321,7 @@ class Instrument(QObject):
             os.remove(fullPath)
         with open(fullPath, 'w') as file:
             json.dump(self.savePacket(), file, sort_keys=True, indent=4)
+        self.readyCheck()
 
     #### Load Instrument ####
     def loadInstrumentFile(self, path):

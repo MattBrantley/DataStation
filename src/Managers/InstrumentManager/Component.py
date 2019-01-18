@@ -68,6 +68,9 @@ class Component(QObject):
         self.combineAddRemoveEvents(addEvents, removeEvents)
         return True
 
+    def Reset_Component(self):
+        self.resetComponent()
+
     def Get_Events(self):
         return self.eventList
 
@@ -167,7 +170,7 @@ class Component(QObject):
         self.instr.programmingModified(self)
 
     def onRun(self):  ### OVERRIDE ME!! ####
-        return readyCheckPacket('Component', DSConstants.READY_CHECK_ERROR, msg='User Component Does Not Override onRun()!')
+        self.ds.postLog('ERROR: User Component Does Not Override onRun()!', DSConstants.LOG_PRIORITY_HIGH)
 
     def onStandardFieldChanged(self, field):
         pass
@@ -271,37 +274,37 @@ class Component(QObject):
     def combineAddRemoveEvents(self, addEvents, removeEvents):
         for event in addEvents:
             self.eventList.append(event)
-            self.instr.eventAdded(self, event)
         for event in removeEvents:
-            self.instr.eventRemoved(self, event)
             self.eventList.remove(event)
+        self.instr.eventsModified(self)
+        self.onProgramParent()
+
+    def resetComponent(self):
         self.onProgramParent()
 
     def addEvents(self, events):
         if isinstance(events, (list,)):
-            if(not events):
+            if not events:
                 return
             for event in events:
                 self.eventList.append(event)
-                self.instr.eventAdded(self, event)
-            self.onProgramParent()
         else:
             self.eventList.append(event)
-            self.instr.eventAdded(self, event)
-            self.onProgramParent()
+
+        self.instr.eventsModified(self)
+        self.onProgramParent()
 
     def removeEvents(self, events):
         if isinstance(events, (list,)):
+            if not events:
+                return
             for event in events:
-                if(not events):
-                    return
-                self.instr.eventRemoved(self, event)
                 self.eventList.remove(event)
-            self.onProgramParent()
         else:
-            self.instr.eventRemoved(self, event)
             self.eventList.remove(event)
-            self.onProgramParent()
+
+        self.instr.eventsModified(self)
+        self.onProgramParent()
 
     def loadSequenceData(self, eventData):
         self.Clear_Events()

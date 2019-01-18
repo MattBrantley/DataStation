@@ -55,14 +55,6 @@ class MultiInstrumentControl(DSModule):
 
 
 class instrumentControlItem(QWidget):
-    STATUS_NOT_READY = 200
-    STATUS_READY = 201
-    STATUS_CONFIGURING = 202
-    STATUS_RUNNING = 203
-    STATUS_PROCESSING = 204
-    STATUS_UNKNOWN = 205
-    STATUS_WAITING = 206
-    STATUS_READY_CHECKING = 207
 
     def __init__(self, ds, instrument):
         super().__init__()
@@ -74,10 +66,7 @@ class instrumentControlItem(QWidget):
 
         self.initLayout()
 
-        self.iM.Sequence_Loaded.connect(self.readyChecks)
-        self.iM.Instrument_New.connect(self.readyChecks)
-        self.iM.Socket_Attached.connect(self.readyChecks)
-
+        self.iM.Instrument_Ready_Checked.connect(self.updateStatus)
         self.iM.Instrument_Name_Changed.connect(self.instrumentNameChanged)
 
     def instrumentNameChanged(self, instrument):
@@ -111,13 +100,9 @@ class instrumentControlItem(QWidget):
         self.mainLayout.addWidget(self.recheckReadyButton)
         self.mainLayout.addWidget(self.readyCheckInfoButton)
 
-        self.setStatus(DSConstants.STATUS_NOT_READY)
+        self.updateStatus(None)
 
-        self.iM.Sequence_Loaded.connect(self.readyChecks)
-        self.iM.Instrument_New.connect(self.readyChecks)
-        self.iM.Socket_Attached.connect(self.readyChecks)
-
-        self.startReadyCheckTimer()
+        #self.startReadyCheckTimer()
 
     def initButtons(self):
         dir = self.ds.srcDir
@@ -125,12 +110,14 @@ class instrumentControlItem(QWidget):
         self.runOnceIcon = QIcon(os.path.join(dir, 'icons5\\reply.png'))
         self.runOnceButton.setIcon(self.runOnceIcon)
         self.runOnceButton.setIconSize(QSize(24,24))
+        self.runOnceButton.setToolTip('Run Once')
         self.runOnceButton.pressed.connect(self.runOncePressed)
 
         self.runMultipleButton = QPushButton()
         self.runMultipleIcon = QIcon(os.path.join(dir, 'icons5\\reply-1.png'))
         self.runMultipleButton.setIcon(self.runMultipleIcon)
         self.runMultipleButton.setIconSize(QSize(24,24))
+        self.runMultipleButton.setToolTip('Rune Multiple')
         self.runMultipleButton.pressed.connect(self.runMultiplePressed)
         self.runMultipleButton.setEnabled(False)
 
@@ -138,6 +125,7 @@ class instrumentControlItem(QWidget):
         self.runStopIcon = QIcon(os.path.join(dir, 'icons5\stop.png'))
         self.runStopButton.setIcon(self.runStopIcon)
         self.runStopButton.setIconSize(QSize(24,24))
+        self.runStopButton.setToolTip('Stop Run')
         self.runStopButton.pressed.connect(self.runStopPressed)
         self.runStopButton.setEnabled(False)
 
@@ -145,6 +133,7 @@ class instrumentControlItem(QWidget):
         self.runSettingsIcon = QIcon(os.path.join(dir, 'icons5\settings.png'))
         self.runSettingsButton.setIcon(self.runSettingsIcon)
         self.runSettingsButton.setIconSize(QSize(24,24))
+        self.runSettingsButton.setToolTip('Settings')
         self.runSettingsButton.pressed.connect(self.runSettingsPressed)
         self.runSettingsButton.setEnabled(False)
 
@@ -152,22 +141,16 @@ class instrumentControlItem(QWidget):
         self.recheckReadyIcon = QIcon(os.path.join(dir, 'icons5\\refresh.png'))
         self.recheckReadyButton.setIcon(self.recheckReadyIcon)
         self.recheckReadyButton.setIconSize(QSize(14,14))
-        self.recheckReadyButton.pressed.connect(self.configChanged)
+        self.recheckReadyButton.setToolTip('Reset Instrument')
+        self.recheckReadyButton.pressed.connect(self.resetPressed)
 
         self.readyCheckInfoButton = readyCheckButton(self)
         self.readyCheckInfoButton.pressed.connect(self.readyCheckInfoPressed)
 
         self.statusDisplayWidget = statusDisplayWidget(self)
 
-    def startReadyCheckTimer(self):
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.configChanged)
-        self.timer.start(10)
-
     def runOncePressed(self):
-        if(self.readyChecks()):
-            if(self.targetInstrument is not None):
-                self.targetInstrument.Run_Instrument()
+        self.targetInstrument.Run_Instrument()
 
     def addReadyCheckMessage(self, message):
         self.readyCheckMessages.append(message)
@@ -176,7 +159,7 @@ class instrumentControlItem(QWidget):
         print('run multiple')
 
     def runStopPressed(self):
-        print('run stop')
+        self.targetInstrument.Stop_Instrument()
 
     def runSettingsPressed(self):
         menu = QMenu()
@@ -185,6 +168,9 @@ class instrumentControlItem(QWidget):
         menu.addAction(settingsConfig)
 
         action = menu.exec_(QCursor().pos())
+
+    def resetPressed(self):
+        self.targetInstrument.Reset_Instrument()
 
     def readyCheckInfoPressed(self):
         menu = QMenu()
@@ -230,89 +216,37 @@ class instrumentControlItem(QWidget):
         menu.addAction(traceAction)
         action = menu.exec_(QCursor().pos())
 
-    def configChanged(self):
-        self.setStatus(DSConstants.STATUS_READY_CHECKING)
-        if(self.statusDisplayWidget.status == DSConstants.STATUS_READY or self.statusDisplayWidget.status == DSConstants.STATUS_NOT_READY or self.statusDisplayWidget.status == DSConstants.STATUS_READY_CHECKING):
-            if(self.readyChecks() is True):
-                self.setStatus(DSConstants.STATUS_READY)
-            else:
-                self.setStatus(DSConstants.STATUS_NOT_READY)
+    def updateStatus(self, instrument):
+        if instrument == self.targetInstrument:
+            readyCheckList = self.targetInstrument.Ready_Check_List()
+            self.updateButtons(readyCheckList)
+            self.statusDisplayWidget.update()
 
-    def readyChecks(self):
-        self.readyCheckMessages.clear()
-        ready = True
-
-        if self.targetInstrument is None:
-            return False
+    def updateButtons(self, readyCheckList):
+        if self.targetInstrument.Can_Run():
+            self.runOnceButton.setEnabled(True)
+            self.runMultipleButton.setEnabled(True)
         else:
-            self.targetInstrument.Ready_Check()
-            if self.targetInstrument.Ready_Check_Status() is True:
-                return True
-            else:
-                return False
-
-    def setStatus(self, state):
-        self.statusDisplayWidget.changeStatus(state)
-        self.updateButtons()
-
-    def updateButtons(self):
-        if(self.statusDisplayWidget.status == DSConstants.STATUS_NOT_READY):
             self.runOnceButton.setEnabled(False)
             self.runMultipleButton.setEnabled(False)
-            self.runStopButton.setEnabled(False)
+
+        if self.targetInstrument.Is_Running():
+            self.runStopButton.setEnabled(True)
             self.runSettingsButton.setEnabled(True)
+        else:
+            self.runStopButton.setEnabled(False)
+            self.runSettingsButton.setEnabled(False)
+
+        readyCheckStatus = readyCheckList.Get_Status()
+
+        if readyCheckStatus == DSConstants.READY_CHECK_ERROR:
             self.readyCheckInfoButton.setToError()
-
-        if(self.statusDisplayWidget.status == DSConstants.STATUS_WARNING):
-            self.runOnceButton.setEnabled(True)
-            self.runMultipleButton.setEnabled(True)
-            self.runStopButton.setEnabled(False)
-            self.runSettingsButton.setEnabled(True)
+        elif readyCheckStatus == DSConstants.READY_CHECK_WARNING:
             self.readyCheckInfoButton.setToWarning()
-
-        if(self.statusDisplayWidget.status == DSConstants.STATUS_READY):
-            self.runOnceButton.setEnabled(True)
-            self.runMultipleButton.setEnabled(True)
-            self.runStopButton.setEnabled(False)
-            self.runSettingsButton.setEnabled(True)
+        else:
             self.readyCheckInfoButton.setToInfo()
 
-        if(self.statusDisplayWidget.status == DSConstants.STATUS_CONFIGURING):
-            self.runOnceButton.setEnabled(False)
-            self.runMultipleButton.setEnabled(False)
-            self.runStopButton.setEnabled(False)
-            self.runSettingsButton.setEnabled(False)
-            self.readyCheckInfoButton.setToInfo()
-
-        if(self.statusDisplayWidget.status == DSConstants.STATUS_RUNNING):
-            self.runOnceButton.setEnabled(False)
-            self.runMultipleButton.setEnabled(False)
-            self.runStopButton.setEnabled(False)
-            self.runSettingsButton.setEnabled(False)
-            self.readyCheckInfoButton.setToInfo()
-
-        if(self.statusDisplayWidget.status == DSConstants.STATUS_PROCESSING):
-            self.runOnceButton.setEnabled(False)
-            self.runMultipleButton.setEnabled(False)
-            self.runStopButton.setEnabled(False)
-            self.runSettingsButton.setEnabled(False)
-            self.readyCheckInfoButton.setToInfo()
-
-        if(self.statusDisplayWidget.status == DSConstants.STATUS_WAITING):
-            self.runOnceButton.setEnabled(False)
-            self.runMultipleButton.setEnabled(False)
-            self.runStopButton.setEnabled(False)
-            self.runSettingsButton.setEnabled(False)
-            self.readyCheckInfoButton.setToInfo()
-
-        if(self.statusDisplayWidget.status == DSConstants.STATUS_READY_CHECKING):
-            self.runOnceButton.setEnabled(False)
-            self.runMultipleButton.setEnabled(False)
-            self.runStopButton.setEnabled(False)
-            self.runSettingsButton.setEnabled(False)
-            self.readyCheckInfoButton.setToInfo()
-
-        self.readyCheckInfoButton.setMessageCount(len(self.readyCheckMessages))
+        self.readyCheckInfoButton.setMessageCount(len(readyCheckList))
 
 class settingsConfigWidget(QWidget):
     def __init__(self, widget, ds):
@@ -372,37 +306,64 @@ class statusDisplayWidget(QLineEdit):
 
     def __init__(self, controlWidget):
         super().__init__()
+        self.controlWidget = controlWidget
+        self.messageIndex = 0
+        self.messageList = list()
         self.setReadOnly(True)
-        self.status = DSConstants.STATUS_NOT_READY
-        self.changeStatus(DSConstants.STATUS_NOT_READY)
-        
-    def changeStatus(self, requestedStatus):
-        self.status = requestedStatus
-        self.updateText()
+        self.setText('NOT CONFIGURED..')
+        self.startReadyCheckTimer()
 
-    def updateText(self):
-        if(self.status == DSConstants.STATUS_NOT_READY):
-            self.setStyleSheet("background-color: #DDDDDD; color: #ff0000")
-            self.setText('NOT READY')
+    def startReadyCheckTimer(self):
+        self.updateTimer = QTimer()
+        self.updateTimer.timeout.connect(self.updateMessage)
+        self.updateTimer.start(50)
+
+        self.cycleTimer = QTimer()
+        self.cycleTimer.timeout.connect(self.cycleMessage)
+        self.cycleTimer.start(2000)
+
+    def getPercentComplete(self):
+        progress = self.controlWidget.targetInstrument.Get_Run_Time() / self.controlWidget.targetInstrument.Get_Sequence().Get_Sequence_Length() * 100
+        if progress > 100:
+            progress = 100
+
+        return progress
+
+    def updateMessage(self):
+        messageCount = len(self.messageList)
+
+        if self.controlWidget.targetInstrument.Is_Running():
+            self.setStyleSheet("background-color: #DDDDDD; color: #007710; font-weight: bold")
+            self.setText('Running!..  [' + str(int(self.getPercentComplete())) + '%]') 
             return
-        if(self.status == DSConstants.STATUS_READY):
+
+        if messageCount == 0:
             self.setStyleSheet("background-color: #DDDDDD; color: #007710; font-weight: bold")
             self.setText('READY')
             return
-        if(self.status == DSConstants.STATUS_CONFIGURING):
-            self.setText('CONFIGURING..')
-            return
-        if(self.status == DSConstants.STATUS_RUNNING):
-            self.setText('RUNNING..')
-            return
-        if(self.status == DSConstants.STATUS_PROCESSING):
-            self.setText('PROCESSING..')
-            return
-        if(self.status == DSConstants.STATUS_WAITING):
-            self.setText('WAITING..')
-            return
-        if(self.status == DSConstants.STATUS_READY_CHECKING):
-            self.setText('READY CHECKING..')
-            return
-            
-        self.setText('UNKNOWN!')
+
+        if messageCount <= self.messageIndex:
+            self.messageIndex = 0
+
+        message = self.messageList[self.messageIndex]
+        text = '[' + str(self.messageIndex + 1) + '/' + str(messageCount) + '] '
+
+        if message['Level'] == DSConstants.READY_CHECK_ERROR:
+            self.setStyleSheet("background-color: #DDDDDD; color: #ff0000; font-weight: bold")
+            text = text + 'ERROR: '
+        elif message['Level'] == DSConstants.READY_CHECK_WARNING:
+            self.setStyleSheet("background-color: #DDDDDD; color: #AAAA00; font-weight: bold")
+            text = text + 'WARNING: '
+        else:
+            self.setStyleSheet("background-color: #DDDDDD; color: #007710; font-weight: bold")
+
+        text = text + message['Msg']
+        self.setText(text)
+        self.setCursorPosition(0)
+
+    def cycleMessage(self):
+        self.messageIndex += 1
+
+    def update(self):
+        self.messageList = self.controlWidget.targetInstrument.Ready_Check_List()
+        self.updateMessage()

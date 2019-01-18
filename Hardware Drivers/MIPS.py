@@ -141,10 +141,18 @@ class MIPS(HardwareDevice):
                     self.Send_Status_Message('RECIEVED: Table Ready!')
                     self.Set_Ready_Status(True)
                     self.runTable = False
+                #else:
+                #    self.Send_Status_Message('UNHANDLED MESSAGE: ' + response)
             if(self.Ready_Status() is False):
                 if(ms() - self.reportTime >= 500):
                     self.Send_Status_Message('Running...')
                     self.reportTime = ms()
+
+    def stop(self):
+        self.Send_Status_Message('Sending Stop Command...')
+        with serial.Serial(self.Get_Standard_Field('deviceName'), 115200, timeout=1) as ser:
+            self.Send_Status_Message(r'SENT: TBLSTOP\r\n')
+            ser.write(b'TBLSTOP\r\n')
 
 ############################################################################################
 ###################################### INTERNAL FUNCS ######################################

@@ -94,8 +94,8 @@ class stepEvent(eventType):
         super().__init__()
         self.Add_Parameter(eventParameterDouble('Voltage'))
 
-    def getLength(self, params):
-        return self.gran
+    def getLength(self):
+        return 0
 
     def toCommand(self, v0):
         pairs = np.array([[self.time, v0], [self.time, self.eventParams['Voltage'].v()]])
@@ -109,8 +109,8 @@ class pulseEvent(eventType):
         self.Add_Parameter(eventParameterDouble('Voltage'))
         self.Add_Parameter(eventParameterDouble('Duration', allowZero=False, allowNegative=False))
 
-    def getLength(self, params):
-        return params[1].value()
+    def getLength(self):
+        return self.eventParams['Duration'].v()
 
     def toCommand(self, v0):
         pairs = np.array([[self.time, v0],
@@ -128,8 +128,8 @@ class linearRampEvent(eventType):
         self.Add_Parameter(eventParameterDouble('Voltage'))
         self.Add_Parameter(eventParameterDouble('Duration', allowZero=False))
 
-    def getLength(self, params):
-        return params[1].value()
+    def getLength(self):
+        return self.eventParams['Duration'].v()
 
     def toCommand(self, v0):
         pairs = np.array([[self.time, v0],
@@ -147,8 +147,9 @@ class pulseTrainEvent(eventType):
         self.Add_Parameter(eventParameterDouble('onDuration', allowZero=False, allowNegative=False))
         self.Add_Parameter(eventParameterDouble('offDuration', allowZero=False, allowNegative=False))
 
-    def getLength(self, params):
-        return params[1].value()*params[2].value() + (params[1].value()-1)*params[3].value()
+    def getLength(self):
+        return (self.eventParams['onDuration'] *self.eventParams['Count']) + (self.eventParams['offDuration'] *(self.eventParams['Count']-1))
+        #return params[1].value()*params[2].value() + (params[1].value()-1)*params[3].value()
 
     def toCommand(self, v0):
         pairs = None

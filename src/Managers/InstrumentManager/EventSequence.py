@@ -26,6 +26,9 @@ class EventSequence():
     def Clear_All_Events(self):
         self.clearAllEvents()
 
+    def Get_Sequence_Length(self):
+        return self.getSequenceLength()
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
     def __init__(self, ds, instr):
@@ -112,3 +115,11 @@ class EventSequence():
             compSaveData.append(comp.Serialize_Events())
         savePacket['eventData'] = compSaveData
         return savePacket
+
+    def getSequenceLength(self):
+        lengths = list()
+        for comp in self.instr.Get_Components():
+            for event in comp.Get_Events():
+                lengths.append(event.time + event.Get_Length())
+
+        return max(lengths)

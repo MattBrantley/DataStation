@@ -24,7 +24,7 @@ class eventType():
 ############################################################################################
 ###################################### OVERRIDE THESE ######################################
 
-    def Get_Length(self, params):
+    def Get_Length(self):
         return 0
 
     def Ready_Check(self):

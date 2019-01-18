@@ -13,6 +13,7 @@ class HardwareDeviceHandler(QObject):
     softTrigger = pyqtSignal()
     shutdown = pyqtSignal()
     idleState = pyqtSignal()
+    stopRun = pyqtSignal()
 
     deviceChanged = pyqtSignal(str)
     triggerChanged = pyqtSignal(str)
@@ -56,13 +57,18 @@ class HardwareDeviceHandler(QObject):
     def Set_Active_Instrument(self, instrument):
         self.setActiveInstrument(instrument)
 
+    def Get_Active_Instrument(self):
+        return self.activeInstrument
+
+    def Push_Programming(self):
+        return self.pushProgramming()
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
     def __init__(self, ds, deviceModel, loadData):
         super().__init__()
         self.deviceModel = deviceModel
         self.loadData = loadData
-        self.deferredProgramming = True
         self.programPackets = list()
         self.hardwareReadyStatus = False
         self.triggerModeList = list()
@@ -78,9 +84,6 @@ class HardwareDeviceHandler(QObject):
         self.hardwareSettings = dict()
         self.deviceList = list()
         self.sourceList = list()
-
-        #self.iM.Sequence_Unloaded.connect(self.toggleDeferredProgrammingOn)
-        self.iM.Sequence_Loaded.connect(self.toggleDeferredProgrammingOff)
         self.ds.DataStation_Closing.connect(self.shutdown)
 
     def initDeviceThread(self, deviceInformation):
@@ -114,6 +117,7 @@ class HardwareDeviceHandler(QObject):
         self.softTrigger.connect(self.deviceThread.softTrigger)
         self.shutdown.connect(self.deviceThread.shutdown)
         self.idleState.connect(self.deviceThread.idleState)
+        self.stopRun.connect(self.deviceThread.stop)
 
         self.deviceChanged.connect(self.deviceThread.deviceChanged)
         self.triggerChanged.connect(self.deviceThread.triggerChanged)
@@ -177,16 +181,8 @@ class HardwareDeviceHandler(QObject):
     def setActiveInstrument(self, instrument):
         self.activeInstrument = instrument
 
-    def toggleDeferredProgrammingOn(self):
-        self.deferredProgramming = True
-
-    def toggleDeferredProgrammingOff(self):
-        self.deferredProgramming = False
-        self.pushProgramming()
-
     def pushProgramming(self):
-        if(self.deferredProgramming is False):
-            self.program.emit(self.programPackets)
+        self.program.emit(self.programPackets)
 
     def savePacket(self):
         savePacket = dict()
@@ -221,6 +217,10 @@ class HardwareDeviceHandler(QObject):
         self.hM.handlerSoftTriggerSent(self)
         self.softTrigger.emit()
 
+    def onStop(self):
+        self.hM.handlerStoppingInstrument(self)
+        self.stopRun.emit()
+
     def readyCheck(self, traceIn):
         trace = traceIn.copy()
         trace.append(self)
@@ -232,11 +232,11 @@ class HardwareDeviceHandler(QObject):
 
         self.programPackets = list()
         for source in self.sourceList:
-            if(source.programmingPacket is not None and source.isConnected()):
+            if(source.programmingPacket is not None and source.isConnected() and source.Get_Programming_Instrument() is self.Get_Active_Instrument()):
                 self.programPackets.append({'source': source, 'programmingPacket': source.programmingPacket})
-                self.activeInstrument = source.programmingPacket.Get_Origin_Socket().Get_Component().Get_Instrument()
+                #self.activeInstrument = source.Get_Programming_Instrument()
 
-        self.pushProgramming()
+        #self.pushProgramming()
 
 
 
@@ -299,6 +299,9 @@ class HardwareDevice(QObject):
 
     def idle(self):
         pass
+
+    def stop(self):
+        self.Send_Status_Message('Device does not have implemented stop() functionality.')
 
 ############################################################################################
 #################################### EXTERNAL FUNCTIONS ####################################

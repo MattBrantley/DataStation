@@ -20,6 +20,7 @@ class HardwareManager(QObject):
 
 ##### Signals: Hardware #####
     Hardware_Handler_Soft_Trigger_Sent = pyqtSignal(object) # hardware
+    Hardware_Handler_Stopping_Instrument = pyqtSignal(object) # hardware
 
     Hardware_Scanned = pyqtSignal(object) # hardware
     Hardware_Initialized = pyqtSignal(object) # hardware
@@ -142,6 +143,9 @@ class HardwareManager(QObject):
 ##### Functions Called By Factoried Hardware Device Handlers #####
     def handlerSoftTriggerSent(self, hWare):
         self.Hardware_Handler_Soft_Trigger_Sent.emit(hWare)
+
+    def handlerStoppingInstrument(self, hWare):
+        self.Hardware_Handler_Stopping_Instrument.emit(hWare)
 
     def hardwareScanned(self, hWare):
         self.Hardware_Scanned.emit(hWare)

@@ -41,8 +41,8 @@ class nCountCollectionEvent(eventType):
         self.Add_Parameter(eventParameterDouble('Range-Max', defaultVal=10))
         self.Add_Parameter(eventParameterDouble('Range-Min', defaultVal=-10))
 
-    def getLength(self, params):
-        return params[0].value()/params[1].value()
+    def getLength(self):
+        return self.eventParams['Num. Points'] / self.eventParams['Rate']
 
     def toCommand(self):
         command = AnalogAcquisitionCommand(self.eventParams['Rate'].v(), self.eventParams['Num. Points'].v(), self.eventParams['Range-Max'].v(), self.eventParams['Range-Min'].v())

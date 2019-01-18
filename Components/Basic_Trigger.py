@@ -39,8 +39,8 @@ class goHigh(eventType):
     def __init__(self):
         super().__init__()
     
-    def getLength(self, params):
-        return 1
+    def getLength(self):
+        return 0
 
     def toCommand(self):
         pairs = np.array([[self.time, 1]])
@@ -53,8 +53,8 @@ class goLow(eventType):
     def __init__(self):
         super().__init__()
     
-    def getLength(self, params):
-        return 1
+    def getLength(self):
+        return 0
 
     def toCommand(self):
         pairs = np.array([[self.time, 0]])
@@ -68,8 +68,8 @@ class pulse(eventType):
         super().__init__()
         self.Add_Parameter(eventParameterDouble('Width', allowZero=False, allowNegative=False, defaultVal=0.05))
     
-    def getLength(self, params):
-        return 1
+    def getLength(self):
+        return self.eventParams['Width'].v()
 
     def toCommand(self):
         pairs = np.array([[self.time, 1], [self.time+self.eventParams['Width'].v(), 0]])
@@ -85,8 +85,8 @@ class pulseTrain(eventType):
         self.Add_Parameter(eventParameterDouble('On Time', allowNegative=False, defaultVal=0.001))
         self.Add_Parameter(eventParameterDouble('Off Time', allowNegative=False, defaultVal=0.001))
 
-    def getLength(self, params):
-        return 1
+    def getLength(self):
+        return (self.eventParams['On Time'].v() * self.eventParams['Count'].v()) + (self.eventParams['Off Time'].v() * (self.eventParams['Count'].v()-1))
 
     def toCommand(self):
         pairs = None
