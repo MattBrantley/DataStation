@@ -103,8 +103,7 @@ class HardwareDeviceHandler(QObject):
         self.deviceThread.sourceAdded.connect(self.sourceAdded)
         self.deviceThread.triggerModeAdded.connect(self.triggerModeAdded)
         self.deviceThread.deviceFound.connect(self.deviceFound)
-
-        self.deviceThread.addDOSocket.connect(self.addDOSocket)
+        
         self.deviceThread.clearHardwareSockets.connect(self.clearHardwareSockets)
 
         self.deviceThread.moveToThread(self.thread)
@@ -167,10 +166,6 @@ class HardwareDeviceHandler(QObject):
     def readyStatus(self, bool):
         self.hardwareReadyStatus = bool
         self.hM.hardwareReadyStatusChanged(self, bool)
-
-    def addDOSocket(self, name):
-        pass
-        #print('add socket')
 
     def clearHardwareSockets(self):
         pass
@@ -274,7 +269,6 @@ class HardwareDevice(QObject):
     triggerModeAdded = pyqtSignal(str) # name
     deviceFound = pyqtSignal(str)
 
-    addDOSocket = pyqtSignal(str) # socket name
     clearHardwareSockets = pyqtSignal()
 
 ############################################################################################
@@ -333,13 +327,23 @@ class HardwareDevice(QObject):
         self.addSource(source)
         return source
 
-    def Add_DISource(self, name, trigger=True):
-        source = DISource(self.handler, '['+self.hardwareSettings['deviceName']+'] '+name, name, trigger=True)
+    def Add_DISource(self, name):
+        source = DISource(self.handler, '['+self.hardwareSettings['deviceName']+'] '+name, name)
         self.addSource(source)
         return source
 
     def Add_DOSource(self, name):
         source = DOSource(self.handler, '['+self.hardwareSettings['deviceName']+'] '+name, name)
+        self.addSource(source)
+        return source
+
+    def Add_Digital_Trigger(self, name):
+        source = DISource(self.handler, '['+self.hardwareSettings['deviceName']+'] '+name, name, trigger=True)
+        self.addSource(source)
+        return source
+
+    def Add_Analog_Trigger(self, name, vMin, vMax, prec):
+        source = AISource(self.handler, '['+self.hardwareSettings['deviceName']+'] '+name, vMin, vMax, prec, name, trigger=True)
         self.addSource(source)
         return source
 
@@ -358,9 +362,6 @@ class HardwareDevice(QObject):
 
     def Get_Handler(self):
         return self.handler
-
-    def Add_Digital_Socket(self, name):
-        self.addDigitalSocket(name)
 
     def Clear_Hardware_Sockets(self):
         self.clearHardwareSockets.emit()
@@ -390,9 +391,6 @@ class HardwareDevice(QObject):
     def idleState(self):
         self.idle()
         QTimer().singleShot(1, self.idleState)
-
-    def addDigitalSocket(self, name):
-        self.addDOSocket.emit(name)
 
     def deviceChanged(self, deviceName):
         self.hardwareSettings['deviceName'] = deviceName

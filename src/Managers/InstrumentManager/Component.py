@@ -382,3 +382,4 @@ class Component(QObject):
         index = 0
         for socket in sockets:
             self.socketList[index].loadPacket(socket)
+            

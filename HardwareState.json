@@ -292,55 +292,6 @@
                     "physConID": "DIO/Q",
                     "trigger": true,
                     "uuid": "40081662-8efa-4eca-b681-71da989c98f4"
-                },
-                {
-                    "enabled": false,
-                    "name": "[COM14] DIO/R",
-                    "physConID": "DIO/R",
-                    "trigger": true,
-                    "uuid": "063a7e6b-95d5-405e-a746-94bc84082d5e"
-                },
-                {
-                    "enabled": false,
-                    "name": "[COM14] DIO/S",
-                    "physConID": "DIO/S",
-                    "trigger": true,
-                    "uuid": "5984fdac-8d09-4a9e-9aab-edf48b422de6"
-                },
-                {
-                    "enabled": false,
-                    "name": "[COM14] DIO/T",
-                    "physConID": "DIO/T",
-                    "trigger": true,
-                    "uuid": "3dd85998-25bf-47e1-8b10-a67353e6914a"
-                },
-                {
-                    "enabled": false,
-                    "name": "[COM14] DIO/U",
-                    "physConID": "DIO/U",
-                    "trigger": true,
-                    "uuid": "0652976f-a302-4eb1-b34d-949d4ef20082"
-                },
-                {
-                    "enabled": false,
-                    "name": "[COM14] DIO/V",
-                    "physConID": "DIO/V",
-                    "trigger": true,
-                    "uuid": "c50f9e7b-c4cf-4937-b6ce-458e436c7176"
-                },
-                {
-                    "enabled": false,
-                    "name": "[COM14] DIO/W",
-                    "physConID": "DIO/W",
-                    "trigger": true,
-                    "uuid": "2907cf81-8af6-4a0f-835a-5f92cc333713"
-                },
-                {
-                    "enabled": false,
-                    "name": "[COM14] DIO/X",
-                    "physConID": "DIO/X",
-                    "trigger": true,
-                    "uuid": "1af21235-6237-4a5d-9d9c-52eee86ef50c"
                 }
             ]
         },
@@ -376,6 +327,13 @@
                     "uuid": "38ca07fa-8907-4a61-852d-b057eb05dfa5",
                     "vMax": 10,
                     "vMin": -10
+                },
+                {
+                    "enabled": false,
+                    "name": "[DIGITIZER] PXIe-5122 Trigger",
+                    "physConID": "PXIe-5122 Trigger",
+                    "trigger": true,
+                    "uuid": "af8ad4d7-95ff-4cc3-8541-1a8bb1b23371"
                 }
             ]
         },

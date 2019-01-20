@@ -39,7 +39,7 @@ class PXIe_5122(HardwareDevice):
                 self.session = niscope.Session(deviceName)
 
             if(triggerMode == 'Front Digital Trigger'):
-                self.Add_Digital_Socket('PXIe-5122 Trigger')
+                self.Add_Digital_Trigger('PXIe-5122 Trigger')
         except:
             pass
 

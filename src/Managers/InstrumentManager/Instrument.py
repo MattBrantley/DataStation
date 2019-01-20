@@ -120,6 +120,7 @@ class Instrument(QObject):
         self.directory = None
         self.sequence = EventSequence(self.ds, self)
         self.componentList = list()
+        self.trigComponentList = list()
         self.uuid = str(uuid.uuid4())
         self.runID = ''
 

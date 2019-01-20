@@ -309,6 +309,7 @@ class statusDisplayWidget(QLineEdit):
         self.controlWidget = controlWidget
         self.messageIndex = 0
         self.messageList = list()
+        
         self.setReadOnly(True)
         self.setText('NOT CONFIGURED..')
         self.startReadyCheckTimer()
@@ -316,7 +317,7 @@ class statusDisplayWidget(QLineEdit):
     def startReadyCheckTimer(self):
         self.updateTimer = QTimer()
         self.updateTimer.timeout.connect(self.updateMessage)
-        self.updateTimer.start(50)
+        self.updateTimer.start(250)
 
         self.cycleTimer = QTimer()
         self.cycleTimer.timeout.connect(self.cycleMessage)

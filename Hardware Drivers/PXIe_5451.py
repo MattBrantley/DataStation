@@ -27,8 +27,8 @@ class PXIe_5451(HardwareDevice):
                 self.reportTime = ms()
                 with nifgen.Session(deviceName) as session:
                     self.maxRate = session.arb_sample_rate
-                    for i in range(0, 2):
-                        self.Add_AOSource(str(i), 1, 1, 0.1)
+                    self.source0 = self.Add_AOSource('0', -1, 1, 0.1)
+                    self.source1 = self.Add_AOSource('1', -1, 1, 0.1)
 
                 self.session = nifgen.Session(deviceName)
         except:
