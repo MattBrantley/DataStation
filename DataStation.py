@@ -124,6 +124,7 @@ class DataStation_Core(QMainWindow):
         self.mM.connections()
 
     def postLog(self, key, level, source=None, **kwargs):
+        """Post a log to DataStation Core"""
         useKey = kwargs.get('textKey', False)
         if(useKey):
             text = self.DSC.getLogText(key)
@@ -135,6 +136,12 @@ class DataStation_Core(QMainWindow):
         self.Log_Posted.emit(log)
         self.logText.append(log)
         app.processEvents()
+
+    def testFunction(self):
+        pass
+
+    def _testFunction2(self):
+        pass
 
     def softExit(self):
         self.postLog('Shutting down Datastation!', DSConstants.LOG_PRIORITY_HIGH)

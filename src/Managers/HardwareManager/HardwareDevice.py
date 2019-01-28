@@ -182,8 +182,6 @@ class HardwareDeviceHandler(QObject):
         self.activeInstrument = instrument
 
     def pushProgramming(self):
-        import traceback
-        traceback.print_stack() 
         self.program.emit(self.programPackets)
 
     def savePacket(self):
