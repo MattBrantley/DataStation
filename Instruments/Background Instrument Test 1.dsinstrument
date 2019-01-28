@@ -23,7 +23,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "0a1a9a52-6718-4ed7-8f8c-d495dfc9bd9d",
+                    "inputSource": "d2dee802-581a-4959-99f3-bf6dbd32a106",
                     "inputSourcePathNo": 1,
                     "name": "",
                     "tag": "[DO]",
@@ -54,7 +54,7 @@
             "sockets": [
                 {
                     "drivingSocket": true,
-                    "inputSource": "43f23c8f-df16-4eaf-96ee-49a046ef1dac",
+                    "inputSource": "d948e206-b661-4c91-ad81-2a255265cae9",
                     "inputSourcePathNo": 1,
                     "name": "",
                     "tag": "[DO]",

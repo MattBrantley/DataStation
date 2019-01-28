@@ -63,6 +63,12 @@ class HardwareDeviceHandler(QObject):
     def Push_Programming(self):
         return self.pushProgramming()
 
+    def Disable_Programming_Lock(self):
+        self.progLock = False
+
+    def Enable_Programming_Lock(self):
+        self.progLock = True
+
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
     def __init__(self, ds, deviceModel, loadData):
@@ -73,6 +79,7 @@ class HardwareDeviceHandler(QObject):
         self.hardwareReadyStatus = False
         self.triggerModeList = list()
         self.deviceComponents = list()
+        self.progLock = False
 
         self.ds = ds
         self.iM = ds.iM
@@ -101,10 +108,9 @@ class HardwareDeviceHandler(QObject):
         self.deviceThread.statusMessage.connect(self.statusMessage)
         self.deviceThread.readyStatus.connect(self.readyStatus)
         self.deviceThread.sourceAdded.connect(self.sourceAdded)
+        self.deviceThread.sourceRemoved.connect(self.sourceRemoved)
         self.deviceThread.triggerModeAdded.connect(self.triggerModeAdded)
         self.deviceThread.deviceFound.connect(self.deviceFound)
-        
-        self.deviceThread.clearHardwareSockets.connect(self.clearHardwareSockets)
 
         self.deviceThread.moveToThread(self.thread)
 
@@ -134,8 +140,8 @@ class HardwareDeviceHandler(QObject):
         self.hM.hardwareScanned(self)
 
     def initialized(self):
-        self.idleState.emit()
         self.hM.hardwareInitialized(self)
+        self.idleState.emit()
 
     def configured(self):
         self.hM.hardwareConfigured(self)
@@ -147,8 +153,11 @@ class HardwareDeviceHandler(QObject):
         self.hM.hardwareSoftTriggered(self)
 
     def sourceAdded(self, source):
-        source.registerHWare(self)
+        #source.registerHWare(self)
         self.hM.sourceAdded(self, source)
+
+    def sourceRemoved(self, source):
+        self.hM.sourceRemoved(self, source)
 
     def triggerModeAdded(self, triggerModeName):
         self.triggerModeList.append(triggerModeName)
@@ -167,16 +176,14 @@ class HardwareDeviceHandler(QObject):
         self.hardwareReadyStatus = bool
         self.hM.hardwareReadyStatusChanged(self, bool)
 
-    def clearHardwareSockets(self):
-        pass
-        #print('clear sockets')
-
 ##################################### INTERNAL FUNCS #####################################
 
     def setActiveInstrument(self, instrument):
         self.activeInstrument = instrument
 
     def pushProgramming(self):
+        import traceback
+        traceback.print_stack() 
         self.program.emit(self.programPackets)
 
     def savePacket(self):
@@ -204,6 +211,7 @@ class HardwareDeviceHandler(QObject):
         self.triggerMode = triggerModeName
         self.hardwareSettings['triggerMode'] = triggerModeName
         self.triggerChanged.emit(triggerModeName)
+        self.Push_Programming()
 
     def onRemove(self):
         pass # safetly shut down the hardware device
@@ -221,17 +229,22 @@ class HardwareDeviceHandler(QObject):
         trace.append(self)
         if self.hardwareReadyStatus is False:
             trace[0].Fail_Ready_Check(trace, 'Device Not Ready!')
+
+        if self.Get_Active_Instrument().Get_UUID() != trace[0].Get_UUID():
+            trace[0].Warning_Ready_Check(trace, 'Source/Device Is Currently Programmed For Another Instrument')
  
     def programDataReceived(self, source):
+        self.deferredProgramDataRecieved(source)
+        #self.pushProgramming()
+
+    def deferredProgramDataRecieved(self, source):
         self.hM.programmingModified(self, source)
 
         self.programPackets = list()
         for source in self.sourceList:
             if(source.programmingPacket is not None and source.isConnected() and source.Get_Programming_Instrument() is self.Get_Active_Instrument()):
                 self.programPackets.append({'source': source, 'programmingPacket': source.programmingPacket})
-                #self.activeInstrument = source.Get_Programming_Instrument()
 
-        #self.pushProgramming()
 
 
 
@@ -265,11 +278,10 @@ class HardwareDevice(QObject):
     measurementPacket = pyqtSignal(object, object) # source, measurementPacket
     statusMessage = pyqtSignal(str)
     readyStatus = pyqtSignal(bool)
-    sourceAdded = pyqtSignal(object)
+    sourceAdded = pyqtSignal(object) # source
+    sourceRemoved = pyqtSignal(object) # source
     triggerModeAdded = pyqtSignal(str) # name
     deviceFound = pyqtSignal(str)
-
-    clearHardwareSockets = pyqtSignal()
 
 ############################################################################################
 ###################################### OVERRIDE THESE ######################################
@@ -317,6 +329,15 @@ class HardwareDevice(QObject):
     def Get_Trigger_Mode(self):
         return self.Get_Standard_Field('triggerMode')
 
+    def Set_Triggered_State(self, state):
+        if state is True:
+            self.isTriggered = True
+        else:
+            self.isTriggered = False
+
+    def Is_Triggered(self):
+        return self.isTriggered
+
     def Add_AISource(self, name, vMin, vMax, prec):
         source = AISource(self.handler, '['+self.hardwareSettings['deviceName']+'] '+name, vMin, vMax, prec, name)
         self.addSource(source)
@@ -363,9 +384,6 @@ class HardwareDevice(QObject):
     def Get_Handler(self):
         return self.handler
 
-    def Clear_Hardware_Sockets(self):
-        self.clearHardwareSockets.emit()
-
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
     def __init__(self, handler, systemDeviceInfo, hardwareSettings, deviceList, sourceList):
@@ -386,6 +404,9 @@ class HardwareDevice(QObject):
         self.sourceList = sourceList
         self.runThread = True
         self.readyStatusCopy = False
+        self.isTriggered = False
+
+        self.loadPacketData = None
 
     @pyqtSlot()
     def idleState(self):
@@ -397,10 +418,15 @@ class HardwareDevice(QObject):
         self.initialize(deviceName, self.Get_Trigger_Mode())
 
     def triggerChanged(self, triggerModeName):
-        self.hardwareSettings['triggerMode'] = triggerModeName
-        self.initialize(self.Get_Device_Name(), triggerModeName)
+        self.loadPacket(self.loadPacketData, triggerModeChange=triggerModeName)
+
+        for source in self.sourceList:
+            for socket in source.Get_Sockets():
+                if socket.Get_Component().Get_Instrument() == self.Get_Handler().Get_Active_Instrument():
+                    socket.Push_Programming()
 
     def addSource(self, source):
+        source.registerHWare(self.handler)
         self.sourceList.append(source)
         self.sourceAdded.emit(source)
 
@@ -408,14 +434,24 @@ class HardwareDevice(QObject):
         self.deviceList.append(deviceName)
         self.deviceFound.emit(deviceName)
 
-    def loadPacket(self, loadPacket):
+    def loadPacket(self, loadPacket, triggerModeChange=None):
+        self.loadPacketData = loadPacket
         for key, val in loadPacket['hardwareSettings'].items():
             self.hardwareSettings[key] = val
 
+        if triggerModeChange is not None:
+            self.hardwareSettings['triggerMode'] = triggerModeChange
+
+        self.clearSources()
         self.initialize(self.hardwareSettings['deviceName'], self.hardwareSettings['triggerMode'])
 
         if('sourceList' in loadPacket):
             self.loadSourceData(loadPacket['sourceList'])
+
+    def clearSources(self):
+        for source in self.sourceList:
+            self.sourceRemoved.emit(source)
+        self.sourceList.clear()
 
     def loadSourceData(self, sourceData):
         if(sourceData is not None):

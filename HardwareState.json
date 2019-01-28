@@ -10,7 +10,7 @@
                 "name": "",
                 "physID": "",
                 "triggerCompUUID": "",
-                "triggerMode": "",
+                "triggerMode": "Digital Trigger POS (DIO/R)",
                 "uuid": "2e22cf1f-20fb-465f-94da-41f693bf9944"
             },
             "sourceList": [
@@ -20,7 +20,7 @@
                     "physConID": "DCB/1",
                     "prec": 0.1,
                     "trigger": false,
-                    "uuid": "d14e19ee-622f-4cc2-af8a-1c2b2eb0a13f",
+                    "uuid": "23141438-86b0-4a22-9479-2f6cf2d6be37",
                     "vMax": 250.0,
                     "vMin": -250.0
                 },
@@ -30,7 +30,7 @@
                     "physConID": "DCB/2",
                     "prec": 0.1,
                     "trigger": false,
-                    "uuid": "2ace5719-f3bd-45bd-8513-eb768bcc8933",
+                    "uuid": "adad200c-fc52-4c45-acd1-49d132dceb2a",
                     "vMax": 250.0,
                     "vMin": -250.0
                 },
@@ -40,7 +40,7 @@
                     "physConID": "DCB/3",
                     "prec": 0.1,
                     "trigger": false,
-                    "uuid": "bc655578-db2c-404b-b7de-c8d5579a9feb",
+                    "uuid": "b4ed69e7-8e97-411f-a349-6a6ed1c39bb3",
                     "vMax": 250.0,
                     "vMin": -250.0
                 },
@@ -50,7 +50,7 @@
                     "physConID": "DCB/4",
                     "prec": 0.1,
                     "trigger": false,
-                    "uuid": "ab80f764-9b4f-41a4-9b4d-95e2b22d2478",
+                    "uuid": "76bb5a7a-f5fc-4c5b-be54-19f20fc9c02e",
                     "vMax": 250.0,
                     "vMin": -250.0
                 },
@@ -60,7 +60,7 @@
                     "physConID": "DCB/5",
                     "prec": 0.1,
                     "trigger": false,
-                    "uuid": "9877f142-b913-4ead-8d3e-adcca6b9e107",
+                    "uuid": "781ad3c0-780d-475a-b4ce-09f1fa2c771a",
                     "vMax": 250.0,
                     "vMin": -250.0
                 },
@@ -70,7 +70,7 @@
                     "physConID": "DCB/6",
                     "prec": 0.1,
                     "trigger": false,
-                    "uuid": "fa0e3563-93b2-4701-b812-9be7787bfbf9",
+                    "uuid": "2a595c93-d6ba-425d-b5b2-a730f6a21e47",
                     "vMax": 250.0,
                     "vMin": -250.0
                 },
@@ -80,7 +80,7 @@
                     "physConID": "DCB/7",
                     "prec": 0.1,
                     "trigger": false,
-                    "uuid": "6317c1c8-7aee-4b42-83a2-a349d9d079e8",
+                    "uuid": "2f2644a7-8802-4ed1-8d28-2dc04ac153fe",
                     "vMax": 250.0,
                     "vMin": -250.0
                 },
@@ -90,7 +90,7 @@
                     "physConID": "DCB/8",
                     "prec": 0.1,
                     "trigger": false,
-                    "uuid": "06441de1-e7a4-4349-a391-237d496fbd8e",
+                    "uuid": "eb97fbc3-e557-4320-89f5-cdfc086dab65",
                     "vMax": 250.0,
                     "vMin": -250.0
                 },
@@ -100,7 +100,7 @@
                     "physConID": "DCB/9",
                     "prec": 0.1,
                     "trigger": false,
-                    "uuid": "a71ada98-fd7c-4c63-985d-e81a40e9d550",
+                    "uuid": "2388bdf2-c6d1-49e2-af5f-c1b528f4668c",
                     "vMax": 50.0,
                     "vMin": -50.0
                 },
@@ -110,7 +110,7 @@
                     "physConID": "DCB/10",
                     "prec": 0.1,
                     "trigger": false,
-                    "uuid": "b6e05193-9b18-4c4c-8a4e-f0f837c17c29",
+                    "uuid": "6967c2c8-7500-433e-b43d-c8de8bc7ef1e",
                     "vMax": 50.0,
                     "vMin": -50.0
                 },
@@ -120,7 +120,7 @@
                     "physConID": "DCB/11",
                     "prec": 0.1,
                     "trigger": false,
-                    "uuid": "1cfa69f9-e49e-403e-a39f-e4711ec0668c",
+                    "uuid": "85468ff4-b8cd-41a8-8b58-31225c92cee8",
                     "vMax": 50.0,
                     "vMin": -50.0
                 },
@@ -130,7 +130,7 @@
                     "physConID": "DCB/12",
                     "prec": 0.1,
                     "trigger": false,
-                    "uuid": "fff7fff3-780b-4024-a608-b786521b6ffd",
+                    "uuid": "cd5cb142-d704-4a39-993a-1e42386fa3ec",
                     "vMax": 50.0,
                     "vMin": -50.0
                 },
@@ -140,7 +140,7 @@
                     "physConID": "DCB/13",
                     "prec": 0.1,
                     "trigger": false,
-                    "uuid": "8638c0cd-277b-4e3a-abd4-5d32ab5b187d",
+                    "uuid": "bdd75343-eaa8-4db2-9998-dac627641562",
                     "vMax": 50.0,
                     "vMin": -50.0
                 },
@@ -150,7 +150,7 @@
                     "physConID": "DCB/14",
                     "prec": 0.1,
                     "trigger": false,
-                    "uuid": "f4254f79-6b63-4d31-b8e5-f41818c4d4b0",
+                    "uuid": "41a544ff-512e-4e32-8691-0b36e894401c",
                     "vMax": 50.0,
                     "vMin": -50.0
                 },
@@ -160,7 +160,7 @@
                     "physConID": "DCB/15",
                     "prec": 0.1,
                     "trigger": false,
-                    "uuid": "558a8bda-2526-4505-ae8a-039c058de635",
+                    "uuid": "9d8eac09-8211-49ec-8710-da97a2e57482",
                     "vMax": 50.0,
                     "vMin": -50.0
                 },
@@ -170,7 +170,7 @@
                     "physConID": "DCB/16",
                     "prec": 0.1,
                     "trigger": false,
-                    "uuid": "2674b9c5-da9f-432d-be96-7ff6636ff2b2",
+                    "uuid": "0908a0dd-f5bf-4829-a12e-e8d476e0be97",
                     "vMax": 50.0,
                     "vMin": -50.0
                 },
@@ -179,161 +179,168 @@
                     "name": "[COM14] DIO/A",
                     "physConID": "DIO/A",
                     "trigger": false,
-                    "uuid": "0a1a9a52-6718-4ed7-8f8c-d495dfc9bd9d"
+                    "uuid": "18b51f8c-237c-4613-a167-0f5e7ee42cf2"
                 },
                 {
                     "enabled": false,
                     "name": "[COM14] DIO/B",
                     "physConID": "DIO/B",
                     "trigger": false,
-                    "uuid": "43f23c8f-df16-4eaf-96ee-49a046ef1dac"
+                    "uuid": "e51d09a4-796d-465f-a83d-b614cfe6f48e"
                 },
                 {
                     "enabled": false,
                     "name": "[COM14] DIO/C",
                     "physConID": "DIO/C",
                     "trigger": false,
-                    "uuid": "5cc6208c-959c-4b46-8d0b-0a21d8098779"
+                    "uuid": "b7dd39d2-beb7-4c1f-b994-5b80eb13fc97"
                 },
                 {
                     "enabled": false,
                     "name": "[COM14] DIO/D",
                     "physConID": "DIO/D",
                     "trigger": false,
-                    "uuid": "5ec2557d-f6ed-4c35-b6a0-88803b907c8e"
+                    "uuid": "d71c51d9-be0b-49ac-b0c8-9a4c69780eef"
                 },
                 {
                     "enabled": false,
                     "name": "[COM14] DIO/E",
                     "physConID": "DIO/E",
                     "trigger": false,
-                    "uuid": "e07378d8-275a-40b0-a8dc-c39012b3fbf5"
+                    "uuid": "d286f3ee-4670-4d67-b9a8-32e6626b14f7"
                 },
                 {
                     "enabled": false,
                     "name": "[COM14] DIO/F",
                     "physConID": "DIO/F",
                     "trigger": false,
-                    "uuid": "d1121791-3232-49b7-b9df-50daea006f45"
+                    "uuid": "85674725-a218-4ca9-8b6b-3fddea534619"
                 },
                 {
                     "enabled": false,
                     "name": "[COM14] DIO/G",
                     "physConID": "DIO/G",
                     "trigger": false,
-                    "uuid": "d6df7b25-1505-413d-ad7d-b29ba9e1f915"
+                    "uuid": "1cd0b6fa-03f4-490e-8d35-390e0cd70f41"
                 },
                 {
                     "enabled": false,
                     "name": "[COM14] DIO/H",
                     "physConID": "DIO/H",
                     "trigger": false,
-                    "uuid": "9d464ea2-531e-4589-9a4c-ac7b71da1f8a"
+                    "uuid": "e53b767d-d8a8-4e1b-9416-5a69d6b35754"
                 },
                 {
                     "enabled": false,
                     "name": "[COM14] DIO/I",
                     "physConID": "DIO/I",
                     "trigger": false,
-                    "uuid": "be70a92f-d6a2-4ad2-a21a-7097f5122518"
+                    "uuid": "07274a0a-7371-4f91-bee4-c768792e576e"
                 },
                 {
                     "enabled": false,
                     "name": "[COM14] DIO/J",
                     "physConID": "DIO/J",
                     "trigger": false,
-                    "uuid": "913ab23a-5d40-4673-abc9-af5a5fa9e1bf"
+                    "uuid": "5cb7d2f6-0b9a-445d-9e8e-f5512f587aff"
                 },
                 {
                     "enabled": false,
                     "name": "[COM14] DIO/K",
                     "physConID": "DIO/K",
                     "trigger": false,
-                    "uuid": "9aaf50c0-b6b6-4d16-bb4e-24737cc4f2f4"
+                    "uuid": "4c0543b5-b345-4df8-9e26-d44f5363056d"
                 },
                 {
                     "enabled": false,
                     "name": "[COM14] DIO/L",
                     "physConID": "DIO/L",
                     "trigger": false,
-                    "uuid": "eb012094-83d5-4a19-baa1-c5990c485a1c"
+                    "uuid": "5599b6d1-03a4-4bd2-90e8-7509b26c758d"
                 },
                 {
                     "enabled": false,
                     "name": "[COM14] DIO/M",
                     "physConID": "DIO/M",
                     "trigger": false,
-                    "uuid": "d526080b-5137-4f2e-af2a-0ef601d39782"
+                    "uuid": "fe473a5a-5a2f-44fe-a879-8c1ec018a9ec"
                 },
                 {
                     "enabled": false,
                     "name": "[COM14] DIO/N",
                     "physConID": "DIO/N",
                     "trigger": false,
-                    "uuid": "2361f6b3-9746-4528-a958-e1fbce78509c"
+                    "uuid": "4084205e-6acd-43f6-9b79-328b524d3869"
                 },
                 {
                     "enabled": false,
                     "name": "[COM14] DIO/O",
                     "physConID": "DIO/O",
                     "trigger": false,
-                    "uuid": "b24cb684-8e36-462d-ba6a-721936b43a45"
+                    "uuid": "ee52b0cb-53a4-4153-a77d-c8f556f0387e"
                 },
                 {
                     "enabled": false,
                     "name": "[COM14] DIO/P",
                     "physConID": "DIO/P",
                     "trigger": false,
-                    "uuid": "851623f4-6a7f-4102-838e-8c5b3871747f"
+                    "uuid": "55c0cb9f-537c-4d27-a641-c89dee0472e7"
                 },
                 {
                     "enabled": false,
                     "name": "[COM14] DIO/Q",
                     "physConID": "DIO/Q",
-                    "trigger": true,
-                    "uuid": "40081662-8efa-4eca-b681-71da989c98f4"
-                }
-            ]
-        },
-        {
-            "hardwareIdentifier": "MRB_PXIe5122",
-            "hardwareSettings": {
-                "deviceName": "DIGITIZER",
-                "hardwareIdentifier": "MRB_PXIe5122",
-                "hardwareType": "NI PXIe-5122",
-                "name": "",
-                "physID": "",
-                "triggerCompUUID": "",
-                "triggerMode": "Front Digital Trigger",
-                "uuid": "0080eacb-b63c-42f5-b4a5-e0cf0948ba0e"
-            },
-            "sourceList": [
-                {
-                    "enabled": false,
-                    "name": "[DIGITIZER] 0",
-                    "physConID": "0",
-                    "prec": 0.1,
                     "trigger": false,
-                    "uuid": "6facb6fe-b3f4-428b-ade3-6f599992bbe2",
-                    "vMax": 10,
-                    "vMin": -10
+                    "uuid": "476699f7-1dbb-487a-9ab9-0f1e83ae4aa2"
                 },
                 {
                     "enabled": false,
-                    "name": "[DIGITIZER] 1",
-                    "physConID": "1",
-                    "prec": 0.1,
+                    "name": "[COM14] DIO/R",
+                    "physConID": "DIO/R",
                     "trigger": false,
-                    "uuid": "38ca07fa-8907-4a61-852d-b057eb05dfa5",
-                    "vMax": 10,
-                    "vMin": -10
+                    "uuid": "108f31c7-31fa-4a60-bd47-c9bc747655bb"
                 },
                 {
                     "enabled": false,
-                    "name": "[DIGITIZER] PXIe-5122 Trigger",
-                    "physConID": "PXIe-5122 Trigger",
-                    "trigger": true,
-                    "uuid": "af8ad4d7-95ff-4cc3-8541-1a8bb1b23371"
+                    "name": "[COM14] DIO/S",
+                    "physConID": "DIO/S",
+                    "trigger": false,
+                    "uuid": "160bd29e-9045-472c-b5ec-d4c6cf4c765e"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/T",
+                    "physConID": "DIO/T",
+                    "trigger": false,
+                    "uuid": "e1cd645b-0090-4720-bebe-6be67d77e4ab"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/U",
+                    "physConID": "DIO/U",
+                    "trigger": false,
+                    "uuid": "c8c4e567-eb62-4313-ab5e-9ade5874822e"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/V",
+                    "physConID": "DIO/V",
+                    "trigger": false,
+                    "uuid": "dcf5ca5f-dfee-4096-a683-e16ec0852644"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/W",
+                    "physConID": "DIO/W",
+                    "trigger": false,
+                    "uuid": "c6d4a9dc-e8be-46ab-875d-1a53c433cb46"
+                },
+                {
+                    "enabled": false,
+                    "name": "[COM14] DIO/X",
+                    "physConID": "DIO/X",
+                    "trigger": false,
+                    "uuid": "8c2ec468-e7d6-4357-9315-e03d14a50d32"
                 }
             ]
         },
@@ -356,9 +363,9 @@
                     "physConID": "0",
                     "prec": 0.1,
                     "trigger": false,
-                    "uuid": "9bb531c5-edb2-4d56-bcf5-80952b38cefd",
+                    "uuid": "93a9cf5c-49f4-4a17-a164-5d8de26b9f8a",
                     "vMax": 1,
-                    "vMin": 1
+                    "vMin": -1
                 },
                 {
                     "enabled": false,
@@ -366,9 +373,44 @@
                     "physConID": "1",
                     "prec": 0.1,
                     "trigger": false,
-                    "uuid": "6ea0ee81-b3f5-4d89-8dc2-1d23ffbe64ea",
+                    "uuid": "a8fc425c-ad0c-4467-b7cb-d7c4e4d20626",
                     "vMax": 1,
-                    "vMin": 1
+                    "vMin": -1
+                }
+            ]
+        },
+        {
+            "hardwareIdentifier": "MRB_PXIe5122",
+            "hardwareSettings": {
+                "deviceName": "DIGITIZER",
+                "hardwareIdentifier": "MRB_PXIe5122",
+                "hardwareType": "NI PXIe-5122",
+                "name": "",
+                "physID": "",
+                "triggerCompUUID": "",
+                "triggerMode": "Software",
+                "uuid": "ba92637f-7469-41e5-9f1a-49381964b0e7"
+            },
+            "sourceList": [
+                {
+                    "enabled": false,
+                    "name": "[DIGITIZER] 0",
+                    "physConID": "0",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "639bfced-00db-4e57-8d83-892281485148",
+                    "vMax": 10,
+                    "vMin": -10
+                },
+                {
+                    "enabled": false,
+                    "name": "[DIGITIZER] 1",
+                    "physConID": "1",
+                    "prec": 0.1,
+                    "trigger": false,
+                    "uuid": "63532f6b-bedd-4834-9d16-fb152bc7d8b0",
+                    "vMax": 10,
+                    "vMin": -10
                 }
             ]
         }

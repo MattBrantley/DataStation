@@ -25,7 +25,6 @@ class PXIe_5122(HardwareDevice):
 
     def initialize(self, deviceName, triggerMode):
         try:
-            self.Clear_Hardware_Sockets()
 
             if(deviceName != ''):
                 self.session = None

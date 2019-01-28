@@ -214,6 +214,7 @@ class Instrument(QObject):
         self.iM.sequenceLoaded(self)
 
         for hardware in self.Get_Hardware_Devices():
+            hardware.Disable_Programming_Lock()
             hardware.Push_Programming()
 
         self.readyCheck()

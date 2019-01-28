@@ -17,6 +17,14 @@
                     },
                     "time": 0.01,
                     "type": "Pulse"
+                },
+                {
+                    "params": {
+                        "Duration": 0.0036,
+                        "Voltage": 0.0
+                    },
+                    "time": 7.998,
+                    "type": "Pulse"
                 }
             ],
             "name": "Quad Trap Plate",
@@ -76,7 +84,7 @@
                     "params": {
                         "Amplitude": 0.2,
                         "Duration": 0.004,
-                        "End": 1000000.0,
+                        "End": 200000.0,
                         "Rate": 50000000.0,
                         "Start": 8000000.0
                     },
@@ -93,7 +101,7 @@
             "events": [
                 {
                     "params": {
-                        "Num. Points": 10000000,
+                        "Num. Points": 1000000,
                         "Range-Max": 10.0,
                         "Range-Min": -10.0,
                         "Rate": 16000000.0
@@ -110,16 +118,16 @@
             "compID": "trig_mrb",
             "events": [
                 {
-                    "params": {
-                        "Width": 0.05
-                    },
-                    "time": 12.0,
-                    "type": "Pulse High"
+                    "params": {},
+                    "time": 0.0,
+                    "type": "Go Low"
                 },
                 {
-                    "params": {},
-                    "time": 13.0,
-                    "type": "Go Low"
+                    "params": {
+                        "Width": 0.01
+                    },
+                    "time": 20.0,
+                    "type": "Pulse High"
                 }
             ],
             "name": "Excite Trigger",
@@ -130,10 +138,15 @@
             "compID": "trig_mrb",
             "events": [
                 {
+                    "params": {},
+                    "time": 0.0,
+                    "type": "Go Low"
+                },
+                {
                     "params": {
-                        "Width": 0.05
+                        "Width": 0.01
                     },
-                    "time": 12.004,
+                    "time": 20.03,
                     "type": "Pulse High"
                 }
             ],
@@ -147,7 +160,7 @@
                 {
                     "params": {
                         "Duration": 8.0,
-                        "Voltage": 70.0
+                        "Voltage": 0.0
                     },
                     "time": 2.0,
                     "type": "Pulse"
@@ -164,27 +177,6 @@
                     "params": {},
                     "time": 0.0,
                     "type": "Go Low"
-                },
-                {
-                    "params": {
-                        "Width": 0.01
-                    },
-                    "time": 2.5,
-                    "type": "Pulse High"
-                },
-                {
-                    "params": {
-                        "Width": 0.01
-                    },
-                    "time": 3.5,
-                    "type": "Pulse High"
-                },
-                {
-                    "params": {
-                        "Width": 0.01
-                    },
-                    "time": 4.5,
-                    "type": "Pulse High"
                 }
             ],
             "name": "Cell Pulse Valve",

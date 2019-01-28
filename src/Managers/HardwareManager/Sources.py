@@ -88,9 +88,6 @@ class Source():
         if self.programmingPacket is None:
             trace[0].Fail_Ready_Check(trace, 'Active Source Has No Programming Packet')
             return False
-        else:
-            if self.Get_Programming_Instrument().Get_UUID() != trace[0].Get_UUID():
-                trace[0].Warning_Ready_Check(trace, 'Source Is Currently Programmed For Another Instrument')
 
         self.hWare.readyCheck(trace)
         return True

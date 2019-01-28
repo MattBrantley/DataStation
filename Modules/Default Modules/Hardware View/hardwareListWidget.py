@@ -99,7 +99,7 @@ class hardwareListItem(QWidget):
         self.statusIconReady = QIcon(os.path.join(self.ds.srcDir, r'icons5\rotate.png'))
         self.statusButton.setIcon(self.statusIconNotReady)
         self.statusButton.setIconSize(QSize(16,16))
-        #self.configButton.pressed.connect(self.showConfigWidget)
+        self.statusButton.pressed.connect(self.statusButtonPressed)
 
         self.infoSection = QWidget()
         self.infoSectionLayout = QVBoxLayout()
@@ -292,6 +292,9 @@ class hardwareListItem(QWidget):
 
         action = menu.exec_(QCursor().pos())
         #self.hardwareObj.Show_Config_Widget(cursor.pos())
+
+    def statusButtonPressed(self):
+        self.hardwareObj.Push_Programming()
 
     def mousePressEvent(self, e):
         #check if min/max pressed
