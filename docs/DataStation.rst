@@ -7,10 +7,14 @@ Welcome to DataStation's documentation!
 =======================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
-
+   source/DataStation
+   source/HardwareManager/HardwareManager
+   source/InstrumentManager/InstrumentManager
+   source/ModuleManager/ModuleManager
+   source/WorkspaceManager/WorkspaceManager
 
 Indices and tables
 ==================

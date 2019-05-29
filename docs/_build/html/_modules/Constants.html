@@ -1,0 +1,210 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Constants &#8212; DataStation 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for Constants</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<div class="viewcode-block" id="DSConstants"><a class="viewcode-back" href="../source/DataStation.html#Constants.DSConstants">[docs]</a><span class="k">class</span> <span class="nc">DSConstants</span><span class="p">():</span>
+    <span class="n">MW_STATE_NO_WORKSPACE</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">MW_STATE_WORKSPACE_LOADED</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">LOG_PRIORITY_LOW</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">LOG_PRIORITY_MED</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">LOG_PRIORITY_HIGH</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">LOG_PRIORITY_DEBUG</span> <span class="o">=</span> <span class="mi">1</span>
+    
+    <span class="n">FILTER_OBJ_SOURCE</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">FILTER_OBJ_FILTER</span> <span class="o">=</span> <span class="mi">101</span>
+    <span class="n">FILTER_OBJ_PLUG</span> <span class="o">=</span> <span class="mi">102</span>
+
+    <span class="n">STATUS_CAN_RUN</span> <span class="o">=</span> <span class="mi">300</span>
+    <span class="n">STATUS_CANNOT_RUN</span> <span class="o">=</span> <span class="mi">301</span>
+
+    <span class="n">STATUS_NOT_READY</span> <span class="o">=</span> <span class="mi">200</span>
+    <span class="n">STATUS_READY</span> <span class="o">=</span> <span class="mi">201</span>
+    <span class="n">STATUS_CONFIGURING</span> <span class="o">=</span> <span class="mi">202</span>
+    <span class="n">STATUS_RUNNING</span> <span class="o">=</span> <span class="mi">203</span>
+    <span class="n">STATUS_PROCESSING</span> <span class="o">=</span> <span class="mi">204</span>
+    <span class="n">STATUS_UNKNOWN</span> <span class="o">=</span> <span class="mi">205</span>
+    <span class="n">STATUS_WAITING</span> <span class="o">=</span> <span class="mi">206</span>
+    <span class="n">STATUS_READY_CHECKING</span> <span class="o">=</span> <span class="mi">207</span>
+    <span class="n">STATUS_WARNING</span> <span class="o">=</span> <span class="mi">208</span>
+    <span class="n">STATUS_NOT_PROGRAMMED</span> <span class="o">=</span> <span class="mi">209</span>
+    <span class="n">STATUS_ERROR</span> <span class="o">=</span> <span class="mi">210</span>
+    <span class="n">STATUS_OTHER</span> <span class="o">=</span> <span class="mi">211</span>
+
+    <span class="n">READY_CHECK_READY</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">READY_CHECK_WARNING</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">READY_CHECK_ERROR</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;English&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logTexts</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initEnglishLogText</span><span class="p">()</span>
+
+<div class="viewcode-block" id="DSConstants.getLogText"><a class="viewcode-back" href="../source/DataStation.html#Constants.DSConstants.getLogText">[docs]</a>    <span class="k">def</span> <span class="nf">getLogText</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">logTexts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">logTexts</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">logTexts</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;LOG ERROR!: Invalid logText key used!&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;LOG ERROR!: Invalid language key used!&quot;</span></div>
+
+<div class="viewcode-block" id="DSConstants.initEnglishLogText"><a class="viewcode-back" href="../source/DataStation.html#Constants.DSConstants.initEnglishLogText">[docs]</a>    <span class="k">def</span> <span class="nf">initEnglishLogText</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logTexts</span><span class="p">[</span><span class="s1">&#39;English&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">DSLogTexts</span><span class="p">(</span><span class="s1">&#39;English&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logTexts</span><span class="p">[</span><span class="s1">&#39;English&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="s1">&#39;VI_SAVE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Saving Virtual Instrument to file...&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logTexts</span><span class="p">[</span><span class="s1">&#39;English&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="s1">&#39;VI_SAVE_NO_VI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Attempting to write virtual instrument to file but no instrument is loaded!! Aborting...&#39;</span></div></div>
+
+<div class="viewcode-block" id="moduleFlags"><a class="viewcode-back" href="../source/DataStation.html#Constants.moduleFlags">[docs]</a><span class="k">class</span> <span class="nc">moduleFlags</span><span class="p">():</span>
+    <span class="n">CAN_HIDE</span> <span class="o">=</span> <span class="mi">200</span>
+    <span class="n">CAN_DELETE</span> <span class="o">=</span> <span class="mi">201</span>
+
+    <span class="n">CAN_FLOAT</span> <span class="o">=</span> <span class="mi">210</span>
+
+    <span class="n">SINGLE_INSTANCE</span> <span class="o">=</span> <span class="mi">300</span>
+    <span class="n">DEFAULT_MODULE</span> <span class="o">=</span> <span class="mi">301</span>
+
+    <span class="n">LATE_CLOSE</span> <span class="o">=</span> <span class="mi">400</span></div>
+
+<div class="viewcode-block" id="DSLogTexts"><a class="viewcode-back" href="../source/DataStation.html#Constants.DSLogTexts">[docs]</a><span class="k">class</span> <span class="nc">DSLogTexts</span><span class="p">():</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">language</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="readyCheckPacket"><a class="viewcode-back" href="../source/DataStation.html#Constants.readyCheckPacket">[docs]</a><span class="k">class</span> <span class="nc">readyCheckPacket</span><span class="p">():</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">readyStatus</span><span class="p">,</span> <span class="n">subs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readyStatus</span> <span class="o">=</span> <span class="n">readyStatus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subs</span> <span class="o">=</span> <span class="n">subs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">areSubsReady</span><span class="p">()</span>
+
+<div class="viewcode-block" id="readyCheckPacket.areSubsReady"><a class="viewcode-back" href="../source/DataStation.html#Constants.readyCheckPacket.areSubsReady">[docs]</a>    <span class="k">def</span> <span class="nf">areSubsReady</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subs</span><span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">sub</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="n">sub</span><span class="o">.</span><span class="n">areSubsReady</span><span class="p">()</span>
+                    <span class="k">if</span><span class="p">(</span><span class="n">sub</span><span class="o">.</span><span class="n">readyStatus</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">READY_CHECK_READY</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">readyStatus</span> <span class="o">=</span> <span class="n">sub</span><span class="o">.</span><span class="n">readyStatus</span></div>
+
+<div class="viewcode-block" id="readyCheckPacket.generateMessages"><a class="viewcode-back" href="../source/DataStation.html#Constants.readyCheckPacket.generateMessages">[docs]</a>    <span class="k">def</span> <span class="nf">generateMessages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="p">):</span>
+        <span class="n">msgList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">readyStatus</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">READY_CHECK_READY</span><span class="p">):</span>
+            <span class="n">indentStr</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">indent</span><span class="p">):</span>
+                <span class="n">indentStr</span> <span class="o">=</span> <span class="n">indentStr</span> <span class="o">+</span> <span class="s1">&#39;    &#39;</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">indent</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">):</span>
+                <span class="n">indentStr</span> <span class="o">=</span> <span class="n">indentStr</span> <span class="o">+</span> <span class="sa">u</span><span class="s1">&#39;</span><span class="se">\u21B3</span><span class="s1">&#39;</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">readyCheckMsg</span><span class="p">(</span><span class="n">indentStr</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">readyStatus</span><span class="p">)</span>
+            <span class="n">msgList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subs</span><span class="p">:</span>
+                    <span class="n">msgList</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">sub</span><span class="o">.</span><span class="n">generateMessages</span><span class="p">(</span><span class="n">indent</span><span class="p">))</span>
+        
+        <span class="k">return</span> <span class="n">msgList</span></div></div>
+
+<div class="viewcode-block" id="readyCheckMsg"><a class="viewcode-back" href="../source/DataStation.html#Constants.readyCheckMsg">[docs]</a><span class="k">class</span> <span class="nc">readyCheckMsg</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span></div>
+
+<div class="viewcode-block" id="logObject"><a class="viewcode-back" href="../source/DataStation.html#Constants.logObject">[docs]</a><span class="k">class</span> <span class="nc">logObject</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">warningLevel</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">source</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warningLevel</span> <span class="o">=</span> <span class="n">warningLevel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeStamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">()</span>
+
+<div class="viewcode-block" id="logObject.timeText"><a class="viewcode-back" href="../source/DataStation.html#Constants.logObject.timeText">[docs]</a>    <span class="k">def</span> <span class="nf">timeText</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;[%m/</span><span class="si">%d</span><span class="s1">/%Y %H:%M:%S] &#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeStamp</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../DataStation.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/DataStation.html">DataStation module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/HardwareManager/HardwareManager.html">HardwareManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/InstrumentManager/InstrumentManager.html">InstrumentManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/ModuleManager/ModuleManager.html">ModuleManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/WorkspaceManager/WorkspaceManager.html">WorkspaceManager module</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Matthew R. Brantley.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>

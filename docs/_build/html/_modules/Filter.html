@@ -1,0 +1,316 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Filter &#8212; DataStation 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for Filter</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt5.Qt</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">uuid</span>
+<span class="kn">from</span> <span class="nn">src.Constants</span> <span class="k">import</span> <span class="n">DSConstants</span> <span class="k">as</span> <span class="n">DSConstants</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">src.Managers.InstrumentManager.Sockets</span> <span class="k">import</span> <span class="n">Socket</span>
+<span class="kn">from</span> <span class="nn">src.Managers.HardwareManager.Sources</span> <span class="k">import</span> <span class="n">Source</span>
+
+<div class="viewcode-block" id="Filter"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter">[docs]</a><span class="k">class</span> <span class="nc">Filter</span><span class="p">():</span>
+    <span class="n">filterType</span> <span class="o">=</span> <span class="s1">&#39;Default Filter&#39;</span>
+    <span class="n">filterIdentifier</span> <span class="o">=</span> <span class="s1">&#39;DefFil&#39;</span>
+    <span class="n">filterVersion</span> <span class="o">=</span> <span class="s1">&#39;1.0&#39;</span>
+    <span class="n">filterCreator</span> <span class="o">=</span> <span class="s1">&#39;Matthew R. Brantley&#39;</span>
+    <span class="n">filterVersionDate</span> <span class="o">=</span> <span class="s1">&#39;8/13/2018&#39;</span>
+    <span class="n">iconGraphicSrc</span> <span class="o">=</span> <span class="s1">&#39;default.png&#39;</span>
+    <span class="n">numPaths</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### EXTERNAL FUNCTIONS ####################################</span>
+
+<div class="viewcode-block" id="Filter.Get_Name"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.Get_Name">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Filter.Get_Source"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.Get_Source">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Source</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getSource</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Filter.Get_Sockets"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.Get_Sockets">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Sockets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getSockets</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Filter.Get_UUID"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.Get_UUID">[docs]</a>    <span class="k">def</span> <span class="nf">Get_UUID</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Filter.Get_Input_UUID"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.Get_Input_UUID">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Input_UUID</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSource&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Filter.Get_Input_Path_Number"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.Get_Input_Path_Number">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Input_Path_Number</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSourcePathNo&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Filter.Get_Number_Of_Paths"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.Get_Number_Of_Paths">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Number_Of_Paths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">numPaths</span></div>
+
+<div class="viewcode-block" id="Filter.Attach_Input"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.Attach_Input">[docs]</a>    <span class="k">def</span> <span class="nf">Attach_Input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">,</span> <span class="n">pathNo</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">attachInput</span><span class="p">(</span><span class="n">uuid</span><span class="p">,</span> <span class="n">pathNo</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Filter.Detatch_Input"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.Detatch_Input">[docs]</a>    <span class="k">def</span> <span class="nf">Detatch_Input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detatch</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Filter.Get_Type"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.Get_Type">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;filterType&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Filter.Remove"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.Remove">[docs]</a>    <span class="k">def</span> <span class="nf">Remove</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">removeFilter</span><span class="p">()</span></div>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### INTERNAL USER ONLY ####################################</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hM</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Unnamed &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterType</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;filterType&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterType</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;filterIdentifier&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterIdentifier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;iconGraphicSrc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iconGraphicSrc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSourcePathNo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">iM</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># These are defined by hardwareManager immediately after generation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># These are defined by hardwareManager immediately after generation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># These are defined by hardwareManager immediately after generation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hW</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># These are defined by hardwareManager immediately after generation</span>
+
+<span class="c1">##### DataStation Interface Functions #####</span>
+
+<div class="viewcode-block" id="Filter.getUUID"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.getUUID">[docs]</a>    <span class="k">def</span> <span class="nf">getUUID</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Filter.readyCheck"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.readyCheck">[docs]</a>    <span class="k">def</span> <span class="nf">readyCheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traceIn</span><span class="p">):</span>
+        <span class="n">trace</span> <span class="o">=</span> <span class="n">traceIn</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">trace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getInputObject</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">getInputObject</span><span class="p">()</span><span class="o">.</span><span class="n">readyCheck</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Filter.getInputObject"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.getInputObject">[docs]</a>    <span class="k">def</span> <span class="nf">getInputObject</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSource&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSourcePathNo&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">inputObj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">Get_Filters</span><span class="p">(</span><span class="n">uuid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSource&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">inputObj</span><span class="p">:</span>
+                <span class="n">inputObj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">Get_Sources</span><span class="p">(</span><span class="n">uuid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSource&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">inputObj</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">inputObj</span></div>
+
+<span class="c1">##### Functions Over-Ridden By Factoried Filters #####</span>
+
+<div class="viewcode-block" id="Filter.procForwardParent"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.procForwardParent">[docs]</a>    <span class="k">def</span> <span class="nf">procForwardParent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packetIn</span><span class="p">):</span>
+        <span class="n">packetType</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getPacketType</span><span class="p">(</span><span class="n">packetIn</span><span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">packetType</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="c1">#Incoming packet is an unknown type</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">packetOut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">procForward</span><span class="p">(</span><span class="n">packetIn</span><span class="p">,</span> <span class="n">packetType</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">packetOut</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">packetOut</span> <span class="o">=</span> <span class="n">packetIn</span>
+        
+        <span class="k">return</span> <span class="n">packetOut</span></div>
+
+<div class="viewcode-block" id="Filter.procForward"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.procForward">[docs]</a>    <span class="k">def</span> <span class="nf">procForward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span> <span class="c1">### OVERRIDE ME!! ####</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Filter.procReverseParent"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.procReverseParent">[docs]</a>    <span class="k">def</span> <span class="nf">procReverseParent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packetIn</span><span class="p">):</span>
+        <span class="n">subs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">packetType</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getPacketType</span><span class="p">(</span><span class="n">packetIn</span><span class="p">)</span>
+
+        <span class="n">packetOut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">procReverse</span><span class="p">(</span><span class="n">pathNo</span><span class="p">,</span> <span class="n">packetIn</span><span class="p">,</span> <span class="n">packetType</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">packetOut</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">packetOut</span> <span class="o">=</span> <span class="n">packetIn</span></div>
+
+<div class="viewcode-block" id="Filter.procReverse"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.procReverse">[docs]</a>    <span class="k">def</span> <span class="nf">procReverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pathNo</span><span class="p">,</span> <span class="n">packetIn</span><span class="p">,</span> <span class="n">packetType</span><span class="p">):</span> <span class="c1">### OVERRIDE ME!! ####</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Filter.onCreationParent"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.onCreationParent">[docs]</a>    <span class="k">def</span> <span class="nf">onCreationParent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">onCreation</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Filter.onCreation"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.onCreation">[docs]</a>    <span class="k">def</span> <span class="nf">onCreation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1">### OVERRIDE ME!! ####</span>
+        <span class="k">pass</span></div>
+
+<span class="c1">##### Search Functions ######</span>
+
+<div class="viewcode-block" id="Filter.getSockets"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.getSockets">[docs]</a>    <span class="k">def</span> <span class="nf">getSockets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iM</span><span class="o">.</span><span class="n">Get_Instrument</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">outputFilters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">Get_Filters</span><span class="p">(</span><span class="n">inputUUID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">])</span>
+        <span class="n">outputSockets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iM</span><span class="o">.</span><span class="n">Get_Instrument</span><span class="p">()</span><span class="o">.</span><span class="n">Get_Sockets</span><span class="p">(</span><span class="n">inputUUID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">Filter</span> <span class="ow">in</span> <span class="n">outputFilters</span><span class="p">:</span>
+            <span class="n">outputSockets</span> <span class="o">+=</span> <span class="n">Filter</span><span class="o">.</span><span class="n">Get_Sockets</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">outputSockets</span></div>
+
+<div class="viewcode-block" id="Filter.getSource"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.getSource">[docs]</a>    <span class="k">def</span> <span class="nf">getSource</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSource&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSourcePathNo&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">inputObj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">Get_Filters</span><span class="p">(</span><span class="n">uuid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSource&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">inputObj</span><span class="p">:</span>
+                <span class="n">inputObj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">Get_Sources</span><span class="p">(</span><span class="n">uuid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSource&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">inputObj</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">if</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">Source</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">inputObj</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">inputObj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">inputObj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Get_Source</span><span class="p">()</span></div>
+
+<span class="c1">##### Filter Manipulation Functions #####</span>
+
+<div class="viewcode-block" id="Filter.savePacket"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.savePacket">[docs]</a>    <span class="k">def</span> <span class="nf">savePacket</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span></div>
+        
+<div class="viewcode-block" id="Filter.loadPacket"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.loadPacket">[docs]</a>    <span class="k">def</span> <span class="nf">loadPacket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loadPacket</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">loadPacket</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">return</span> <span class="c1">#loadPacket is malformed - can&#39;t run</span>
+        
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">loadPacket</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">restoreState</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Filter.restoreState"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.restoreState">[docs]</a>    <span class="k">def</span> <span class="nf">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSource&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSourcePathNo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="c1"># Previous filter state was not connected to anything</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSourcePathNo&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="c1"># Previous filter state was not connected to anything; even if it was, we don&#39;t know to what path.</span>
+
+        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">Get_Sources</span><span class="p">(</span><span class="n">uuid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSource&#39;</span><span class="p">])</span>
+        <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">Get_Filters</span><span class="p">(</span><span class="n">uuid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSource&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSourcePathNo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;FILTER RESTORE ERROR: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; (&#39;</span> <span class="o">+</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;) Trying To Attach To Filter/Source that does not exist!!!&#39;</span> <span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_MED</span><span class="p">)</span>
+            <span class="k">return</span> <span class="c1"># No Filter or Source found at that uuid - clear this filter&#39;s reference.</span></div>
+
+<div class="viewcode-block" id="Filter.attachInput"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.attachInput">[docs]</a>    <span class="k">def</span> <span class="nf">attachInput</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">,</span> <span class="n">pathNumber</span><span class="p">):</span>
+
+        <span class="c1"># Remove anything else that has a connection to what this is connecting to</span>
+        <span class="n">filtersAttached</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">Get_Filters</span><span class="p">(</span><span class="n">inputUUID</span> <span class="o">=</span> <span class="n">uuid</span><span class="p">,</span> <span class="n">pathNo</span><span class="o">=</span><span class="n">pathNumber</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">Filter</span> <span class="ow">in</span> <span class="n">filtersAttached</span><span class="p">:</span>
+            <span class="n">Filter</span><span class="o">.</span><span class="n">Detatch_Input</span><span class="p">()</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iM</span><span class="o">.</span><span class="n">Get_Instrument</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">socketsAttached</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iM</span><span class="o">.</span><span class="n">Get_Instrument</span><span class="p">()</span><span class="o">.</span><span class="n">Get_Sockets</span><span class="p">(</span><span class="n">inputUUID</span> <span class="o">=</span> <span class="n">uuid</span><span class="p">,</span> <span class="n">pathNo</span><span class="o">=</span><span class="n">pathNumber</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">Socket</span> <span class="ow">in</span> <span class="n">socketsAttached</span><span class="p">:</span>
+                <span class="n">Socket</span><span class="o">.</span><span class="n">Detatch_Input</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uuid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSourcePathNo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pathNumber</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">filterAttached</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Filter.detatch"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.detatch">[docs]</a>    <span class="k">def</span> <span class="nf">detatch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSourcePathNo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">filterDetatched</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Filter.removeFilter"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.Filter.removeFilter">[docs]</a>    <span class="k">def</span> <span class="nf">removeFilter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detatch</span><span class="p">()</span>
+        <span class="n">outputFilters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">Get_Filters</span><span class="p">(</span><span class="n">inputUUID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">Filter</span> <span class="ow">in</span> <span class="n">outputFilters</span><span class="p">:</span>
+            <span class="n">Filter</span><span class="o">.</span><span class="n">Remove</span><span class="p">()</span>
+        <span class="n">outputSockets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iM</span><span class="o">.</span><span class="n">Get_Instrument</span><span class="p">()</span><span class="o">.</span><span class="n">Get_Sockets</span><span class="p">(</span><span class="n">inputUUID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">Socket</span> <span class="ow">in</span> <span class="n">outputSockets</span><span class="p">:</span>
+            <span class="n">Socket</span><span class="o">.</span><span class="n">Detatch_Input</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">removeFilter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="AnalogFilter"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.AnalogFilter">[docs]</a><span class="k">class</span> <span class="nc">AnalogFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hM</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">hM</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DigitalFilter"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Filter.DigitalFilter">[docs]</a><span class="k">class</span> <span class="nc">DigitalFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hM</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">hM</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../DataStation.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/DataStation.html">DataStation module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/HardwareManager/HardwareManager.html">HardwareManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/InstrumentManager/InstrumentManager.html">InstrumentManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/ModuleManager/ModuleManager.html">ModuleManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/WorkspaceManager/WorkspaceManager.html">WorkspaceManager module</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Matthew R. Brantley.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>

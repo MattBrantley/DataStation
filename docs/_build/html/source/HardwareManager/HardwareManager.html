@@ -1,0 +1,1731 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>HardwareManager module &#8212; DataStation 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="InstrumentManager module" href="../InstrumentManager/InstrumentManager.html" />
+    <link rel="prev" title="DataStation module" href="../DataStation.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../InstrumentManager/InstrumentManager.html" title="InstrumentManager module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../DataStation.html" title="DataStation module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="hardwaremanager-module">
+<span id="api-widgets"></span><h1>HardwareManager module<a class="headerlink" href="#hardwaremanager-module" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="hardwaremanager">
+<h2>HardwareManager<a class="headerlink" href="#hardwaremanager" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-HardwareManager"></span><dl class="class">
+<dt id="HardwareManager.HardwareManager">
+<em class="property">class </em><code class="descclassname">HardwareManager.</code><code class="descname">HardwareManager</code><span class="sig-paren">(</span><em>ds</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtCore.QObject</span></code></p>
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.Add_Filter">
+<code class="descname">Add_Filter</code><span class="sig-paren">(</span><em>filterModel</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.Add_Filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.Add_Filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.Add_Hardware">
+<code class="descname">Add_Hardware</code><span class="sig-paren">(</span><em>hardwareModel</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.Add_Hardware"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.Add_Hardware" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.Do_Ready_Check">
+<code class="descname">Do_Ready_Check</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.Do_Ready_Check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.Do_Ready_Check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.Fail_Ready_Check">
+<code class="descname">Fail_Ready_Check</code><span class="sig-paren">(</span><em>trace</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.Fail_Ready_Check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.Fail_Ready_Check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Filter_Added">
+<code class="descname">Filter_Added</code><a class="headerlink" href="#HardwareManager.HardwareManager.Filter_Added" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Filter_Attached">
+<code class="descname">Filter_Attached</code><a class="headerlink" href="#HardwareManager.HardwareManager.Filter_Attached" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Filter_Detatched">
+<code class="descname">Filter_Detatched</code><a class="headerlink" href="#HardwareManager.HardwareManager.Filter_Detatched" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Filter_Removed">
+<code class="descname">Filter_Removed</code><a class="headerlink" href="#HardwareManager.HardwareManager.Filter_Removed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.Get_Filter_Models_Available">
+<code class="descname">Get_Filter_Models_Available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.Get_Filter_Models_Available"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.Get_Filter_Models_Available" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.Get_Filters">
+<code class="descname">Get_Filters</code><span class="sig-paren">(</span><em>uuid=-1</em>, <em>inputUUID=-1</em>, <em>pathNo=-1</em>, <em>filterType=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.Get_Filters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.Get_Filters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.Get_Hardware">
+<code class="descname">Get_Hardware</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.Get_Hardware"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.Get_Hardware" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.Get_Hardware_Models_Available">
+<code class="descname">Get_Hardware_Models_Available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.Get_Hardware_Models_Available"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.Get_Hardware_Models_Available" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.Get_Sources">
+<code class="descname">Get_Sources</code><span class="sig-paren">(</span><em>uuid=-1</em>, <em>sourceType=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.Get_Sources"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.Get_Sources" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_Added">
+<code class="descname">Hardware_Added</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_Added" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_Configured">
+<code class="descname">Hardware_Configured</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_Configured" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_Device_Changed">
+<code class="descname">Hardware_Device_Changed</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_Device_Changed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_Device_Found">
+<code class="descname">Hardware_Device_Found</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_Device_Found" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_Device_Removed">
+<code class="descname">Hardware_Device_Removed</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_Device_Removed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_Device_Reset">
+<code class="descname">Hardware_Device_Reset</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_Device_Reset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_Device_Trigger_Mode_Added">
+<code class="descname">Hardware_Device_Trigger_Mode_Added</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_Device_Trigger_Mode_Added" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_Handler_Soft_Trigger_Sent">
+<code class="descname">Hardware_Handler_Soft_Trigger_Sent</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_Handler_Soft_Trigger_Sent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_Handler_Stopping_Instrument">
+<code class="descname">Hardware_Handler_Stopping_Instrument</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_Handler_Stopping_Instrument" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_Initialized">
+<code class="descname">Hardware_Initialized</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_Initialized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_Programmed">
+<code class="descname">Hardware_Programmed</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_Programmed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_Programming_Modified">
+<code class="descname">Hardware_Programming_Modified</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_Programming_Modified" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_Ready_Status_Changed">
+<code class="descname">Hardware_Ready_Status_Changed</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_Ready_Status_Changed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_Removed">
+<code class="descname">Hardware_Removed</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_Removed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_Scanned">
+<code class="descname">Hardware_Scanned</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_Scanned" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_Soft_Triggered">
+<code class="descname">Hardware_Soft_Triggered</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_Soft_Triggered" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_State_Loaded">
+<code class="descname">Hardware_State_Loaded</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_State_Loaded" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_State_Saving">
+<code class="descname">Hardware_State_Saving</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_State_Saving" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_Status_Message">
+<code class="descname">Hardware_Status_Message</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_Status_Message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Hardware_Trigger_Modified">
+<code class="descname">Hardware_Trigger_Modified</code><a class="headerlink" href="#HardwareManager.HardwareManager.Hardware_Trigger_Modified" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.Ready_Check_Status">
+<code class="descname">Ready_Check_Status</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.Ready_Check_Status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.Ready_Check_Status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.Remove_Hardware">
+<code class="descname">Remove_Hardware</code><span class="sig-paren">(</span><em>hardwareObject</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.Remove_Hardware"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.Remove_Hardware" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Sequence_Finished">
+<code class="descname">Sequence_Finished</code><a class="headerlink" href="#HardwareManager.HardwareManager.Sequence_Finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Sequence_Started">
+<code class="descname">Sequence_Started</code><a class="headerlink" href="#HardwareManager.HardwareManager.Sequence_Started" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Source_Added">
+<code class="descname">Source_Added</code><a class="headerlink" href="#HardwareManager.HardwareManager.Source_Added" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareManager.HardwareManager.Source_Removed">
+<code class="descname">Source_Removed</code><a class="headerlink" href="#HardwareManager.HardwareManager.Source_Removed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.addDigitalTriggerComp">
+<code class="descname">addDigitalTriggerComp</code><span class="sig-paren">(</span><em>hardwareObj</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.addDigitalTriggerComp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.addDigitalTriggerComp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.addFilter">
+<code class="descname">addFilter</code><span class="sig-paren">(</span><em>filterModel</em>, <em>loadData=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.addFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.addFilter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.addHardwareObj">
+<code class="descname">addHardwareObj</code><span class="sig-paren">(</span><em>deviceModel</em>, <em>loadData=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.addHardwareObj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.addHardwareObj" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.connections">
+<code class="descname">connections</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.connections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.connections" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.deviceReset">
+<code class="descname">deviceReset</code><span class="sig-paren">(</span><em>hWare</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.deviceReset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.deviceReset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.deviceSelectionChanged">
+<code class="descname">deviceSelectionChanged</code><span class="sig-paren">(</span><em>hardwareObj</em>, <em>deviceName</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.deviceSelectionChanged"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.deviceSelectionChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.deviceSelectionRemoved">
+<code class="descname">deviceSelectionRemoved</code><span class="sig-paren">(</span><em>hardwareObj</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.deviceSelectionRemoved"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.deviceSelectionRemoved" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.filterAttached">
+<code class="descname">filterAttached</code><span class="sig-paren">(</span><em>Filter</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.filterAttached"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.filterAttached" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.filterDetatched">
+<code class="descname">filterDetatched</code><span class="sig-paren">(</span><em>Filter</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.filterDetatched"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.filterDetatched" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.findHardwareModelByIdentifier">
+<code class="descname">findHardwareModelByIdentifier</code><span class="sig-paren">(</span><em>identifier</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.findHardwareModelByIdentifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.findHardwareModelByIdentifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.getFilterModelFromIdentifier">
+<code class="descname">getFilterModelFromIdentifier</code><span class="sig-paren">(</span><em>identifier</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.getFilterModelFromIdentifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.getFilterModelFromIdentifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.getFilters">
+<code class="descname">getFilters</code><span class="sig-paren">(</span><em>uuid=-1</em>, <em>inputUUID=-1</em>, <em>pathNo=-1</em>, <em>filterType=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.getFilters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.getFilters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.getHardwareObjectByUUID">
+<code class="descname">getHardwareObjectByUUID</code><span class="sig-paren">(</span><em>uuid</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.getHardwareObjectByUUID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.getHardwareObjectByUUID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.getSourceObjs">
+<code class="descname">getSourceObjs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.getSourceObjs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.getSourceObjs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.getSources">
+<code class="descname">getSources</code><span class="sig-paren">(</span><em>uuid=-1</em>, <em>sourceType=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.getSources"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.getSources" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.getTrigCompsRefUUID">
+<code class="descname">getTrigCompsRefUUID</code><span class="sig-paren">(</span><em>uuid</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.getTrigCompsRefUUID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.getTrigCompsRefUUID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.handlerSoftTriggerSent">
+<code class="descname">handlerSoftTriggerSent</code><span class="sig-paren">(</span><em>hWare</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.handlerSoftTriggerSent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.handlerSoftTriggerSent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.handlerStoppingInstrument">
+<code class="descname">handlerStoppingInstrument</code><span class="sig-paren">(</span><em>hWare</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.handlerStoppingInstrument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.handlerStoppingInstrument" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.hardwareConfigured">
+<code class="descname">hardwareConfigured</code><span class="sig-paren">(</span><em>hWare</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.hardwareConfigured"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.hardwareConfigured" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.hardwareDeviceFound">
+<code class="descname">hardwareDeviceFound</code><span class="sig-paren">(</span><em>hWare</em>, <em>deviceName</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.hardwareDeviceFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.hardwareDeviceFound" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.hardwareInitialized">
+<code class="descname">hardwareInitialized</code><span class="sig-paren">(</span><em>hWare</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.hardwareInitialized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.hardwareInitialized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.hardwareProgrammed">
+<code class="descname">hardwareProgrammed</code><span class="sig-paren">(</span><em>hWare</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.hardwareProgrammed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.hardwareProgrammed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.hardwareReadyStatusChanged">
+<code class="descname">hardwareReadyStatusChanged</code><span class="sig-paren">(</span><em>hWare</em>, <em>status</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.hardwareReadyStatusChanged"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.hardwareReadyStatusChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.hardwareScanned">
+<code class="descname">hardwareScanned</code><span class="sig-paren">(</span><em>hWare</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.hardwareScanned"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.hardwareScanned" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.hardwareSoftTriggered">
+<code class="descname">hardwareSoftTriggered</code><span class="sig-paren">(</span><em>hWare</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.hardwareSoftTriggered"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.hardwareSoftTriggered" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.hardwareStatusMessage">
+<code class="descname">hardwareStatusMessage</code><span class="sig-paren">(</span><em>hWare</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.hardwareStatusMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.hardwareStatusMessage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.loadDriverFromFile">
+<code class="descname">loadDriverFromFile</code><span class="sig-paren">(</span><em>filepath</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.loadDriverFromFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.loadDriverFromFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.loadFilterFromData">
+<code class="descname">loadFilterFromData</code><span class="sig-paren">(</span><em>filterInputSource</em>, <em>data</em>, <em>pathNo</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.loadFilterFromData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.loadFilterFromData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.loadFilterFromFile">
+<code class="descname">loadFilterFromFile</code><span class="sig-paren">(</span><em>filepath</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.loadFilterFromFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.loadFilterFromFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.loadFilters">
+<code class="descname">loadFilters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.loadFilters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.loadFilters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.loadHardwareDrivers">
+<code class="descname">loadHardwareDrivers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.loadHardwareDrivers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.loadHardwareDrivers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.loadHardwareState">
+<code class="descname">loadHardwareState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.loadHardwareState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.loadHardwareState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.loadLabviewInterface">
+<code class="descname">loadLabviewInterface</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.loadLabviewInterface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.loadLabviewInterface" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.processHardwareData">
+<code class="descname">processHardwareData</code><span class="sig-paren">(</span><em>hardwareData</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.processHardwareData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.processHardwareData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.programAllDevices">
+<code class="descname">programAllDevices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.programAllDevices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.programAllDevices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.programmingModified">
+<code class="descname">programmingModified</code><span class="sig-paren">(</span><em>hWare</em>, <em>source</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.programmingModified"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.programmingModified" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.readyCheck">
+<code class="descname">readyCheck</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.readyCheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.readyCheck" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.removeCompByUUID">
+<code class="descname">removeCompByUUID</code><span class="sig-paren">(</span><em>uuid</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.removeCompByUUID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.removeCompByUUID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.removeFilter">
+<code class="descname">removeFilter</code><span class="sig-paren">(</span><em>Filter</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.removeFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.removeFilter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.removeHardwareObj">
+<code class="descname">removeHardwareObj</code><span class="sig-paren">(</span><em>deviceHandler</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.removeHardwareObj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.removeHardwareObj" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.saveHardwareState">
+<code class="descname">saveHardwareState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.saveHardwareState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.saveHardwareState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.sourceAdded">
+<code class="descname">sourceAdded</code><span class="sig-paren">(</span><em>hardwareObj</em>, <em>sourceObj</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.sourceAdded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.sourceAdded" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.sourceRemoved">
+<code class="descname">sourceRemoved</code><span class="sig-paren">(</span><em>hardwareObj</em>, <em>sourceObj</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.sourceRemoved"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.sourceRemoved" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.triggerModeAdded">
+<code class="descname">triggerModeAdded</code><span class="sig-paren">(</span><em>hardwareObj</em>, <em>triggerModeName</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.triggerModeAdded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.triggerModeAdded" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.triggerModified">
+<code class="descname">triggerModified</code><span class="sig-paren">(</span><em>hWare</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.triggerModified"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.triggerModified" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareManager.HardwareManager.writeHardwareStateFile">
+<code class="descname">writeHardwareStateFile</code><span class="sig-paren">(</span><em>stateData</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareManager.html#HardwareManager.writeHardwareStateFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareManager.HardwareManager.writeHardwareStateFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-HardwareDevice">
+<span id="hardwaredevice"></span><h2>HardwareDevice<a class="headerlink" href="#module-HardwareDevice" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="HardwareDevice.HardwareDevice">
+<em class="property">class </em><code class="descclassname">HardwareDevice.</code><code class="descname">HardwareDevice</code><span class="sig-paren">(</span><em>handler</em>, <em>systemDeviceInfo</em>, <em>hardwareSettings</em>, <em>deviceList</em>, <em>sourceList</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtCore.QObject</span></code></p>
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.Add_AISource">
+<code class="descname">Add_AISource</code><span class="sig-paren">(</span><em>name</em>, <em>vMin</em>, <em>vMax</em>, <em>prec</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.Add_AISource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.Add_AISource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.Add_AOSource">
+<code class="descname">Add_AOSource</code><span class="sig-paren">(</span><em>name</em>, <em>vMin</em>, <em>vMax</em>, <em>prec</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.Add_AOSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.Add_AOSource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.Add_Analog_Trigger">
+<code class="descname">Add_Analog_Trigger</code><span class="sig-paren">(</span><em>name</em>, <em>vMin</em>, <em>vMax</em>, <em>prec</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.Add_Analog_Trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.Add_Analog_Trigger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.Add_DISource">
+<code class="descname">Add_DISource</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.Add_DISource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.Add_DISource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.Add_DOSource">
+<code class="descname">Add_DOSource</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.Add_DOSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.Add_DOSource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.Add_Device">
+<code class="descname">Add_Device</code><span class="sig-paren">(</span><em>deviceName</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.Add_Device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.Add_Device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.Add_Digital_Trigger">
+<code class="descname">Add_Digital_Trigger</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.Add_Digital_Trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.Add_Digital_Trigger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.Add_Trigger_Mode">
+<code class="descname">Add_Trigger_Mode</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.Add_Trigger_Mode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.Add_Trigger_Mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.Get_Device_Name">
+<code class="descname">Get_Device_Name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.Get_Device_Name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.Get_Device_Name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.Get_Handler">
+<code class="descname">Get_Handler</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.Get_Handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.Get_Handler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.Get_Standard_Field">
+<code class="descname">Get_Standard_Field</code><span class="sig-paren">(</span><em>field</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.Get_Standard_Field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.Get_Standard_Field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.Get_Trigger_Mode">
+<code class="descname">Get_Trigger_Mode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.Get_Trigger_Mode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.Get_Trigger_Mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.Is_Triggered">
+<code class="descname">Is_Triggered</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.Is_Triggered"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.Is_Triggered" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.Push_Measurements_Packet">
+<code class="descname">Push_Measurements_Packet</code><span class="sig-paren">(</span><em>source</em>, <em>measurementPacket</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.Push_Measurements_Packet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.Push_Measurements_Packet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.Ready_Status">
+<code class="descname">Ready_Status</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.Ready_Status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.Ready_Status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.Send_Status_Message">
+<code class="descname">Send_Status_Message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.Send_Status_Message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.Send_Status_Message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.Set_Ready_Status">
+<code class="descname">Set_Ready_Status</code><span class="sig-paren">(</span><em>status</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.Set_Ready_Status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.Set_Ready_Status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.Set_Triggered_State">
+<code class="descname">Set_Triggered_State</code><span class="sig-paren">(</span><em>state</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.Set_Triggered_State"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.Set_Triggered_State" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.addDevice">
+<code class="descname">addDevice</code><span class="sig-paren">(</span><em>deviceName</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.addDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.addDevice" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.addSource">
+<code class="descname">addSource</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.addSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.addSource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.clearSources">
+<code class="descname">clearSources</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.clearSources"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.clearSources" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.configure">
+<code class="descname">configure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.configure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.configure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDevice.configured">
+<code class="descname">configured</code><a class="headerlink" href="#HardwareDevice.HardwareDevice.configured" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.deviceChanged">
+<code class="descname">deviceChanged</code><span class="sig-paren">(</span><em>deviceName</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.deviceChanged"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.deviceChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDevice.deviceFound">
+<code class="descname">deviceFound</code><a class="headerlink" href="#HardwareDevice.HardwareDevice.deviceFound" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.getSourceByPhysConID">
+<code class="descname">getSourceByPhysConID</code><span class="sig-paren">(</span><em>physConID</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.getSourceByPhysConID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.getSourceByPhysConID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDevice.hardwareCreator">
+<code class="descname">hardwareCreator</code><em class="property"> = 'Matthew R. Brantley'</em><a class="headerlink" href="#HardwareDevice.HardwareDevice.hardwareCreator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDevice.hardwareIdentifier">
+<code class="descname">hardwareIdentifier</code><em class="property"> = 'HD_Base'</em><a class="headerlink" href="#HardwareDevice.HardwareDevice.hardwareIdentifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDevice.hardwareType">
+<code class="descname">hardwareType</code><em class="property"> = 'HardwareDevice'</em><a class="headerlink" href="#HardwareDevice.HardwareDevice.hardwareType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDevice.hardwareVersion">
+<code class="descname">hardwareVersion</code><em class="property"> = '1.0'</em><a class="headerlink" href="#HardwareDevice.HardwareDevice.hardwareVersion" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDevice.hardwareVersionDate">
+<code class="descname">hardwareVersionDate</code><em class="property"> = '8/20/2018'</em><a class="headerlink" href="#HardwareDevice.HardwareDevice.hardwareVersionDate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.idle">
+<code class="descname">idle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.idle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.idle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.idleState">
+<code class="descname">idleState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.idleState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.idleState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.initialize">
+<code class="descname">initialize</code><span class="sig-paren">(</span><em>deviceName</em>, <em>triggerMode</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.initialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDevice.initialized">
+<code class="descname">initialized</code><a class="headerlink" href="#HardwareDevice.HardwareDevice.initialized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.loadPacket">
+<code class="descname">loadPacket</code><span class="sig-paren">(</span><em>loadPacket</em>, <em>triggerModeChange=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.loadPacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.loadPacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.loadSourceData">
+<code class="descname">loadSourceData</code><span class="sig-paren">(</span><em>sourceData</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.loadSourceData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.loadSourceData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDevice.measurementPacket">
+<code class="descname">measurementPacket</code><a class="headerlink" href="#HardwareDevice.HardwareDevice.measurementPacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.program">
+<code class="descname">program</code><span class="sig-paren">(</span><em>eventList</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.program"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.program" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDevice.programmed">
+<code class="descname">programmed</code><a class="headerlink" href="#HardwareDevice.HardwareDevice.programmed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDevice.readyStatus">
+<code class="descname">readyStatus</code><a class="headerlink" href="#HardwareDevice.HardwareDevice.readyStatus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.scan">
+<code class="descname">scan</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.scan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.scan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDevice.scanned">
+<code class="descname">scanned</code><a class="headerlink" href="#HardwareDevice.HardwareDevice.scanned" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.shutdown">
+<code class="descname">shutdown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.shutdown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.softTrigger">
+<code class="descname">softTrigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.softTrigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.softTrigger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDevice.softTriggered">
+<code class="descname">softTriggered</code><a class="headerlink" href="#HardwareDevice.HardwareDevice.softTriggered" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDevice.sourceAdded">
+<code class="descname">sourceAdded</code><a class="headerlink" href="#HardwareDevice.HardwareDevice.sourceAdded" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDevice.sourceRemoved">
+<code class="descname">sourceRemoved</code><a class="headerlink" href="#HardwareDevice.HardwareDevice.sourceRemoved" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDevice.statusMessage">
+<code class="descname">statusMessage</code><a class="headerlink" href="#HardwareDevice.HardwareDevice.statusMessage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.stop">
+<code class="descname">stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDevice.triggerChanged">
+<code class="descname">triggerChanged</code><span class="sig-paren">(</span><em>triggerModeName</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDevice.triggerChanged"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDevice.triggerChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDevice.triggerModeAdded">
+<code class="descname">triggerModeAdded</code><a class="headerlink" href="#HardwareDevice.HardwareDevice.triggerModeAdded" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="HardwareDevice.HardwareDeviceHandler">
+<em class="property">class </em><code class="descclassname">HardwareDevice.</code><code class="descname">HardwareDeviceHandler</code><span class="sig-paren">(</span><em>ds</em>, <em>deviceModel</em>, <em>loadData</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtCore.QObject</span></code></p>
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.Disable_Programming_Lock">
+<code class="descname">Disable_Programming_Lock</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.Disable_Programming_Lock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.Disable_Programming_Lock" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.Enable_Programming_Lock">
+<code class="descname">Enable_Programming_Lock</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.Enable_Programming_Lock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.Enable_Programming_Lock" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.Get_Active_Instrument">
+<code class="descname">Get_Active_Instrument</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.Get_Active_Instrument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.Get_Active_Instrument" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.Get_Available_Devices">
+<code class="descname">Get_Available_Devices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.Get_Available_Devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.Get_Available_Devices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.Get_Current_Trigger_Mode">
+<code class="descname">Get_Current_Trigger_Mode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.Get_Current_Trigger_Mode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.Get_Current_Trigger_Mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.Get_Name">
+<code class="descname">Get_Name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.Get_Name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.Get_Name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.Get_Sources">
+<code class="descname">Get_Sources</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.Get_Sources"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.Get_Sources" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.Get_Standard_Field">
+<code class="descname">Get_Standard_Field</code><span class="sig-paren">(</span><em>field</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.Get_Standard_Field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.Get_Standard_Field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.Get_Trigger_Modes">
+<code class="descname">Get_Trigger_Modes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.Get_Trigger_Modes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.Get_Trigger_Modes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.Load_Device">
+<code class="descname">Load_Device</code><span class="sig-paren">(</span><em>deviceName</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.Load_Device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.Load_Device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.Push_Programming">
+<code class="descname">Push_Programming</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.Push_Programming"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.Push_Programming" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.Ready_Status">
+<code class="descname">Ready_Status</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.Ready_Status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.Ready_Status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.Set_Active_Instrument">
+<code class="descname">Set_Active_Instrument</code><span class="sig-paren">(</span><em>instrument</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.Set_Active_Instrument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.Set_Active_Instrument" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.Set_Ready_Status">
+<code class="descname">Set_Ready_Status</code><span class="sig-paren">(</span><em>bool</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.Set_Ready_Status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.Set_Ready_Status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.Set_Trigger_Mode">
+<code class="descname">Set_Trigger_Mode</code><span class="sig-paren">(</span><em>triggerModeName</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.Set_Trigger_Mode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.Set_Trigger_Mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDeviceHandler.configure">
+<code class="descname">configure</code><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.configure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.configured">
+<code class="descname">configured</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.configured"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.configured" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.deferredProgramDataRecieved">
+<code class="descname">deferredProgramDataRecieved</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.deferredProgramDataRecieved"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.deferredProgramDataRecieved" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDeviceHandler.deviceChanged">
+<code class="descname">deviceChanged</code><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.deviceChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.deviceFound">
+<code class="descname">deviceFound</code><span class="sig-paren">(</span><em>deviceName</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.deviceFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.deviceFound" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDeviceHandler.idleState">
+<code class="descname">idleState</code><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.idleState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.initDeviceThread">
+<code class="descname">initDeviceThread</code><span class="sig-paren">(</span><em>deviceInformation</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.initDeviceThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.initDeviceThread" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDeviceHandler.initialize">
+<code class="descname">initialize</code><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.initialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.initialized">
+<code class="descname">initialized</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.initialized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.initialized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.loadDevice">
+<code class="descname">loadDevice</code><span class="sig-paren">(</span><em>deviceName</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.loadDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.loadDevice" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDeviceHandler.loadPacket">
+<code class="descname">loadPacket</code><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.loadPacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.measurementPacket">
+<code class="descname">measurementPacket</code><span class="sig-paren">(</span><em>source</em>, <em>measurementPacket</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.measurementPacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.measurementPacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.onRemove">
+<code class="descname">onRemove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.onRemove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.onRemove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.onRun">
+<code class="descname">onRun</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.onRun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.onRun" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.onStop">
+<code class="descname">onStop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.onStop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.onStop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDeviceHandler.program">
+<code class="descname">program</code><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.program" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.programDataReceived">
+<code class="descname">programDataReceived</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.programDataReceived"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.programDataReceived" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.programmed">
+<code class="descname">programmed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.programmed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.programmed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.pushProgramming">
+<code class="descname">pushProgramming</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.pushProgramming"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.pushProgramming" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.readyCheck">
+<code class="descname">readyCheck</code><span class="sig-paren">(</span><em>traceIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.readyCheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.readyCheck" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.readyStatus">
+<code class="descname">readyStatus</code><span class="sig-paren">(</span><em>bool</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.readyStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.readyStatus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.savePacket">
+<code class="descname">savePacket</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.savePacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.savePacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDeviceHandler.scan">
+<code class="descname">scan</code><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.scan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.scanned">
+<code class="descname">scanned</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.scanned"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.scanned" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.setActiveInstrument">
+<code class="descname">setActiveInstrument</code><span class="sig-paren">(</span><em>instrument</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.setActiveInstrument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.setActiveInstrument" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.setTriggerMode">
+<code class="descname">setTriggerMode</code><span class="sig-paren">(</span><em>triggerModeName</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.setTriggerMode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.setTriggerMode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDeviceHandler.shutdown">
+<code class="descname">shutdown</code><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDeviceHandler.softTrigger">
+<code class="descname">softTrigger</code><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.softTrigger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.softTriggered">
+<code class="descname">softTriggered</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.softTriggered"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.softTriggered" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.sourceAdded">
+<code class="descname">sourceAdded</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.sourceAdded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.sourceAdded" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.sourceRemoved">
+<code class="descname">sourceRemoved</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.sourceRemoved"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.sourceRemoved" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.statusMessage">
+<code class="descname">statusMessage</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.statusMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.statusMessage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDeviceHandler.stopRun">
+<code class="descname">stopRun</code><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.stopRun" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="HardwareDevice.HardwareDeviceHandler.triggerChanged">
+<code class="descname">triggerChanged</code><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.triggerChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="HardwareDevice.HardwareDeviceHandler.triggerModeAdded">
+<code class="descname">triggerModeAdded</code><span class="sig-paren">(</span><em>triggerModeName</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/HardwareDevice.html#HardwareDeviceHandler.triggerModeAdded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#HardwareDevice.HardwareDeviceHandler.triggerModeAdded" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Sources">
+<span id="sources"></span><h2>Sources<a class="headerlink" href="#module-Sources" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="Sources.AISource">
+<em class="property">class </em><code class="descclassname">Sources.</code><code class="descname">AISource</code><span class="sig-paren">(</span><em>handler</em>, <em>name</em>, <em>vMin</em>, <em>vMax</em>, <em>prec</em>, <em>physConID</em>, <em>trigger=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#AISource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.AISource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#Sources.Source" title="Sources.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sources.Source</span></code></a></p>
+<dl class="method">
+<dt id="Sources.AISource.commandInSourceRange">
+<code class="descname">commandInSourceRange</code><span class="sig-paren">(</span><em>cmd</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#AISource.commandInSourceRange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.AISource.commandInSourceRange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.AISource.parsePacket">
+<code class="descname">parsePacket</code><span class="sig-paren">(</span><em>packetIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#AISource.parsePacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.AISource.parsePacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.AISource.readyCheck">
+<code class="descname">readyCheck</code><span class="sig-paren">(</span><em>traceIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#AISource.readyCheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.AISource.readyCheck" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Sources.AOSource">
+<em class="property">class </em><code class="descclassname">Sources.</code><code class="descname">AOSource</code><span class="sig-paren">(</span><em>handler</em>, <em>name</em>, <em>vMin</em>, <em>vMax</em>, <em>prec</em>, <em>physConID</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#AOSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.AOSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#Sources.Source" title="Sources.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sources.Source</span></code></a></p>
+<dl class="method">
+<dt id="Sources.AOSource.commandInSourceRange">
+<code class="descname">commandInSourceRange</code><span class="sig-paren">(</span><em>cmd</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#AOSource.commandInSourceRange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.AOSource.commandInSourceRange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.AOSource.parsePacket">
+<code class="descname">parsePacket</code><span class="sig-paren">(</span><em>packetIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#AOSource.parsePacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.AOSource.parsePacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.AOSource.readyCheck">
+<code class="descname">readyCheck</code><span class="sig-paren">(</span><em>traceIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#AOSource.readyCheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.AOSource.readyCheck" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Sources.DISource">
+<em class="property">class </em><code class="descclassname">Sources.</code><code class="descname">DISource</code><span class="sig-paren">(</span><em>handler</em>, <em>name</em>, <em>physConID</em>, <em>trigger=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#DISource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.DISource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#Sources.Source" title="Sources.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sources.Source</span></code></a></p>
+<dl class="method">
+<dt id="Sources.DISource.commandInSourceRange">
+<code class="descname">commandInSourceRange</code><span class="sig-paren">(</span><em>cmd</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#DISource.commandInSourceRange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.DISource.commandInSourceRange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.DISource.parsePacket">
+<code class="descname">parsePacket</code><span class="sig-paren">(</span><em>packetIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#DISource.parsePacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.DISource.parsePacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.DISource.readyCheck">
+<code class="descname">readyCheck</code><span class="sig-paren">(</span><em>traceIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#DISource.readyCheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.DISource.readyCheck" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Sources.DOSource">
+<em class="property">class </em><code class="descclassname">Sources.</code><code class="descname">DOSource</code><span class="sig-paren">(</span><em>handler</em>, <em>name</em>, <em>physConID</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#DOSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.DOSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#Sources.Source" title="Sources.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sources.Source</span></code></a></p>
+<dl class="method">
+<dt id="Sources.DOSource.commandInSourceRange">
+<code class="descname">commandInSourceRange</code><span class="sig-paren">(</span><em>cmd</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#DOSource.commandInSourceRange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.DOSource.commandInSourceRange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.DOSource.parsePacket">
+<code class="descname">parsePacket</code><span class="sig-paren">(</span><em>packetIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#DOSource.parsePacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.DOSource.parsePacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.DOSource.readyCheck">
+<code class="descname">readyCheck</code><span class="sig-paren">(</span><em>traceIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#DOSource.readyCheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.DOSource.readyCheck" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Sources.Source">
+<em class="property">class </em><code class="descclassname">Sources.</code><code class="descname">Source</code><span class="sig-paren">(</span><em>handler</em>, <em>name</em>, <em>physConID</em>, <em>trigger=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="Sources.Source.Get_Connector_ID">
+<code class="descname">Get_Connector_ID</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Get_Connector_ID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Get_Connector_ID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Get_Handler">
+<code class="descname">Get_Handler</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Get_Handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Get_Handler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Get_Hardware_Device">
+<code class="descname">Get_Hardware_Device</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Get_Hardware_Device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Get_Hardware_Device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Get_Name">
+<code class="descname">Get_Name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Get_Name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Get_Name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Get_Number_Of_Paths">
+<code class="descname">Get_Number_Of_Paths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Get_Number_Of_Paths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Get_Number_Of_Paths" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Get_Programming_Instrument">
+<code class="descname">Get_Programming_Instrument</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Get_Programming_Instrument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Get_Programming_Instrument" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Get_Sockets">
+<code class="descname">Get_Sockets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Get_Sockets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Get_Sockets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Get_Source">
+<code class="descname">Get_Source</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Get_Source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Get_Source" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Get_UUID">
+<code class="descname">Get_UUID</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Get_UUID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Get_UUID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Is_Registered">
+<code class="descname">Is_Registered</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Is_Registered"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Is_Registered" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Push_Measurement_Packet">
+<code class="descname">Push_Measurement_Packet</code><span class="sig-paren">(</span><em>measurementPacket</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Push_Measurement_Packet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Push_Measurement_Packet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.attachPathOther">
+<code class="descname">attachPathOther</code><span class="sig-paren">(</span><em>uuid</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.attachPathOther"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.attachPathOther" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.attachPathSelf">
+<code class="descname">attachPathSelf</code><span class="sig-paren">(</span><em>pathNo</em>, <em>uuid</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.attachPathSelf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.attachPathSelf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.detatchPathOther">
+<code class="descname">detatchPathOther</code><span class="sig-paren">(</span><em>uuid</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.detatchPathOther"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.detatchPathOther" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.getProgrammingInstrument">
+<code class="descname">getProgrammingInstrument</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.getProgrammingInstrument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.getProgrammingInstrument" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.getProgrammingPacket">
+<code class="descname">getProgrammingPacket</code><span class="sig-paren">(</span><em>programmingPacket</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.getProgrammingPacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.getProgrammingPacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.getSockets">
+<code class="descname">getSockets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.getSockets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.getSockets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.getUUID">
+<code class="descname">getUUID</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.getUUID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.getUUID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.isConnected">
+<code class="descname">isConnected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.isConnected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.isConnected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.loadPacket">
+<code class="descname">loadPacket</code><span class="sig-paren">(</span><em>loadPacket</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.loadPacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.loadPacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.parsePacket">
+<code class="descname">parsePacket</code><span class="sig-paren">(</span><em>packetIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.parsePacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.parsePacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.procReverseParent">
+<code class="descname">procReverseParent</code><span class="sig-paren">(</span><em>packetIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.procReverseParent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.procReverseParent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.program">
+<code class="descname">program</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.program"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.program" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.pushMeasurementPacket">
+<code class="descname">pushMeasurementPacket</code><span class="sig-paren">(</span><em>measurementPacket</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.pushMeasurementPacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.pushMeasurementPacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.readyCheck">
+<code class="descname">readyCheck</code><span class="sig-paren">(</span><em>traceIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.readyCheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.readyCheck" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.registerHWare">
+<code class="descname">registerHWare</code><span class="sig-paren">(</span><em>hWare</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.registerHWare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.registerHWare" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.savePacket">
+<code class="descname">savePacket</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.savePacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.savePacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Filter">
+<span id="filter"></span><h2>Filter<a class="headerlink" href="#module-Filter" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="Filter.AnalogFilter">
+<em class="property">class </em><code class="descclassname">Filter.</code><code class="descname">AnalogFilter</code><span class="sig-paren">(</span><em>hM</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#AnalogFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.AnalogFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#Filter.Filter" title="Filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter.Filter</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="Filter.DigitalFilter">
+<em class="property">class </em><code class="descclassname">Filter.</code><code class="descname">DigitalFilter</code><span class="sig-paren">(</span><em>hM</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#DigitalFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.DigitalFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#Filter.Filter" title="Filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter.Filter</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="Filter.Filter">
+<em class="property">class </em><code class="descclassname">Filter.</code><code class="descname">Filter</code><span class="sig-paren">(</span><em>hM</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="Filter.Filter.Attach_Input">
+<code class="descname">Attach_Input</code><span class="sig-paren">(</span><em>uuid</em>, <em>pathNo</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.Attach_Input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.Attach_Input" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.Detatch_Input">
+<code class="descname">Detatch_Input</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.Detatch_Input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.Detatch_Input" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.Get_Input_Path_Number">
+<code class="descname">Get_Input_Path_Number</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.Get_Input_Path_Number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.Get_Input_Path_Number" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.Get_Input_UUID">
+<code class="descname">Get_Input_UUID</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.Get_Input_UUID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.Get_Input_UUID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.Get_Name">
+<code class="descname">Get_Name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.Get_Name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.Get_Name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.Get_Number_Of_Paths">
+<code class="descname">Get_Number_Of_Paths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.Get_Number_Of_Paths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.Get_Number_Of_Paths" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.Get_Sockets">
+<code class="descname">Get_Sockets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.Get_Sockets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.Get_Sockets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.Get_Source">
+<code class="descname">Get_Source</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.Get_Source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.Get_Source" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.Get_Type">
+<code class="descname">Get_Type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.Get_Type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.Get_Type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.Get_UUID">
+<code class="descname">Get_UUID</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.Get_UUID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.Get_UUID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.Remove">
+<code class="descname">Remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.Remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.Remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.attachInput">
+<code class="descname">attachInput</code><span class="sig-paren">(</span><em>uuid</em>, <em>pathNumber</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.attachInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.attachInput" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.detatch">
+<code class="descname">detatch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.detatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.detatch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Filter.Filter.filterCreator">
+<code class="descname">filterCreator</code><em class="property"> = 'Matthew R. Brantley'</em><a class="headerlink" href="#Filter.Filter.filterCreator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Filter.Filter.filterIdentifier">
+<code class="descname">filterIdentifier</code><em class="property"> = 'DefFil'</em><a class="headerlink" href="#Filter.Filter.filterIdentifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Filter.Filter.filterType">
+<code class="descname">filterType</code><em class="property"> = 'Default Filter'</em><a class="headerlink" href="#Filter.Filter.filterType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Filter.Filter.filterVersion">
+<code class="descname">filterVersion</code><em class="property"> = '1.0'</em><a class="headerlink" href="#Filter.Filter.filterVersion" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Filter.Filter.filterVersionDate">
+<code class="descname">filterVersionDate</code><em class="property"> = '8/13/2018'</em><a class="headerlink" href="#Filter.Filter.filterVersionDate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.getInputObject">
+<code class="descname">getInputObject</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.getInputObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.getInputObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.getSockets">
+<code class="descname">getSockets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.getSockets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.getSockets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.getSource">
+<code class="descname">getSource</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.getSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.getSource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.getUUID">
+<code class="descname">getUUID</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.getUUID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.getUUID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Filter.Filter.iconGraphicSrc">
+<code class="descname">iconGraphicSrc</code><em class="property"> = 'default.png'</em><a class="headerlink" href="#Filter.Filter.iconGraphicSrc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.loadPacket">
+<code class="descname">loadPacket</code><span class="sig-paren">(</span><em>loadPacket</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.loadPacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.loadPacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Filter.Filter.numPaths">
+<code class="descname">numPaths</code><em class="property"> = 1</em><a class="headerlink" href="#Filter.Filter.numPaths" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.onCreation">
+<code class="descname">onCreation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.onCreation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.onCreation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.onCreationParent">
+<code class="descname">onCreationParent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.onCreationParent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.onCreationParent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.procForward">
+<code class="descname">procForward</code><span class="sig-paren">(</span><em>inputs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.procForward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.procForward" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.procForwardParent">
+<code class="descname">procForwardParent</code><span class="sig-paren">(</span><em>packetIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.procForwardParent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.procForwardParent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.procReverse">
+<code class="descname">procReverse</code><span class="sig-paren">(</span><em>pathNo</em>, <em>packetIn</em>, <em>packetType</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.procReverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.procReverse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.procReverseParent">
+<code class="descname">procReverseParent</code><span class="sig-paren">(</span><em>packetIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.procReverseParent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.procReverseParent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.readyCheck">
+<code class="descname">readyCheck</code><span class="sig-paren">(</span><em>traceIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.readyCheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.readyCheck" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.removeFilter">
+<code class="descname">removeFilter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.removeFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.removeFilter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.restoreState">
+<code class="descname">restoreState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.restoreState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.restoreState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Filter.Filter.savePacket">
+<code class="descname">savePacket</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Filter.html#Filter.savePacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Filter.Filter.savePacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Filter.Filter.valid">
+<code class="descname">valid</code><em class="property"> = False</em><a class="headerlink" href="#Filter.Filter.valid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="packetcommands">
+<h2>PacketCommands<a class="headerlink" href="#packetcommands" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-PacketCommands"></span><dl class="class">
+<dt id="PacketCommands.AnalogAcquisitionCommand">
+<em class="property">class </em><code class="descclassname">PacketCommands.</code><code class="descname">AnalogAcquisitionCommand</code><span class="sig-paren">(</span><em>rate</em>, <em>noSamples</em>, <em>acqMax</em>, <em>acqMin</em>, <em>trig=50</em>, <em>trigThreshold=1</em>, <em>preTrigSamples=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketCommands.html#AnalogAcquisitionCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketCommands.AnalogAcquisitionCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#PacketCommands.Command" title="PacketCommands.Command"><code class="xref py py-class docutils literal notranslate"><span class="pre">PacketCommands.Command</span></code></a></p>
+<dl class="attribute">
+<dt id="PacketCommands.AnalogAcquisitionCommand.ACQ_TRIG_EXTERNAL">
+<code class="descname">ACQ_TRIG_EXTERNAL</code><em class="property"> = 50</em><a class="headerlink" href="#PacketCommands.AnalogAcquisitionCommand.ACQ_TRIG_EXTERNAL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="PacketCommands.AnalogAcquisitionCommand.ACQ_TRIG_THRESHOLD">
+<code class="descname">ACQ_TRIG_THRESHOLD</code><em class="property"> = 51</em><a class="headerlink" href="#PacketCommands.AnalogAcquisitionCommand.ACQ_TRIG_THRESHOLD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="PacketCommands.AnalogSparseCommand">
+<em class="property">class </em><code class="descclassname">PacketCommands.</code><code class="descname">AnalogSparseCommand</code><span class="sig-paren">(</span><em>pairs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketCommands.html#AnalogSparseCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketCommands.AnalogSparseCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#PacketCommands.Command" title="PacketCommands.Command"><code class="xref py py-class docutils literal notranslate"><span class="pre">PacketCommands.Command</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="PacketCommands.AnalogWaveformCommand">
+<em class="property">class </em><code class="descclassname">PacketCommands.</code><code class="descname">AnalogWaveformCommand</code><span class="sig-paren">(</span><em>t0</em>, <em>f</em>, <em>wave</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketCommands.html#AnalogWaveformCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketCommands.AnalogWaveformCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#PacketCommands.Command" title="PacketCommands.Command"><code class="xref py py-class docutils literal notranslate"><span class="pre">PacketCommands.Command</span></code></a></p>
+<dl class="method">
+<dt id="PacketCommands.AnalogWaveformCommand.toPairs">
+<code class="descname">toPairs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketCommands.html#AnalogWaveformCommand.toPairs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketCommands.AnalogWaveformCommand.toPairs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="PacketCommands.ArbitraryCommand">
+<em class="property">class </em><code class="descclassname">PacketCommands.</code><code class="descname">ArbitraryCommand</code><span class="sig-paren">(</span><em>commandType</em>, <em>commandData</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketCommands.html#ArbitraryCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketCommands.ArbitraryCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#PacketCommands.Command" title="PacketCommands.Command"><code class="xref py py-class docutils literal notranslate"><span class="pre">PacketCommands.Command</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="PacketCommands.Command">
+<em class="property">class </em><code class="descclassname">PacketCommands.</code><code class="descname">Command</code><a class="reference internal" href="../../_modules/PacketCommands.html#Command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketCommands.Command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="PacketCommands.DigitalAcquisitionCommand">
+<em class="property">class </em><code class="descclassname">PacketCommands.</code><code class="descname">DigitalAcquisitionCommand</code><span class="sig-paren">(</span><em>rate</em>, <em>noSamples</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketCommands.html#DigitalAcquisitionCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketCommands.DigitalAcquisitionCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#PacketCommands.Command" title="PacketCommands.Command"><code class="xref py py-class docutils literal notranslate"><span class="pre">PacketCommands.Command</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="PacketCommands.DigitalSparseCommand">
+<em class="property">class </em><code class="descclassname">PacketCommands.</code><code class="descname">DigitalSparseCommand</code><span class="sig-paren">(</span><em>pairs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketCommands.html#DigitalSparseCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketCommands.DigitalSparseCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#PacketCommands.Command" title="PacketCommands.Command"><code class="xref py py-class docutils literal notranslate"><span class="pre">PacketCommands.Command</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="PacketCommands.DigitalWaveformCommand">
+<em class="property">class </em><code class="descclassname">PacketCommands.</code><code class="descname">DigitalWaveformCommand</code><span class="sig-paren">(</span><em>rate</em>, <em>yData</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketCommands.html#DigitalWaveformCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketCommands.DigitalWaveformCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#PacketCommands.Command" title="PacketCommands.Command"><code class="xref py py-class docutils literal notranslate"><span class="pre">PacketCommands.Command</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="PacketCommands.WaveformCommand">
+<em class="property">class </em><code class="descclassname">PacketCommands.</code><code class="descname">WaveformCommand</code><span class="sig-paren">(</span><em>freq</em>, <em>amplitude</em>, <em>waveformType=100</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketCommands.html#WaveformCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketCommands.WaveformCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#PacketCommands.Command" title="PacketCommands.Command"><code class="xref py py-class docutils literal notranslate"><span class="pre">PacketCommands.Command</span></code></a></p>
+<dl class="attribute">
+<dt id="PacketCommands.WaveformCommand.WFM_COSINE">
+<code class="descname">WFM_COSINE</code><em class="property"> = 101</em><a class="headerlink" href="#PacketCommands.WaveformCommand.WFM_COSINE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="PacketCommands.WaveformCommand.WFM_SAWTOOTH">
+<code class="descname">WFM_SAWTOOTH</code><em class="property"> = 103</em><a class="headerlink" href="#PacketCommands.WaveformCommand.WFM_SAWTOOTH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="PacketCommands.WaveformCommand.WFM_SINE">
+<code class="descname">WFM_SINE</code><em class="property"> = 100</em><a class="headerlink" href="#PacketCommands.WaveformCommand.WFM_SINE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="PacketCommands.WaveformCommand.WFM_SQUARE">
+<code class="descname">WFM_SQUARE</code><em class="property"> = 102</em><a class="headerlink" href="#PacketCommands.WaveformCommand.WFM_SQUARE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="PacketCommands.commandPacket">
+<em class="property">class </em><code class="descclassname">PacketCommands.</code><code class="descname">commandPacket</code><a class="reference internal" href="../../_modules/PacketCommands.html#commandPacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketCommands.commandPacket" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="PacketCommands.commandPacket.Add_Command">
+<code class="descname">Add_Command</code><span class="sig-paren">(</span><em>command</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketCommands.html#commandPacket.Add_Command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketCommands.commandPacket.Add_Command" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="PacketCommands.commandPacket.Get_Commands">
+<code class="descname">Get_Commands</code><span class="sig-paren">(</span><em>commandType=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketCommands.html#commandPacket.Get_Commands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketCommands.commandPacket.Get_Commands" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="PacketCommands.commandPacket.Get_Origin_Socket">
+<code class="descname">Get_Origin_Socket</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketCommands.html#commandPacket.Get_Origin_Socket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketCommands.commandPacket.Get_Origin_Socket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="PacketCommands.commandPacket.Remove_Command">
+<code class="descname">Remove_Command</code><span class="sig-paren">(</span><em>command</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketCommands.html#commandPacket.Remove_Command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketCommands.commandPacket.Remove_Command" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="PacketCommands.commandPacket.Set_Origin_Socket">
+<code class="descname">Set_Origin_Socket</code><span class="sig-paren">(</span><em>socket</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketCommands.html#commandPacket.Set_Origin_Socket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketCommands.commandPacket.Set_Origin_Socket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="PacketCommands.commandPacket.getCommands">
+<code class="descname">getCommands</code><span class="sig-paren">(</span><em>commandType=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketCommands.html#commandPacket.getCommands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketCommands.commandPacket.getCommands" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="packetmeasurements">
+<h2>PacketMeasurements<a class="headerlink" href="#packetmeasurements" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-PacketMeasurements"></span><dl class="class">
+<dt id="PacketMeasurements.AnalogWaveformMeasurement">
+<em class="property">class </em><code class="descclassname">PacketMeasurements.</code><code class="descname">AnalogWaveformMeasurement</code><span class="sig-paren">(</span><em>t0</em>, <em>f</em>, <em>wave</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketMeasurements.html#AnalogWaveformMeasurement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketMeasurements.AnalogWaveformMeasurement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#PacketMeasurements.Measurement" title="PacketMeasurements.Measurement"><code class="xref py py-class docutils literal notranslate"><span class="pre">PacketMeasurements.Measurement</span></code></a></p>
+<dl class="method">
+<dt id="PacketMeasurements.AnalogWaveformMeasurement.seconds">
+<code class="descname">seconds</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketMeasurements.html#AnalogWaveformMeasurement.seconds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketMeasurements.AnalogWaveformMeasurement.seconds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="PacketMeasurements.AnalogWaveformMeasurement.stepSize">
+<code class="descname">stepSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketMeasurements.html#AnalogWaveformMeasurement.stepSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketMeasurements.AnalogWaveformMeasurement.stepSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="PacketMeasurements.AnalogWaveformMeasurement.toPairs">
+<code class="descname">toPairs</code><span class="sig-paren">(</span><em>zeroOrigin=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketMeasurements.html#AnalogWaveformMeasurement.toPairs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketMeasurements.AnalogWaveformMeasurement.toPairs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="PacketMeasurements.AnalogWaveformMeasurement.xData">
+<code class="descname">xData</code><span class="sig-paren">(</span><em>zeroOrigin=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketMeasurements.html#AnalogWaveformMeasurement.xData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketMeasurements.AnalogWaveformMeasurement.xData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="PacketMeasurements.AnalogWaveformMeasurement.yData">
+<code class="descname">yData</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketMeasurements.html#AnalogWaveformMeasurement.yData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketMeasurements.AnalogWaveformMeasurement.yData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="PacketMeasurements.Measurement">
+<em class="property">class </em><code class="descclassname">PacketMeasurements.</code><code class="descname">Measurement</code><a class="reference internal" href="../../_modules/PacketMeasurements.html#Measurement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketMeasurements.Measurement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="PacketMeasurements.measurementPacket">
+<em class="property">class </em><code class="descclassname">PacketMeasurements.</code><code class="descname">measurementPacket</code><a class="reference internal" href="../../_modules/PacketMeasurements.html#measurementPacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketMeasurements.measurementPacket" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="PacketMeasurements.measurementPacket.Add_Measurement">
+<code class="descname">Add_Measurement</code><span class="sig-paren">(</span><em>measurement</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketMeasurements.html#measurementPacket.Add_Measurement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketMeasurements.measurementPacket.Add_Measurement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="PacketMeasurements.measurementPacket.Get_Measurements">
+<code class="descname">Get_Measurements</code><span class="sig-paren">(</span><em>measurementType=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketMeasurements.html#measurementPacket.Get_Measurements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketMeasurements.measurementPacket.Get_Measurements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="PacketMeasurements.measurementPacket.Remove_Measurement">
+<code class="descname">Remove_Measurement</code><span class="sig-paren">(</span><em>measurement</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketMeasurements.html#measurementPacket.Remove_Measurement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketMeasurements.measurementPacket.Remove_Measurement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="PacketMeasurements.measurementPacket.getMeasurements">
+<code class="descname">getMeasurements</code><span class="sig-paren">(</span><em>measurementType=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/PacketMeasurements.html#measurementPacket.getMeasurements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#PacketMeasurements.measurementPacket.getMeasurements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="datastation-labview">
+<h2>DataStation_Labview<a class="headerlink" href="#datastation-labview" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-DataStation_Labview"></span><dl class="class">
+<dt id="DataStation_Labview.DataStation_LabviewExtension">
+<em class="property">class </em><code class="descclassname">DataStation_Labview.</code><code class="descname">DataStation_LabviewExtension</code><span class="sig-paren">(</span><em>ds</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/DataStation_Labview.html#DataStation_LabviewExtension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DataStation_Labview.DataStation_LabviewExtension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="DataStation_Labview.DataStation_LabviewExtension.getDeviceCount">
+<code class="descname">getDeviceCount</code><span class="sig-paren">(</span><em>driver</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/DataStation_Labview.html#DataStation_LabviewExtension.getDeviceCount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DataStation_Labview.DataStation_LabviewExtension.getDeviceCount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="DataStation_Labview.DataStation_LabviewExtension.getDeviceParam">
+<code class="descname">getDeviceParam</code><span class="sig-paren">(</span><em>driver</em>, <em>param</em>, <em>deviceNo</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/DataStation_Labview.html#DataStation_LabviewExtension.getDeviceParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DataStation_Labview.DataStation_LabviewExtension.getDeviceParam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="DataStation_Labview.DataStation_LabviewExtension.getDeviceParameters">
+<code class="descname">getDeviceParameters</code><span class="sig-paren">(</span><em>driver</em>, <em>deviceNo</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/DataStation_Labview.html#DataStation_LabviewExtension.getDeviceParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DataStation_Labview.DataStation_LabviewExtension.getDeviceParameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="DataStation_Labview.DataStation_LabviewExtension.getDevices">
+<code class="descname">getDevices</code><span class="sig-paren">(</span><em>driver</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/DataStation_Labview.html#DataStation_LabviewExtension.getDevices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DataStation_Labview.DataStation_LabviewExtension.getDevices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../DataStation.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../DataStation.html">DataStation module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">HardwareManager module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#hardwaremanager">HardwareManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-HardwareDevice">HardwareDevice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-Sources">Sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-Filter">Filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#packetcommands">PacketCommands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#packetmeasurements">PacketMeasurements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#datastation-labview">DataStation_Labview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../InstrumentManager/InstrumentManager.html">InstrumentManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ModuleManager/ModuleManager.html">ModuleManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorkspaceManager/WorkspaceManager.html">WorkspaceManager module</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/source/HardwareManager/HardwareManager.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../InstrumentManager/InstrumentManager.html" title="InstrumentManager module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../DataStation.html" title="DataStation module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Matthew R. Brantley.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>

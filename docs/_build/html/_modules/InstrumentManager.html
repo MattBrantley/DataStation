@@ -1,0 +1,363 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>InstrumentManager &#8212; DataStation 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for InstrumentManager</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">imp</span><span class="o">,</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">src.Managers.InstrumentManager.Instrument</span> <span class="k">import</span> <span class="o">*</span>
+<span class="c1">#from src.Managers.InstrumentManager.Digital_Trigger_Component import Digital_Trigger_Component</span>
+<span class="kn">from</span> <span class="nn">src.Managers.InstrumentManager.Device_Triggers</span> <span class="k">import</span> <span class="n">Device_Digital_Trigger</span>
+<span class="kn">from</span> <span class="nn">src.Constants</span> <span class="k">import</span> <span class="n">DSConstants</span> <span class="k">as</span> <span class="n">DSConstants</span>
+<span class="kn">from</span> <span class="nn">src.Constants</span> <span class="k">import</span> <span class="n">readyCheckPacket</span>
+<span class="kn">import</span> <span class="nn">json</span> <span class="k">as</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">PyQt5.Qt</span> <span class="k">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="InstrumentManager"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager">[docs]</a><span class="k">class</span> <span class="nc">InstrumentManager</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+<span class="c1">############################################################################################</span>
+<span class="c1">##################################### EXTERNAL SIGNALS #####################################</span>
+
+<span class="c1">##### Signals: Instrument #####</span>
+    <span class="c1">#Instrument_File_Loaded = pyqtSignal(object) # Instrument</span>
+    <span class="n">Instrument_Loaded</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument</span>
+    <span class="n">Instrument_Removed</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument</span>
+    <span class="n">Instrument_Saving</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument</span>
+    <span class="n">Instrument_Saved</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument</span>
+    <span class="n">Instrument_New</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument</span>
+    <span class="n">Instrument_Config_Changed</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument</span>
+    <span class="n">Instrument_Name_Changed</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument</span>
+    <span class="n">Instrument_UUID_Changed</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument</span>
+    <span class="n">Instrument_Sequence_Running</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument</span>
+    <span class="n">Instrument_Ready_Checked</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument</span>
+    
+<span class="c1">##### Signals: Components #####</span>
+    <span class="n">Component_Added</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument, Component</span>
+    <span class="n">Component_Removed</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument, Component</span>
+    <span class="n">Component_Programming_Modified</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument, Component</span>
+    <span class="n">Component_Standard_Field_Changed</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="c1"># Instrument, Component, Field</span>
+    <span class="n">Component_Custom_Field_Changed</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="c1"># Instrument, Component, Field</span>
+
+<span class="c1">##### Signals: Sequence #####</span>
+    <span class="n">Sequence_Loaded</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument</span>
+    <span class="n">Sequence_Saved</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument</span>
+
+<span class="c1">##### Signals: Events #####</span>
+    <span class="c1">#Event_Added = pyqtSignal(object, object, object) # Instrument, Component, Event</span>
+    <span class="c1">#Event_Removed = pyqtSignal(object, object, object) # Instrument, Component, Event</span>
+    <span class="n">Events_Modified</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument, Component</span>
+
+<span class="c1">##### Signals: Sockets #####</span>
+    <span class="n">Socket_Added</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument, Component, Socket</span>
+    <span class="n">Socket_Attached</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument, Component, Socket</span>
+    <span class="n">Socket_Detatched</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument, Component, Socket</span>
+    <span class="n">Socket_Measurement_Packet_Recieved</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="c1"># Instrument, Component, Socket, Measurement Packet</span>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### EXTERNAL FUNCTIONS ####################################</span>
+
+<span class="c1">##### Functions: Component Models #####</span>
+<div class="viewcode-block" id="InstrumentManager.Get_Component_Models_Available"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.Get_Component_Models_Available">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Component_Models_Available</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">componentsAvailable</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.Get_Component_Model_By_Index"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.Get_Component_Model_By_Index">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Component_Model_By_Index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">componentsAvailable</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<span class="c1">##### Functions: Instrument Management #####</span>
+<div class="viewcode-block" id="InstrumentManager.Get_Instruments"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.Get_Instruments">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Instruments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">path</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getInstruments</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">uuid</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.Load_Instrument"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.Load_Instrument">[docs]</a>    <span class="k">def</span> <span class="nf">Load_Instrument</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">sequencePath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">newInstrument</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">New_Instrument</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">newInstrument</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">newInstrument</span><span class="o">.</span><span class="n">Load_Instrument_File</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">sequencePath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">newInstrument</span><span class="o">.</span><span class="n">Load_Sequence</span><span class="p">(</span><span class="n">sequencePath</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.Close_Instrument"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.Close_Instrument">[docs]</a>    <span class="k">def</span> <span class="nf">Close_Instrument</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">closeInstrument</span><span class="p">(</span><span class="n">instrument</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.New_Instrument"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.New_Instrument">[docs]</a>    <span class="k">def</span> <span class="nf">New_Instrument</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">newInstrument</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.Instrument_Save_Directory"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.Instrument_Save_Directory">[docs]</a>    <span class="k">def</span> <span class="nf">Instrument_Save_Directory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrumentsDir</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.Component_Save_Directory"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.Component_Save_Directory">[docs]</a>    <span class="k">def</span> <span class="nf">Component_Save_Directory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">componentsDir</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.Sequences_Save_Directory"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.Sequences_Save_Directory">[docs]</a>    <span class="k">def</span> <span class="nf">Sequences_Save_Directory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequencesDir</span></div>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### INTERNAL USER ONLY ####################################</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instrumentsDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">rootDir</span><span class="p">,</span> <span class="s1">&#39;Instruments&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">componentsDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">rootDir</span><span class="p">,</span> <span class="s1">&#39;Components&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequencesDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">rootDir</span><span class="p">,</span> <span class="s1">&#39;Sequences&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">currentSequenceURL</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">componentsAvailable</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceTriggerComponentsAvailable</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instruments</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loadComponents</span><span class="p">()</span>
+
+<span class="c1">##### DataStation Reserved Functions #####</span>
+<div class="viewcode-block" id="InstrumentManager.connections"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.connections">[docs]</a>    <span class="k">def</span> <span class="nf">connections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">wM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">hM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">mM</span></div>
+        <span class="c1"># Called after all managers are created so they can connect to each other&#39;s signals</span>
+
+<span class="c1">##### Functions Called Internally By Factoried Instruments #####</span>
+    <span class="c1">##### Instrument #####</span>
+<div class="viewcode-block" id="InstrumentManager.instrumentModified"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.instrumentModified">[docs]</a>    <span class="k">def</span> <span class="nf">instrumentModified</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.instrumentLoaded"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.instrumentLoaded">[docs]</a>    <span class="k">def</span> <span class="nf">instrumentLoaded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Instrument_Loaded</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.instrumentNameChanged"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.instrumentNameChanged">[docs]</a>    <span class="k">def</span> <span class="nf">instrumentNameChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Instrument_Name_Changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.instrumentUUIDChanged"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.instrumentUUIDChanged">[docs]</a>    <span class="k">def</span> <span class="nf">instrumentUUIDChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Instrument_UUID_Changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.instrumentConfigModified"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.instrumentConfigModified">[docs]</a>    <span class="k">def</span> <span class="nf">instrumentConfigModified</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Instrument_Config_Changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.instrumentSaving"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.instrumentSaving">[docs]</a>    <span class="k">def</span> <span class="nf">instrumentSaving</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Instrument_Saving</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.instrumentSaved"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.instrumentSaved">[docs]</a>    <span class="k">def</span> <span class="nf">instrumentSaved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Instrument_Saved</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">)</span></div>
+
+    <span class="c1">#def instrumentFileLoaded(self, instrument):</span>
+    <span class="c1">#    self.Instrument_File_Loaded.emit(instrument)</span>
+
+<div class="viewcode-block" id="InstrumentManager.instrumentSequenceRunning"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.instrumentSequenceRunning">[docs]</a>    <span class="k">def</span> <span class="nf">instrumentSequenceRunning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Instrument_Sequence_Running</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.instrumentReadyChecked"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.instrumentReadyChecked">[docs]</a>    <span class="k">def</span> <span class="nf">instrumentReadyChecked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Instrument_Ready_Checked</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">)</span></div>
+
+    <span class="c1">##### Component #####</span>
+<div class="viewcode-block" id="InstrumentManager.componentAdded"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.componentAdded">[docs]</a>    <span class="k">def</span> <span class="nf">componentAdded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Component_Added</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.componentRemoved"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.componentRemoved">[docs]</a>    <span class="k">def</span> <span class="nf">componentRemoved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Component_Removed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.componentStandardFieldChanged"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.componentStandardFieldChanged">[docs]</a>    <span class="k">def</span> <span class="nf">componentStandardFieldChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Component_Standard_Field_Changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.componentCustomFieldChanged"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.componentCustomFieldChanged">[docs]</a>    <span class="k">def</span> <span class="nf">componentCustomFieldChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Component_Custom_Field_Changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span></div>
+
+    <span class="c1">##### Socket #####</span>
+<div class="viewcode-block" id="InstrumentManager.socketAttached"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.socketAttached">[docs]</a>    <span class="k">def</span> <span class="nf">socketAttached</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">socket</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Socket_Attached</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">socket</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.socketDetatched"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.socketDetatched">[docs]</a>    <span class="k">def</span> <span class="nf">socketDetatched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">socket</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Socket_Detatched</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">socket</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.socketAdded"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.socketAdded">[docs]</a>    <span class="k">def</span> <span class="nf">socketAdded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">socket</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Socket_Added</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">socket</span><span class="p">)</span></div>
+
+    <span class="c1">##### Event #####</span>
+    <span class="c1">#def eventAdded(self, instrument, component, event):</span>
+    <span class="c1">#    self.Event_Added.emit(instrument, component, event)</span>
+
+    <span class="c1">#def eventRemoved(self, instrument, component, event):</span>
+    <span class="c1">#    self.Event_Removed.emit(instrument, component, event)</span>
+
+<div class="viewcode-block" id="InstrumentManager.eventsModified"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.eventsModified">[docs]</a>    <span class="k">def</span> <span class="nf">eventsModified</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Events_Modified</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span></div>
+
+    <span class="c1">##### Sequence #####</span>
+<div class="viewcode-block" id="InstrumentManager.sequenceLoaded"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.sequenceLoaded">[docs]</a>    <span class="k">def</span> <span class="nf">sequenceLoaded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Sequence_Loaded</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.sequenceSaved"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.sequenceSaved">[docs]</a>    <span class="k">def</span> <span class="nf">sequenceSaved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Sequence_Saved</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">)</span></div>
+
+    <span class="c1">##### Component Programming #####</span>
+<div class="viewcode-block" id="InstrumentManager.programmingModified"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.programmingModified">[docs]</a>    <span class="k">def</span> <span class="nf">programmingModified</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Component_Programming_Modified</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.measurementRecieved"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.measurementRecieved">[docs]</a>    <span class="k">def</span> <span class="nf">measurementRecieved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">socket</span><span class="p">,</span> <span class="n">measurementPacket</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Socket_Measurement_Packet_Recieved</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">socket</span><span class="p">,</span> <span class="n">measurementPacket</span><span class="p">)</span></div>
+        
+<span class="c1">##### Search Functions ######</span>
+<div class="viewcode-block" id="InstrumentManager.getInstruments"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.getInstruments">[docs]</a>    <span class="k">def</span> <span class="nf">getInstruments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">uuid</span><span class="p">):</span>
+        <span class="n">outList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">instrument</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">instruments</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">instrument</span><span class="o">.</span><span class="n">Get_Name</span><span class="p">()</span> <span class="o">!=</span> <span class="n">name</span> <span class="ow">and</span> <span class="n">name</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">instrument</span><span class="o">.</span><span class="n">Get_Path</span><span class="p">()</span> <span class="o">!=</span> <span class="n">path</span> <span class="ow">and</span> <span class="n">path</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">instrument</span><span class="o">.</span><span class="n">Get_UUID</span><span class="p">()</span> <span class="o">!=</span> <span class="n">uuid</span> <span class="ow">and</span> <span class="n">uuid</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">outList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instrument</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">outList</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.removeCompByUUID"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.removeCompByUUID">[docs]</a>    <span class="k">def</span> <span class="nf">removeCompByUUID</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">instrument</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">instruments</span><span class="p">:</span>
+            <span class="n">instrument</span><span class="o">.</span><span class="n">removeComponent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getComponentByUUID</span><span class="p">(</span><span class="n">uuid</span><span class="p">))</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.findCompModelByIdentifier"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.findCompModelByIdentifier">[docs]</a>    <span class="k">def</span> <span class="nf">findCompModelByIdentifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">componentsAvailable</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">componentIdentifier</span> <span class="o">==</span> <span class="n">identifier</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">comp</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<span class="c1">##### Instrument Manipulations ######</span>
+<div class="viewcode-block" id="InstrumentManager.newInstrument"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.newInstrument">[docs]</a>    <span class="k">def</span> <span class="nf">newInstrument</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">rootPath</span><span class="p">):</span> <span class="c1"># Instrument_New</span>
+        <span class="n">newInstrument</span> <span class="o">=</span> <span class="n">Instrument</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">newInstrument</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">if</span> <span class="n">rootPath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">newInstrument</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="n">rootPath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newInstrument</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Instrument_New</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">newInstrument</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">newInstrument</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.closeInstrument"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.closeInstrument">[docs]</a>    <span class="k">def</span> <span class="nf">closeInstrument</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">):</span> <span class="c1"># Instrument_Removed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">instrument</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Instrument_Removed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">instrument</span><span class="p">)</span></div>
+
+<span class="c1">##### Sequence Manipulation #####</span>
+<div class="viewcode-block" id="InstrumentManager.newSequence"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.newSequence">[docs]</a>    <span class="k">def</span> <span class="nf">newSequence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">DSNewFileDialog</span><span class="o">.</span><span class="n">newFile</span><span class="p">()</span></div>
+
+<span class="c1">##### Components #####</span>
+<div class="viewcode-block" id="InstrumentManager.loadComponents"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.loadComponents">[docs]</a>    <span class="k">def</span> <span class="nf">loadComponents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Loading Component Models... &#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">componentsDir</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                <span class="n">compHolder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loadComponentFromFile</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">compHolder</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">componentsAvailable</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">compHolder</span><span class="p">)</span>
+
+        <span class="c1">### Load Device Triggers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceTriggerComponentsAvailable</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Device_Digital_Trigger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Finished Loading Component Models!&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InstrumentManager.loadComponentFromFile"><a class="viewcode-back" href="../source/InstrumentManager/InstrumentManager.html#InstrumentManager.InstrumentManager.loadComponentFromFile">[docs]</a>    <span class="k">def</span> <span class="nf">loadComponentFromFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span> <span class="c1"># I think this is only for the models</span>
+        <span class="n">class_inst</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">py_mod</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">mod_name</span><span class="p">,</span> <span class="n">file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">filepath</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">loaded</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">file_ext</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;.py&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;   Found Component Script: &#39;</span> <span class="o">+</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_MED</span><span class="p">)</span>
+            <span class="n">py_mod</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">load_source</span><span class="p">(</span><span class="n">mod_name</span><span class="p">,</span> <span class="n">filepath</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">py_mod</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">if</span><span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">py_mod</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
+                <span class="n">class_temp</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">py_mod</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">class_temp</span><span class="p">),</span> <span class="n">Component</span><span class="p">):</span>
+                    <span class="n">class_inst</span> <span class="o">=</span> <span class="n">class_temp</span>
+                    <span class="n">loaded</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">loaded</span><span class="p">):</span>
+            <span class="n">class_inst</span><span class="o">.</span><span class="n">iM</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;  (Success!)&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_MED</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39; (Failed!)&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_MED</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">class_inst</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../DataStation.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/DataStation.html">DataStation module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/HardwareManager/HardwareManager.html">HardwareManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/InstrumentManager/InstrumentManager.html">InstrumentManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/ModuleManager/ModuleManager.html">ModuleManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/WorkspaceManager/WorkspaceManager.html">WorkspaceManager module</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Matthew R. Brantley.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>

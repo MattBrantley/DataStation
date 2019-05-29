@@ -15,8 +15,13 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../'))
-sys.path.insert(0, os.path.abspath('../src/'))
-sys.path.insert(0, os.path.abspath('../src/Managers/'))
+sys.path.insert(1, os.path.abspath('../src/'))
+sys.path.insert(2, os.path.abspath('../src/Managers/'))
+sys.path.insert(2, os.path.abspath('../src/Managers/InstrumentManager/'))
+sys.path.insert(2, os.path.abspath('../src/Managers/HardwareManager/'))
+sys.path.insert(2, os.path.abspath('../src/Managers/InstrumentManager/'))
+sys.path.insert(2, os.path.abspath('../src/Managers/WorkspaceManager/'))
+sys.path.insert(2, os.path.abspath('../src/Managers/ModuleManager/'))
 
 
 # -- Project information -----------------------------------------------------
@@ -101,7 +106,7 @@ html_static_path = []
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
 #
-# html_sidebars = {}
+html_sidebars = { '**': ['globaltoc.html', 'sourcelink.html', 'searchbox.html'] }
 
 
 # -- Options for HTMLHelp output ---------------------------------------------

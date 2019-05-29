@@ -110,16 +110,16 @@
             "compID": "trig_mrb",
             "events": [
                 {
+                    "params": {},
+                    "time": 0.0,
+                    "type": "Go Low"
+                },
+                {
                     "params": {
                         "Width": 0.05
                     },
                     "time": 12.0,
                     "type": "Pulse High"
-                },
-                {
-                    "params": {},
-                    "time": 13.0,
-                    "type": "Go Low"
                 }
             ],
             "name": "Excite Trigger",
@@ -129,6 +129,11 @@
         {
             "compID": "trig_mrb",
             "events": [
+                {
+                    "params": {},
+                    "time": 0.0,
+                    "type": "Go Low"
+                },
                 {
                     "params": {
                         "Width": 0.05

@@ -1,0 +1,385 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hardwareObject_old &#8212; DataStation 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hardwareObject_old</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt5.Qt</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">uuid</span><span class="o">,</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="k">import</span> <span class="n">Process</span><span class="p">,</span> <span class="n">Queue</span><span class="p">,</span> <span class="n">Pipe</span>
+<span class="kn">from</span> <span class="nn">src.Constants</span> <span class="k">import</span> <span class="n">DSConstants</span> <span class="k">as</span> <span class="n">DSConstants</span><span class="p">,</span> <span class="n">readyCheckPacket</span>
+<span class="kn">from</span> <span class="nn">src.Managers.HardwareManager.Sources</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">src.Managers.InstrumentManager.Sockets</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="c1"># This is so that pickle can pull the correct class</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)))))</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">Hardware Drivers</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="hardwareObject"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject">[docs]</a><span class="k">class</span> <span class="nc">hardwareObject</span><span class="p">():</span>
+    <span class="n">hardwareType</span> <span class="o">=</span> <span class="s1">&#39;Default Hardware Object&#39;</span>
+    <span class="n">hardwareIdentifier</span> <span class="o">=</span> <span class="s1">&#39;DefHardObj&#39;</span>
+    <span class="n">hardwareVersion</span> <span class="o">=</span> <span class="s1">&#39;1.0&#39;</span>
+    <span class="n">hardwareCreator</span> <span class="o">=</span> <span class="s1">&#39;Matthew R. Brantley&#39;</span>
+    <span class="n">hardwareVersionDate</span> <span class="o">=</span> <span class="s1">&#39;8/18/2018&#39;</span>
+
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### EXTERNAL FUNCTIONS ####################################</span>
+
+<div class="viewcode-block" id="hardwareObject.Get_Sources"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.Get_Sources">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Sources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span></div>
+
+<div class="viewcode-block" id="hardwareObject.Get_Sources_By_Type"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.Get_Sources_By_Type">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Sources_By_Type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sourceType</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">sourceType</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="hardwareObject.Clear_Sources"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.Clear_Sources">[docs]</a>    <span class="k">def</span> <span class="nf">Clear_Sources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clearSourceList</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="hardwareObject.Show_Config_Widget"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.Show_Config_Widget">[docs]</a>    <span class="k">def</span> <span class="nf">Show_Config_Widget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">showConfigWidget</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="hardwareObject.Remove_Hardware"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.Remove_Hardware">[docs]</a>    <span class="k">def</span> <span class="nf">Remove_Hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">Remove_Device</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="hardwareObject.Add_AISource"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.Add_AISource">[docs]</a>    <span class="k">def</span> <span class="nf">Add_AISource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">vMin</span><span class="p">,</span> <span class="n">vMax</span><span class="p">,</span> <span class="n">prec</span><span class="p">):</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">AISource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;[&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;deviceName&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;] &#39;</span><span class="o">+</span><span class="n">name</span><span class="p">,</span> <span class="n">vMin</span><span class="p">,</span> <span class="n">vMax</span><span class="p">,</span> <span class="n">prec</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addSource</span><span class="p">(</span><span class="n">source</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="hardwareObject.Add_AOSource"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.Add_AOSource">[docs]</a>    <span class="k">def</span> <span class="nf">Add_AOSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">vMin</span><span class="p">,</span> <span class="n">vMax</span><span class="p">,</span> <span class="n">prec</span><span class="p">):</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">AOSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;[&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;deviceName&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;] &#39;</span><span class="o">+</span><span class="n">name</span><span class="p">,</span> <span class="n">vMin</span><span class="p">,</span> <span class="n">vMax</span><span class="p">,</span> <span class="n">prec</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addSource</span><span class="p">(</span><span class="n">source</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="hardwareObject.Add_DISource"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.Add_DISource">[docs]</a>    <span class="k">def</span> <span class="nf">Add_DISource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">trigger</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">DISource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;[&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;deviceName&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;] &#39;</span><span class="o">+</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">trigger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addSource</span><span class="p">(</span><span class="n">source</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="hardwareObject.Add_DOSource"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.Add_DOSource">[docs]</a>    <span class="k">def</span> <span class="nf">Add_DOSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">DOSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;[&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;deviceName&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;] &#39;</span><span class="o">+</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addSource</span><span class="p">(</span><span class="n">source</span><span class="p">)</span></div>
+
+    
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### INTERNAL USER ONLY ####################################</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hM</span><span class="p">,</span> <span class="n">modelObject</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="kc">None</span>                <span class="c1">#Factory does not write this. Hardware manager writes it immediately after init.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iM</span> <span class="o">=</span> <span class="kc">None</span>                <span class="c1">#Factory does not write this. Hardware manager writes it immediately after init.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wM</span> <span class="o">=</span> <span class="kc">None</span>                <span class="c1">#Factory does not write this. Hardware manager writes it immediately after init.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span> <span class="o">=</span> <span class="kc">None</span>                <span class="c1">#Factory does not write this. Hardware manager writes it immediately after init.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;physID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;triggerCompUUID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;triggerMode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;hardwareType&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareType</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initTriggerModes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">onCreationParent</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">triggerComponent</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread</span> <span class="o">=</span> <span class="n">hardwareThread</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">sourceAdded</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceAdded</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+
+<span class="c1">##### DataStation Interface Functions #####</span>
+
+<div class="viewcode-block" id="hardwareObject.readyCheck"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.readyCheck">[docs]</a>    <span class="k">def</span> <span class="nf">readyCheck</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">subs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span><span class="p">:</span>
+            <span class="n">subs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">readyCheck</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">readyCheckPacket</span><span class="p">(</span><span class="s1">&#39;Hardware Object&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">READY_CHECK_READY</span><span class="p">,</span> <span class="n">subs</span><span class="o">=</span><span class="n">subs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="hardwareObject.getUUID"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.getUUID">[docs]</a>    <span class="k">def</span> <span class="nf">getUUID</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">]</span></div>
+
+<span class="c1">##### Slots #####</span>
+
+<div class="viewcode-block" id="hardwareObject.sourceAdded"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.sourceAdded">[docs]</a>    <span class="k">def</span> <span class="nf">sourceAdded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#self.sourceList.append(source)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SOURCE WAS ADDED&#39;</span><span class="p">)</span></div>
+
+<span class="c1">##### Functions Called By Factoried Sources #####</span>
+
+<div class="viewcode-block" id="hardwareObject.programDataRecieved"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.programDataRecieved">[docs]</a>    <span class="k">def</span> <span class="nf">programDataRecieved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">programmingModified</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="hardwareObject.clearSourceList"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.clearSourceList">[docs]</a>    <span class="k">def</span> <span class="nf">clearSourceList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">sourceRemoved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span></div>
+
+<span class="c1">##### Functions Over-Ridden By hardwareObjects #####</span>
+
+<div class="viewcode-block" id="hardwareObject.initHardwareWorker"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.initHardwareWorker">[docs]</a>    <span class="k">def</span> <span class="nf">initHardwareWorker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1">### OVERRIDE ME!! ####</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareWorker</span> <span class="o">=</span> <span class="n">hardwareWorker</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="hardwareObject.initTriggerModes"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.initTriggerModes">[docs]</a>    <span class="k">def</span> <span class="nf">initTriggerModes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1">### OVERRIDE ME!! ####</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">triggerModes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">triggerModes</span><span class="p">[</span><span class="s1">&#39;Software&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">triggerModes</span><span class="p">[</span><span class="s1">&#39;Digital Rise&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">triggerModes</span><span class="p">[</span><span class="s1">&#39;Digital Fall&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="hardwareObject.getDeviceList"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.getDeviceList">[docs]</a>    <span class="k">def</span> <span class="nf">getDeviceList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1">### OVERRIDE ME!! ####</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="hardwareObject.hardwareObjectConfigWidgetParent"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.hardwareObjectConfigWidgetParent">[docs]</a>    <span class="k">def</span> <span class="nf">hardwareObjectConfigWidgetParent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">configWidget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="n">configLayout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="n">configWidget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">configLayout</span><span class="p">)</span>
+        <span class="c1">#configWidget.setMinimumHeight(350)</span>
+        <span class="n">configWidget</span><span class="o">.</span><span class="n">setMinimumWidth</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+
+        <span class="n">hardwareConfig</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">QFormLayout</span><span class="p">()</span>
+        <span class="n">hardwareConfig</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="s1">&#39;deviceName&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">):</span>
+            <span class="n">recoverDeviceTemp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;deviceName&#39;</span><span class="p">]</span> <span class="c1">#Temp fix - updateDevice called at start was whiping deviceName</span>
+        <span class="n">deviceSelection</span> <span class="o">=</span> <span class="n">QComboBox</span><span class="p">()</span>
+        <span class="n">deviceSelection</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDeviceList</span><span class="p">():</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">deviceSelection</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">item</span> <span class="o">==</span> <span class="n">recoverDeviceTemp</span><span class="p">):</span>
+                <span class="n">deviceSelection</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="c1">#Doing this after solved the issue of rebuilding the instrument every time widget was shown</span>
+        <span class="n">deviceSelection</span><span class="o">.</span><span class="n">currentTextChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updateDevice</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addRow</span><span class="p">(</span><span class="s2">&quot;Device:&quot;</span><span class="p">,</span> <span class="n">deviceSelection</span><span class="p">)</span>
+
+        <span class="n">configLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">hardwareConfig</span><span class="p">)</span>
+        <span class="n">driverConfig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareObjectConfigWidget</span><span class="p">()</span>
+        <span class="k">if</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">driverConfig</span><span class="p">,</span> <span class="n">QWidget</span><span class="p">)):</span>
+            <span class="n">configLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">driverConfig</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">configWidget</span></div>
+
+<div class="viewcode-block" id="hardwareObject.hardwareObjectConfigWidget"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.hardwareObjectConfigWidget">[docs]</a>    <span class="k">def</span> <span class="nf">hardwareObjectConfigWidget</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1">### OVERRIDE ME!! ####</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="hardwareObject.onCreationParent"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.onCreationParent">[docs]</a>    <span class="k">def</span> <span class="nf">onCreationParent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">onCreation</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="hardwareObject.onCreation"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.onCreation">[docs]</a>    <span class="k">def</span> <span class="nf">onCreation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1">### OVERRIDE ME!! ####</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="hardwareObject.loadPacketParent"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.loadPacketParent">[docs]</a>    <span class="k">def</span> <span class="nf">loadPacketParent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loadPacket</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">,</span> <span class="o">**</span><span class="n">loadPacket</span><span class="p">[</span><span class="s1">&#39;hardwareSettings&#39;</span><span class="p">]}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resetDevice</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">onLoad</span><span class="p">(</span><span class="n">loadPacket</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="s1">&#39;sourceList&#39;</span> <span class="ow">in</span> <span class="n">loadPacket</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loadSourceData</span><span class="p">(</span><span class="n">loadPacket</span><span class="p">[</span><span class="s1">&#39;sourceList&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="hardwareObject.onLoad"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.onLoad">[docs]</a>    <span class="k">def</span> <span class="nf">onLoad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loadPacket</span><span class="p">):</span> <span class="c1">### OVERRIDE ME!! ####</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="hardwareObject.onInitialize"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.onInitialize">[docs]</a>    <span class="k">def</span> <span class="nf">onInitialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1">### OVERRIDE ME!! ####</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="hardwareObject.onProgramParent"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.onProgramParent">[docs]</a>    <span class="k">def</span> <span class="nf">onProgramParent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">onProgram</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="hardwareObject.onProgram"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.onProgram">[docs]</a>    <span class="k">def</span> <span class="nf">onProgram</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1">### OVERRIDE ME!! ####</span>
+        <span class="k">pass</span></div>
+
+<span class="c1">##### Search Functions #####</span>
+
+<div class="viewcode-block" id="hardwareObject.getEvents"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.getEvents">[docs]</a>    <span class="k">def</span> <span class="nf">getEvents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">programDataList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">getProgramData</span><span class="p">()</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">programDataList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">programDataList</span></div>
+
+<span class="c1">##### hardwareObject Manipulation Functions #####</span>
+
+<div class="viewcode-block" id="hardwareObject.showConfigWidget"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.showConfigWidget">[docs]</a>    <span class="k">def</span> <span class="nf">showConfigWidget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+        <span class="n">menu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">()</span>
+        <span class="n">hardwareConfig</span> <span class="o">=</span> <span class="n">QWidgetAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">)</span>
+        <span class="n">hardwareConfig</span><span class="o">.</span><span class="n">setDefaultWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hardwareObjectConfigWidgetParent</span><span class="p">())</span>
+        <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">hardwareConfig</span><span class="p">)</span>
+
+        <span class="n">action</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">exec_</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="hardwareObject.updateDevice"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.updateDevice">[docs]</a>    <span class="k">def</span> <span class="nf">updateDevice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;deviceName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;deviceName&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resetDevice</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="hardwareObject.resetDevice"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.resetDevice">[docs]</a>    <span class="k">def</span> <span class="nf">resetDevice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">deviceReset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Clear_Sources</span><span class="p">()</span>
+        
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;deviceName&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">onInitialize</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="hardwareObject.addSource"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.addSource">[docs]</a>    <span class="k">def</span> <span class="nf">addSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">source</span><span class="p">)</span></div>
+
+
+<span class="c1">##### hardwareWorker Functions #####</span>
+
+<div class="viewcode-block" id="hardwareObject.getMessages"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.getMessages">[docs]</a>    <span class="k">def</span> <span class="nf">getMessages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">messageList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">messageList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareWorker</span><span class="o">.</span><span class="n">updateWorkerResponses</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">messageList</span></div>
+
+<div class="viewcode-block" id="hardwareObject.onRun"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObject.onRun">[docs]</a>    <span class="k">def</span> <span class="nf">onRun</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareWorker</span><span class="o">.</span><span class="n">outQueues</span><span class="p">[</span><span class="s1">&#39;command&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">hwm</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;run&#39;</span><span class="p">))</span></div></div>
+
+
+
+<div class="viewcode-block" id="hardwareWorker"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareWorker">[docs]</a><span class="k">class</span> <span class="nc">hardwareWorker</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pingList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pingAverageCount</span> <span class="o">=</span> <span class="mi">5</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">inQueues</span> <span class="o">=</span> <span class="p">{</span>   <span class="s1">&#39;response&#39;</span><span class="p">:</span> <span class="n">Queue</span><span class="p">(),</span>
+                            <span class="s1">&#39;measurement&#39;</span><span class="p">:</span> <span class="n">Queue</span><span class="p">()</span>
+                        <span class="p">}</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">outQueues</span> <span class="o">=</span> <span class="p">{</span>   <span class="s1">&#39;config&#39;</span><span class="p">:</span> <span class="n">Queue</span><span class="p">(),</span>
+                            <span class="s1">&#39;command&#39;</span><span class="p">:</span> <span class="n">Queue</span><span class="p">()</span>
+                        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">initProcess</span><span class="p">()</span>
+
+<div class="viewcode-block" id="hardwareWorker.initProcess"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareWorker.initProcess">[docs]</a>    <span class="k">def</span> <span class="nf">initProcess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Hardware Worker&#39;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">runWorker</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inQueues</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outQueues</span><span class="p">,</span> <span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="hardwareWorker.updateWorkerResponses"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareWorker.updateWorkerResponses">[docs]</a>    <span class="k">def</span> <span class="nf">updateWorkerResponses</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">responseList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inQueues</span><span class="p">[</span><span class="s1">&#39;response&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inQueues</span><span class="p">[</span><span class="s1">&#39;response&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;[Worker]: &#39;</span> <span class="o">+</span> <span class="n">msg</span><span class="o">.</span><span class="n">msg</span>
+            <span class="n">responseList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">responseList</span></div>
+
+<div class="viewcode-block" id="hardwareWorker.runWorker"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareWorker.runWorker">[docs]</a>    <span class="k">def</span> <span class="nf">runWorker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msgOut</span><span class="p">,</span> <span class="n">msgIn</span><span class="p">):</span>
+        <span class="n">die</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">while</span><span class="p">(</span><span class="n">die</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">msgIn</span><span class="p">[</span><span class="s1">&#39;ping&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">onPing</span><span class="p">(</span><span class="n">msgIn</span><span class="p">[</span><span class="s1">&#39;ping&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">msgOut</span><span class="p">[</span><span class="s1">&#39;pong&#39;</span><span class="p">])</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">msgIn</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">onConfig</span><span class="p">(</span><span class="n">msgIn</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">msgOut</span><span class="p">[</span><span class="s1">&#39;response&#39;</span><span class="p">])</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">msgIn</span><span class="p">[</span><span class="s1">&#39;command&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">onCommand</span><span class="p">(</span><span class="n">msgIn</span><span class="p">[</span><span class="s1">&#39;command&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">msgOut</span><span class="p">[</span><span class="s1">&#39;response&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="hardwareWorker.onPing"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareWorker.onPing">[docs]</a>    <span class="k">def</span> <span class="nf">onPing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msgIn</span><span class="p">,</span> <span class="n">queueOut</span><span class="p">):</span>
+        <span class="n">queueOut</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">hwm</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;pong&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msgIn</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">*</span><span class="mi">1000</span><span class="p">))</span><span class="o">-</span><span class="n">msgIn</span><span class="o">.</span><span class="n">data</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="hardwareWorker.onConfig"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareWorker.onConfig">[docs]</a>    <span class="k">def</span> <span class="nf">onConfig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msgIn</span><span class="p">,</span> <span class="n">queueOut</span><span class="p">):</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="n">hwm</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;textUpdate&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Hardware_Driver does not implement config()!&#39;</span><span class="p">)</span>
+        <span class="n">queueOut</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="hardwareWorker.onCommand"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareWorker.onCommand">[docs]</a>    <span class="k">def</span> <span class="nf">onCommand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msgIn</span><span class="p">,</span> <span class="n">queueOut</span><span class="p">):</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="n">hwm</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;textUpdate&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Hardware_Driver does not implement command()!&#39;</span><span class="p">)</span>
+        <span class="n">queueOut</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="hwm"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hwm">[docs]</a><span class="k">class</span> <span class="nc">hwm</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">=</span> <span class="n">action</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="hardwareObjectConfigWidget"><a class="viewcode-back" href="../source/HardwareManager/hardwareObject_old.html#hardwareObject_old.hardwareObjectConfigWidget">[docs]</a><span class="k">class</span> <span class="nc">hardwareObjectConfigWidget</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hM</span><span class="p">,</span> <span class="n">Hardware_Object</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span> <span class="o">=</span> <span class="n">hM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hardware_Object</span> <span class="o">=</span> <span class="n">Hardware_Object</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../DataStation.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/DataStation.html">DataStation module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/HardwareManager/HardwareManager.html">HardwareManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/InstrumentManager/InstrumentManager.html">InstrumentManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/ModuleManager/ModuleManager.html">ModuleManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/WorkspaceManager/WorkspaceManager.html">WorkspaceManager module</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Matthew R. Brantley.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,440 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>ModuleManager &#8212; DataStation 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for ModuleManager</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">imp</span><span class="o">,</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">inspect</span><span class="o">,</span> <span class="nn">json</span> <span class="k">as</span> <span class="nn">json</span><span class="o">,</span> <span class="nn">uuid</span>
+<span class="kn">from</span> <span class="nn">src.Constants</span> <span class="k">import</span> <span class="n">DSConstants</span> <span class="k">as</span> <span class="n">DSConstants</span>
+<span class="kn">from</span> <span class="nn">src.Constants</span> <span class="k">import</span> <span class="n">readyCheckPacket</span>
+<span class="kn">from</span> <span class="nn">src.Managers.ModuleManager.DSModule</span> <span class="k">import</span> <span class="n">DSModule</span>
+<span class="kn">from</span> <span class="nn">src.Managers.ModuleManager.moduleManagerWindow</span> <span class="k">import</span> <span class="n">moduleManagerWindow</span>
+<span class="kn">from</span> <span class="nn">src.Managers.ModuleManager.DSWindow</span> <span class="k">import</span> <span class="n">DSWindow</span>
+<span class="kn">from</span> <span class="nn">src.Managers.ModuleManager.ModuleHandler</span> <span class="k">import</span> <span class="n">ModuleHandler</span>
+<span class="kn">from</span> <span class="nn">src.Managers.ModuleManager.mainWindow</span> <span class="k">import</span> <span class="n">mainWindow</span>
+<span class="kn">from</span> <span class="nn">PyQt5.Qt</span> <span class="k">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="ModuleManager"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager">[docs]</a><span class="k">class</span> <span class="nc">ModuleManager</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    
+<span class="c1">############################################################################################</span>
+<span class="c1">##################################### EXTERNAL SIGNALS #####################################</span>
+
+<span class="c1">##### Signals: Windows #####</span>
+    <span class="n">Window_Added</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Window</span>
+    <span class="n">Window_Removed</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Window</span>
+
+<span class="c1">##### Signals: Modules #####</span>
+    <span class="n">Module_Instantiated</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Module</span>
+    <span class="n">Module_Deleted</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Module</span>
+    <span class="n">Module_Transfered_To_Window</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="c1"># Module, Window</span>
+
+<span class="c1">##### Signals: Module Resources #####</span>
+    <span class="n">Resource_Added</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="c1"># Module, Resource</span>
+    <span class="n">Resource_Removed</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Module</span>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### EXTERNAL FUNCTIONS ####################################</span>
+    
+<div class="viewcode-block" id="ModuleManager.Close_Window"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.Close_Window">[docs]</a>    <span class="k">def</span> <span class="nf">Close_Window</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">windowClosing</span><span class="p">(</span><span class="n">window</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModuleManager.Close_DataStation"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.Close_DataStation">[docs]</a>    <span class="k">def</span> <span class="nf">Close_DataStation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">closeDataStation</span><span class="p">(</span><span class="n">window</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModuleManager.Save_Window_States"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.Save_Window_States">[docs]</a>    <span class="k">def</span> <span class="nf">Save_Window_States</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveWindowStates</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ModuleManager.Load_Window_States"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.Load_Window_States">[docs]</a>    <span class="k">def</span> <span class="nf">Load_Window_States</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loadWindowStates</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModuleManager.Hide_Main_Window"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.Hide_Main_Window">[docs]</a>    <span class="k">def</span> <span class="nf">Hide_Main_Window</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hideMainWindow</span><span class="p">()</span></div>
+
+    <span class="c1">##### Manager Widget #####</span>
+<div class="viewcode-block" id="ModuleManager.Show_Manager_Widget"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.Show_Manager_Widget">[docs]</a>    <span class="k">def</span> <span class="nf">Show_Manager_Widget</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">showManagerWidget</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ModuleManager.Get_Manager_Menu"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.Get_Manager_Menu">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Manager_Menu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu</span></div>
+
+    <span class="c1">##### Modules #####</span>
+<div class="viewcode-block" id="ModuleManager.Get_Available_Modules"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.Get_Available_Modules">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Available_Modules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modulesAvailable</span></div>
+
+<div class="viewcode-block" id="ModuleManager.Scan_Modules"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.Scan_Modules">[docs]</a>    <span class="k">def</span> <span class="nf">Scan_Modules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanModules</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ModuleManager.Get_Module_Instances"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.Get_Module_Instances">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Module_Instances</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span></div>
+
+<div class="viewcode-block" id="ModuleManager.Add_Module_Instance"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.Add_Module_Instance">[docs]</a>    <span class="k">def</span> <span class="nf">Add_Module_Instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addModuleInstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">uuid</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModuleManager.Remove_Module_Instance"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.Remove_Module_Instance">[docs]</a>    <span class="k">def</span> <span class="nf">Remove_Module_Instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">moduleHandler</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">removeModuleInstance</span><span class="p">(</span><span class="n">moduleHandler</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModuleManager.Get_Module_Resources"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.Get_Module_Resources">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Module_Resources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getModuleResources</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span></div>
+
+    <span class="c1">##### Windows #####</span>
+<div class="viewcode-block" id="ModuleManager.Add_New_Window"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.Add_New_Window">[docs]</a>    <span class="k">def</span> <span class="nf">Add_New_Window</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addWindow</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ModuleManager.Get_Windows"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.Get_Windows">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Windows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindows</span></div>
+
+<div class="viewcode-block" id="ModuleManager.Set_StyleSheet"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.Set_StyleSheet">[docs]</a>    <span class="k">def</span> <span class="nf">Set_StyleSheet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setStylesheet</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModuleManager.Get_StyleSheet"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.Get_StyleSheet">[docs]</a>    <span class="k">def</span> <span class="nf">Get_StyleSheet</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">styleSheet</span></div>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### INTERNAL USER ONLY ####################################</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moduleDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">rootDir</span><span class="p">,</span> <span class="s1">&#39;Modules&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">styleSheet</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modulesAvailable</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindows</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isShutdown</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">defaultModules</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Default Loading Screen&#39;</span><span class="p">,</span> <span class="s1">&#39;Profile Selection&#39;</span><span class="p">]</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">srcDir</span><span class="p">,</span> <span class="s1">&#39;icons5/zoom-in.png&#39;</span><span class="p">)</span>
+        <span class="c1">#self.defaultSS = &#39;QDockWidget::close-button {image: url(&#39; + url + &#39;);}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">defaultSS</span> <span class="o">=</span> <span class="s1">&#39;QPushButton {color:#b1b1b1; }&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">focusLock</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">populateMenu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanModules</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DSLoading</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">DataStation_Closing</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DSClosing</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">DataStation_Closing_Final</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DSLateClosing</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">focusWindowChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">focusWindowChanged</span><span class="p">)</span>
+
+<span class="c1">##### DataStation Reserved Functions #####</span>
+<div class="viewcode-block" id="ModuleManager.connections"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.connections">[docs]</a>    <span class="k">def</span> <span class="nf">connections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">wM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">hM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">iM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initModuleSettingsWindow</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ModuleManager.DSLoading"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.DSLoading">[docs]</a>    <span class="k">def</span> <span class="nf">DSLoading</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span> <span class="o">=</span> <span class="n">mainWindow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">styleSheet</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">modName</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaultModules</span><span class="p">:</span>
+            <span class="n">widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getModByModName</span><span class="p">(</span><span class="n">modName</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">widget</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Add_Module_Instance</span><span class="p">(</span><span class="n">widget</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">centerWindow</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ModuleManager.DSLoaded"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.DSLoaded">[docs]</a>    <span class="k">def</span> <span class="nf">DSLoaded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ModuleManager.DSClosing"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.DSClosing">[docs]</a>    <span class="k">def</span> <span class="nf">DSClosing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindows</span><span class="p">:</span>
+            <span class="n">window</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ModuleManager.DSLateClosing"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.DSLateClosing">[docs]</a>    <span class="k">def</span> <span class="nf">DSLateClosing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+        <span class="c1">#for modHandler in self.modules:</span>
+        <span class="c1">#    modHandler.removeHandler(late=True)</span>
+        <span class="c1">#for window in self.mainWindows:</span>
+        <span class="c1">#    window.close()</span>
+
+<div class="viewcode-block" id="ModuleManager.closeDataStation"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.closeDataStation">[docs]</a>    <span class="k">def</span> <span class="nf">closeDataStation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isShutdown</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">softExit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ModuleManager.populateMenu"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.populateMenu">[docs]</a>    <span class="k">def</span> <span class="nf">populateMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">showWidgetAction</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;Show Module Widget&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">showWidgetAction</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Show_Manager_Widget</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lockFocusAction</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;Shared Window Focus&#39;</span><span class="p">,</span> <span class="n">checkable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lockFocusAction</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="s1">&#39;Modules&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">showWidgetAction</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lockFocusAction</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu</span></div>
+
+<span class="c1">##### Functions Called By Module Instances #####</span>
+<div class="viewcode-block" id="ModuleManager.resourceAdded"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.resourceAdded">[docs]</a>    <span class="k">def</span> <span class="nf">resourceAdded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Resource_Added</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">resource</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModuleManager.resourceRemoved"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.resourceRemoved">[docs]</a>    <span class="k">def</span> <span class="nf">resourceRemoved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Resource_Removed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">module</span><span class="p">)</span></div>
+
+<span class="c1">##### Module Manager Settings Window #####</span>
+<div class="viewcode-block" id="ModuleManager.initModuleSettingsWindow"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.initModuleSettingsWindow">[docs]</a>    <span class="k">def</span> <span class="nf">initModuleSettingsWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moduleSettingsWindow</span> <span class="o">=</span> <span class="n">moduleManagerWindow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">)</span></div>
+        <span class="c1">#self.moduleSettingsWindow.show()</span>
+
+<div class="viewcode-block" id="ModuleManager.showManagerWidget"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.showManagerWidget">[docs]</a>    <span class="k">def</span> <span class="nf">showManagerWidget</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moduleSettingsWindow</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moduleSettingsWindow</span><span class="o">.</span><span class="n">setWindowState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moduleSettingsWindow</span><span class="o">.</span><span class="n">windowState</span><span class="p">()</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">Qt</span><span class="o">.</span><span class="n">WindowMinimized</span> <span class="o">|</span> <span class="n">Qt</span><span class="o">.</span><span class="n">WindowActive</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moduleSettingsWindow</span><span class="o">.</span><span class="n">activateWindow</span><span class="p">()</span></div>
+
+<span class="c1">##### Stylesheets #####</span>
+<div class="viewcode-block" id="ModuleManager.setStylesheet"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.setStylesheet">[docs]</a>    <span class="k">def</span> <span class="nf">setStylesheet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">styleSheet</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                    <span class="n">ssTxt</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">styleSheet</span> <span class="o">=</span> <span class="n">ssTxt</span>
+
+            <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindows</span><span class="p">:</span>
+                <span class="n">window</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">styleSheet</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaultSS</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Could not load styleSheet: &#39;</span> <span class="o">+</span> <span class="n">path</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span></div>
+
+<span class="c1">##### Windows #####</span>
+<div class="viewcode-block" id="ModuleManager.hideMainWindow"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.hideMainWindow">[docs]</a>    <span class="k">def</span> <span class="nf">hideMainWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ModuleManager.addWindow"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.addWindow">[docs]</a>    <span class="k">def</span> <span class="nf">addWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">newWindow</span> <span class="o">=</span> <span class="n">DSWindow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">)</span>
+        <span class="n">newWindow</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s1">&#39;DataStation Expansion Window #&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mainWindows</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">newWindow</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">styleSheet</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newWindow</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">newWindow</span></div>
+
+<div class="viewcode-block" id="ModuleManager.windowClosing"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.windowClosing">[docs]</a>    <span class="k">def</span> <span class="nf">windowClosing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindows</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Window_Removed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">window</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModuleManager.saveWindowStates"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.saveWindowStates">[docs]</a>    <span class="k">def</span> <span class="nf">saveWindowStates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">windowStates</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindows</span><span class="p">:</span>
+            <span class="n">windowStates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">window</span><span class="o">.</span><span class="n">saveWindowState</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">windowStates</span></div>
+
+<div class="viewcode-block" id="ModuleManager.loadWindowStates"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.loadWindowStates">[docs]</a>    <span class="k">def</span> <span class="nf">loadWindowStates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">newWindow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addWindow</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">restoreModules</span><span class="p">(</span><span class="n">window</span><span class="p">[</span><span class="s1">&#39;modules&#39;</span><span class="p">],</span> <span class="n">newWindow</span><span class="p">)</span>
+            <span class="n">newWindow</span><span class="o">.</span><span class="n">loadWindowState</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+        
+        <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mainWindows</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addWindow</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ModuleManager.focusWindowChanged"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.focusWindowChanged">[docs]</a>    <span class="k">def</span> <span class="nf">focusWindowChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">focusLock</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">focusLock</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lockFocusAction</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindows</span><span class="p">:</span>
+                    <span class="n">window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+                    <span class="n">window</span><span class="o">.</span><span class="n">raise_</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">focusLock</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<span class="c1">##### Modules #####</span>
+<div class="viewcode-block" id="ModuleManager.addModuleInstance"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.addModuleInstance">[docs]</a>    <span class="k">def</span> <span class="nf">addModuleInstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">uuid</span><span class="p">):</span>
+        <span class="n">modHandler</span> <span class="o">=</span> <span class="n">ModuleHandler</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">modHandler</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModuleManager.removeModuleInstance"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.removeModuleInstance">[docs]</a>    <span class="k">def</span> <span class="nf">removeModuleInstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modHandler</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">modHandler</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModuleManager.restoreModules"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.restoreModules">[docs]</a>    <span class="k">def</span> <span class="nf">restoreModules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modDataList</span><span class="p">,</span> <span class="n">window</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">modData</span> <span class="ow">in</span> <span class="n">modDataList</span><span class="p">:</span>
+            <span class="n">mod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getModByPath</span><span class="p">(</span><span class="n">modData</span><span class="p">[</span><span class="s1">&#39;filePath&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">mod</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Add_Module_Instance</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=</span><span class="n">modData</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="ModuleManager.getModByFileName"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.getModByFileName">[docs]</a>    <span class="k">def</span> <span class="nf">getModByFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modulesAvailable</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fileName</span> <span class="o">==</span> <span class="n">name</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">mod</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ModuleManager.getModByModName"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.getModByModName">[docs]</a>    <span class="k">def</span> <span class="nf">getModByModName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modulesAvailable</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">mod</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ModuleManager.getModByPath"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.getModByPath">[docs]</a>    <span class="k">def</span> <span class="nf">getModByPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modulesAvailable</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">filePath</span> <span class="o">==</span> <span class="n">path</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">mod</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ModuleManager.scanModules"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.scanModules">[docs]</a>    <span class="k">def</span> <span class="nf">scanModules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modulesAvailable</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Searching For Modules... &#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moduleDir</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">verifyModule</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">res</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="n">nMod</span> <span class="o">=</span> <span class="n">ModuleAvailable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moduleDir</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">modulesAvailable</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nMod</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;   Found Module: &#39;</span> <span class="o">+</span> <span class="n">name</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Finished Searching For Modules!&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModuleManager.verifyModule"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.verifyModule">[docs]</a>    <span class="k">def</span> <span class="nf">verifyModule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="n">mod_name</span><span class="p">,</span> <span class="n">file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">url</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">pathStore</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">file_ext</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;.py&#39;</span><span class="p">:</span>
+            <span class="n">py_mod</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">load_source</span><span class="p">(</span><span class="n">mod_name</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">py_mod</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">py_mod</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
+                <span class="n">module</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">py_mod</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">DSModule</span><span class="p">)):</span>
+                    <span class="k">return</span> <span class="n">module</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="ModuleManager.getModuleResources"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleManager.getModuleResources">[docs]</a>    <span class="k">def</span> <span class="nf">getModuleResources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">tags</span><span class="p">):</span>
+        <span class="n">outList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">moduleIn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">Get_Module_Instances</span><span class="p">():</span>
+            <span class="n">moduleIn</span> <span class="o">=</span> <span class="n">moduleIn</span><span class="o">.</span><span class="n">Get_Module</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">module</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">moduleIn</span> <span class="ow">is</span> <span class="n">module</span><span class="p">:</span>
+                    <span class="n">outList</span> <span class="o">=</span> <span class="n">outList</span> <span class="o">+</span> <span class="n">moduleIn</span><span class="o">.</span><span class="n">Get_Resources</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">outList</span> <span class="o">=</span> <span class="n">outList</span> <span class="o">+</span> <span class="n">moduleIn</span><span class="o">.</span><span class="n">Get_Resources</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">outList</span></div></div>
+
+<div class="viewcode-block" id="ModuleDirectory"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleDirectory">[docs]</a><span class="k">class</span> <span class="nc">ModuleDirectory</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dirStructure</span><span class="p">,</span> <span class="n">folderName</span><span class="p">,</span> <span class="n">folderPath</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folderNmae</span> <span class="o">=</span> <span class="n">folderName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folderPath</span> <span class="o">=</span> <span class="n">folderPath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">childModules</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">childDirectories</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ModuleAvailable"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleAvailable">[docs]</a><span class="k">class</span> <span class="nc">ModuleAvailable</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">moduleDir</span><span class="p">,</span> <span class="n">fileName</span><span class="p">,</span> <span class="n">filePath</span><span class="p">,</span> <span class="n">modClass</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moduleDir</span> <span class="o">=</span> <span class="n">moduleDir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span> <span class="o">=</span> <span class="n">fileName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filePath</span> <span class="o">=</span> <span class="n">filePath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modClass</span> <span class="o">=</span> <span class="n">modClass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subDirectories</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">modClass</span><span class="p">,</span> <span class="s1">&#39;Module_Name&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">modClass</span><span class="p">,</span> <span class="s1">&#39;Module_Name&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;NULL&#39;</span>
+        
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">modClass</span><span class="p">,</span> <span class="s1">&#39;Module_Flags&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">modFlags</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">modClass</span><span class="p">,</span> <span class="s1">&#39;Module_Flags&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">modFlags</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parseDirectories</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ModuleAvailable.parseDirectories"><a class="viewcode-back" href="../source/ModuleManager/ModuleManager.html#ModuleManager.ModuleAvailable.parseDirectories">[docs]</a>    <span class="k">def</span> <span class="nf">parseDirectories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">relPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filePath</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">moduleDir</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">relPath</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">relPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">relPath</span><span class="p">)</span>
+            <span class="n">relPathBase</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">relPath</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subDirectories</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">relPathBase</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subDirectories</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../DataStation.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/DataStation.html">DataStation module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/HardwareManager/HardwareManager.html">HardwareManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/InstrumentManager/InstrumentManager.html">InstrumentManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/ModuleManager/ModuleManager.html">ModuleManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/WorkspaceManager/WorkspaceManager.html">WorkspaceManager module</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Matthew R. Brantley.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>

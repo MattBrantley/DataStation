@@ -1,0 +1,398 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Sources &#8212; DataStation 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for Sources</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt5.Qt</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtGui</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">imp</span><span class="o">,</span> <span class="nn">math</span><span class="o">,</span> <span class="nn">uuid</span><span class="o">,</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">src.Constants</span> <span class="k">import</span> <span class="n">DSConstants</span> <span class="k">as</span> <span class="n">DSConstants</span>
+<span class="kn">from</span> <span class="nn">src.Managers.InstrumentManager.Sockets</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">src.Managers.HardwareManager.PacketCommands</span> <span class="k">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="Source"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source">[docs]</a><span class="k">class</span> <span class="nc">Source</span><span class="p">():</span>
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### EXTERNAL FUNCTIONS ####################################</span>
+<div class="viewcode-block" id="Source.Get_Name"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.Get_Name">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Source.Get_Connector_ID"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.Get_Connector_ID">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Connector_ID</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;physConID&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Source.Get_Sockets"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.Get_Sockets">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Sockets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getSockets</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Source.Get_Source"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.Get_Source">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Source</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Source.Get_Hardware_Device"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.Get_Hardware_Device">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Hardware_Device</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">handler</span></div>
+
+<div class="viewcode-block" id="Source.Get_Programming_Instrument"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.Get_Programming_Instrument">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Programming_Instrument</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getProgrammingInstrument</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Source.Get_Handler"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.Get_Handler">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Handler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Get_Hardware_Device</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Source.Get_UUID"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.Get_UUID">[docs]</a>    <span class="k">def</span> <span class="nf">Get_UUID</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Source.Get_Number_Of_Paths"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.Get_Number_Of_Paths">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Number_Of_Paths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="Source.Push_Measurement_Packet"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.Push_Measurement_Packet">[docs]</a>    <span class="k">def</span> <span class="nf">Push_Measurement_Packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measurementPacket</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pushMeasurementPacket</span><span class="p">(</span><span class="n">measurementPacket</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Source.Is_Registered"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.Is_Registered">[docs]</a>    <span class="k">def</span> <span class="nf">Is_Registered</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isRegistered</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### INTERNAL USER ONLY ####################################</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">physConID</span><span class="p">,</span> <span class="n">trigger</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iM</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">handler</span> <span class="o">=</span> <span class="n">handler</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isRegistered</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;physConID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">physConID</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;trigger&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trigger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;enabled&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">programmingPacket</span> <span class="o">=</span> <span class="kc">None</span>
+ 
+<span class="c1">##### DataStation Interface Functions #####</span>
+
+<div class="viewcode-block" id="Source.readyCheck"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.readyCheck">[docs]</a>    <span class="k">def</span> <span class="nf">readyCheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traceIn</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Is_Registered</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">trace</span> <span class="o">=</span> <span class="n">traceIn</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">trace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">socketInstrumentUUIDList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">socket</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getSockets</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">socket</span><span class="o">.</span><span class="n">socketSettings</span><span class="p">[</span><span class="s1">&#39;drivingSocket&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">socketInstrumentUUIDList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">Get_Component</span><span class="p">()</span><span class="o">.</span><span class="n">Get_Instrument</span><span class="p">()</span><span class="o">.</span><span class="n">Get_UUID</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">socketInstrumentUUIDList</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">socketInstrumentUUIDList</span><span class="p">)):</span>
+            <span class="n">trace</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Fail_Ready_Check</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="s1">&#39;Source Has More Than One Driving Socket From An Instrument!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1">#drivingSocketCount = 0</span>
+        <span class="c1">#for socket in self.getSockets():</span>
+        <span class="c1">#    if socket.socketSettings[&#39;drivingSocket&#39;] == True:</span>
+        <span class="c1">#        drivingSocketCount = drivingSocketCount + 1</span>
+
+        <span class="c1">#if drivingSocketCount &gt; 1:</span>
+        <span class="c1">#    trace[0].Fail_Ready_Check(trace, &#39;Source Has More Than One Driving Socket!&#39;)</span>
+        <span class="c1">#    return False</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">programmingPacket</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">trace</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Fail_Ready_Check</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="s1">&#39;Active Source Has No Programming Packet&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hWare</span><span class="o">.</span><span class="n">readyCheck</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Source.getUUID"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.getUUID">[docs]</a>    <span class="k">def</span> <span class="nf">getUUID</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Source.registerHWare"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.registerHWare">[docs]</a>    <span class="k">def</span> <span class="nf">registerHWare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hWare</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hWare</span> <span class="o">=</span> <span class="n">hWare</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="n">hWare</span><span class="o">.</span><span class="n">ds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iM</span> <span class="o">=</span> <span class="n">hWare</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">iM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span> <span class="o">=</span> <span class="n">hWare</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">hM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isRegistered</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Source.getProgrammingPacket"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.getProgrammingPacket">[docs]</a>    <span class="k">def</span> <span class="nf">getProgrammingPacket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">programmingPacket</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">programmingPacket</span> <span class="o">=</span> <span class="n">programmingPacket</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hWare</span><span class="o">.</span><span class="n">Set_Active_Instrument</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Get_Programming_Instrument</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hWare</span><span class="o">.</span><span class="n">programDataReceived</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Source.isConnected"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.isConnected">[docs]</a>    <span class="k">def</span> <span class="nf">isConnected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getSockets</span><span class="p">()):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Source.pushMeasurementPacket"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.pushMeasurementPacket">[docs]</a>    <span class="k">def</span> <span class="nf">pushMeasurementPacket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measurementPacket</span><span class="p">):</span>
+        <span class="n">sockets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Get_Sockets</span><span class="p">()</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">sockets</span><span class="p">):</span>
+            <span class="n">sockets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">getMeasurementPacket</span><span class="p">(</span><span class="n">measurementPacket</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Source.getProgrammingInstrument"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.getProgrammingInstrument">[docs]</a>    <span class="k">def</span> <span class="nf">getProgrammingInstrument</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">programmingPacket</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">programmingPacket</span><span class="o">.</span><span class="n">Get_Origin_Socket</span><span class="p">()</span><span class="o">.</span><span class="n">Get_Component</span><span class="p">()</span><span class="o">.</span><span class="n">Get_Instrument</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<span class="c1">##### Search Functions #####</span>
+<div class="viewcode-block" id="Source.getSockets"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.getSockets">[docs]</a>    <span class="k">def</span> <span class="nf">getSockets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">outputSockets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">outputFilters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">Get_Filters</span><span class="p">(</span><span class="n">inputUUID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">instrument</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iM</span><span class="o">.</span><span class="n">Get_Instruments</span><span class="p">():</span>
+            <span class="n">outputSockets</span> <span class="o">+=</span> <span class="n">instrument</span><span class="o">.</span><span class="n">Get_Sockets</span><span class="p">(</span><span class="n">inputUUID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">Filter</span> <span class="ow">in</span> <span class="n">outputFilters</span><span class="p">:</span>
+            <span class="n">outputSockets</span> <span class="o">+=</span> <span class="n">Filter</span><span class="o">.</span><span class="n">Get_Sockets</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">outputSockets</span></div>
+
+<span class="c1">##### Functions Over-Ridden By Factoried Sources #####</span>
+<div class="viewcode-block" id="Source.procReverseParent"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.procReverseParent">[docs]</a>    <span class="k">def</span> <span class="nf">procReverseParent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packetIn</span><span class="p">):</span>
+        <span class="c1">#Source got the packet!</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsePacket</span><span class="p">(</span><span class="n">packetIn</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Source.parsePacket"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.parsePacket">[docs]</a>    <span class="k">def</span> <span class="nf">parsePacket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packetIn</span><span class="p">):</span> <span class="c1">### OVERRIDE ME!! ####</span>
+        <span class="k">pass</span></div>
+
+<span class="c1">##### Source Manipulation Functions #####</span>
+<div class="viewcode-block" id="Source.attachPathOther"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.attachPathOther">[docs]</a>    <span class="k">def</span> <span class="nf">attachPathOther</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">uuid</span>
+        <span class="k">return</span> <span class="kc">True</span> <span class="c1"># Sources don&#39;t retain their connection information, always returns True</span></div>
+                    <span class="c1"># This means anything that tells the Source it is attached will be.</span>
+
+<div class="viewcode-block" id="Source.attachPathSelf"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.attachPathSelf">[docs]</a>    <span class="k">def</span> <span class="nf">attachPathSelf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pathNo</span><span class="p">,</span> <span class="n">uuid</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">uuid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;SOURCE ATTACH ERROR: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; (&#39;</span> <span class="o">+</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;) Trying To Attach To Path Filter/Socket that is NoneValue!!!&#39;</span> <span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_MED</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">][</span><span class="n">pathNo</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">False</span> 
+
+        <span class="n">targetFilterOrSocket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">getFilterOrSourceByUUID</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span> <span class="c1">#Search for Filter</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">targetFilterOrSocket</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">targetFilterOrSocket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">getSocketByUUID</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span> <span class="c1">#If it&#39;s not a filter, search for a Socket</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">targetFilterOrSocket</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;SOURCE ATTACH ERROR: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; (&#39;</span> <span class="o">+</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;) Trying To Attach To Path Filter/Socket that does not exist!!!&#39;</span> <span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_MED</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">][</span><span class="n">pathNo</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">][</span><span class="n">pathNo</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">uuid</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Source.detatchPathOther"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.detatchPathOther">[docs]</a>    <span class="k">def</span> <span class="nf">detatchPathOther</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">):</span>
+        <span class="n">newPaths</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">]:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">path</span> <span class="o">==</span> <span class="n">uuid</span><span class="p">):</span>
+                <span class="n">newPaths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">newPaths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">found</span></div>
+
+<div class="viewcode-block" id="Source.savePacket"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.savePacket">[docs]</a>    <span class="k">def</span> <span class="nf">savePacket</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span></div>
+
+<div class="viewcode-block" id="Source.loadPacket"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.loadPacket">[docs]</a>    <span class="k">def</span> <span class="nf">loadPacket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loadPacket</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span> <span class="o">=</span> <span class="n">loadPacket</span></div>
+
+<div class="viewcode-block" id="Source.program"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.Source.program">[docs]</a>    <span class="k">def</span> <span class="nf">program</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hWare</span><span class="o">.</span><span class="n">program</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+
+
+
+<div class="viewcode-block" id="AISource"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.AISource">[docs]</a><span class="k">class</span> <span class="nc">AISource</span><span class="p">(</span><span class="n">Source</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">vMin</span><span class="p">,</span> <span class="n">vMax</span><span class="p">,</span> <span class="n">prec</span><span class="p">,</span> <span class="n">physConID</span><span class="p">,</span> <span class="n">trigger</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">physConID</span><span class="p">,</span> <span class="n">trigger</span><span class="o">=</span><span class="n">trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;vMin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vMin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;vMax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vMax</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;prec&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prec</span>
+
+<div class="viewcode-block" id="AISource.readyCheck"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.AISource.readyCheck">[docs]</a>    <span class="k">def</span> <span class="nf">readyCheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traceIn</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">readyCheck</span><span class="p">(</span><span class="n">traceIn</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">trace</span> <span class="o">=</span> <span class="n">traceIn</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">trace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">programmingPacket</span><span class="o">.</span><span class="n">Get_Commands</span><span class="p">():</span>
+            <span class="k">if</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">AnalogAcquisitionCommand</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">trace</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Fail_Ready_Check</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="s1">&#39;Analog Input Source Recieved Unknown Programming Packet Type! &#39;</span> <span class="o">+</span> <span class="n">command</span><span class="o">.</span><span class="fm">__str__</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">commandInSourceRange</span><span class="p">(</span><span class="n">command</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="n">trace</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Fail_Ready_Check</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="s1">&#39;Analog Input Source Programming Packet Out Of Source Range&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AISource.parsePacket"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.AISource.parsePacket">[docs]</a>    <span class="k">def</span> <span class="nf">parsePacket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packetIn</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">programmingPacket</span> <span class="o">=</span> <span class="n">packetIn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">programmingPacket</span><span class="o">.</span><span class="n">physicalConnectorID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">physicalConnectorID</span></div>
+
+<div class="viewcode-block" id="AISource.commandInSourceRange"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.AISource.commandInSourceRange">[docs]</a>    <span class="k">def</span> <span class="nf">commandInSourceRange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+
+
+
+<div class="viewcode-block" id="AOSource"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.AOSource">[docs]</a><span class="k">class</span> <span class="nc">AOSource</span><span class="p">(</span><span class="n">Source</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">vMin</span><span class="p">,</span> <span class="n">vMax</span><span class="p">,</span> <span class="n">prec</span><span class="p">,</span> <span class="n">physConID</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">physConID</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;vMin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vMin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;vMax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vMax</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;prec&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prec</span>
+
+<div class="viewcode-block" id="AOSource.readyCheck"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.AOSource.readyCheck">[docs]</a>    <span class="k">def</span> <span class="nf">readyCheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traceIn</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">readyCheck</span><span class="p">(</span><span class="n">traceIn</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">trace</span> <span class="o">=</span> <span class="n">traceIn</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">trace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">programmingPacket</span><span class="o">.</span><span class="n">Get_Commands</span><span class="p">():</span>
+            <span class="k">if</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="p">(</span><span class="n">AnalogWaveformCommand</span><span class="p">,</span> <span class="n">AnalogSparseCommand</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">trace</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Fail_Ready_Check</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="s1">&#39;Analog Output Source Recieved Unknown Programming Packet Type! &#39;</span> <span class="o">+</span> <span class="n">command</span><span class="o">.</span><span class="fm">__str__</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">commandInSourceRange</span><span class="p">(</span><span class="n">command</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="n">trace</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Fail_Ready_Check</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="s1">&#39;Analog Output Source Programming Packet Out Of Source Range&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AOSource.parsePacket"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.AOSource.parsePacket">[docs]</a>    <span class="k">def</span> <span class="nf">parsePacket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packetIn</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">programmingPacket</span> <span class="o">=</span> <span class="n">packetIn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">programmingPacket</span><span class="o">.</span><span class="n">physicalConnectorID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">physicalConnectorID</span></div>
+            
+<div class="viewcode-block" id="AOSource.commandInSourceRange"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.AOSource.commandInSourceRange">[docs]</a>    <span class="k">def</span> <span class="nf">commandInSourceRange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="c1">#if(cmd.waveformData is None):</span>
+        <span class="c1">#    return True</span>
+        <span class="c1">#yAxis = cmd.waveformData[:,1]</span>
+        <span class="c1">#if(yAxis.max() &gt; self.vMax):</span>
+        <span class="c1">#    return False</span>
+        <span class="c1">#if(yAxis.min() &lt; self.vMin):</span>
+        <span class="c1">#    return False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+
+
+
+<div class="viewcode-block" id="DISource"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.DISource">[docs]</a><span class="k">class</span> <span class="nc">DISource</span><span class="p">(</span><span class="n">Source</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">physConID</span><span class="p">,</span> <span class="n">trigger</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">physConID</span><span class="p">,</span> <span class="n">trigger</span><span class="o">=</span><span class="n">trigger</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DISource.readyCheck"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.DISource.readyCheck">[docs]</a>    <span class="k">def</span> <span class="nf">readyCheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traceIn</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">readyCheck</span><span class="p">(</span><span class="n">traceIn</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">trace</span> <span class="o">=</span> <span class="n">traceIn</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">trace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">readyCheck</span><span class="p">(</span><span class="n">traceIn</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">programmingPacket</span><span class="o">.</span><span class="n">Get_Commands</span><span class="p">():</span>
+            <span class="k">if</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">DigitalAcquisitionCommand</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">trace</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Fail_Ready_Check</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="s1">&#39;Digital Input Source Recieved Unknown Programming Packet Type! &#39;</span> <span class="o">+</span> <span class="n">command</span><span class="o">.</span><span class="fm">__str__</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">commandInSourceRange</span><span class="p">(</span><span class="n">command</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="n">trace</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Fail_Ready_Check</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="s1">&#39;Digital Input Source Programming Packet Out Of Source Range&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DISource.parsePacket"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.DISource.parsePacket">[docs]</a>    <span class="k">def</span> <span class="nf">parsePacket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packetIn</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">programmingPacket</span> <span class="o">=</span> <span class="n">packetIn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">programmingPacket</span><span class="o">.</span><span class="n">physicalConnectorID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">physicalConnectorID</span></div>
+
+<div class="viewcode-block" id="DISource.commandInSourceRange"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.DISource.commandInSourceRange">[docs]</a>    <span class="k">def</span> <span class="nf">commandInSourceRange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+
+
+
+<div class="viewcode-block" id="DOSource"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.DOSource">[docs]</a><span class="k">class</span> <span class="nc">DOSource</span><span class="p">(</span><span class="n">Source</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">physConID</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">physConID</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DOSource.readyCheck"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.DOSource.readyCheck">[docs]</a>    <span class="k">def</span> <span class="nf">readyCheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traceIn</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">readyCheck</span><span class="p">(</span><span class="n">traceIn</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">trace</span> <span class="o">=</span> <span class="n">traceIn</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">trace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">programmingPacket</span><span class="o">.</span><span class="n">Get_Commands</span><span class="p">():</span>
+            <span class="k">if</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="p">(</span><span class="n">DigitalWaveformCommand</span><span class="p">,</span> <span class="n">DigitalSparseCommand</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">trace</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Fail_Ready_Check</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="s1">&#39;Digital Output Source Recieved Unknown Programming Packet Type! &#39;</span> <span class="o">+</span> <span class="n">command</span><span class="o">.</span><span class="fm">__str__</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">commandInSourceRange</span><span class="p">(</span><span class="n">command</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="n">trace</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Fail_Ready_Check</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="s1">&#39;Digital Output Source Programming Packet Out Of Source Range&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DOSource.parsePacket"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.DOSource.parsePacket">[docs]</a>    <span class="k">def</span> <span class="nf">parsePacket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packetIn</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">programmingPacket</span> <span class="o">=</span> <span class="n">packetIn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">programmingPacket</span><span class="o">.</span><span class="n">physicalConnectorID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">physicalConnectorID</span></div>
+
+<div class="viewcode-block" id="DOSource.commandInSourceRange"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#Sources.DOSource.commandInSourceRange">[docs]</a>    <span class="k">def</span> <span class="nf">commandInSourceRange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../DataStation.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/DataStation.html">DataStation module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/HardwareManager/HardwareManager.html">HardwareManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/InstrumentManager/InstrumentManager.html">InstrumentManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/ModuleManager/ModuleManager.html">ModuleManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/WorkspaceManager/WorkspaceManager.html">WorkspaceManager module</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Matthew R. Brantley.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>

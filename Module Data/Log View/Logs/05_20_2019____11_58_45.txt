@@ -1,0 +1,143 @@
+[05/20/2019 11:58:38] Searching For Modules... 
+[05/20/2019 11:58:38]    Found Module: codeEditor.py
+[05/20/2019 11:58:39]    Found Module: Console.py
+[05/20/2019 11:58:39]    Found Module: datastationWeb.py
+[05/20/2019 11:58:39]    Found Module: FTStudio.py
+[05/20/2019 11:58:39]    Found Module: hardwareView.py
+[05/20/2019 11:58:39]    Found Module: instrumentEditor.py
+[05/20/2019 11:58:39]    Found Module: loadingScreen.py
+[05/20/2019 11:58:39]    Found Module: logView.py
+[05/20/2019 11:58:39]    Found Module: measurementPreview.py
+[05/20/2019 11:58:39]    Found Module: MultiInstrumentControl.py
+[05/20/2019 11:58:39]    Found Module: processStatus.py
+[05/20/2019 11:58:39]    Found Module: profileSelection.py
+[05/20/2019 11:58:39]    Found Module: Sequencer.py
+[05/20/2019 11:58:39]    Found Module: SQLiteDataRecorder.py
+[05/20/2019 11:58:39] Finished Searching For Modules!
+[05/20/2019 11:58:39] Loading User Profiles... 
+[05/20/2019 11:58:39] Done!
+[05/20/2019 11:58:39] Loading Component Models... 
+[05/20/2019 11:58:39]    Found Component Script: d:/InstrPlatform/DataStation\Components\Basic_Trigger.py
+[05/20/2019 11:58:39]   (Success!)
+[05/20/2019 11:58:39]    Found Component Script: d:/InstrPlatform/DataStation\Components\Circular_Lens.py
+[05/20/2019 11:58:39]   (Success!)
+[05/20/2019 11:58:39]    Found Component Script: d:/InstrPlatform/DataStation\Components\DC_Electrode.py
+[05/20/2019 11:58:39]   (Success!)
+[05/20/2019 11:58:39]    Found Component Script: d:/InstrPlatform/DataStation\Components\Detection_Plates.py
+[05/20/2019 11:58:39]   (Success!)
+[05/20/2019 11:58:39]    Found Component Script: d:/InstrPlatform/DataStation\Components\Excitation_Plates.py
+[05/20/2019 11:58:39]   (Success!)
+[05/20/2019 11:58:39]    Found Component Script: d:/InstrPlatform/DataStation\Components\Filament.py
+[05/20/2019 11:58:39]   (Success!)
+[05/20/2019 11:58:39]    Found Component Script: d:/InstrPlatform/DataStation\Components\Penning_Trap.py
+[05/20/2019 11:58:39]   (Success!)
+[05/20/2019 11:58:39]    Found Component Script: d:/InstrPlatform/DataStation\Components\Pulse_Valve.py
+[05/20/2019 11:58:39]   (Success!)
+[05/20/2019 11:58:39]    Found Component Script: d:/InstrPlatform/DataStation\Components\Quadrupole.py
+[05/20/2019 11:58:39]   (Success!)
+[05/20/2019 11:58:39] Finished Loading Component Models!
+[05/20/2019 11:58:39] Loading User Filters... 
+[05/20/2019 11:58:39]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Signal_Splitter_2Way.py
+[05/20/2019 11:58:39]   (Success!)
+[05/20/2019 11:58:39]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Signal_Splitter_3Way.py
+[05/20/2019 11:58:39]   (Success!)
+[05/20/2019 11:58:39]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Simple_Amplifier.py
+[05/20/2019 11:58:39]   (Success!)
+[05/20/2019 11:58:39] Finished Loading User Filters!
+[05/20/2019 11:58:39] Loading Hardware Drivers... 
+[05/20/2019 11:58:39]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\MIPS.py
+[05/20/2019 11:58:39]   (Success!)
+[05/20/2019 11:58:39]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\NI_DAQmx.py
+[05/20/2019 11:58:39]   (Success!)
+[05/20/2019 11:58:39]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5122.py
+[05/20/2019 11:58:39]   (Success!)
+[05/20/2019 11:58:39]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5451.py
+[05/20/2019 11:58:40]   (Success!)
+[05/20/2019 11:58:40]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\Test_Driver.py
+[05/20/2019 11:58:40]   (Success!)
+[05/20/2019 11:58:40] Finished Loading Hardware Drivers!
+[05/20/2019 11:58:40] Initializing DataStation Labview Interface... 
+[05/20/2019 11:58:43] Done!
+[05/20/2019 11:58:43] Loading Hardware State Data.. 
+[05/20/2019 11:58:43] Done!
+[05/20/2019 11:58:45] Could not load styleSheet: 
+[05/20/2019 11:58:46] Loading User Instrument (D:/InstrPlatform/DataStation/Instruments\Basic FT-ICR.dsinstrument)... 
+[05/20/2019 11:58:46] Added New Component to Instrument: Circular Lens
+[05/20/2019 11:58:46] Added New Component to Instrument: Circular Lens
+[05/20/2019 11:58:46] Added New Component to Instrument: Penning Trap
+[05/20/2019 11:58:46] Added New Component to Instrument: Excitation Plates
+[05/20/2019 11:58:46] Added New Component to Instrument: Detection Plates
+[05/20/2019 11:58:46] Added New Component to Instrument: Basic Trigger
+[05/20/2019 11:58:46] Added New Component to Instrument: Basic Trigger
+[05/20/2019 11:58:46] Added New Component to Instrument: Filament
+[05/20/2019 11:58:46] Added New Component to Instrument: Pulse Valve
+[05/20/2019 11:58:46] Opening Sequence File (d:/InstrPlatform/DataStation\Sequences\Basic FT-ICR\test)... 
+[05/20/2019 11:58:46] Applying sequence to instrument... 
+[05/20/2019 11:58:46] Sequence applied to instrument!
+[05/20/2019 11:58:46] Loading User Instrument (D:/InstrPlatform/DataStation/Instruments\Background Instrument Test 1.dsinstrument)... 
+[05/20/2019 11:58:46] Added New Component to Instrument: Basic Trigger
+[05/20/2019 11:58:46] Added New Component to Instrument: Basic Trigger
+[05/20/2019 11:58:46] Opening Sequence File (d:/InstrPlatform/DataStation\Sequences\Background Instrument Test 1\Background Instrument Test 1)... 
+[05/20/2019 11:58:46] Applying sequence to instrument... 
+[05/20/2019 11:58:46] Sequence applied to instrument!
+[05/20/2019 11:59:04] Opening Sequence File (D:/InstrPlatform/DataStation/Sequences/Basic FT-ICR/test_copy)... 
+[05/20/2019 11:59:04] Applying sequence to instrument... 
+[05/20/2019 11:59:04] Sequence data for comp with uuid (c330fd81-ae6b-4e08-a8a6-3e5cd19889d3) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:04] Sequence data for comp with uuid (e54d3171-4888-4639-aa43-fab25145473f) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:04] Sequence data for comp with uuid (e6a8589e-cb19-4953-9f94-9d9866ab6795) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:04] Sequence data for comp with uuid (594d2479-ae28-4106-9191-c4d09b224e7a) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:04] Sequence data for comp with uuid (ea30b3f6-2f85-4a1d-ae67-c2d60c990543) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:04] Sequence data for comp with uuid (26fcabe4-7def-4be5-ba16-d38c83fbb095) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:04] Sequence data for comp with uuid (533d7fbe-5769-4d4d-b3e1-a3933d8639fb) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:04] Sequence data for comp with uuid (65d26fd1-fd48-4bdd-9d8f-2b2ee2752ff8) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:04] Sequence data for comp with uuid (c23c13b6-e51f-48ab-acd8-c96f3c5aa5c1) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:04] Sequence applied to instrument!
+[05/20/2019 11:59:26] Opening Sequence File (D:/InstrPlatform/DataStation/Sequences/Basic FT-ICR/test)... 
+[05/20/2019 11:59:26] Applying sequence to instrument... 
+[05/20/2019 11:59:26] Sequence data for comp with uuid (c330fd81-ae6b-4e08-a8a6-3e5cd19889d3) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:26] Sequence data for comp with uuid (e54d3171-4888-4639-aa43-fab25145473f) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:26] Sequence data for comp with uuid (e6a8589e-cb19-4953-9f94-9d9866ab6795) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:26] Sequence data for comp with uuid (594d2479-ae28-4106-9191-c4d09b224e7a) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:26] Sequence data for comp with uuid (ea30b3f6-2f85-4a1d-ae67-c2d60c990543) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:26] Sequence data for comp with uuid (26fcabe4-7def-4be5-ba16-d38c83fbb095) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:26] Sequence data for comp with uuid (533d7fbe-5769-4d4d-b3e1-a3933d8639fb) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:26] Sequence data for comp with uuid (65d26fd1-fd48-4bdd-9d8f-2b2ee2752ff8) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:26] Sequence data for comp with uuid (c23c13b6-e51f-48ab-acd8-c96f3c5aa5c1) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:26] Sequence applied to instrument!
+[05/20/2019 11:59:29] Opening Sequence File (D:/InstrPlatform/DataStation/Sequences/Basic FT-ICR/test_copy)... 
+[05/20/2019 11:59:29] Applying sequence to instrument... 
+[05/20/2019 11:59:29] Sequence data for comp with uuid (c330fd81-ae6b-4e08-a8a6-3e5cd19889d3) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:29] Sequence data for comp with uuid (e54d3171-4888-4639-aa43-fab25145473f) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:29] Sequence data for comp with uuid (e6a8589e-cb19-4953-9f94-9d9866ab6795) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:29] Sequence data for comp with uuid (594d2479-ae28-4106-9191-c4d09b224e7a) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:29] Sequence data for comp with uuid (ea30b3f6-2f85-4a1d-ae67-c2d60c990543) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:29] Sequence data for comp with uuid (26fcabe4-7def-4be5-ba16-d38c83fbb095) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:29] Sequence data for comp with uuid (533d7fbe-5769-4d4d-b3e1-a3933d8639fb) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:29] Sequence data for comp with uuid (65d26fd1-fd48-4bdd-9d8f-2b2ee2752ff8) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:29] Sequence data for comp with uuid (c23c13b6-e51f-48ab-acd8-c96f3c5aa5c1) cannot be assigned! Possibly from different instrument.
+[05/20/2019 11:59:29] Sequence applied to instrument!
+[05/20/2019 12:00:04] Opening Sequence File (D:/InstrPlatform/DataStation/Sequences/Basic FT-ICR/test_copy)... 
+[05/20/2019 12:00:05] Applying sequence to instrument... 
+[05/20/2019 12:00:05] Sequence data for comp with uuid (c330fd81-ae6b-4e08-a8a6-3e5cd19889d3) cannot be assigned! Possibly from different instrument.
+[05/20/2019 12:00:05] Sequence data for comp with uuid (e54d3171-4888-4639-aa43-fab25145473f) cannot be assigned! Possibly from different instrument.
+[05/20/2019 12:00:05] Sequence data for comp with uuid (e6a8589e-cb19-4953-9f94-9d9866ab6795) cannot be assigned! Possibly from different instrument.
+[05/20/2019 12:00:05] Sequence data for comp with uuid (594d2479-ae28-4106-9191-c4d09b224e7a) cannot be assigned! Possibly from different instrument.
+[05/20/2019 12:00:05] Sequence data for comp with uuid (ea30b3f6-2f85-4a1d-ae67-c2d60c990543) cannot be assigned! Possibly from different instrument.
+[05/20/2019 12:00:05] Sequence data for comp with uuid (26fcabe4-7def-4be5-ba16-d38c83fbb095) cannot be assigned! Possibly from different instrument.
+[05/20/2019 12:00:05] Sequence data for comp with uuid (533d7fbe-5769-4d4d-b3e1-a3933d8639fb) cannot be assigned! Possibly from different instrument.
+[05/20/2019 12:00:05] Sequence data for comp with uuid (65d26fd1-fd48-4bdd-9d8f-2b2ee2752ff8) cannot be assigned! Possibly from different instrument.
+[05/20/2019 12:00:05] Sequence data for comp with uuid (c23c13b6-e51f-48ab-acd8-c96f3c5aa5c1) cannot be assigned! Possibly from different instrument.
+[05/20/2019 12:00:05] Sequence applied to instrument!
+[05/20/2019 12:00:10] Opening Sequence File (D:/InstrPlatform/DataStation/Sequences/Background Instrument Test 1/Background Instrument Test 1)... 
+[05/20/2019 12:00:10] Applying sequence to instrument... 
+[05/20/2019 12:00:10] Sequence applied to instrument!
+[05/20/2019 12:01:15] Opening Sequence File (D:/InstrPlatform/DataStation/Sequences/Basic FT-ICR/test_copy)... 
+[05/20/2019 12:01:15] Corrupted sequence file - aborting!
+[05/20/2019 12:01:15] Applying sequence to instrument... 
+[05/20/2019 12:01:15] Sequence data was empty - aborting!
+[05/20/2019 12:01:31] Opening Sequence File (D:/InstrPlatform/DataStation/Sequences/Basic FT-ICR/test_copy)... 
+[05/20/2019 12:01:31] Applying sequence to instrument... 
+[05/20/2019 12:01:32] Sequence applied to instrument!
+[05/20/2019 12:31:00] Opening Sequence File (D:/InstrPlatform/DataStation/Sequences/Basic FT-ICR/test)... 
+[05/20/2019 12:31:00] Applying sequence to instrument... 
+[05/20/2019 12:31:01] Sequence applied to instrument!

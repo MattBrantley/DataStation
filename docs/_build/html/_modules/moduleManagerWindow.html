@@ -1,0 +1,319 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>moduleManagerWindow &#8212; DataStation 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for moduleManagerWindow</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt5.Qt</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<div class="viewcode-block" id="moduleManagerWindow"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.moduleManagerWindow">[docs]</a><span class="k">class</span> <span class="nc">moduleManagerWindow</span><span class="p">(</span><span class="n">QMainWindow</span><span class="p">):</span>
+    <span class="n">ITEM_GUID</span> <span class="o">=</span> <span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s1">&#39;Module Manager&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mM</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">mM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowFlags</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">WindowStaysOnTopHint</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWidget</span> <span class="o">=</span> <span class="n">QTabWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setCentralWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mainWidget</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">modulesTab</span> <span class="o">=</span> <span class="n">modulesTab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWidget</span><span class="o">.</span><span class="n">addTab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modulesTab</span><span class="p">,</span> <span class="s1">&#39;Modules&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">windowsTab</span> <span class="o">=</span> <span class="n">windowsTab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWidget</span><span class="o">.</span><span class="n">addTab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">windowsTab</span><span class="p">,</span> <span class="s1">&#39;Windows&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">stylesTab</span> <span class="o">=</span> <span class="n">stylesTab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWidget</span><span class="o">.</span><span class="n">addTab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stylesTab</span><span class="p">,</span> <span class="s1">&#39;Styles&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">DataStation_Closing</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">closing</span><span class="p">)</span>
+
+<div class="viewcode-block" id="moduleManagerWindow.closing"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.moduleManagerWindow.closing">[docs]</a>    <span class="k">def</span> <span class="nf">closing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+        
+<div class="viewcode-block" id="stylesTab"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.stylesTab">[docs]</a><span class="k">class</span> <span class="nc">stylesTab</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mM</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">mM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initWindow</span><span class="p">()</span>
+
+<div class="viewcode-block" id="stylesTab.initWindow"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.stylesTab.initWindow">[docs]</a>    <span class="k">def</span> <span class="nf">initWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">listBox</span> <span class="o">=</span> <span class="n">QListWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">listBox</span><span class="o">.</span><span class="n">itemClicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">listBoxChanged</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">populateStyles</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">listBox</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">applyButton</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Apply Style&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">applyButton</span><span class="o">.</span><span class="n">pressed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">applyPressed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">applyButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">applyButton</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="stylesTab.listBoxChanged"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.stylesTab.listBoxChanged">[docs]</a>    <span class="k">def</span> <span class="nf">listBoxChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">listBox</span><span class="o">.</span><span class="n">currentIndex</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">applyButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="stylesTab.populateStyles"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.stylesTab.populateStyles">[docs]</a>    <span class="k">def</span> <span class="nf">populateStyles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">listBox</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">listItem</span> <span class="o">=</span> <span class="n">QListWidgetItem</span><span class="p">(</span><span class="s1">&#39;Default&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">listBox</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">listItem</span><span class="p">)</span>
+        <span class="n">listItem</span><span class="o">.</span><span class="n">ssPath</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">stylesPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">rootDir</span><span class="p">,</span> <span class="s1">&#39;Stylesheets&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">stylesPath</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+                <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s1">&#39;.stylesheet&#39;</span><span class="p">:</span>
+                    <span class="n">listItem</span> <span class="o">=</span> <span class="n">QListWidgetItem</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">listBox</span><span class="p">)</span>
+                    <span class="c1">#listItem = self.listBox.addItem(listItem)</span>
+                    <span class="n">listItem</span><span class="o">.</span><span class="n">ssPath</span> <span class="o">=</span> <span class="n">url</span></div>
+
+<div class="viewcode-block" id="stylesTab.applyPressed"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.stylesTab.applyPressed">[docs]</a>    <span class="k">def</span> <span class="nf">applyPressed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ssPath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">listBox</span><span class="o">.</span><span class="n">selectedItems</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ssPath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mM</span><span class="o">.</span><span class="n">Set_StyleSheet</span><span class="p">(</span><span class="n">ssPath</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="windowsTab"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.windowsTab">[docs]</a><span class="k">class</span> <span class="nc">windowsTab</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mM</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">mM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initWindow</span><span class="p">()</span>
+
+<div class="viewcode-block" id="windowsTab.initWindow"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.windowsTab.initWindow">[docs]</a>    <span class="k">def</span> <span class="nf">initWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">initLeftSide</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">leftSide</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="windowsTab.initLeftSide"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.windowsTab.initLeftSide">[docs]</a>    <span class="k">def</span> <span class="nf">initLeftSide</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leftSide</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leftSideLayout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leftSide</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">leftSideLayout</span><span class="p">)</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">newWindowButton</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;New Window&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newWindowButton</span><span class="o">.</span><span class="n">pressed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newWindowPressed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leftSideLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newWindowButton</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="windowsTab.newWindowPressed"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.windowsTab.newWindowPressed">[docs]</a>    <span class="k">def</span> <span class="nf">newWindowPressed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mM</span><span class="o">.</span><span class="n">Add_New_Window</span><span class="p">()</span></div></div>
+
+<div class="viewcode-block" id="modulesTab"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.modulesTab">[docs]</a><span class="k">class</span> <span class="nc">modulesTab</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">showFolders</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mM</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">mM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initWindow</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">populateWindow</span><span class="p">()</span>
+
+    <span class="c1">##### Initialize Window Layout #####</span>
+<div class="viewcode-block" id="modulesTab.initWindow"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.modulesTab.initWindow">[docs]</a>    <span class="k">def</span> <span class="nf">initWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#### Main Widget &amp; Layout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">initLeftSide</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">leftSide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initRightSide</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rightSide</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="modulesTab.initLeftSide"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.modulesTab.initLeftSide">[docs]</a>    <span class="k">def</span> <span class="nf">initLeftSide</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leftSide</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leftSideLayout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leftSide</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">leftSideLayout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">moduleIcon</span> <span class="o">=</span> <span class="n">QIcon</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">srcDir</span><span class="p">,</span> <span class="s1">&#39;icons/pie-chart.png&#39;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">moduleTree</span> <span class="o">=</span> <span class="n">moduleTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">)</span>
+
+        <span class="c1">#self.moduleTree.contextMenuEvent.connect(self.moduleContextMenu)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">leftSideLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moduleTree</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkboxWidget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkboxLayout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkboxWidget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">checkboxLayout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkBox</span> <span class="o">=</span> <span class="n">QCheckBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkBox</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">showFoldersChanged</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkboxLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Show Folders: &#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkboxLayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkboxLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">checkBox</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">leftSideLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">checkboxWidget</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="modulesTab.initRightSide"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.modulesTab.initRightSide">[docs]</a>    <span class="k">def</span> <span class="nf">initRightSide</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rightSide</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rightSideLayout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rightSide</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rightSideLayout</span><span class="p">)</span></div>
+
+    <span class="c1">##### Populate Window Contents #####</span>
+<div class="viewcode-block" id="modulesTab.populateWindow"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.modulesTab.populateWindow">[docs]</a>    <span class="k">def</span> <span class="nf">populateWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">populateModuleTree</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="modulesTab.showFoldersChanged"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.modulesTab.showFoldersChanged">[docs]</a>    <span class="k">def</span> <span class="nf">showFoldersChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">showFolders</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">showFolders</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">populateModuleTree</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="modulesTab.populateModuleTree"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.modulesTab.populateModuleTree">[docs]</a>    <span class="k">def</span> <span class="nf">populateModuleTree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moduleTree</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">rootNode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">moduleTree</span><span class="o">.</span><span class="n">invisibleRootItem</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mM</span><span class="o">.</span><span class="n">Get_Available_Modules</span><span class="p">():</span>
+            <span class="n">dirs</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">subDirectories</span>
+            <span class="k">if</span> <span class="n">dirs</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">showFolders</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">moduleItem</span> <span class="o">=</span> <span class="n">moduleTreeItem</span><span class="p">(</span><span class="n">rootNode</span><span class="p">,</span> <span class="p">[</span><span class="n">module</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;Module&#39;</span><span class="p">],</span> <span class="n">module</span><span class="p">)</span>
+                <span class="n">moduleItem</span><span class="o">.</span><span class="n">setIcon</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moduleIcon</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">curNode</span> <span class="o">=</span> <span class="n">rootNode</span>
+                <span class="k">for</span> <span class="n">dirsItem</span> <span class="ow">in</span> <span class="n">dirs</span><span class="p">:</span>
+                    <span class="n">curNode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findOrCreateChildNode</span><span class="p">(</span><span class="n">dirsItem</span><span class="p">,</span> <span class="n">curNode</span><span class="p">)</span>
+                <span class="n">moduleItem</span> <span class="o">=</span> <span class="n">moduleTreeItem</span><span class="p">(</span><span class="n">curNode</span><span class="p">,</span> <span class="p">[</span><span class="n">module</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;Module&#39;</span><span class="p">],</span> <span class="n">module</span><span class="p">)</span>
+                <span class="n">moduleItem</span><span class="o">.</span><span class="n">setIcon</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moduleIcon</span><span class="p">)</span></div>
+                    
+<div class="viewcode-block" id="modulesTab.findOrCreateChildNode"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.modulesTab.findOrCreateChildNode">[docs]</a>    <span class="k">def</span> <span class="nf">findOrCreateChildNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodeName</span><span class="p">,</span> <span class="n">parentNode</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">parentNode</span><span class="o">.</span><span class="n">childCount</span><span class="p">()):</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">parentNode</span><span class="o">.</span><span class="n">child</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">nodeName</span> <span class="ow">and</span> <span class="n">parentNode</span><span class="o">.</span><span class="n">child</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;Module&#39;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">parentNode</span><span class="o">.</span><span class="n">child</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        
+        <span class="c1"># If we can&#39;t find this node, create it!</span>
+        <span class="k">return</span> <span class="n">QTreeWidgetItem</span><span class="p">(</span><span class="n">parentNode</span><span class="p">,</span> <span class="p">[</span><span class="n">nodeName</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">])</span></div></div>
+
+<div class="viewcode-block" id="moduleTree"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.moduleTree">[docs]</a><span class="k">class</span> <span class="nc">moduleTree</span><span class="p">(</span><span class="n">QTreeWidget</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mM</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">mM</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setColumnCount</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setSortingEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setHeaderLabels</span><span class="p">([</span><span class="s1">&#39;Modules&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">()</span><span class="o">.</span><span class="n">hideSection</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<div class="viewcode-block" id="moduleTree.mousePressEvent"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.moduleTree.mousePressEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mousePressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mouseEvent</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">mousePressEvent</span><span class="p">(</span><span class="n">mouseEvent</span><span class="p">)</span>
+        <span class="n">itemPressed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itemAt</span><span class="p">(</span><span class="n">mouseEvent</span><span class="o">.</span><span class="n">pos</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">itemPressed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">itemPressed</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;Module&#39;</span><span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">mouseEvent</span><span class="o">.</span><span class="n">buttons</span><span class="p">()</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">RightButton</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">showModuleContextMenu</span><span class="p">(</span><span class="n">itemPressed</span><span class="p">,</span> <span class="n">mouseEvent</span><span class="o">.</span><span class="n">pos</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="moduleTree.showModuleContextMenu"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.moduleTree.showModuleContextMenu">[docs]</a>    <span class="k">def</span> <span class="nf">showModuleContextMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+        <span class="n">menu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">addMenu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="s1">&#39;Add Instance&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">menu</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="n">addMenu</span><span class="p">)</span>
+
+        <span class="n">windowActionList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mM</span><span class="o">.</span><span class="n">Get_Windows</span><span class="p">():</span>
+            <span class="n">windowActionList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">addMenu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">window</span><span class="o">.</span><span class="n">windowTitle</span><span class="p">()))</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">exec_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mapToGlobal</span><span class="p">(</span><span class="n">pos</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">windowActionList</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">windowActionList</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+            <span class="n">window</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mM</span><span class="o">.</span><span class="n">Get_Windows</span><span class="p">()[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">module</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mM</span><span class="o">.</span><span class="n">Add_Module_Instance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">window</span><span class="p">)</span></div></div>
+        <span class="c1">#if action == addAction:</span>
+        <span class="c1">#    print(&#39;Adding&#39;)</span>
+
+<div class="viewcode-block" id="moduleTreeItem"><a class="viewcode-back" href="../source/ModuleManager/moduleManagerWindow.html#moduleManagerWindow.moduleTreeItem">[docs]</a><span class="k">class</span> <span class="nc">moduleTreeItem</span><span class="p">(</span><span class="n">QTreeWidgetItem</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">texts</span><span class="p">,</span> <span class="n">module</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">texts</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span class="n">module</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../DataStation.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/DataStation.html">DataStation module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/HardwareManager/HardwareManager.html">HardwareManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/InstrumentManager/InstrumentManager.html">InstrumentManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/ModuleManager/ModuleManager.html">ModuleManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/WorkspaceManager/WorkspaceManager.html">WorkspaceManager module</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Matthew R. Brantley.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>

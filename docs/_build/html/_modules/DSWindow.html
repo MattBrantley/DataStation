@@ -1,0 +1,216 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>DSWindow &#8212; DataStation 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for DSWindow</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt5.Qt</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">json</span> <span class="k">as</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">src.Constants</span> <span class="k">import</span> <span class="n">moduleFlags</span> <span class="k">as</span> <span class="n">mfs</span>
+
+<div class="viewcode-block" id="DSWindow"><a class="viewcode-back" href="../source/ModuleManager/DSWindow.html#DSWindow.DSWindow">[docs]</a><span class="k">class</span> <span class="nc">DSWindow</span><span class="p">(</span><span class="n">QMainWindow</span><span class="p">):</span>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### EXTERNAL FUNCTIONS ####################################</span>
+    
+<div class="viewcode-block" id="DSWindow.Widget_Closing"><a class="viewcode-back" href="../source/ModuleManager/DSWindow.html#DSWindow.DSWindow.Widget_Closing">[docs]</a>    <span class="k">def</span> <span class="nf">Widget_Closing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">widget</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="DSWindow.Transfer_Module"><a class="viewcode-back" href="../source/ModuleManager/DSWindow.html#DSWindow.DSWindow.Transfer_Module">[docs]</a>    <span class="k">def</span> <span class="nf">Transfer_Module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">moduleHandler</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transferModule</span><span class="p">(</span><span class="n">moduleHandler</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DSWindow.Remove_Module"><a class="viewcode-back" href="../source/ModuleManager/DSWindow.html#DSWindow.DSWindow.Remove_Module">[docs]</a>    <span class="k">def</span> <span class="nf">Remove_Module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">moduleHandler</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">removeModule</span><span class="p">(</span><span class="n">moduleHandler</span><span class="p">)</span></div>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### INTERNAL USER ONLY ####################################</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">core</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moduleHandlers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">core</span> <span class="o">=</span> <span class="n">core</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mM</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">mM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AnimatedDocks</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setDockNestingEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initMenu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">1280</span><span class="p">,</span> <span class="mi">720</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1">##### DataStation Reserverd #####</span>
+<div class="viewcode-block" id="DSWindow.closeEvent"><a class="viewcode-back" href="../source/ModuleManager/DSWindow.html#DSWindow.DSWindow.closeEvent">[docs]</a>    <span class="k">def</span> <span class="nf">closeEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mM</span><span class="o">.</span><span class="n">isShutdown</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">menu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">()</span>
+
+            <span class="n">removeMenu</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;Remove Window From Workspace&#39;</span><span class="p">)</span>
+            <span class="n">removeMenu</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">removeWindow</span><span class="p">)</span>
+            <span class="n">shutDownMenu</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Shut Down DataStation&quot;</span><span class="p">)</span>
+            <span class="n">shutDownMenu</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">closeDataStation</span><span class="p">)</span>
+            <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">removeMenu</span><span class="p">)</span>
+            <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">shutDownMenu</span><span class="p">)</span>
+
+            <span class="n">action</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">exec_</span><span class="p">(</span><span class="n">QCursor</span><span class="p">()</span><span class="o">.</span><span class="n">pos</span><span class="p">())</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">action</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">event</span><span class="o">.</span><span class="n">ignore</span><span class="p">()</span>
+                <span class="k">return</span>
+
+        <span class="n">event</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span></div>
+        
+<div class="viewcode-block" id="DSWindow.removeWindow"><a class="viewcode-back" href="../source/ModuleManager/DSWindow.html#DSWindow.DSWindow.removeWindow">[docs]</a>    <span class="k">def</span> <span class="nf">removeWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mM</span><span class="o">.</span><span class="n">Close_Window</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="c1">#event.accept()</span>
+
+<div class="viewcode-block" id="DSWindow.closeDataStation"><a class="viewcode-back" href="../source/ModuleManager/DSWindow.html#DSWindow.DSWindow.closeDataStation">[docs]</a>    <span class="k">def</span> <span class="nf">closeDataStation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mM</span><span class="o">.</span><span class="n">Close_DataStation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="c1">#event.accept()</span>
+
+<span class="c1">##### Modules #####</span>
+<div class="viewcode-block" id="DSWindow.transferModule"><a class="viewcode-back" href="../source/ModuleManager/DSWindow.html#DSWindow.DSWindow.transferModule">[docs]</a>    <span class="k">def</span> <span class="nf">transferModule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">moduleHandler</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moduleHandlers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">moduleHandler</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addDockWidget</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">LeftDockWidgetArea</span><span class="p">,</span> <span class="n">moduleHandler</span><span class="o">.</span><span class="n">modInstance</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DSWindow.removeModule"><a class="viewcode-back" href="../source/ModuleManager/DSWindow.html#DSWindow.DSWindow.removeModule">[docs]</a>    <span class="k">def</span> <span class="nf">removeModule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">moduleHandler</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moduleHandlers</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">moduleHandler</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">removeDockWidget</span><span class="p">(</span><span class="n">moduleHandler</span><span class="o">.</span><span class="n">modInstance</span><span class="p">)</span></div>
+
+<span class="c1">##### Window State Info #####</span>
+<div class="viewcode-block" id="DSWindow.saveWindowState"><a class="viewcode-back" href="../source/ModuleManager/DSWindow.html#DSWindow.DSWindow.saveWindowState">[docs]</a>    <span class="k">def</span> <span class="nf">saveWindowState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">stateDict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">stateDict</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">saveState</span><span class="p">()</span><span class="o">.</span><span class="n">toHex</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+        <span class="n">stateDict</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">saveGeometry</span><span class="p">()</span><span class="o">.</span><span class="n">toHex</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+        <span class="n">stateDict</span><span class="p">[</span><span class="s1">&#39;modules&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializeModuleList</span><span class="p">()</span>
+        
+        <span class="k">return</span> <span class="n">stateDict</span></div>
+
+<div class="viewcode-block" id="DSWindow.loadWindowState"><a class="viewcode-back" href="../source/ModuleManager/DSWindow.html#DSWindow.DSWindow.loadWindowState">[docs]</a>    <span class="k">def</span> <span class="nf">loadWindowState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">tempGeometry</span> <span class="o">=</span> <span class="n">QByteArray</span><span class="o">.</span><span class="n">fromHex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]),</span> <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restoreGeometry</span><span class="p">(</span><span class="n">tempGeometry</span><span class="p">)</span>
+        <span class="n">tempState</span> <span class="o">=</span> <span class="n">QByteArray</span><span class="o">.</span><span class="n">fromHex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]),</span> <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="n">tempState</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DSWindow.serializeModuleList"><a class="viewcode-back" href="../source/ModuleManager/DSWindow.html#DSWindow.DSWindow.serializeModuleList">[docs]</a>    <span class="k">def</span> <span class="nf">serializeModuleList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">moduleSerialList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">moduleHandler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">moduleHandlers</span><span class="p">:</span>
+            <span class="n">modData</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;uuid&#39;</span><span class="p">:</span> <span class="n">moduleHandler</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="s1">&#39;filePath&#39;</span><span class="p">:</span> <span class="n">moduleHandler</span><span class="o">.</span><span class="n">modObject</span><span class="o">.</span><span class="n">filePath</span><span class="p">}</span>
+            <span class="n">moduleSerialList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">modData</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">moduleSerialList</span></div>
+
+<span class="c1">##### Window Configuration #####</span>
+<div class="viewcode-block" id="DSWindow.centerWindow"><a class="viewcode-back" href="../source/ModuleManager/DSWindow.html#DSWindow.DSWindow.centerWindow">[docs]</a>    <span class="k">def</span> <span class="nf">centerWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">frameGm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameGeometry</span><span class="p">()</span>
+        <span class="n">screen</span> <span class="o">=</span> <span class="n">QApplication</span><span class="o">.</span><span class="n">desktop</span><span class="p">()</span><span class="o">.</span><span class="n">screenNumber</span><span class="p">(</span><span class="n">QApplication</span><span class="o">.</span><span class="n">desktop</span><span class="p">()</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="o">.</span><span class="n">pos</span><span class="p">())</span>
+        <span class="n">centerPoint</span> <span class="o">=</span> <span class="n">QApplication</span><span class="o">.</span><span class="n">desktop</span><span class="p">()</span><span class="o">.</span><span class="n">screenGeometry</span><span class="p">(</span><span class="n">screen</span><span class="p">)</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
+        <span class="n">frameGm</span><span class="o">.</span><span class="n">moveCenter</span><span class="p">(</span><span class="n">centerPoint</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">frameGm</span><span class="o">.</span><span class="n">topLeft</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="DSWindow.initMenu"><a class="viewcode-back" href="../source/ModuleManager/DSWindow.html#DSWindow.DSWindow.initMenu">[docs]</a>    <span class="k">def</span> <span class="nf">initMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menuBar</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fileMenu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menubar</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="s1">&#39;&amp;File&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fileMenu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="c1">#self.fileMenu.addAction(self.exitAction)</span>
+
+        <span class="c1">#self.viewWindowsMenu = QMenu(&#39;Windows&#39;)</span>
+        <span class="c1">#self.viewWindowsMenu.aboutToShow.connect(self.populateViewWindowMenu)</span>
+
+        <span class="c1">#self.viewMenu = self.menubar.addMenu(&#39;&amp;View&#39;)</span>
+        <span class="c1">#self.viewMenu.addMenu(self.viewWindowsMenu)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">moduleManagerMenu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menubar</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mM</span><span class="o">.</span><span class="n">Get_Manager_Menu</span><span class="p">())</span></div></div>
+
+    <span class="c1">#def populateViewWindowMenu(self):</span>
+    <span class="c1">#    windows = self.findChildren(QDockWidget)</span>
+    <span class="c1">#    self.viewWindowsMenu.clear()</span>
+    <span class="c1">#    for window in windows:</span>
+    <span class="c1">#        if(hasattr(window, &#39;doNotAutoPopulate&#39;) is False):</span>
+    <span class="c1">#            action = QAction(str(window.windowTitle()), self)</span>
+    <span class="c1">#            action.setCheckable(True)</span>
+    <span class="c1">#            action.setChecked(window.isVisible())##</span>
+
+    <span class="c1">#            if(window.isVisible()):</span>
+    <span class="c1">#                action.triggered.connect(window.hide)</span>
+    <span class="c1">#            else:</span>
+    <span class="c1">#                action.triggered.connect(window.show)</span>
+
+    <span class="c1">#            self.viewWindowsMenu.addAction(action)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../DataStation.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/DataStation.html">DataStation module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/HardwareManager/HardwareManager.html">HardwareManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/InstrumentManager/InstrumentManager.html">InstrumentManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/ModuleManager/ModuleManager.html">ModuleManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/WorkspaceManager/WorkspaceManager.html">WorkspaceManager module</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Matthew R. Brantley.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,475 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Component &#8212; DataStation 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for Component</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt5.Qt</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtGui</span> <span class="k">import</span> <span class="n">QStandardItemModel</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">random</span><span class="o">,</span> <span class="nn">uuid</span><span class="o">,</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">src.Constants</span> <span class="k">import</span> <span class="n">DSConstants</span> <span class="k">as</span> <span class="n">DSConstants</span>
+<span class="kn">from</span> <span class="nn">src.Managers.InstrumentManager.Sockets</span> <span class="k">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="Component"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component">[docs]</a><span class="k">class</span> <span class="nc">Component</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="n">indexMe</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">componentType</span> <span class="o">=</span> <span class="s1">&#39;Default Component&#39;</span>
+    <span class="n">componentIdentifier</span> <span class="o">=</span> <span class="s1">&#39;DefComp&#39;</span>
+    <span class="n">componentVersion</span> <span class="o">=</span> <span class="s1">&#39;1.0&#39;</span>
+    <span class="n">componentCreator</span> <span class="o">=</span> <span class="s1">&#39;Matthew R. Brantley&#39;</span>
+    <span class="n">componentVersionDate</span> <span class="o">=</span> <span class="s1">&#39;7/13/2018&#39;</span>
+    <span class="n">iconGraphicSrc</span> <span class="o">=</span> <span class="s1">&#39;default.png&#39;</span> <span class="c1"># Not adjustable like layoutGraphicSrc is.</span>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### EXTERNAL FUNCTIONS ####################################</span>
+
+<div class="viewcode-block" id="Component.Get_Component_Type"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.Get_Component_Type">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Component_Type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">componentType</span></div>
+
+<div class="viewcode-block" id="Component.Get_Standard_Field"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.Get_Standard_Field">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Standard_Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compSettings</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compSettings</span><span class="p">[</span><span class="n">field</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Component.Get_Custom_Field"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.Get_Custom_Field">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Custom_Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compSettings</span><span class="p">[</span><span class="s1">&#39;customFields&#39;</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compSettings</span><span class="p">[</span><span class="s1">&#39;customFields&#39;</span><span class="p">][</span><span class="n">field</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Component.Set_Custom_Field"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.Set_Custom_Field">[docs]</a>    <span class="k">def</span> <span class="nf">Set_Custom_Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">changeCustomField</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Component.Set_Standard_Field"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.Set_Standard_Field">[docs]</a>    <span class="k">def</span> <span class="nf">Set_Standard_Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">changeStandardField</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Component.Set_Name"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.Set_Name">[docs]</a>    <span class="k">def</span> <span class="nf">Set_Name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">changeStandardField</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Component.Get_Name"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.Get_Name">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Get_Standard_Field</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Component.Remove_Component"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.Remove_Component">[docs]</a>    <span class="k">def</span> <span class="nf">Remove_Component</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instr</span><span class="o">.</span><span class="n">Remove_Component</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Component.Get_Sockets"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.Get_Sockets">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Sockets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">socketList</span></div>
+
+<div class="viewcode-block" id="Component.Get_Event_Types"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.Get_Event_Types">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Event_Types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eventTypeList</span></div>
+
+<div class="viewcode-block" id="Component.Add_Events"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.Add_Events">[docs]</a>    <span class="k">def</span> <span class="nf">Add_Events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addEvents</span><span class="p">(</span><span class="n">events</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Component.Clear_Events"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.Clear_Events">[docs]</a>    <span class="k">def</span> <span class="nf">Clear_Events</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Remove_Events</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Get_Events</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Component.Remove_Events"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.Remove_Events">[docs]</a>    <span class="k">def</span> <span class="nf">Remove_Events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">removeEvents</span><span class="p">(</span><span class="n">events</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Component.Combined_Add_Remove_Events"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.Combined_Add_Remove_Events">[docs]</a>    <span class="k">def</span> <span class="nf">Combined_Add_Remove_Events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addEvents</span><span class="p">,</span> <span class="n">removeEvents</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">combineAddRemoveEvents</span><span class="p">(</span><span class="n">addEvents</span><span class="p">,</span> <span class="n">removeEvents</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Component.Reset_Component"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.Reset_Component">[docs]</a>    <span class="k">def</span> <span class="nf">Reset_Component</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resetComponent</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Component.Get_Events"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.Get_Events">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Events</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eventList</span></div>
+
+<div class="viewcode-block" id="Component.Get_Instrument"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.Get_Instrument">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Instrument</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instr</span></div>
+
+<div class="viewcode-block" id="Component.Serialize_Events"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.Serialize_Events">[docs]</a>    <span class="k">def</span> <span class="nf">Serialize_Events</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveEventsPacket</span><span class="p">()</span></div>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### INTERNAL USER ONLY ####################################</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allowOverlappingEvents</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compSettings</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compSettings</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compSettings</span><span class="p">[</span><span class="s1">&#39;layoutGraphicSrc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iconGraphicSrc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compSettings</span><span class="p">[</span><span class="s1">&#39;triggerComp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compSettings</span><span class="p">[</span><span class="s1">&#39;customFields&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instr</span> <span class="o">=</span> <span class="kc">None</span>           <span class="c1">#Factory does not write this. It&#39;s in the very next line in Instrument though.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span>                <span class="c1">#Factory does not write this. It&#39;s in the very next line in Instrument though.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iM</span> <span class="o">=</span> <span class="kc">None</span>              <span class="c1">#Factory does not write this. It&#39;s in the very next line in Instrument though.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isTriggerComponent</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1">#self.name = kwargs.get(&#39;name&#39;, self.componentType)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socketList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pathDataPackets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pathDataPackets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequencerEditWidget</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eventTypeList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eventList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+<span class="c1">##### Datastation Reserved Functions #####</span>
+
+<div class="viewcode-block" id="Component.readyCheck"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.readyCheck">[docs]</a>    <span class="k">def</span> <span class="nf">readyCheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traceIn</span><span class="p">):</span>
+        <span class="n">trace</span> <span class="o">=</span> <span class="n">traceIn</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">trace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">socket</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">socketList</span><span class="p">:</span>
+            <span class="n">socket</span><span class="o">.</span><span class="n">readyCheck</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">eventList</span><span class="p">:</span>
+            <span class="n">event</span><span class="o">.</span><span class="n">readyCheck</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iM</span><span class="p">,</span> <span class="n">trace</span><span class="p">)</span></div>
+
+<span class="c1">##### Functions Called By Factoried Sockets #####</span>
+
+<div class="viewcode-block" id="Component.socketAttached"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.socketAttached">[docs]</a>    <span class="k">def</span> <span class="nf">socketAttached</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">onProgramParent</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instr</span><span class="o">.</span><span class="n">socketAttached</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Component.socketDetatched"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.socketDetatched">[docs]</a>    <span class="k">def</span> <span class="nf">socketDetatched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instr</span><span class="o">.</span><span class="n">socketDetatched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Component.measurementReceived"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.measurementReceived">[docs]</a>    <span class="k">def</span> <span class="nf">measurementReceived</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">,</span> <span class="n">measurementPacket</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instr</span><span class="o">.</span><span class="n">measurementRecieved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">,</span> <span class="n">measurementPacket</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Component.readyCheckInterrupt"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.readyCheckInterrupt">[docs]</a>    <span class="k">def</span> <span class="nf">readyCheckInterrupt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instr</span><span class="o">.</span><span class="n">componentReadyCheckInterrupt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span></div>
+
+<span class="c1">##### Functions Over-Ridden By Factoried Components #####</span>
+
+<div class="viewcode-block" id="Component.onCreationParent"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.onCreationParent">[docs]</a>    <span class="k">def</span> <span class="nf">onCreationParent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">onCreation</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Component.onCreation"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.onCreation">[docs]</a>    <span class="k">def</span> <span class="nf">onCreation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1">### OVERRIDE ME!! ####</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Component.onCreationFinishedParent"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.onCreationFinishedParent">[docs]</a>    <span class="k">def</span> <span class="nf">onCreationFinishedParent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#Walks through all appropriate objects and adds the update call.</span>
+        <span class="c1">#for widget in self.configWidget.findChildren(QLineEdit):</span>
+        <span class="c1">#    widget.textChanged.connect(self.updatePlot)</span>
+
+        <span class="c1">#for widget in self.configWidget.findChildren(QCheckBox):</span>
+        <span class="c1">#    widget.stateChanged.connect(self.updatePlot)</span>
+
+        <span class="c1">#for widget in self.configWidget.findChildren(QDoubleSpinBox):</span>
+        <span class="c1">#    widget.valueChanged.connect(self.updatePlot)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">onCreationFinished</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Component.onCreationFinished"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.onCreationFinished">[docs]</a>    <span class="k">def</span> <span class="nf">onCreationFinished</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1">### OVERRIDE ME!! ####</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Component.onRemovalParent"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.onRemovalParent">[docs]</a>    <span class="k">def</span> <span class="nf">onRemovalParent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Removing Instrument Component: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">componentType</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_MED</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">socket</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">socketList</span><span class="p">:</span>
+            <span class="n">socket</span><span class="o">.</span><span class="n">Detatch_Input</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">onRemoval</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Component.onRemoval"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.onRemoval">[docs]</a>    <span class="k">def</span> <span class="nf">onRemoval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1">### OVERRIDE ME!! ####</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Component.onProgramParent"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.onProgramParent">[docs]</a>    <span class="k">def</span> <span class="nf">onProgramParent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eventList</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">onProgram</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pushProgramming</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instr</span><span class="o">.</span><span class="n">programmingModified</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Component.onRun"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.onRun">[docs]</a>    <span class="k">def</span> <span class="nf">onRun</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1">### OVERRIDE ME!! ####</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;ERROR: User Component Does Not Override onRun()!&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Component.onStandardFieldChanged"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.onStandardFieldChanged">[docs]</a>    <span class="k">def</span> <span class="nf">onStandardFieldChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Component.onCustomFieldChanged"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.onCustomFieldChanged">[docs]</a>    <span class="k">def</span> <span class="nf">onCustomFieldChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<span class="c1">##### Component Programming #####</span>
+
+<div class="viewcode-block" id="Component.pushProgramming"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.pushProgramming">[docs]</a>    <span class="k">def</span> <span class="nf">pushProgramming</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">socket</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">socketList</span><span class="p">:</span>
+            <span class="n">socket</span><span class="o">.</span><span class="n">pushProgramming</span><span class="p">()</span></div>
+
+<span class="c1">##### Component Modifications #####</span>
+
+<div class="viewcode-block" id="Component.changeStandardField"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.changeStandardField">[docs]</a>    <span class="k">def</span> <span class="nf">changeStandardField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compSettings</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instr</span><span class="o">.</span><span class="n">componentStandardFieldChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">onStandardFieldChanged</span><span class="p">(</span><span class="n">field</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Component.changeCustomField"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.changeCustomField">[docs]</a>    <span class="k">def</span> <span class="nf">changeCustomField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compSettings</span><span class="p">[</span><span class="s1">&#39;customFields&#39;</span><span class="p">][</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instr</span><span class="o">.</span><span class="n">componentCustomFieldChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">onCustomFieldChanged</span><span class="p">(</span><span class="n">field</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Component.onSaveParent"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.onSaveParent">[docs]</a>    <span class="k">def</span> <span class="nf">onSaveParent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">savePacket</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">savePacket</span><span class="p">[</span><span class="s1">&#39;compSettings&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compSettings</span>
+        <span class="n">savePacket</span><span class="p">[</span><span class="s1">&#39;compType&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">componentType</span>
+        <span class="n">savePacket</span><span class="p">[</span><span class="s1">&#39;compIdentifier&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">componentIdentifier</span>
+        <span class="n">savePacket</span><span class="p">[</span><span class="s1">&#39;triggerComp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">isTriggerComponent</span>
+        <span class="n">savePacket</span><span class="p">[</span><span class="s1">&#39;sockets&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveSockets</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">savePacket</span></div>
+
+<div class="viewcode-block" id="Component.loadCompSettings"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.loadCompSettings">[docs]</a>    <span class="k">def</span> <span class="nf">loadCompSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compSettings</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">compSettings</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">compSettings</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Set_Standard_Field</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+                
+<div class="viewcode-block" id="Component.setPathDataPacket"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.setPathDataPacket">[docs]</a>    <span class="k">def</span> <span class="nf">setPathDataPacket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pathNo</span><span class="p">,</span> <span class="n">packet</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pathDataPackets</span><span class="p">[</span><span class="n">pathNo</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">packet</span></div>
+
+<div class="viewcode-block" id="Component.loadCustomFields"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.loadCustomFields">[docs]</a>    <span class="k">def</span> <span class="nf">loadCustomFields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">customFields</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">customFields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Set_Custom_Field</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span></div>
+
+<span class="c1">##### Event Type Modifications #####</span>
+
+<div class="viewcode-block" id="Component.addEventType"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.addEventType">[docs]</a>    <span class="k">def</span> <span class="nf">addEventType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventType</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eventTypeList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eventType</span><span class="p">)</span></div>
+
+<span class="c1">##### Event Modifications #####</span>
+
+<div class="viewcode-block" id="Component.getEventStartEnd"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.getEventStartEnd">[docs]</a>    <span class="k">def</span> <span class="nf">getEventStartEnd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span> <span class="c1">### UNCORRECTED FROM EVENTLISTWIDGET</span>
+        <span class="n">sequenceType</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eventTypes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">cellWidget</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()]</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">cellWidget</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">currentWidget</span><span class="p">()</span><span class="o">.</span><span class="n">paramList</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">sequenceType</span><span class="o">.</span><span class="n">getLength</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">cellWidget</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">length</span>
+        <span class="k">return</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span></div>
+
+<div class="viewcode-block" id="Component.checkEventOverlaps"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.checkEventOverlaps">[docs]</a>    <span class="k">def</span> <span class="nf">checkEventOverlaps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1">### UNCORRECTED FROM EVENTLISTWIDGET</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()):</span>
+            <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getEventStartEnd</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkIfTimeIsValid</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">result</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">cellWidget</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">setBackground</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">cellWidget</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="c1">#widget = self.table.verticalHeaderItem(row)</span>
+                <span class="c1">#widget.setBackground(QColor(255, 0, 0))</span>
+                <span class="c1">#self.table.setVerticalHeaderItem(row, widget)</span>
+                <span class="c1">#self.table.verticalHeaderItem(row).setBackground(QBrush(Qt.red))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">cellWidget</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">setBackground</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">white</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">cellWidget</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="c1">#self.table.verticalHeaderItem(row).setBackground(QBrush(Qt.white))</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">comp</span><span class="o">.</span><span class="n">updatePlot</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Component.checkIfTimeIsValid"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.checkIfTimeIsValid">[docs]</a>    <span class="k">def</span> <span class="nf">checkIfTimeIsValid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">startIn</span><span class="p">,</span> <span class="n">endIn</span><span class="p">):</span> <span class="c1">### UNCORRECTED FROM EVENTLISTWIDGET</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()):</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">row</span> <span class="o">!=</span> <span class="n">index</span><span class="p">):</span>
+                <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getEventStartEnd</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">start</span> <span class="o">&gt;</span> <span class="n">startIn</span> <span class="ow">and</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">endIn</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">end</span> <span class="o">&gt;</span> <span class="n">startIn</span> <span class="ow">and</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">endIn</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">startIn</span> <span class="o">&gt;</span> <span class="n">start</span> <span class="ow">and</span> <span class="n">startIn</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">endIn</span> <span class="o">&gt;</span> <span class="n">start</span> <span class="ow">and</span> <span class="n">endIn</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+    <span class="c1"># At the moment, addEvents and removeEvents both force a recalculation. For</span>
+    <span class="c1"># the sequencer widget, this means that a modify event (add and remove) will</span>
+    <span class="c1"># force two updates. It&#39;s a minor performance loss. This can be bypassed by</span>
+    <span class="c1"># calling combineAddRemoveEvents()</span>
+<div class="viewcode-block" id="Component.combineAddRemoveEvents"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.combineAddRemoveEvents">[docs]</a>    <span class="k">def</span> <span class="nf">combineAddRemoveEvents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addEvents</span><span class="p">,</span> <span class="n">removeEvents</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">addEvents</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eventList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">removeEvents</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eventList</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instr</span><span class="o">.</span><span class="n">eventsModified</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">onProgramParent</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Component.resetComponent"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.resetComponent">[docs]</a>    <span class="k">def</span> <span class="nf">resetComponent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">onProgramParent</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Component.addEvents"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.addEvents">[docs]</a>    <span class="k">def</span> <span class="nf">addEvents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,)):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">events</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">eventList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eventList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">instr</span><span class="o">.</span><span class="n">eventsModified</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">onProgramParent</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Component.removeEvents"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.removeEvents">[docs]</a>    <span class="k">def</span> <span class="nf">removeEvents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,)):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">events</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">eventList</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eventList</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">instr</span><span class="o">.</span><span class="n">eventsModified</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">onProgramParent</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Component.loadSequenceData"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.loadSequenceData">[docs]</a>    <span class="k">def</span> <span class="nf">loadSequenceData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventData</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Clear_Events</span><span class="p">()</span>
+        <span class="n">eventListIn</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">datum</span> <span class="ow">in</span> <span class="n">eventData</span><span class="p">:</span>
+            <span class="n">datumType</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getEventTypeByName</span><span class="p">(</span><span class="n">datum</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">datumType</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Sequence File had an unknown event type (&#39;</span> <span class="o">+</span> <span class="n">datum</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;) for component type (&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">componentType</span> <span class="o">+</span> <span class="s1">&#39;)... &#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">eventTemp</span> <span class="o">=</span> <span class="n">datumType</span><span class="p">()</span>
+            <span class="n">eventTemp</span><span class="o">.</span><span class="n">loadPacket</span><span class="p">(</span><span class="n">datum</span><span class="p">)</span>
+            <span class="n">eventListIn</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eventTemp</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">addEvents</span><span class="p">(</span><span class="n">eventListIn</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Component.saveEventsPacket"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.saveEventsPacket">[docs]</a>    <span class="k">def</span> <span class="nf">saveEventsPacket</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">savePacket</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">savePacket</span><span class="p">[</span><span class="s1">&#39;compID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">componentIdentifier</span>
+        <span class="n">savePacket</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">]</span>
+        <span class="n">savePacket</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compSettings</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="n">savePacket</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">componentType</span>
+        <span class="n">eventData</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">eventList</span><span class="p">:</span>
+            <span class="n">eventData</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">savePacket</span><span class="p">())</span>
+        <span class="n">savePacket</span><span class="p">[</span><span class="s1">&#39;events&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eventData</span>
+        <span class="k">return</span> <span class="n">savePacket</span></div>
+
+<div class="viewcode-block" id="Component.getEventTypeByName"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.getEventTypeByName">[docs]</a>    <span class="k">def</span> <span class="nf">getEventTypeByName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventData</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">eventType</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">eventTypeList</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">eventType</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">eventData</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]):</span>
+                <span class="k">return</span> <span class="n">eventType</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<span class="c1">##### Socket Interactions #####</span>
+
+<div class="viewcode-block" id="Component.reprogramSourceTargets"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.reprogramSourceTargets">[docs]</a>    <span class="k">def</span> <span class="nf">reprogramSourceTargets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">socket</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">socketList</span><span class="p">:</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">getSource</span><span class="p">()</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">source</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">source</span><span class="o">.</span><span class="n">reprogram</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Component.addAOSocket"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.addAOSocket">[docs]</a>    <span class="k">def</span> <span class="nf">addAOSocket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">socket</span> <span class="o">=</span> <span class="n">AOSocket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socketList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">socket</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instr</span><span class="o">.</span><span class="n">socketAdded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">socket</span></div>
+
+<div class="viewcode-block" id="Component.addAISocket"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.addAISocket">[docs]</a>    <span class="k">def</span> <span class="nf">addAISocket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">socket</span> <span class="o">=</span> <span class="n">AISocket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socketList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">socket</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instr</span><span class="o">.</span><span class="n">socketAdded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">socket</span></div>
+
+<div class="viewcode-block" id="Component.addDOSocket"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.addDOSocket">[docs]</a>    <span class="k">def</span> <span class="nf">addDOSocket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">socket</span> <span class="o">=</span> <span class="n">DOSocket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socketList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">socket</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instr</span><span class="o">.</span><span class="n">socketAdded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">socket</span></div>
+
+<div class="viewcode-block" id="Component.addDISocket"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.addDISocket">[docs]</a>    <span class="k">def</span> <span class="nf">addDISocket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">socket</span> <span class="o">=</span> <span class="n">DISocket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socketList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">socket</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instr</span><span class="o">.</span><span class="n">socketAdded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">socket</span></div>
+
+<div class="viewcode-block" id="Component.saveSockets"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.saveSockets">[docs]</a>    <span class="k">def</span> <span class="nf">saveSockets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sockets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">socket</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">socketList</span><span class="p">:</span>
+            <span class="n">sockets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">savePacket</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">sockets</span></div>
+
+<div class="viewcode-block" id="Component.loadSockets"><a class="viewcode-back" href="../source/InstrumentManager/Component.html#Component.Component.loadSockets">[docs]</a>    <span class="k">def</span> <span class="nf">loadSockets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sockets</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">isTriggerComponent</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">genTriggerSocket</span><span class="p">()</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">socket</span> <span class="ow">in</span> <span class="n">sockets</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">socketList</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">loadPacket</span><span class="p">(</span><span class="n">socket</span><span class="p">)</span></div></div>
+            
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../DataStation.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/DataStation.html">DataStation module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/HardwareManager/HardwareManager.html">HardwareManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/InstrumentManager/InstrumentManager.html">InstrumentManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/ModuleManager/ModuleManager.html">ModuleManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/WorkspaceManager/WorkspaceManager.html">WorkspaceManager module</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Matthew R. Brantley.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>

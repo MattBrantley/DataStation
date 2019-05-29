@@ -48,6 +48,14 @@
                     },
                     "time": 0.01,
                     "type": "Pulse"
+                },
+                {
+                    "params": {
+                        "Duration": 0.1231,
+                        "Voltage": -30.0
+                    },
+                    "time": 0.01,
+                    "type": "Pulse"
                 }
             ],
             "name": "Fil Trap Plate",

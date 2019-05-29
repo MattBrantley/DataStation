@@ -1,0 +1,556 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>HardwareDevice &#8212; DataStation 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for HardwareDevice</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt5.Qt</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">uuid</span><span class="o">,</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="k">import</span> <span class="n">Process</span><span class="p">,</span> <span class="n">Queue</span><span class="p">,</span> <span class="n">Pipe</span>
+<span class="kn">from</span> <span class="nn">src.Constants</span> <span class="k">import</span> <span class="n">DSConstants</span> <span class="k">as</span> <span class="n">DSConstants</span>
+<span class="kn">from</span> <span class="nn">src.Managers.HardwareManager.Sources</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">src.Managers.InstrumentManager.Sockets</span> <span class="k">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="HardwareDeviceHandler"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler">[docs]</a><span class="k">class</span> <span class="nc">HardwareDeviceHandler</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="n">scan</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">initialize</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">configure</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">program</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">softTrigger</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">shutdown</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">idleState</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">stopRun</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+
+    <span class="n">deviceChanged</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">triggerChanged</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">loadPacket</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### EXTERNAL FUNCTIONS ####################################</span>
+<div class="viewcode-block" id="HardwareDeviceHandler.Get_Standard_Field"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.Get_Standard_Field">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Standard_Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="n">field</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.Get_Name"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.Get_Name">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Get_Standard_Field</span><span class="p">(</span><span class="s1">&#39;deviceName&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.Get_Current_Trigger_Mode"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.Get_Current_Trigger_Mode">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Current_Trigger_Mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Get_Standard_Field</span><span class="p">(</span><span class="s1">&#39;triggerMode&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.Get_Available_Devices"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.Get_Available_Devices">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Available_Devices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviceList</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.Get_Trigger_Modes"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.Get_Trigger_Modes">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Trigger_Modes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">triggerModeList</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.Get_Sources"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.Get_Sources">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Sources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.Load_Device"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.Load_Device">[docs]</a>    <span class="k">def</span> <span class="nf">Load_Device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deviceName</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loadDevice</span><span class="p">(</span><span class="n">deviceName</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.Set_Trigger_Mode"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.Set_Trigger_Mode">[docs]</a>    <span class="k">def</span> <span class="nf">Set_Trigger_Mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">triggerModeName</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setTriggerMode</span><span class="p">(</span><span class="n">triggerModeName</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.Ready_Status"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.Ready_Status">[docs]</a>    <span class="k">def</span> <span class="nf">Ready_Status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareReadyStatus</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.Set_Ready_Status"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.Set_Ready_Status">[docs]</a>    <span class="k">def</span> <span class="nf">Set_Ready_Status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readyStatus</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.Set_Active_Instrument"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.Set_Active_Instrument">[docs]</a>    <span class="k">def</span> <span class="nf">Set_Active_Instrument</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setActiveInstrument</span><span class="p">(</span><span class="n">instrument</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.Get_Active_Instrument"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.Get_Active_Instrument">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Active_Instrument</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">activeInstrument</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.Push_Programming"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.Push_Programming">[docs]</a>    <span class="k">def</span> <span class="nf">Push_Programming</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pushProgramming</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.Disable_Programming_Lock"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.Disable_Programming_Lock">[docs]</a>    <span class="k">def</span> <span class="nf">Disable_Programming_Lock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progLock</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.Enable_Programming_Lock"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.Enable_Programming_Lock">[docs]</a>    <span class="k">def</span> <span class="nf">Enable_Programming_Lock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progLock</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### INTERNAL USER ONLY ####################################</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">deviceModel</span><span class="p">,</span> <span class="n">loadData</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceModel</span> <span class="o">=</span> <span class="n">deviceModel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loadData</span> <span class="o">=</span> <span class="n">loadData</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">programPackets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareReadyStatus</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">triggerModeList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceComponents</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progLock</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iM</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">iM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">hM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wM</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">wM</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">activeInstrument</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">DataStation_Closing</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shutdown</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.initDeviceThread"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.initDeviceThread">[docs]</a>    <span class="k">def</span> <span class="nf">initDeviceThread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deviceInformation</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviceModel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deviceInformation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviceList</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread</span> <span class="o">=</span> <span class="n">QThread</span><span class="p">()</span>
+
+        <span class="c1">##### Incoming Messages #####</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">scanned</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scanned</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">initialized</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initialized</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">configured</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configured</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">programmed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">programmed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">softTriggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">softTriggered</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">measurementPacket</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">measurementPacket</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">statusMessage</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statusMessage</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">readyStatus</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">readyStatus</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">sourceAdded</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceAdded</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">sourceRemoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceRemoved</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">triggerModeAdded</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">triggerModeAdded</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">deviceFound</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deviceFound</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">moveToThread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="p">)</span>
+
+        <span class="c1">##### Outgoing Messages #####</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">scan</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialize</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">initialize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">configure</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">program</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">program</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">softTrigger</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">softTrigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shutdown</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">shutdown</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idleState</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">idleState</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopRun</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">deviceChanged</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">triggerChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">triggerChanged</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loadPacket</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deviceThread</span><span class="o">.</span><span class="n">loadPacket</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">scan</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loadData</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loadPacket</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loadData</span><span class="p">)</span></div>
+
+<span class="c1">##################################### SIGNAL HANDLERS #####################################</span>
+<div class="viewcode-block" id="HardwareDeviceHandler.scanned"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.scanned">[docs]</a>    <span class="k">def</span> <span class="nf">scanned</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">hardwareScanned</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.initialized"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.initialized">[docs]</a>    <span class="k">def</span> <span class="nf">initialized</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">hardwareInitialized</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idleState</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.configured"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.configured">[docs]</a>    <span class="k">def</span> <span class="nf">configured</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">hardwareConfigured</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.programmed"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.programmed">[docs]</a>    <span class="k">def</span> <span class="nf">programmed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">hardwareProgrammed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.softTriggered"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.softTriggered">[docs]</a>    <span class="k">def</span> <span class="nf">softTriggered</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">hardwareSoftTriggered</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.sourceAdded"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.sourceAdded">[docs]</a>    <span class="k">def</span> <span class="nf">sourceAdded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+        <span class="c1">#source.registerHWare(self)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">sourceAdded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.sourceRemoved"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.sourceRemoved">[docs]</a>    <span class="k">def</span> <span class="nf">sourceRemoved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">sourceRemoved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.triggerModeAdded"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.triggerModeAdded">[docs]</a>    <span class="k">def</span> <span class="nf">triggerModeAdded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">triggerModeName</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">triggerModeList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">triggerModeName</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">triggerModeAdded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">triggerModeName</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.deviceFound"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.deviceFound">[docs]</a>    <span class="k">def</span> <span class="nf">deviceFound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deviceName</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">hardwareDeviceFound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deviceName</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.measurementPacket"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.measurementPacket">[docs]</a>    <span class="k">def</span> <span class="nf">measurementPacket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">measurementPacket</span><span class="p">):</span>
+        <span class="n">source</span><span class="o">.</span><span class="n">Push_Measurement_Packet</span><span class="p">(</span><span class="n">measurementPacket</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.statusMessage"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.statusMessage">[docs]</a>    <span class="k">def</span> <span class="nf">statusMessage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">hardwareStatusMessage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.readyStatus"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.readyStatus">[docs]</a>    <span class="k">def</span> <span class="nf">readyStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareReadyStatus</span> <span class="o">=</span> <span class="nb">bool</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">hardwareReadyStatusChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span></div>
+
+<span class="c1">##################################### INTERNAL FUNCS #####################################</span>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.setActiveInstrument"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.setActiveInstrument">[docs]</a>    <span class="k">def</span> <span class="nf">setActiveInstrument</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activeInstrument</span> <span class="o">=</span> <span class="n">instrument</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.pushProgramming"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.pushProgramming">[docs]</a>    <span class="k">def</span> <span class="nf">pushProgramming</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">program</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">programPackets</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.savePacket"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.savePacket">[docs]</a>    <span class="k">def</span> <span class="nf">savePacket</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">savePacket</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">savePacket</span><span class="p">[</span><span class="s1">&#39;hardwareIdentifier&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;hardwareIdentifier&#39;</span><span class="p">]</span>
+        <span class="n">savePacket</span><span class="p">[</span><span class="s1">&#39;hardwareSettings&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span>
+        <span class="n">sourceSavePackets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span><span class="p">:</span>
+            <span class="n">sourceSavePackets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">savePacket</span><span class="p">())</span>
+
+        <span class="n">savePacket</span><span class="p">[</span><span class="s1">&#39;sourceList&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sourceSavePackets</span>
+        <span class="k">return</span> <span class="n">savePacket</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.loadDevice"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.loadDevice">[docs]</a>    <span class="k">def</span> <span class="nf">loadDevice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deviceName</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selectedDevice</span> <span class="o">=</span> <span class="n">deviceName</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">deviceName</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">deviceSelectionRemoved</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">deviceName</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviceList</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">deviceSelectionChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deviceName</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;deviceName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">deviceName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">deviceName</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.setTriggerMode"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.setTriggerMode">[docs]</a>    <span class="k">def</span> <span class="nf">setTriggerMode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">triggerModeName</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">triggerMode</span> <span class="o">=</span> <span class="n">triggerModeName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;triggerMode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">triggerModeName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">triggerChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">triggerModeName</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Push_Programming</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.onRemove"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.onRemove">[docs]</a>    <span class="k">def</span> <span class="nf">onRemove</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span> <span class="c1"># safetly shut down the hardware device</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.onRun"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.onRun">[docs]</a>    <span class="k">def</span> <span class="nf">onRun</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">handlerSoftTriggerSent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">softTrigger</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.onStop"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.onStop">[docs]</a>    <span class="k">def</span> <span class="nf">onStop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">handlerStoppingInstrument</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopRun</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.readyCheck"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.readyCheck">[docs]</a>    <span class="k">def</span> <span class="nf">readyCheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traceIn</span><span class="p">):</span>
+        <span class="n">trace</span> <span class="o">=</span> <span class="n">traceIn</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">trace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareReadyStatus</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">trace</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Fail_Ready_Check</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="s1">&#39;Device Not Ready!&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Get_Active_Instrument</span><span class="p">()</span><span class="o">.</span><span class="n">Get_UUID</span><span class="p">()</span> <span class="o">!=</span> <span class="n">trace</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Get_UUID</span><span class="p">():</span>
+            <span class="n">trace</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Warning_Ready_Check</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="s1">&#39;Source/Device Is Currently Programmed For Another Instrument&#39;</span><span class="p">)</span></div>
+ 
+<div class="viewcode-block" id="HardwareDeviceHandler.programDataReceived"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.programDataReceived">[docs]</a>    <span class="k">def</span> <span class="nf">programDataReceived</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deferredProgramDataRecieved</span><span class="p">(</span><span class="n">source</span><span class="p">)</span></div>
+        <span class="c1">#self.pushProgramming()</span>
+
+<div class="viewcode-block" id="HardwareDeviceHandler.deferredProgramDataRecieved"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDeviceHandler.deferredProgramDataRecieved">[docs]</a>    <span class="k">def</span> <span class="nf">deferredProgramDataRecieved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hM</span><span class="o">.</span><span class="n">programmingModified</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">programPackets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">programmingPacket</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">source</span><span class="o">.</span><span class="n">isConnected</span><span class="p">()</span> <span class="ow">and</span> <span class="n">source</span><span class="o">.</span><span class="n">Get_Programming_Instrument</span><span class="p">()</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">Get_Active_Instrument</span><span class="p">()):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">programPackets</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="n">source</span><span class="p">,</span> <span class="s1">&#39;programmingPacket&#39;</span><span class="p">:</span> <span class="n">source</span><span class="o">.</span><span class="n">programmingPacket</span><span class="p">})</span></div></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="viewcode-block" id="HardwareDevice"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice">[docs]</a><span class="k">class</span> <span class="nc">HardwareDevice</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="n">hardwareType</span> <span class="o">=</span> <span class="s1">&#39;HardwareDevice&#39;</span>
+    <span class="n">hardwareIdentifier</span> <span class="o">=</span> <span class="s1">&#39;HD_Base&#39;</span>
+    <span class="n">hardwareVersion</span> <span class="o">=</span> <span class="s1">&#39;1.0&#39;</span>
+    <span class="n">hardwareCreator</span> <span class="o">=</span> <span class="s1">&#39;Matthew R. Brantley&#39;</span>
+    <span class="n">hardwareVersionDate</span> <span class="o">=</span> <span class="s1">&#39;8/20/2018&#39;</span>
+
+    <span class="n">scanned</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">initialized</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">configured</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">programmed</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">softTriggered</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+
+    <span class="n">measurementPacket</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="c1"># source, measurementPacket</span>
+    <span class="n">statusMessage</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">readyStatus</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">sourceAdded</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># source</span>
+    <span class="n">sourceRemoved</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># source</span>
+    <span class="n">triggerModeAdded</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="c1"># name</span>
+    <span class="n">deviceFound</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">###################################### OVERRIDE THESE ######################################</span>
+<div class="viewcode-block" id="HardwareDevice.scan"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.scan">[docs]</a>    <span class="k">def</span> <span class="nf">scan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.initialize"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.initialize">[docs]</a>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deviceName</span><span class="p">,</span> <span class="n">triggerMode</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.configure"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.configure">[docs]</a>    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.program"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.program">[docs]</a>    <span class="k">def</span> <span class="nf">program</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventList</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.softTrigger"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.softTrigger">[docs]</a>    <span class="k">def</span> <span class="nf">softTrigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.shutdown"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.shutdown">[docs]</a>    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.idle"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.idle">[docs]</a>    <span class="k">def</span> <span class="nf">idle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.stop"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Send_Status_Message</span><span class="p">(</span><span class="s1">&#39;Device does not have implemented stop() functionality.&#39;</span><span class="p">)</span></div>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### EXTERNAL FUNCTIONS ####################################</span>
+<div class="viewcode-block" id="HardwareDevice.Get_Standard_Field"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.Get_Standard_Field">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Standard_Field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="n">field</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.Send_Status_Message"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.Send_Status_Message">[docs]</a>    <span class="k">def</span> <span class="nf">Send_Status_Message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statusMessage</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.Add_Trigger_Mode"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.Add_Trigger_Mode">[docs]</a>    <span class="k">def</span> <span class="nf">Add_Trigger_Mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">triggerModeAdded</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.Get_Device_Name"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.Get_Device_Name">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Device_Name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Get_Standard_Field</span><span class="p">(</span><span class="s1">&#39;deviceName&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.Get_Trigger_Mode"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.Get_Trigger_Mode">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Trigger_Mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Get_Standard_Field</span><span class="p">(</span><span class="s1">&#39;triggerMode&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.Set_Triggered_State"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.Set_Triggered_State">[docs]</a>    <span class="k">def</span> <span class="nf">Set_Triggered_State</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">isTriggered</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">isTriggered</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.Is_Triggered"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.Is_Triggered">[docs]</a>    <span class="k">def</span> <span class="nf">Is_Triggered</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">isTriggered</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.Add_AISource"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.Add_AISource">[docs]</a>    <span class="k">def</span> <span class="nf">Add_AISource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">vMin</span><span class="p">,</span> <span class="n">vMax</span><span class="p">,</span> <span class="n">prec</span><span class="p">):</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">AISource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handler</span><span class="p">,</span> <span class="s1">&#39;[&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;deviceName&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;] &#39;</span><span class="o">+</span><span class="n">name</span><span class="p">,</span> <span class="n">vMin</span><span class="p">,</span> <span class="n">vMax</span><span class="p">,</span> <span class="n">prec</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addSource</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">source</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.Add_AOSource"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.Add_AOSource">[docs]</a>    <span class="k">def</span> <span class="nf">Add_AOSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">vMin</span><span class="p">,</span> <span class="n">vMax</span><span class="p">,</span> <span class="n">prec</span><span class="p">):</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">AOSource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handler</span><span class="p">,</span> <span class="s1">&#39;[&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;deviceName&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;] &#39;</span><span class="o">+</span><span class="n">name</span><span class="p">,</span> <span class="n">vMin</span><span class="p">,</span> <span class="n">vMax</span><span class="p">,</span> <span class="n">prec</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addSource</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">source</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.Add_DISource"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.Add_DISource">[docs]</a>    <span class="k">def</span> <span class="nf">Add_DISource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">DISource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handler</span><span class="p">,</span> <span class="s1">&#39;[&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;deviceName&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;] &#39;</span><span class="o">+</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addSource</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">source</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.Add_DOSource"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.Add_DOSource">[docs]</a>    <span class="k">def</span> <span class="nf">Add_DOSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">DOSource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handler</span><span class="p">,</span> <span class="s1">&#39;[&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;deviceName&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;] &#39;</span><span class="o">+</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addSource</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">source</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.Add_Digital_Trigger"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.Add_Digital_Trigger">[docs]</a>    <span class="k">def</span> <span class="nf">Add_Digital_Trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">DISource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handler</span><span class="p">,</span> <span class="s1">&#39;[&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;deviceName&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;] &#39;</span><span class="o">+</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">trigger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addSource</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">source</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.Add_Analog_Trigger"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.Add_Analog_Trigger">[docs]</a>    <span class="k">def</span> <span class="nf">Add_Analog_Trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">vMin</span><span class="p">,</span> <span class="n">vMax</span><span class="p">,</span> <span class="n">prec</span><span class="p">):</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">AISource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handler</span><span class="p">,</span> <span class="s1">&#39;[&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;deviceName&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;] &#39;</span><span class="o">+</span><span class="n">name</span><span class="p">,</span> <span class="n">vMin</span><span class="p">,</span> <span class="n">vMax</span><span class="p">,</span> <span class="n">prec</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">trigger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addSource</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">source</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.Add_Device"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.Add_Device">[docs]</a>    <span class="k">def</span> <span class="nf">Add_Device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deviceName</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addDevice</span><span class="p">(</span><span class="n">deviceName</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.Set_Ready_Status"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.Set_Ready_Status">[docs]</a>    <span class="k">def</span> <span class="nf">Set_Ready_Status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readyStatusCopy</span> <span class="o">=</span> <span class="n">status</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readyStatus</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">status</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.Ready_Status"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.Ready_Status">[docs]</a>    <span class="k">def</span> <span class="nf">Ready_Status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">readyStatusCopy</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.Push_Measurements_Packet"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.Push_Measurements_Packet">[docs]</a>    <span class="k">def</span> <span class="nf">Push_Measurements_Packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">measurementPacket</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurementPacket</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">measurementPacket</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.Get_Handler"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.Get_Handler">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Handler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">handler</span></div>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### INTERNAL USER ONLY ####################################</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler</span><span class="p">,</span> <span class="n">systemDeviceInfo</span><span class="p">,</span> <span class="n">hardwareSettings</span><span class="p">,</span> <span class="n">deviceList</span><span class="p">,</span> <span class="n">sourceList</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">handler</span> <span class="o">=</span> <span class="n">handler</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">systemDeviceInfo</span> <span class="o">=</span> <span class="n">systemDeviceInfo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span> <span class="o">=</span> <span class="n">hardwareSettings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;physID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;triggerCompUUID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;triggerMode&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;hardwareType&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareType</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;deviceName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;hardwareIdentifier&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareIdentifier</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceList</span> <span class="o">=</span> <span class="n">deviceList</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span> <span class="o">=</span> <span class="n">sourceList</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runThread</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readyStatusCopy</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isTriggered</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loadPacketData</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="HardwareDevice.idleState"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.idleState">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">idleState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idle</span><span class="p">()</span>
+        <span class="n">QTimer</span><span class="p">()</span><span class="o">.</span><span class="n">singleShot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">idleState</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.deviceChanged"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.deviceChanged">[docs]</a>    <span class="k">def</span> <span class="nf">deviceChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deviceName</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;deviceName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">deviceName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">deviceName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Get_Trigger_Mode</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.triggerChanged"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.triggerChanged">[docs]</a>    <span class="k">def</span> <span class="nf">triggerChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">triggerModeName</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loadPacket</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loadPacketData</span><span class="p">,</span> <span class="n">triggerModeChange</span><span class="o">=</span><span class="n">triggerModeName</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">socket</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">Get_Sockets</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">socket</span><span class="o">.</span><span class="n">Get_Component</span><span class="p">()</span><span class="o">.</span><span class="n">Get_Instrument</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">Get_Handler</span><span class="p">()</span><span class="o">.</span><span class="n">Get_Active_Instrument</span><span class="p">():</span>
+                    <span class="n">socket</span><span class="o">.</span><span class="n">Push_Programming</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.addSource"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.addSource">[docs]</a>    <span class="k">def</span> <span class="nf">addSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+        <span class="n">source</span><span class="o">.</span><span class="n">registerHWare</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handler</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceAdded</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">source</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.addDevice"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.addDevice">[docs]</a>    <span class="k">def</span> <span class="nf">addDevice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deviceName</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">deviceName</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceFound</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">deviceName</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.loadPacket"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.loadPacket">[docs]</a>    <span class="k">def</span> <span class="nf">loadPacket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loadPacket</span><span class="p">,</span> <span class="n">triggerModeChange</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loadPacketData</span> <span class="o">=</span> <span class="n">loadPacket</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">loadPacket</span><span class="p">[</span><span class="s1">&#39;hardwareSettings&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+        <span class="k">if</span> <span class="n">triggerModeChange</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;triggerMode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">triggerModeChange</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clearSources</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;deviceName&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;triggerMode&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="s1">&#39;sourceList&#39;</span> <span class="ow">in</span> <span class="n">loadPacket</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loadSourceData</span><span class="p">(</span><span class="n">loadPacket</span><span class="p">[</span><span class="s1">&#39;sourceList&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.clearSources"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.clearSources">[docs]</a>    <span class="k">def</span> <span class="nf">clearSources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sourceRemoved</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.loadSourceData"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.loadSourceData">[docs]</a>    <span class="k">def</span> <span class="nf">loadSourceData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sourceData</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">sourceData</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">loadPacket</span> <span class="ow">in</span> <span class="n">sourceData</span><span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span><span class="s1">&#39;physConID&#39;</span> <span class="ow">in</span> <span class="n">loadPacket</span><span class="p">):</span>                                  <span class="c1"># This has to happen AFTER sources are generated</span>
+                    <span class="n">source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getSourceByPhysConID</span><span class="p">(</span><span class="n">loadPacket</span><span class="p">[</span><span class="s1">&#39;physConID&#39;</span><span class="p">])</span> <span class="c1"># Source generation is dynamic, only load a source if it&#39;s physConID matches!</span>
+                    <span class="k">if</span><span class="p">(</span><span class="n">source</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                        <span class="n">source</span><span class="o">.</span><span class="n">loadPacket</span><span class="p">(</span><span class="n">loadPacket</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareDevice.getSourceByPhysConID"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareDevice.HardwareDevice.getSourceByPhysConID">[docs]</a>    <span class="k">def</span> <span class="nf">getSourceByPhysConID</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">physConID</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceList</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;physConID&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">physConID</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">source</span>
+        <span class="k">return</span> <span class="kc">None</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../DataStation.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/DataStation.html">DataStation module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/HardwareManager/HardwareManager.html">HardwareManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/InstrumentManager/InstrumentManager.html">InstrumentManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/ModuleManager/ModuleManager.html">ModuleManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/WorkspaceManager/WorkspaceManager.html">WorkspaceManager module</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Matthew R. Brantley.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>

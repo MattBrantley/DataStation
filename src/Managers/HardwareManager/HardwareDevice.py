@@ -434,8 +434,9 @@ class HardwareDevice(QObject):
 
     def loadPacket(self, loadPacket, triggerModeChange=None):
         self.loadPacketData = loadPacket
-        for key, val in loadPacket['hardwareSettings'].items():
-            self.hardwareSettings[key] = val
+        if loadPacket is not None:
+            for key, val in loadPacket['hardwareSettings'].items():
+                self.hardwareSettings[key] = val
 
         if triggerModeChange is not None:
             self.hardwareSettings['triggerMode'] = triggerModeChange
@@ -443,8 +444,9 @@ class HardwareDevice(QObject):
         self.clearSources()
         self.initialize(self.hardwareSettings['deviceName'], self.hardwareSettings['triggerMode'])
 
-        if('sourceList' in loadPacket):
-            self.loadSourceData(loadPacket['sourceList'])
+        if loadPacket is not None:
+            if('sourceList' in loadPacket):
+                self.loadSourceData(loadPacket['sourceList'])
 
     def clearSources(self):
         for source in self.sourceList:

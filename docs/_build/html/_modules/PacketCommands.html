@@ -1,0 +1,209 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>PacketCommands &#8212; DataStation 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for PacketCommands</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="commandPacket"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#PacketCommands.commandPacket">[docs]</a><span class="k">class</span> <span class="nc">commandPacket</span><span class="p">():</span>
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### EXTERNAL FUNCTIONS ####################################</span>
+<div class="viewcode-block" id="commandPacket.Add_Command"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#PacketCommands.commandPacket.Add_Command">[docs]</a>    <span class="k">def</span> <span class="nf">Add_Command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">commandList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">command</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="commandPacket.Remove_Command"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#PacketCommands.commandPacket.Remove_Command">[docs]</a>    <span class="k">def</span> <span class="nf">Remove_Command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">commandList</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">command</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="commandPacket.Set_Origin_Socket"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#PacketCommands.commandPacket.Set_Origin_Socket">[docs]</a>    <span class="k">def</span> <span class="nf">Set_Origin_Socket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">originSocket</span> <span class="o">=</span> <span class="n">socket</span></div>
+
+<div class="viewcode-block" id="commandPacket.Get_Origin_Socket"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#PacketCommands.commandPacket.Get_Origin_Socket">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Origin_Socket</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">originSocket</span></div>
+
+<div class="viewcode-block" id="commandPacket.Get_Commands"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#PacketCommands.commandPacket.Get_Commands">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Commands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commandType</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCommands</span><span class="p">(</span><span class="n">commandType</span><span class="p">)</span></div>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### INTERNAL USER ONLY ####################################</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">commandList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">originSocket</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="commandPacket.getCommands"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#PacketCommands.commandPacket.getCommands">[docs]</a>    <span class="k">def</span> <span class="nf">getCommands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commandType</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">outList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">commandList</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">commandType</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">if</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">commandType</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">command</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="k">continue</span>
+
+            <span class="n">outList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">outList</span></div></div>
+
+<div class="viewcode-block" id="Command"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#PacketCommands.Command">[docs]</a><span class="k">class</span> <span class="nc">Command</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<span class="c1">##### Digital Commands #####</span>
+
+<div class="viewcode-block" id="DigitalWaveformCommand"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#PacketCommands.DigitalWaveformCommand">[docs]</a><span class="k">class</span> <span class="nc">DigitalWaveformCommand</span><span class="p">(</span><span class="n">Command</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="n">yData</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rate</span> <span class="o">=</span> <span class="n">rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yData</span> <span class="o">=</span> <span class="n">yData</span></div>
+
+<div class="viewcode-block" id="DigitalSparseCommand"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#PacketCommands.DigitalSparseCommand">[docs]</a><span class="k">class</span> <span class="nc">DigitalSparseCommand</span><span class="p">(</span><span class="n">Command</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pairs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pairs</span> <span class="o">=</span> <span class="n">pairs</span></div>
+
+<div class="viewcode-block" id="DigitalAcquisitionCommand"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#PacketCommands.DigitalAcquisitionCommand">[docs]</a><span class="k">class</span> <span class="nc">DigitalAcquisitionCommand</span><span class="p">(</span><span class="n">Command</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="n">noSamples</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rate</span> <span class="o">=</span> <span class="n">rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noSamples</span> <span class="o">=</span> <span class="n">noSamples</span></div>
+
+<span class="c1">##### Analog Commands #####</span>
+
+<div class="viewcode-block" id="AnalogWaveformCommand"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#PacketCommands.AnalogWaveformCommand">[docs]</a><span class="k">class</span> <span class="nc">AnalogWaveformCommand</span><span class="p">(</span><span class="n">Command</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">wave</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t0</span> <span class="o">=</span> <span class="n">t0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">f</span> <span class="c1"># is in units of Hertz (Hz)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wave</span> <span class="o">=</span> <span class="n">wave</span> <span class="c1"># is in units of voltage (V)</span>
+
+<div class="viewcode-block" id="AnalogWaveformCommand.toPairs"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#PacketCommands.AnalogWaveformCommand.toPairs">[docs]</a>    <span class="k">def</span> <span class="nf">toPairs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">len</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wave</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">t0</span> <span class="o">+</span> <span class="nb">len</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wave</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">res</span></div></div>
+
+<div class="viewcode-block" id="AnalogSparseCommand"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#PacketCommands.AnalogSparseCommand">[docs]</a><span class="k">class</span> <span class="nc">AnalogSparseCommand</span><span class="p">(</span><span class="n">Command</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pairs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pairs</span> <span class="o">=</span> <span class="n">pairs</span> <span class="c1"># numpy array: column 1 = time (second), column 2 = voltage (V)</span></div>
+
+<div class="viewcode-block" id="AnalogAcquisitionCommand"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#PacketCommands.AnalogAcquisitionCommand">[docs]</a><span class="k">class</span> <span class="nc">AnalogAcquisitionCommand</span><span class="p">(</span><span class="n">Command</span><span class="p">):</span>
+    <span class="n">ACQ_TRIG_EXTERNAL</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">ACQ_TRIG_THRESHOLD</span> <span class="o">=</span> <span class="mi">51</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="n">noSamples</span><span class="p">,</span> <span class="n">acqMax</span><span class="p">,</span> <span class="n">acqMin</span><span class="p">,</span> <span class="n">trig</span><span class="o">=</span><span class="n">ACQ_TRIG_EXTERNAL</span><span class="p">,</span> <span class="n">trigThreshold</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">preTrigSamples</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rate</span> <span class="o">=</span> <span class="n">rate</span> <span class="c1"># rate in units of Hertz (Hz)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noSamples</span> <span class="o">=</span> <span class="n">noSamples</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acqMax</span> <span class="o">=</span> <span class="n">acqMax</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acqMin</span> <span class="o">=</span> <span class="n">acqMin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trig</span> <span class="o">=</span> <span class="n">trig</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trigThreshold</span> <span class="o">=</span> <span class="n">trigThreshold</span> <span class="c1"># only used if trig=ACQ_TRIG_THRESHOLD, units in Voltage (V)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preTrigSamples</span> <span class="o">=</span> <span class="n">preTrigSamples</span> <span class="c1"># the number of samples retained before the trigger event. </span></div>
+
+<span class="c1">##### Waveform Generator Commands #####</span>
+
+<div class="viewcode-block" id="WaveformCommand"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#PacketCommands.WaveformCommand">[docs]</a><span class="k">class</span> <span class="nc">WaveformCommand</span><span class="p">(</span><span class="n">Command</span><span class="p">):</span>
+    <span class="n">WFM_SINE</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">WFM_COSINE</span> <span class="o">=</span> <span class="mi">101</span>
+    <span class="n">WFM_SQUARE</span> <span class="o">=</span> <span class="mi">102</span>
+    <span class="n">WFM_SAWTOOTH</span> <span class="o">=</span> <span class="mi">103</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">waveformType</span><span class="o">=</span><span class="n">WFM_SINE</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">freq</span> <span class="o">=</span> <span class="n">freq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span> <span class="o">=</span> <span class="n">amplitude</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">waveformType</span> <span class="o">=</span> <span class="n">waveformType</span></div>
+
+<span class="c1">##### Arbitrary Command #####</span>
+<span class="c1"># These commands should be used only when absolutely necessary as this breaks some of modularity paradigms in DataStation</span>
+<span class="c1"># Additional command types can/will be added to address unforseen usecases.</span>
+<span class="c1"># If you must use an arbitrary command, you need to register the arbitrary command in both the source as well as the hardware_object</span>
+<span class="c1"># for them to work correctly.</span>
+
+<div class="viewcode-block" id="ArbitraryCommand"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#PacketCommands.ArbitraryCommand">[docs]</a><span class="k">class</span> <span class="nc">ArbitraryCommand</span><span class="p">(</span><span class="n">Command</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commandType</span><span class="p">,</span> <span class="n">commandData</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">commandType</span> <span class="o">=</span> <span class="n">commandType</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">commandData</span> <span class="o">=</span> <span class="n">commandData</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../DataStation.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/DataStation.html">DataStation module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/HardwareManager/HardwareManager.html">HardwareManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/InstrumentManager/InstrumentManager.html">InstrumentManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/ModuleManager/ModuleManager.html">ModuleManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/WorkspaceManager/WorkspaceManager.html">WorkspaceManager module</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Matthew R. Brantley.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>

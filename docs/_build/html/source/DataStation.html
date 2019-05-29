@@ -14,7 +14,9 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="HardwareManager module" href="HardwareManager/HardwareManager.html" />
+    <link rel="prev" title="Welcome to DataStation’s documentation!" href="../DataStation.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -25,6 +27,12 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="HardwareManager/HardwareManager.html" title="HardwareManager module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../DataStation.html" title="Welcome to DataStation’s documentation!"
+             accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li> 
       </ul>
     </div>  
@@ -34,9 +42,12 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-DataStation">
-<span id="datastation-module"></span><h1>DataStation module<a class="headerlink" href="#module-DataStation" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+  <div class="section" id="datastation-module">
+<span id="api-widgets"></span><h1>DataStation module<a class="headerlink" href="#datastation-module" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="datastation-core">
+<h2>DataStation Core<a class="headerlink" href="#datastation-core" title="Permalink to this headline">¶</a></h2>
+<p>Entry point for DataStation.</p>
+<span class="target" id="module-DataStation"></span><dl class="class">
 <dt id="DataStation.DataStation_Core">
 <em class="property">class </em><code class="descclassname">DataStation.</code><code class="descname">DataStation_Core</code><span class="sig-paren">(</span><em>app</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/DataStation.html#DataStation_Core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DataStation.DataStation_Core" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QMainWindow</span></code></p>
@@ -119,6 +130,231 @@
 <dd></dd></dl>
 
 </div>
+<div class="section" id="module-Constants">
+<span id="constants"></span><h2>Constants<a class="headerlink" href="#module-Constants" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="Constants.DSConstants">
+<em class="property">class </em><code class="descclassname">Constants.</code><code class="descname">DSConstants</code><a class="reference internal" href="../_modules/Constants.html#DSConstants"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Constants.DSConstants" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="Constants.DSConstants.FILTER_OBJ_FILTER">
+<code class="descname">FILTER_OBJ_FILTER</code><em class="property"> = 101</em><a class="headerlink" href="#Constants.DSConstants.FILTER_OBJ_FILTER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.FILTER_OBJ_PLUG">
+<code class="descname">FILTER_OBJ_PLUG</code><em class="property"> = 102</em><a class="headerlink" href="#Constants.DSConstants.FILTER_OBJ_PLUG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.FILTER_OBJ_SOURCE">
+<code class="descname">FILTER_OBJ_SOURCE</code><em class="property"> = 100</em><a class="headerlink" href="#Constants.DSConstants.FILTER_OBJ_SOURCE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.LOG_PRIORITY_DEBUG">
+<code class="descname">LOG_PRIORITY_DEBUG</code><em class="property"> = 1</em><a class="headerlink" href="#Constants.DSConstants.LOG_PRIORITY_DEBUG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.LOG_PRIORITY_HIGH">
+<code class="descname">LOG_PRIORITY_HIGH</code><em class="property"> = 2</em><a class="headerlink" href="#Constants.DSConstants.LOG_PRIORITY_HIGH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.LOG_PRIORITY_LOW">
+<code class="descname">LOG_PRIORITY_LOW</code><em class="property"> = 4</em><a class="headerlink" href="#Constants.DSConstants.LOG_PRIORITY_LOW" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.LOG_PRIORITY_MED">
+<code class="descname">LOG_PRIORITY_MED</code><em class="property"> = 3</em><a class="headerlink" href="#Constants.DSConstants.LOG_PRIORITY_MED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.MW_STATE_NO_WORKSPACE">
+<code class="descname">MW_STATE_NO_WORKSPACE</code><em class="property"> = 0</em><a class="headerlink" href="#Constants.DSConstants.MW_STATE_NO_WORKSPACE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.MW_STATE_WORKSPACE_LOADED">
+<code class="descname">MW_STATE_WORKSPACE_LOADED</code><em class="property"> = 1</em><a class="headerlink" href="#Constants.DSConstants.MW_STATE_WORKSPACE_LOADED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.READY_CHECK_ERROR">
+<code class="descname">READY_CHECK_ERROR</code><em class="property"> = 2</em><a class="headerlink" href="#Constants.DSConstants.READY_CHECK_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.READY_CHECK_READY">
+<code class="descname">READY_CHECK_READY</code><em class="property"> = 0</em><a class="headerlink" href="#Constants.DSConstants.READY_CHECK_READY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.READY_CHECK_WARNING">
+<code class="descname">READY_CHECK_WARNING</code><em class="property"> = 1</em><a class="headerlink" href="#Constants.DSConstants.READY_CHECK_WARNING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.STATUS_CANNOT_RUN">
+<code class="descname">STATUS_CANNOT_RUN</code><em class="property"> = 301</em><a class="headerlink" href="#Constants.DSConstants.STATUS_CANNOT_RUN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.STATUS_CAN_RUN">
+<code class="descname">STATUS_CAN_RUN</code><em class="property"> = 300</em><a class="headerlink" href="#Constants.DSConstants.STATUS_CAN_RUN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.STATUS_CONFIGURING">
+<code class="descname">STATUS_CONFIGURING</code><em class="property"> = 202</em><a class="headerlink" href="#Constants.DSConstants.STATUS_CONFIGURING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.STATUS_ERROR">
+<code class="descname">STATUS_ERROR</code><em class="property"> = 210</em><a class="headerlink" href="#Constants.DSConstants.STATUS_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.STATUS_NOT_PROGRAMMED">
+<code class="descname">STATUS_NOT_PROGRAMMED</code><em class="property"> = 209</em><a class="headerlink" href="#Constants.DSConstants.STATUS_NOT_PROGRAMMED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.STATUS_NOT_READY">
+<code class="descname">STATUS_NOT_READY</code><em class="property"> = 200</em><a class="headerlink" href="#Constants.DSConstants.STATUS_NOT_READY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.STATUS_OTHER">
+<code class="descname">STATUS_OTHER</code><em class="property"> = 211</em><a class="headerlink" href="#Constants.DSConstants.STATUS_OTHER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.STATUS_PROCESSING">
+<code class="descname">STATUS_PROCESSING</code><em class="property"> = 204</em><a class="headerlink" href="#Constants.DSConstants.STATUS_PROCESSING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.STATUS_READY">
+<code class="descname">STATUS_READY</code><em class="property"> = 201</em><a class="headerlink" href="#Constants.DSConstants.STATUS_READY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.STATUS_READY_CHECKING">
+<code class="descname">STATUS_READY_CHECKING</code><em class="property"> = 207</em><a class="headerlink" href="#Constants.DSConstants.STATUS_READY_CHECKING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.STATUS_RUNNING">
+<code class="descname">STATUS_RUNNING</code><em class="property"> = 203</em><a class="headerlink" href="#Constants.DSConstants.STATUS_RUNNING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.STATUS_UNKNOWN">
+<code class="descname">STATUS_UNKNOWN</code><em class="property"> = 205</em><a class="headerlink" href="#Constants.DSConstants.STATUS_UNKNOWN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.STATUS_WAITING">
+<code class="descname">STATUS_WAITING</code><em class="property"> = 206</em><a class="headerlink" href="#Constants.DSConstants.STATUS_WAITING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.DSConstants.STATUS_WARNING">
+<code class="descname">STATUS_WARNING</code><em class="property"> = 208</em><a class="headerlink" href="#Constants.DSConstants.STATUS_WARNING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Constants.DSConstants.getLogText">
+<code class="descname">getLogText</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Constants.html#DSConstants.getLogText"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Constants.DSConstants.getLogText" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Constants.DSConstants.initEnglishLogText">
+<code class="descname">initEnglishLogText</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Constants.html#DSConstants.initEnglishLogText"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Constants.DSConstants.initEnglishLogText" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Constants.DSLogTexts">
+<em class="property">class </em><code class="descclassname">Constants.</code><code class="descname">DSLogTexts</code><span class="sig-paren">(</span><em>language</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Constants.html#DSLogTexts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Constants.DSLogTexts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="Constants.logObject">
+<em class="property">class </em><code class="descclassname">Constants.</code><code class="descname">logObject</code><span class="sig-paren">(</span><em>source</em>, <em>text</em>, <em>warningLevel</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Constants.html#logObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Constants.logObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="Constants.logObject.timeText">
+<code class="descname">timeText</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Constants.html#logObject.timeText"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Constants.logObject.timeText" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Constants.moduleFlags">
+<em class="property">class </em><code class="descclassname">Constants.</code><code class="descname">moduleFlags</code><a class="reference internal" href="../_modules/Constants.html#moduleFlags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Constants.moduleFlags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="Constants.moduleFlags.CAN_DELETE">
+<code class="descname">CAN_DELETE</code><em class="property"> = 201</em><a class="headerlink" href="#Constants.moduleFlags.CAN_DELETE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.moduleFlags.CAN_FLOAT">
+<code class="descname">CAN_FLOAT</code><em class="property"> = 210</em><a class="headerlink" href="#Constants.moduleFlags.CAN_FLOAT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.moduleFlags.CAN_HIDE">
+<code class="descname">CAN_HIDE</code><em class="property"> = 200</em><a class="headerlink" href="#Constants.moduleFlags.CAN_HIDE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.moduleFlags.DEFAULT_MODULE">
+<code class="descname">DEFAULT_MODULE</code><em class="property"> = 301</em><a class="headerlink" href="#Constants.moduleFlags.DEFAULT_MODULE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.moduleFlags.LATE_CLOSE">
+<code class="descname">LATE_CLOSE</code><em class="property"> = 400</em><a class="headerlink" href="#Constants.moduleFlags.LATE_CLOSE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Constants.moduleFlags.SINGLE_INSTANCE">
+<code class="descname">SINGLE_INSTANCE</code><em class="property"> = 300</em><a class="headerlink" href="#Constants.moduleFlags.SINGLE_INSTANCE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Constants.readyCheckMsg">
+<em class="property">class </em><code class="descclassname">Constants.</code><code class="descname">readyCheckMsg</code><span class="sig-paren">(</span><em>msg</em>, <em>status</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Constants.html#readyCheckMsg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Constants.readyCheckMsg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="Constants.readyCheckPacket">
+<em class="property">class </em><code class="descclassname">Constants.</code><code class="descname">readyCheckPacket</code><span class="sig-paren">(</span><em>name</em>, <em>readyStatus</em>, <em>subs=None</em>, <em>msg=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Constants.html#readyCheckPacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Constants.readyCheckPacket" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="Constants.readyCheckPacket.areSubsReady">
+<code class="descname">areSubsReady</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Constants.html#readyCheckPacket.areSubsReady"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Constants.readyCheckPacket.areSubsReady" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Constants.readyCheckPacket.generateMessages">
+<code class="descname">generateMessages</code><span class="sig-paren">(</span><em>indent</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Constants.html#readyCheckPacket.generateMessages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Constants.readyCheckPacket.generateMessages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
 
 
           </div>
@@ -126,6 +362,20 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+<h3><a href="../DataStation.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">DataStation module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#datastation-core">DataStation Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-Constants">Constants</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="HardwareManager/HardwareManager.html">HardwareManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="InstrumentManager/InstrumentManager.html">InstrumentManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ModuleManager/ModuleManager.html">ModuleManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorkspaceManager/WorkspaceManager.html">WorkspaceManager module</a></li>
+</ul>
+
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -158,6 +408,12 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="HardwareManager/HardwareManager.html" title="HardwareManager module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../DataStation.html" title="Welcome to DataStation’s documentation!"
+             >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li> 
       </ul>
     </div>

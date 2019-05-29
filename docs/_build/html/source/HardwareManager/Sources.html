@@ -1,0 +1,322 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Sources module &#8212; DataStation 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-Sources">
+<span id="sources-module"></span><h1>Sources module<a class="headerlink" href="#module-Sources" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="Sources.AISource">
+<em class="property">class </em><code class="descclassname">Sources.</code><code class="descname">AISource</code><span class="sig-paren">(</span><em>handler</em>, <em>name</em>, <em>vMin</em>, <em>vMax</em>, <em>prec</em>, <em>physConID</em>, <em>trigger=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#AISource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.AISource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#Sources.Source" title="Sources.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sources.Source</span></code></a></p>
+<dl class="method">
+<dt id="Sources.AISource.commandInSourceRange">
+<code class="descname">commandInSourceRange</code><span class="sig-paren">(</span><em>cmd</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#AISource.commandInSourceRange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.AISource.commandInSourceRange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.AISource.parsePacket">
+<code class="descname">parsePacket</code><span class="sig-paren">(</span><em>packetIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#AISource.parsePacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.AISource.parsePacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.AISource.readyCheck">
+<code class="descname">readyCheck</code><span class="sig-paren">(</span><em>traceIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#AISource.readyCheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.AISource.readyCheck" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Sources.AOSource">
+<em class="property">class </em><code class="descclassname">Sources.</code><code class="descname">AOSource</code><span class="sig-paren">(</span><em>handler</em>, <em>name</em>, <em>vMin</em>, <em>vMax</em>, <em>prec</em>, <em>physConID</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#AOSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.AOSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#Sources.Source" title="Sources.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sources.Source</span></code></a></p>
+<dl class="method">
+<dt id="Sources.AOSource.commandInSourceRange">
+<code class="descname">commandInSourceRange</code><span class="sig-paren">(</span><em>cmd</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#AOSource.commandInSourceRange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.AOSource.commandInSourceRange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.AOSource.parsePacket">
+<code class="descname">parsePacket</code><span class="sig-paren">(</span><em>packetIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#AOSource.parsePacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.AOSource.parsePacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.AOSource.readyCheck">
+<code class="descname">readyCheck</code><span class="sig-paren">(</span><em>traceIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#AOSource.readyCheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.AOSource.readyCheck" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Sources.DISource">
+<em class="property">class </em><code class="descclassname">Sources.</code><code class="descname">DISource</code><span class="sig-paren">(</span><em>handler</em>, <em>name</em>, <em>physConID</em>, <em>trigger=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#DISource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.DISource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#Sources.Source" title="Sources.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sources.Source</span></code></a></p>
+<dl class="method">
+<dt id="Sources.DISource.commandInSourceRange">
+<code class="descname">commandInSourceRange</code><span class="sig-paren">(</span><em>cmd</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#DISource.commandInSourceRange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.DISource.commandInSourceRange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.DISource.parsePacket">
+<code class="descname">parsePacket</code><span class="sig-paren">(</span><em>packetIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#DISource.parsePacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.DISource.parsePacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.DISource.readyCheck">
+<code class="descname">readyCheck</code><span class="sig-paren">(</span><em>traceIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#DISource.readyCheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.DISource.readyCheck" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Sources.DOSource">
+<em class="property">class </em><code class="descclassname">Sources.</code><code class="descname">DOSource</code><span class="sig-paren">(</span><em>handler</em>, <em>name</em>, <em>physConID</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#DOSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.DOSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#Sources.Source" title="Sources.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sources.Source</span></code></a></p>
+<dl class="method">
+<dt id="Sources.DOSource.commandInSourceRange">
+<code class="descname">commandInSourceRange</code><span class="sig-paren">(</span><em>cmd</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#DOSource.commandInSourceRange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.DOSource.commandInSourceRange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.DOSource.parsePacket">
+<code class="descname">parsePacket</code><span class="sig-paren">(</span><em>packetIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#DOSource.parsePacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.DOSource.parsePacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.DOSource.readyCheck">
+<code class="descname">readyCheck</code><span class="sig-paren">(</span><em>traceIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#DOSource.readyCheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.DOSource.readyCheck" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Sources.Source">
+<em class="property">class </em><code class="descclassname">Sources.</code><code class="descname">Source</code><span class="sig-paren">(</span><em>handler</em>, <em>name</em>, <em>physConID</em>, <em>trigger=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="Sources.Source.Get_Connector_ID">
+<code class="descname">Get_Connector_ID</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Get_Connector_ID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Get_Connector_ID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Get_Handler">
+<code class="descname">Get_Handler</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Get_Handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Get_Handler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Get_Hardware_Device">
+<code class="descname">Get_Hardware_Device</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Get_Hardware_Device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Get_Hardware_Device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Get_Name">
+<code class="descname">Get_Name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Get_Name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Get_Name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Get_Number_Of_Paths">
+<code class="descname">Get_Number_Of_Paths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Get_Number_Of_Paths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Get_Number_Of_Paths" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Get_Programming_Instrument">
+<code class="descname">Get_Programming_Instrument</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Get_Programming_Instrument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Get_Programming_Instrument" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Get_Sockets">
+<code class="descname">Get_Sockets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Get_Sockets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Get_Sockets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Get_Source">
+<code class="descname">Get_Source</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Get_Source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Get_Source" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Get_UUID">
+<code class="descname">Get_UUID</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Get_UUID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Get_UUID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Is_Registered">
+<code class="descname">Is_Registered</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Is_Registered"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Is_Registered" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.Push_Measurement_Packet">
+<code class="descname">Push_Measurement_Packet</code><span class="sig-paren">(</span><em>measurementPacket</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.Push_Measurement_Packet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.Push_Measurement_Packet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.attachPathOther">
+<code class="descname">attachPathOther</code><span class="sig-paren">(</span><em>uuid</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.attachPathOther"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.attachPathOther" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.attachPathSelf">
+<code class="descname">attachPathSelf</code><span class="sig-paren">(</span><em>pathNo</em>, <em>uuid</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.attachPathSelf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.attachPathSelf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.detatchPathOther">
+<code class="descname">detatchPathOther</code><span class="sig-paren">(</span><em>uuid</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.detatchPathOther"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.detatchPathOther" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.getProgrammingInstrument">
+<code class="descname">getProgrammingInstrument</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.getProgrammingInstrument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.getProgrammingInstrument" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.getProgrammingPacket">
+<code class="descname">getProgrammingPacket</code><span class="sig-paren">(</span><em>programmingPacket</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.getProgrammingPacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.getProgrammingPacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.getSockets">
+<code class="descname">getSockets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.getSockets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.getSockets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.getUUID">
+<code class="descname">getUUID</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.getUUID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.getUUID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.isConnected">
+<code class="descname">isConnected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.isConnected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.isConnected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.loadPacket">
+<code class="descname">loadPacket</code><span class="sig-paren">(</span><em>loadPacket</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.loadPacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.loadPacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.parsePacket">
+<code class="descname">parsePacket</code><span class="sig-paren">(</span><em>packetIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.parsePacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.parsePacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.procReverseParent">
+<code class="descname">procReverseParent</code><span class="sig-paren">(</span><em>packetIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.procReverseParent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.procReverseParent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.program">
+<code class="descname">program</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.program"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.program" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.pushMeasurementPacket">
+<code class="descname">pushMeasurementPacket</code><span class="sig-paren">(</span><em>measurementPacket</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.pushMeasurementPacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.pushMeasurementPacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.readyCheck">
+<code class="descname">readyCheck</code><span class="sig-paren">(</span><em>traceIn</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.readyCheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.readyCheck" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.registerHWare">
+<code class="descname">registerHWare</code><span class="sig-paren">(</span><em>hWare</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.registerHWare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.registerHWare" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Sources.Source.savePacket">
+<code class="descname">savePacket</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/Sources.html#Source.savePacket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Sources.Source.savePacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../DataStation.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../DataStation.html">DataStation module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HardwareManager.html">HardwareManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../InstrumentManager/InstrumentManager.html">InstrumentManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ModuleManager/ModuleManager.html">ModuleManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../WorkspaceManager/WorkspaceManager.html">WorkspaceManager module</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/source/HardwareManager/Sources.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Matthew R. Brantley.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>

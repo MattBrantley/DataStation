@@ -1,0 +1,584 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>HardwareManager &#8212; DataStation 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for HardwareManager</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">imp</span>
+<span class="kn">from</span> <span class="nn">src.Managers.InstrumentManager.Instrument</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">src.Managers.InstrumentManager.Sockets</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">src.Managers.InstrumentManager.Digital_Trigger_Component</span> <span class="k">import</span> <span class="n">Digital_Trigger_Component</span>
+<span class="kn">from</span> <span class="nn">src.Managers.HardwareManager.HardwareDevice</span> <span class="k">import</span> <span class="n">HardwareDeviceHandler</span><span class="p">,</span> <span class="n">HardwareDevice</span>
+<span class="kn">from</span> <span class="nn">src.Managers.HardwareManager.Sources</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">src.Managers.HardwareManager.Filter</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">src.Managers.HardwareManager.DataStation_Labview</span> <span class="k">import</span> <span class="n">DataStation_LabviewExtension</span>
+<span class="kn">from</span> <span class="nn">src.Constants</span> <span class="k">import</span> <span class="n">DSConstants</span> <span class="k">as</span> <span class="n">DSConstants</span><span class="p">,</span> <span class="n">readyCheckPacket</span>
+<span class="kn">import</span> <span class="nn">json</span> <span class="k">as</span> <span class="nn">json</span>
+
+<div class="viewcode-block" id="HardwareManager"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager">[docs]</a><span class="k">class</span> <span class="nc">HardwareManager</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">##################################### EXTERNAL SIGNALS #####################################</span>
+
+<span class="c1">##### Signals: Hardware State #####</span>
+    <span class="n">Hardware_State_Loaded</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">Hardware_State_Saving</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+
+<span class="c1">##### Signals: Hardware #####</span>
+    <span class="n">Hardware_Handler_Soft_Trigger_Sent</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># hardware</span>
+    <span class="n">Hardware_Handler_Stopping_Instrument</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># hardware</span>
+
+    <span class="n">Hardware_Scanned</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># hardware</span>
+    <span class="n">Hardware_Initialized</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># hardware</span>
+    <span class="n">Hardware_Configured</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># hardware</span>
+    <span class="n">Hardware_Programmed</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># hardware</span>
+    <span class="n">Hardware_Soft_Triggered</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># hardware</span>
+
+    <span class="n">Hardware_Status_Message</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="c1"># hardware, message</span>
+    <span class="n">Hardware_Ready_Status_Changed</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="c1"># hardware, readyStatus</span>
+
+    <span class="n">Hardware_Added</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># hardware</span>
+    <span class="n">Hardware_Removed</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">Hardware_Trigger_Modified</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">Hardware_Programming_Modified</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="c1"># hardware, source</span>
+    <span class="n">Hardware_Device_Reset</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># hardware</span>
+    <span class="n">Hardware_Device_Changed</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="c1"># hardware, device name</span>
+    <span class="n">Hardware_Device_Removed</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># hardware</span>
+    <span class="n">Hardware_Device_Found</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="c1"># hardware, device name</span>
+
+    <span class="n">Hardware_Device_Trigger_Mode_Added</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="c1"># hardware, trigger name</span>
+
+<span class="c1">##### Signals: Sequence #####</span>
+    <span class="n">Sequence_Started</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">Sequence_Finished</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+
+<span class="c1">##### Signals: Sources #####</span>
+    <span class="n">Source_Added</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="c1"># hardware, source</span>
+    <span class="n">Source_Removed</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="c1"># hardware, source</span>
+
+<span class="c1">##### Signals: Filters #####</span>
+    <span class="n">Filter_Added</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Filter</span>
+    <span class="n">Filter_Attached</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Filter</span>
+    <span class="n">Filter_Detatched</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Filter</span>
+    <span class="n">Filter_Removed</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="c1"># Filter</span>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### EXTERNAL FUNCTIONS ####################################</span>
+
+<span class="c1">##### Functions: Instrument Manager #####</span>
+<div class="viewcode-block" id="HardwareManager.Do_Ready_Check"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.Do_Ready_Check">[docs]</a>    <span class="k">def</span> <span class="nf">Do_Ready_Check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">readyCheck</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="HardwareManager.Ready_Check_Status"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.Ready_Check_Status">[docs]</a>    <span class="k">def</span> <span class="nf">Ready_Check_Status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">readyStatus</span></div>
+
+<div class="viewcode-block" id="HardwareManager.Fail_Ready_Check"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.Fail_Ready_Check">[docs]</a>    <span class="k">def</span> <span class="nf">Fail_Ready_Check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">trace</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Instrument</span><span class="p">)):</span>
+            <span class="n">trace</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Fail_Ready_Check</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span></div>
+
+<span class="c1">##### Functions: Hardware Models #####</span>
+
+<div class="viewcode-block" id="HardwareManager.Get_Hardware_Models_Available"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.Get_Hardware_Models_Available">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Hardware_Models_Available</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">driversAvailable</span></div>
+
+<span class="c1">##### Functions: Filter Models #####</span>
+
+<div class="viewcode-block" id="HardwareManager.Get_Filter_Models_Available"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.Get_Filter_Models_Available">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Filter_Models_Available</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filtersAvailable</span></div>
+
+<span class="c1">##### Functions: Hardware #####</span>
+<div class="viewcode-block" id="HardwareManager.Get_Hardware"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.Get_Hardware">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviceHandlerList</span></div>
+
+<div class="viewcode-block" id="HardwareManager.Add_Hardware"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.Add_Hardware">[docs]</a>    <span class="k">def</span> <span class="nf">Add_Hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hardwareModel</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">addHardwareObj</span><span class="p">(</span><span class="n">hardwareModel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.Remove_Hardware"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.Remove_Hardware">[docs]</a>    <span class="k">def</span> <span class="nf">Remove_Hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hardwareObject</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">removeHardwareObj</span><span class="p">(</span><span class="n">hardwareObject</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.Add_Filter"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.Add_Filter">[docs]</a>    <span class="k">def</span> <span class="nf">Add_Filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filterModel</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">addFilter</span><span class="p">(</span><span class="n">filterModel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.Get_Filters"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.Get_Filters">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Filters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">inputUUID</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">pathNo</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">filterType</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFilters</span><span class="p">(</span><span class="n">uuid</span><span class="p">,</span> <span class="n">inputUUID</span><span class="p">,</span> <span class="n">pathNo</span><span class="p">,</span> <span class="n">filterType</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.Get_Sources"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.Get_Sources">[docs]</a>    <span class="k">def</span> <span class="nf">Get_Sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">sourceType</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getSources</span><span class="p">(</span><span class="n">uuid</span><span class="p">,</span> <span class="n">sourceType</span><span class="p">)</span></div>
+
+<span class="c1">############################################################################################</span>
+<span class="c1">#################################### INTERNAL USER ONLY ####################################</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readyStatus</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filtersDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">rootDir</span><span class="p">,</span> <span class="s1">&#39;Filters&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareDriverDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">rootDir</span><span class="p">,</span> <span class="s1">&#39;Hardware Drivers&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hardwareStatePath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">rootDir</span><span class="p">,</span> <span class="s1">&#39;HardwareState.json&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">filtersAvailable</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">driversAvailable</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceHandlerList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceObjList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filterList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loadFilters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loadHardwareDrivers</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loadLabviewInterface</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">DataStation_Loaded</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loadHardwareState</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">DataStation_Closing</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">saveHardwareState</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HardwareManager.connections"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.connections">[docs]</a>    <span class="k">def</span> <span class="nf">connections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">iM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">wM</span></div>
+
+<span class="c1">##### DataStation Reserved Functions #####</span>
+
+<div class="viewcode-block" id="HardwareManager.readyCheck"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.readyCheck">[docs]</a>    <span class="k">def</span> <span class="nf">readyCheck</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">subs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readyStatus</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">deviceHandler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviceHandlerList</span><span class="p">:</span>
+            <span class="n">check</span> <span class="o">=</span> <span class="n">deviceHandler</span><span class="o">.</span><span class="n">readyCheck</span><span class="p">()</span>
+            <span class="n">subs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">check</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">check</span><span class="o">.</span><span class="n">readyStatus</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">readyStatus</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="n">readyCheckPacket</span><span class="p">(</span><span class="s1">&#39;Hardware Manager&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">READY_CHECK_READY</span><span class="p">,</span> <span class="n">subs</span><span class="o">=</span><span class="n">subs</span><span class="p">)</span></div>
+
+<span class="c1">##### Functions Called By Factoried Hardware Device Handlers #####</span>
+<div class="viewcode-block" id="HardwareManager.handlerSoftTriggerSent"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.handlerSoftTriggerSent">[docs]</a>    <span class="k">def</span> <span class="nf">handlerSoftTriggerSent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hWare</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hardware_Handler_Soft_Trigger_Sent</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">hWare</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.handlerStoppingInstrument"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.handlerStoppingInstrument">[docs]</a>    <span class="k">def</span> <span class="nf">handlerStoppingInstrument</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hWare</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hardware_Handler_Stopping_Instrument</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">hWare</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.hardwareScanned"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.hardwareScanned">[docs]</a>    <span class="k">def</span> <span class="nf">hardwareScanned</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hWare</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hardware_Scanned</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">hWare</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.hardwareInitialized"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.hardwareInitialized">[docs]</a>    <span class="k">def</span> <span class="nf">hardwareInitialized</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hWare</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hardware_Initialized</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">hWare</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.hardwareConfigured"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.hardwareConfigured">[docs]</a>    <span class="k">def</span> <span class="nf">hardwareConfigured</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hWare</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hardware_Configured</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">hWare</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.hardwareProgrammed"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.hardwareProgrammed">[docs]</a>    <span class="k">def</span> <span class="nf">hardwareProgrammed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hWare</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hardware_Programmed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">hWare</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.hardwareSoftTriggered"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.hardwareSoftTriggered">[docs]</a>    <span class="k">def</span> <span class="nf">hardwareSoftTriggered</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hWare</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hardware_Soft_Triggered</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">hWare</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.hardwareDeviceFound"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.hardwareDeviceFound">[docs]</a>    <span class="k">def</span> <span class="nf">hardwareDeviceFound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hWare</span><span class="p">,</span> <span class="n">deviceName</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hardware_Device_Found</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">hWare</span><span class="p">,</span> <span class="n">deviceName</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.hardwareStatusMessage"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.hardwareStatusMessage">[docs]</a>    <span class="k">def</span> <span class="nf">hardwareStatusMessage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hWare</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hardware_Status_Message</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">hWare</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.hardwareReadyStatusChanged"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.hardwareReadyStatusChanged">[docs]</a>    <span class="k">def</span> <span class="nf">hardwareReadyStatusChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hWare</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hardware_Ready_Status_Changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">hWare</span><span class="p">,</span> <span class="n">status</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.programmingModified"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.programmingModified">[docs]</a>    <span class="k">def</span> <span class="nf">programmingModified</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hWare</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hardware_Programming_Modified</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">hWare</span><span class="p">,</span><span class="n">source</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.deviceReset"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.deviceReset">[docs]</a>    <span class="k">def</span> <span class="nf">deviceReset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hWare</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hardware_Device_Reset</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">hWare</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.triggerModified"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.triggerModified">[docs]</a>    <span class="k">def</span> <span class="nf">triggerModified</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hWare</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="HardwareManager.sourceAdded"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.sourceAdded">[docs]</a>    <span class="k">def</span> <span class="nf">sourceAdded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hardwareObj</span><span class="p">,</span> <span class="n">sourceObj</span><span class="p">):</span> <span class="c1"># Source_Added</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Source_Added</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">hardwareObj</span><span class="p">,</span> <span class="n">sourceObj</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.triggerModeAdded"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.triggerModeAdded">[docs]</a>    <span class="k">def</span> <span class="nf">triggerModeAdded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hardwareObj</span><span class="p">,</span> <span class="n">triggerModeName</span><span class="p">):</span> <span class="c1">#Trigger_Mode_Name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hardware_Device_Trigger_Mode_Added</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">hardwareObj</span><span class="p">,</span> <span class="n">triggerModeName</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.sourceRemoved"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.sourceRemoved">[docs]</a>    <span class="k">def</span> <span class="nf">sourceRemoved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hardwareObj</span><span class="p">,</span> <span class="n">sourceObj</span><span class="p">):</span> <span class="c1"># Source_Removed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Source_Removed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">hardwareObj</span><span class="p">,</span> <span class="n">sourceObj</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.deviceSelectionChanged"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.deviceSelectionChanged">[docs]</a>    <span class="k">def</span> <span class="nf">deviceSelectionChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hardwareObj</span><span class="p">,</span> <span class="n">deviceName</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hardware_Device_Changed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">hardwareObj</span><span class="p">,</span> <span class="n">deviceName</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.deviceSelectionRemoved"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.deviceSelectionRemoved">[docs]</a>    <span class="k">def</span> <span class="nf">deviceSelectionRemoved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hardwareObj</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hardware_Device_Removed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">hardwareObj</span><span class="p">)</span></div>
+
+<span class="c1">##### Functions Called By Factoried Filter Objects #####</span>
+
+<div class="viewcode-block" id="HardwareManager.removeFilter"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.removeFilter">[docs]</a>    <span class="k">def</span> <span class="nf">removeFilter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Filter</span><span class="p">):</span> <span class="c1"># Filter_Removed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Filter_Removed</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">Filter</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filterList</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">Filter</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.filterAttached"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.filterAttached">[docs]</a>    <span class="k">def</span> <span class="nf">filterAttached</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Filter</span><span class="p">):</span> <span class="c1"># Filter_Attached</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Filter_Attached</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">Filter</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.filterDetatched"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.filterDetatched">[docs]</a>    <span class="k">def</span> <span class="nf">filterDetatched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Filter</span><span class="p">):</span> <span class="c1"># Filter_Detatched</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Filter_Detatched</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">Filter</span><span class="p">)</span></div>
+
+<span class="c1">##### Search Function ######</span>
+            
+<div class="viewcode-block" id="HardwareManager.getFilters"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.getFilters">[docs]</a>    <span class="k">def</span> <span class="nf">getFilters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">inputUUID</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">pathNo</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">filterType</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">outList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">Filter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterList</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">Filter</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">uuid</span> <span class="ow">and</span> <span class="n">uuid</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">Filter</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSource&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">inputUUID</span> <span class="ow">and</span> <span class="n">inputUUID</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">Filter</span><span class="o">.</span><span class="n">filterSettings</span><span class="p">[</span><span class="s1">&#39;inputSourcePathNo&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">pathNo</span> <span class="ow">and</span> <span class="n">pathNo</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">filterType</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">if</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">filterType</span><span class="p">,</span> <span class="n">Filter</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span> <span class="c1">#AnalogFilter or DigitalFilter</span>
+                    <span class="k">continue</span>
+            <span class="n">outList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Filter</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">outList</span></div>
+
+<div class="viewcode-block" id="HardwareManager.getSources"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.getSources">[docs]</a>    <span class="k">def</span> <span class="nf">getSources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">sourceType</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">outList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getSourceObjs</span><span class="p">():</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">sourceSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">uuid</span> <span class="ow">and</span> <span class="n">uuid</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">sourceType</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">if</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">sourceType</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="k">continue</span>
+            <span class="n">outList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">outList</span></div>
+
+<div class="viewcode-block" id="HardwareManager.getTrigCompsRefUUID"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.getTrigCompsRefUUID">[docs]</a>    <span class="k">def</span> <span class="nf">getTrigCompsRefUUID</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">iM</span><span class="o">.</span><span class="n">getTrigCompsRefUUID</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="HardwareManager.removeCompByUUID"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.removeCompByUUID">[docs]</a>    <span class="k">def</span> <span class="nf">removeCompByUUID</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">iM</span><span class="o">.</span><span class="n">removeCompByUUID</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.getHardwareObjectByUUID"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.getHardwareObjectByUUID">[docs]</a>    <span class="k">def</span> <span class="nf">getHardwareObjectByUUID</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">deviceHandler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">devoceHandlerList</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">deviceHandler</span><span class="o">.</span><span class="n">Get_Standard_Field</span><span class="p">(</span><span class="s1">&#39;uuid&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">uuid</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">deviceHandler</span>
+        <span class="k">return</span> <span class="kc">None</span>        </div>
+
+<div class="viewcode-block" id="HardwareManager.getSourceObjs"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.getSourceObjs">[docs]</a>    <span class="k">def</span> <span class="nf">getSourceObjs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sourceList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">deviceHandler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviceHandlerList</span><span class="p">:</span>
+            <span class="n">sourceList</span> <span class="o">+=</span> <span class="n">deviceHandler</span><span class="o">.</span><span class="n">Get_Sources</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">sourceList</span></div>
+
+<div class="viewcode-block" id="HardwareManager.getFilterModelFromIdentifier"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.getFilterModelFromIdentifier">[docs]</a>    <span class="k">def</span> <span class="nf">getFilterModelFromIdentifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
+        <span class="k">for</span> <span class="nb">filter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filtersAvailable</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="nb">filter</span><span class="o">.</span><span class="n">filterIdentifier</span> <span class="o">==</span> <span class="n">identifier</span><span class="p">):</span>
+                <span class="k">return</span> <span class="nb">filter</span>
+        
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="HardwareManager.findHardwareModelByIdentifier"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.findHardwareModelByIdentifier">[docs]</a>    <span class="k">def</span> <span class="nf">findHardwareModelByIdentifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">hardwareModel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">driversAvailable</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">hardwareModel</span><span class="o">.</span><span class="n">hardwareIdentifier</span> <span class="o">==</span> <span class="n">identifier</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">hardwareModel</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<span class="c1">##### Initialization Functions #####</span>
+
+<div class="viewcode-block" id="HardwareManager.loadFilters"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.loadFilters">[docs]</a>    <span class="k">def</span> <span class="nf">loadFilters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Loading User Filters... &#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filtersDir</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                <span class="n">filterHolder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loadFilterFromFile</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">filterHolder</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">filtersAvailable</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filterHolder</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Finished Loading User Filters!&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.loadHardwareDrivers"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.loadHardwareDrivers">[docs]</a>    <span class="k">def</span> <span class="nf">loadHardwareDrivers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Loading Hardware Drivers... &#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hardwareDriverDir</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                <span class="n">driverHolder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loadDriverFromFile</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">driverHolder</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">driversAvailable</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">driverHolder</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Finished Loading Hardware Drivers!&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.loadLabviewInterface"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.loadLabviewInterface">[docs]</a>    <span class="k">def</span> <span class="nf">loadLabviewInterface</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Initializing DataStation Labview Interface... &#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lvInterface</span> <span class="o">=</span> <span class="n">DataStation_LabviewExtension</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Done!&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.loadFilterFromFile"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.loadFilterFromFile">[docs]</a>    <span class="k">def</span> <span class="nf">loadFilterFromFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+        <span class="n">class_inst</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">expected_class</span> <span class="o">=</span> <span class="s1">&#39;User_Filter&#39;</span>
+        <span class="n">py_mod</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">mod_name</span><span class="p">,</span> <span class="n">file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">filepath</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">loaded</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">file_ext</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;.py&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;   Found Filter Script: &#39;</span> <span class="o">+</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_MED</span><span class="p">)</span>
+            <span class="n">py_mod</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">load_source</span><span class="p">(</span><span class="n">mod_name</span><span class="p">,</span> <span class="n">filepath</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">py_mod</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">py_mod</span><span class="p">,</span> <span class="n">expected_class</span><span class="p">):</span>  <span class="c1"># verify that Filter is a class in this file</span>
+                <span class="n">loaded</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">class_temp</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">py_mod</span><span class="p">,</span> <span class="n">expected_class</span><span class="p">)(</span><span class="n">filepath</span><span class="p">)</span>
+                <span class="n">class_temp</span><span class="o">.</span><span class="n">hM</span> <span class="o">=</span> <span class="bp">self</span>
+                <span class="n">class_temp</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span>
+                <span class="n">class_temp</span><span class="o">.</span><span class="n">iM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">iM</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">class_temp</span><span class="p">,</span> <span class="n">Filter</span><span class="p">):</span>  <span class="c1"># verify that Filter inherits the correct class</span>
+                    <span class="n">class_inst</span> <span class="o">=</span> <span class="n">class_temp</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">loaded</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;  (Success!)&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_MED</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39; (Failed!)&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_MED</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">class_inst</span><span class="o">.</span><span class="n">hM</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="c1">#class_inst.setupWidgets()</span>
+        <span class="n">class_inst</span><span class="o">.</span><span class="n">onCreationParent</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">class_inst</span></div>
+
+<div class="viewcode-block" id="HardwareManager.loadDriverFromFile"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.loadDriverFromFile">[docs]</a>    <span class="k">def</span> <span class="nf">loadDriverFromFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+        <span class="n">class_inst</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">py_mod</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">mod_name</span><span class="p">,</span> <span class="n">file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">filepath</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">loaded</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">file_ext</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;.py&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;   Found Hardware Driver: &#39;</span> <span class="o">+</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_MED</span><span class="p">)</span>
+            <span class="n">py_mod</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">load_source</span><span class="p">(</span><span class="n">mod_name</span><span class="p">,</span> <span class="n">filepath</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">py_mod</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">if</span><span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">py_mod</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
+                <span class="n">class_temp</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">py_mod</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">)(</span><span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(),</span> <span class="nb">dict</span><span class="p">(),</span> <span class="nb">list</span><span class="p">(),</span> <span class="nb">list</span><span class="p">())</span>
+                <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">class_temp</span><span class="p">),</span> <span class="n">HardwareDevice</span><span class="p">):</span>  <span class="c1"># verify that driver inherits the correct class</span>
+                    <span class="n">class_inst</span> <span class="o">=</span> <span class="n">class_temp</span>
+                    <span class="n">loaded</span> <span class="o">=</span> <span class="kc">True</span>
+                
+        <span class="k">if</span><span class="p">(</span><span class="n">loaded</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;  (Success!)&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_MED</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39; (Failed!)&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_MED</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">class_inst</span></div>
+
+<span class="c1">##### Filter Manipulation Functions #####</span>
+
+<div class="viewcode-block" id="HardwareManager.loadFilterFromData"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.loadFilterFromData">[docs]</a>    <span class="k">def</span> <span class="nf">loadFilterFromData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filterInputSource</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">pathNo</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="s1">&#39;filterIdentifier&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">):</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFilterModelFromIdentifier</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;filterIdentifier&#39;</span><span class="p">])</span>
+            <span class="n">newFilter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addFilter</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">newFilter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">newFilter</span><span class="o">.</span><span class="n">onLoad</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                <span class="c1">#newFilter.Attach_Input(filterInputSource, pathNo)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Attempting To Restore Filter With Identifier (&#39;</span> <span class="o">+</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;filterIdentifier&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;) But Could Not Find Matching User_Filter... &#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">newFilter</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="HardwareManager.addFilter"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.addFilter">[docs]</a>    <span class="k">def</span> <span class="nf">addFilter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filterModel</span><span class="p">,</span> <span class="n">loadData</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">filterModel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">newFilter</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">filterModel</span><span class="p">)(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">newFilter</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span>
+            <span class="n">newFilter</span><span class="o">.</span><span class="n">iM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iM</span>
+            <span class="n">newFilter</span><span class="o">.</span><span class="n">hM</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="n">newFilter</span><span class="o">.</span><span class="n">wM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wM</span>
+            <span class="n">newFilter</span><span class="o">.</span><span class="n">onCreationParent</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filterList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newFilter</span><span class="p">)</span>
+
+            <span class="k">if</span><span class="p">(</span><span class="n">loadData</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">newFilter</span><span class="o">.</span><span class="n">loadPacket</span><span class="p">(</span><span class="n">loadData</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Added Filter: &#39;</span> <span class="o">+</span> <span class="n">newFilter</span><span class="o">.</span><span class="n">Get_Type</span><span class="p">(),</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_MED</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Filter_Added</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">newFilter</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">newFilter</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<span class="c1">##### Hardware Manipulation Functions #####</span>
+
+<div class="viewcode-block" id="HardwareManager.programAllDevices"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.programAllDevices">[docs]</a>    <span class="k">def</span> <span class="nf">programAllDevices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="HardwareManager.addDigitalTriggerComp"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.addDigitalTriggerComp">[docs]</a>    <span class="k">def</span> <span class="nf">addDigitalTriggerComp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hardwareObj</span><span class="p">):</span>
+        <span class="n">triggerComp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">iM</span><span class="o">.</span><span class="n">addCompToInstrument</span><span class="p">(</span><span class="n">Digital_Trigger_Component</span><span class="p">)</span>
+        <span class="n">triggerComp</span><span class="o">.</span><span class="n">onConnect</span><span class="p">(</span><span class="n">hardwareObj</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">hardwareObj</span><span class="o">.</span><span class="n">hardwareSettings</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">triggerComp</span></div>
+
+<div class="viewcode-block" id="HardwareManager.addHardwareObj"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.addHardwareObj">[docs]</a>    <span class="k">def</span> <span class="nf">addHardwareObj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deviceModel</span><span class="p">,</span> <span class="n">loadData</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1">#tempHardware = type(hardwareModel)(self)</span>
+        <span class="n">newHandler</span> <span class="o">=</span> <span class="n">HardwareDeviceHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">deviceModel</span><span class="p">),</span> <span class="n">loadData</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceHandlerList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newHandler</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hardware_Added</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">newHandler</span><span class="p">)</span>
+        <span class="n">newHandler</span><span class="o">.</span><span class="n">initDeviceThread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lvInterface</span><span class="o">.</span><span class="n">devices</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="HardwareManager.removeHardwareObj"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.removeHardwareObj">[docs]</a>    <span class="k">def</span> <span class="nf">removeHardwareObj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deviceHandler</span><span class="p">):</span>
+        <span class="n">deviceHandler</span><span class="o">.</span><span class="n">onRemove</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceHandlerList</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">deviceHandler</span><span class="p">)</span></div>
+
+<span class="c1">##### Hardware State ######</span>
+<div class="viewcode-block" id="HardwareManager.saveHardwareState"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.saveHardwareState">[docs]</a>    <span class="k">def</span> <span class="nf">saveHardwareState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Recording Hardware State... &#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span>
+        <span class="n">savePacket</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">savePacket</span><span class="p">[</span><span class="s1">&#39;hardwareStates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">savePacket</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">deviceHandler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviceHandlerList</span><span class="p">:</span>
+            <span class="n">savePacket</span><span class="p">[</span><span class="s1">&#39;hardwareStates&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">deviceHandler</span><span class="o">.</span><span class="n">savePacket</span><span class="p">())</span>
+
+        <span class="k">for</span> <span class="n">Filter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filterList</span><span class="p">:</span>
+            <span class="n">savePacket</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Filter</span><span class="o">.</span><span class="n">savePacket</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">writeHardwareStateFile</span><span class="p">(</span><span class="n">savePacket</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Done!&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HardwareManager.writeHardwareStateFile"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.writeHardwareStateFile">[docs]</a>    <span class="k">def</span> <span class="nf">writeHardwareStateFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stateData</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Updating Settings File... &#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hardwareStatePath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">stateData</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Done!&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+    <span class="c1">#def loadHardwareState(self):</span>
+    <span class="c1">#    self.ds.postLog(&#39;Restoring Hardware State... &#39;, DSConstants.LOG_PRIORITY_HIGH)</span>
+    <span class="c1">#    if(&#39;hardwareState&#39; in self.wM.settings):</span>
+    <span class="c1">#        tempHardwareSettings = self.wM.settings[&#39;hardwareState&#39;]</span>
+    <span class="c1">#        self.ds.wM.settings[&#39;hardwareState&#39;] = None</span>
+    <span class="c1">#        if(self.processHardwareData(tempHardwareSettings) is True):</span>
+    <span class="c1">#            self.ds.postLog(&#39;Done!&#39;, DSConstants.LOG_PRIORITY_HIGH, newline=False)</span>
+    <span class="c1">#        else:</span>
+    <span class="c1">#            self.ds.postLog(&#39;Error Loading Hardware State - Aborting!&#39;, DSConstants.LOG_PRIORITY_HIGH, newline=False)</span>
+    <span class="c1">#    else:</span>
+    <span class="c1">#        self.ds.postLog(&#39;No Hardware State Found - Aborting!&#39;, DSConstants.LOG_PRIORITY_HIGH, newline=False)</span>
+    <span class="c1">#</span>
+    <span class="c1">#    self.Hardware_State_Loaded.emit()</span>
+
+<div class="viewcode-block" id="HardwareManager.loadHardwareState"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.loadHardwareState">[docs]</a>    <span class="k">def</span> <span class="nf">loadHardwareState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Loading Hardware State Data.. &#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hardwareStatePath</span><span class="p">)):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hardwareStatePath</span><span class="p">,</span> <span class="s1">&#39;r+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stateFile</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">stateData</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">stateFile</span><span class="p">)</span>
+                    <span class="n">stateFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Done!&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="n">stateData</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Hardware State File is Corrupt!!! Ignoring..&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">stateData</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">processHardwareData</span><span class="p">(</span><span class="n">stateData</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Hardware State File Not Found! Ignoring..&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">Hardware_State_Loaded</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="HardwareManager.processHardwareData"><a class="viewcode-back" href="../source/HardwareManager/HardwareManager.html#HardwareManager.HardwareManager.processHardwareData">[docs]</a>    <span class="k">def</span> <span class="nf">processHardwareData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hardwareData</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">hardwareData</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;hardwareStates&#39;</span> <span class="ow">in</span> <span class="n">hardwareData</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">hardwareData</span><span class="p">[</span><span class="s1">&#39;hardwareStates&#39;</span><span class="p">]:</span>
+                <span class="k">if</span><span class="p">((</span><span class="s1">&#39;hardwareIdentifier&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">state</span><span class="p">):</span>
+                    <span class="n">hardwareModel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findHardwareModelByIdentifier</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;hardwareIdentifier&#39;</span><span class="p">])</span>
+                    <span class="k">if</span><span class="p">(</span><span class="n">hardwareModel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">addHardwareObj</span><span class="p">(</span><span class="n">hardwareModel</span><span class="p">,</span> <span class="n">loadData</span><span class="o">=</span><span class="n">state</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Hardware Component State Found (Identifier: &#39;</span> <span class="o">+</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;hardwareIdentifier&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;) But No Drivers Are Present For This Identifier! Partial Hardware State Import Continuing...&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span>
+                        
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Hardware Component State Data Corrupted! Partial Hardware State Import Continuing...&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">filterState</span> <span class="ow">in</span> <span class="n">hardwareData</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">]:</span>
+                <span class="k">if</span><span class="p">((</span><span class="s1">&#39;filterIdentifier&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">filterState</span><span class="p">):</span>
+                    <span class="n">filterModel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFilterModelFromIdentifier</span><span class="p">(</span><span class="n">filterState</span><span class="p">[</span><span class="s1">&#39;filterIdentifier&#39;</span><span class="p">])</span>
+                    <span class="k">if</span><span class="p">(</span><span class="n">filterModel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">addFilter</span><span class="p">(</span><span class="n">filterModel</span><span class="p">,</span> <span class="n">loadData</span><span class="o">=</span><span class="n">filterState</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Filter State Found (Identifier: &#39;</span> <span class="o">+</span> <span class="n">filterState</span><span class="p">[</span><span class="s1">&#39;filterIdentifier&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;) But No Filter Models Are Present For This Identifier! Partial Hardware State Import Continuing...&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">postLog</span><span class="p">(</span><span class="s1">&#39;Filter State Data Corrupted! Partial Hardware State Import Continuing...&#39;</span><span class="p">,</span> <span class="n">DSConstants</span><span class="o">.</span><span class="n">LOG_PRIORITY_HIGH</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../DataStation.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/DataStation.html">DataStation module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/HardwareManager/HardwareManager.html">HardwareManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/InstrumentManager/InstrumentManager.html">InstrumentManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/ModuleManager/ModuleManager.html">ModuleManager module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/WorkspaceManager/WorkspaceManager.html">WorkspaceManager module</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../DataStation.html">DataStation 0.5.2 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Matthew R. Brantley.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>
