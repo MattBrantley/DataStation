@@ -1,0 +1,73 @@
+{
+    "eventData": [
+        {
+            "compID": "MRB_DefPlate",
+            "events": [
+                {
+                    "params": {
+                        "Amplitude (V)": 10,
+                        "Count": 500,
+                        "Cycle Length (ms)": 0.5,
+                        "Sample Rate": 200000
+                    },
+                    "time": 0,
+                    "type": "Sawtooth"
+                }
+            ],
+            "name": "X Deflection",
+            "type": "Deflection Plate",
+            "uuid": "6909826f-68fd-454c-b201-7f624e283f76"
+        },
+        {
+            "compID": "MRB_DefPlate",
+            "events": [
+                {
+                    "params": {
+                        "Amplitude (V)": 10,
+                        "Count": 1,
+                        "Cycle Length (ms)": 250.0,
+                        "Sample Rate": 200000
+                    },
+                    "time": 0,
+                    "type": "Sawtooth"
+                }
+            ],
+            "name": "Y Deflection",
+            "type": "Deflection Plate",
+            "uuid": "b860712f-2b6b-4c47-9c28-3213b3467d10"
+        },
+        {
+            "compID": "MRB_SEMDETECTOR",
+            "events": [],
+            "name": "Detector",
+            "type": "SEM Detector",
+            "uuid": "21c0658a-640a-46ed-8128-8ecaf1d88e28"
+        },
+        {
+            "compID": "trig_mrb",
+            "events": [],
+            "name": "Detection Trigger",
+            "type": "Basic Trigger",
+            "uuid": "5116d984-166d-4511-9dec-17968c8a98a5"
+        },
+        {
+            "compID": "fil_mrb",
+            "events": [
+                {
+                    "params": {
+                        "Count": 5,
+                        "Voltage": 5.0,
+                        "offDuration": 0.001,
+                        "onDuration": 0.001
+                    },
+                    "time": 0.0,
+                    "type": "Pulse Train"
+                }
+            ],
+            "name": "Test",
+            "type": "Filament",
+            "uuid": "babc4948-b71b-4470-90e0-04406d0b3257"
+        }
+    ],
+    "instrument": "FIB SEM Working 3"
+}

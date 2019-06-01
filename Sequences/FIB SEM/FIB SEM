@@ -1,0 +1,24 @@
+{
+    "eventData": [
+        {
+            "compID": "MRB_DefPlate",
+            "events": [
+                {
+                    "params": {
+                        "Amplitude": 1.0,
+                        "Duration": 0.05,
+                        "End": 10000.0,
+                        "Rate": 10000.0,
+                        "Start": 1000.0
+                    },
+                    "time": 0.0,
+                    "type": "Chirp"
+                }
+            ],
+            "name": "",
+            "type": "Deflection Plate",
+            "uuid": "7e353e17-bdf0-4e48-a78d-f0980cc99058"
+        }
+    ],
+    "instrument": "FIB SEM"
+}

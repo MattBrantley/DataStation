@@ -66,6 +66,9 @@ class AnalogWaveformCommand(Command):
         self.f = f # is in units of Hertz (Hz)
         self.wave = wave # is in units of voltage (V)
 
+    def count(self):
+        return self.wave.shape[0]
+
     def toPairs(self):
         len = self.wave.shape[0]/self.f
         x = np.arange(self.t0, self.t0 + len, 1/self.f)

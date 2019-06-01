@@ -209,6 +209,7 @@ class DSLineSeries(QLineSeries):
         self.seriesMax = ydata.max()
         ydata -= ydata.min()
         if ydata.max() != 0:
+            # ydata = (ydata * 1/ydata.max())
             ydata *= 1/ydata.max()
             
         ydata += self.plot.getYMin()

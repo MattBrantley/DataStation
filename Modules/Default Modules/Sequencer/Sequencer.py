@@ -59,6 +59,7 @@ class Sequencer(DSModule):
             self.sequenceView.drawPlotForComponent(instrument, component)
 
     def populateInstrumentList(self, instrument):
+        instrumentUUID = self.Read_Setting('Instrument_UUID')
         self.instrumentSelectionBox.clear()
         self.loadedInstruments.clear()
         self.instrumentSelectionBox.addItem('')
@@ -69,6 +70,8 @@ class Sequencer(DSModule):
             #    self.instrumentSelectionBox.setCurrentIndex(idx+1)
 
             self.loadedInstruments.addInstrument(instrument)
+            if instrumentUUID == instrument.Get_UUID():
+                self.instrumentSelectionChanged(idx+1)
 
             #if self.prevInstrumentUUID == instrument.Get_UUID():
             #    self.instrumentSelectionBox.setCurrentIndex(idx+1)
@@ -145,6 +148,7 @@ class Sequencer(DSModule):
         index = self.instrumentSelectionBox.currentIndex()
         uuid = self.instrumentSelectionBox.itemData(index, role=Qt.UserRole)
         instrument = self.iM.Get_Instruments(uuid=uuid)
+        self.Write_Setting('Instrument_UUID', uuid)
 
         if not instrument:
             instrument = None

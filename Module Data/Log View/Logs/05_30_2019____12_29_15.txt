@@ -1,0 +1,103 @@
+[05/30/2019 12:28:54] Searching For Modules... 
+[05/30/2019 12:28:54]    Found Module: FIB_SEM_IMAGER.py
+[05/30/2019 12:28:55]    Found Module: codeEditor.py
+[05/30/2019 12:28:55]    Found Module: Console.py
+[05/30/2019 12:28:55]    Found Module: datastationWeb.py
+[05/30/2019 12:28:55]    Found Module: FTStudio.py
+[05/30/2019 12:28:55]    Found Module: hardwareView.py
+[05/30/2019 12:28:55]    Found Module: instrumentEditor.py
+[05/30/2019 12:28:55]    Found Module: loadingScreen.py
+[05/30/2019 12:28:55]    Found Module: logView.py
+[05/30/2019 12:28:55]    Found Module: measurementPreview.py
+[05/30/2019 12:28:55]    Found Module: MultiInstrumentControl.py
+[05/30/2019 12:28:55]    Found Module: processStatus.py
+[05/30/2019 12:28:55]    Found Module: profileSelection.py
+[05/30/2019 12:28:55]    Found Module: Sequencer.py
+[05/30/2019 12:28:55]    Found Module: SQLiteDataRecorder.py
+[05/30/2019 12:28:55] Finished Searching For Modules!
+[05/30/2019 12:28:56] Loading User Profiles... 
+[05/30/2019 12:28:56] Done!
+[05/30/2019 12:28:56] Loading Component Models... 
+[05/30/2019 12:28:56]    Found Component Script: d:/InstrPlatform/DataStation\Components\Basic_Trigger.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56]    Found Component Script: d:/InstrPlatform/DataStation\Components\Circular_Lens.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56]    Found Component Script: d:/InstrPlatform/DataStation\Components\DC_Electrode.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56]    Found Component Script: d:/InstrPlatform/DataStation\Components\Deflection_Plate.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56]    Found Component Script: d:/InstrPlatform/DataStation\Components\Detection_Plates.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56]    Found Component Script: d:/InstrPlatform/DataStation\Components\Excitation_Plates.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56]    Found Component Script: d:/InstrPlatform/DataStation\Components\Filament.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56]    Found Component Script: d:/InstrPlatform/DataStation\Components\Penning_Trap.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56]    Found Component Script: d:/InstrPlatform/DataStation\Components\Pulse_Valve.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56]    Found Component Script: d:/InstrPlatform/DataStation\Components\Quadrupole.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56]    Found Component Script: d:/InstrPlatform/DataStation\Components\SEM_Detector.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56] Finished Loading Component Models!
+[05/30/2019 12:28:56] Loading User Filters... 
+[05/30/2019 12:28:56]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Signal_Splitter_2Way.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Signal_Splitter_3Way.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Simple_Amplifier.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56] Finished Loading User Filters!
+[05/30/2019 12:28:56] Loading Hardware Drivers... 
+[05/30/2019 12:28:56]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\MIPS.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5105.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5122.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5451.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_6739.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\Test_Driver.py
+[05/30/2019 12:28:56]   (Success!)
+[05/30/2019 12:28:56] Finished Loading Hardware Drivers!
+[05/30/2019 12:28:56] Initializing DataStation Labview Interface... 
+[05/30/2019 12:29:00] Done!
+[05/30/2019 12:29:00] Loading Hardware State Data.. 
+[05/30/2019 12:29:00] Done!
+[05/30/2019 12:29:15] Could not load styleSheet: 
+[05/30/2019 12:29:16] Loading User Instrument (D:/InstrPlatform/DataStation/Instruments\Basic FT-ICR.dsinstrument)... 
+[05/30/2019 12:29:16] Added New Component to Instrument: Circular Lens
+[05/30/2019 12:29:16] Added New Component to Instrument: Circular Lens
+[05/30/2019 12:29:16] Added New Component to Instrument: Penning Trap
+[05/30/2019 12:29:16] Added New Component to Instrument: Excitation Plates
+[05/30/2019 12:29:16] Added New Component to Instrument: Detection Plates
+[05/30/2019 12:29:16] Added New Component to Instrument: Basic Trigger
+[05/30/2019 12:29:16] Added New Component to Instrument: Basic Trigger
+[05/30/2019 12:29:16] Added New Component to Instrument: Filament
+[05/30/2019 12:29:16] Added New Component to Instrument: Pulse Valve
+[05/30/2019 12:29:16] Opening Sequence File (d:/InstrPlatform/DataStation\Sequences\Basic FT-ICR\test)... 
+[05/30/2019 12:29:16] Applying sequence to instrument... 
+[05/30/2019 12:29:16] Sequence applied to instrument!
+[05/30/2019 12:29:16] Loading User Instrument (D:/InstrPlatform/DataStation/Instruments\Background Instrument Test 1.dsinstrument)... 
+[05/30/2019 12:29:16] Added New Component to Instrument: Basic Trigger
+[05/30/2019 12:29:16] Added New Component to Instrument: Basic Trigger
+[05/30/2019 12:29:16] Opening Sequence File (d:/InstrPlatform/DataStation\Sequences\Background Instrument Test 1\Background Instrument Test 1)... 
+[05/30/2019 12:29:16] Applying sequence to instrument... 
+[05/30/2019 12:29:16] Sequence applied to instrument!
+[05/30/2019 12:29:16] Loading User Instrument (d:/InstrPlatform/DataStation\Instruments\FIB SEM Working 3.dsinstrument)... 
+[05/30/2019 12:29:16] Added New Component to Instrument: Deflection Plate
+[05/30/2019 12:29:16] Added New Component to Instrument: Deflection Plate
+[05/30/2019 12:29:16] Added New Component to Instrument: SEM Detector
+[05/30/2019 12:29:16] Opening Sequence File (d:/InstrPlatform/DataStation\Sequences\FIB SEM Working 3\FIB SEQUENCE)... 
+[05/30/2019 12:29:16] Applying sequence to instrument... 
+[05/30/2019 12:29:16] Sequence applied to instrument!
+[05/30/2019 12:31:59] Shutting down Datastation!
+[05/30/2019 12:31:59] Updating User Profile... (d:/InstrPlatform/DataStation\Module Data\Profile Selection\Profiles\Brantley_Matthew1.dsprofile).. 
+[05/30/2019 12:32:00] Recording Hardware State... 
+[05/30/2019 12:32:00] Updating Settings File... 
+[05/30/2019 12:32:00] Done!
+[05/30/2019 12:32:01] Done!
+[05/30/2019 12:32:01] Datastation successfully closed!

@@ -121,5 +121,4 @@ class EventSequence():
         for comp in self.instr.Get_Components():
             for event in comp.Get_Events():
                 lengths.append(event.time + event.Get_Length())
-
         return max(lengths)

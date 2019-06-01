@@ -50,6 +50,9 @@ class Component(QObject):
     def Get_Sockets(self):
         return self.socketList
 
+    def Get_UUID(self):
+        return self.compSettings['uuid']
+
     def Get_Event_Types(self):
         return self.eventTypeList
 
@@ -289,7 +292,7 @@ class Component(QObject):
             for event in events:
                 self.eventList.append(event)
         else:
-            self.eventList.append(event)
+            self.eventList.append(events)
 
         self.instr.eventsModified(self)
         self.onProgramParent()

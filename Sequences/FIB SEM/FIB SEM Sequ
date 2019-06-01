@@ -1,0 +1,30 @@
+{
+    "eventData": [
+        {
+            "compID": "MRB_DefPlate",
+            "events": [
+                {
+                    "params": {
+                        "Amplitude (V)": 1.0,
+                        "Count": 50,
+                        "Cycle Length (ms)": 1.0,
+                        "Sample Rate": 100000
+                    },
+                    "time": 0.1,
+                    "type": "Sawtooth"
+                }
+            ],
+            "name": "",
+            "type": "Deflection Plate",
+            "uuid": "7e353e17-bdf0-4e48-a78d-f0980cc99058"
+        },
+        {
+            "compID": "MRB_DefPlate",
+            "events": [],
+            "name": "",
+            "type": "Deflection Plate",
+            "uuid": "247b479e-5a71-4cee-8352-9eba356a1985"
+        }
+    ],
+    "instrument": "FIB SEM"
+}

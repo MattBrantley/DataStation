@@ -1,0 +1,747 @@
+[05/30/2019 21:55:41] Searching For Modules... 
+[05/30/2019 21:55:41]    Found Module: FIB_SEM_IMAGER.py
+[05/30/2019 21:55:42]    Found Module: codeEditor.py
+[05/30/2019 21:55:42]    Found Module: Console.py
+[05/30/2019 21:55:42]    Found Module: datastationWeb.py
+[05/30/2019 21:55:42]    Found Module: FTStudio.py
+[05/30/2019 21:55:42]    Found Module: hardwareView.py
+[05/30/2019 21:55:42]    Found Module: instrumentEditor.py
+[05/30/2019 21:55:42]    Found Module: loadingScreen.py
+[05/30/2019 21:55:42]    Found Module: logView.py
+[05/30/2019 21:55:42]    Found Module: measurementPreview.py
+[05/30/2019 21:55:42]    Found Module: MultiInstrumentControl.py
+[05/30/2019 21:55:42]    Found Module: processStatus.py
+[05/30/2019 21:55:42]    Found Module: profileSelection.py
+[05/30/2019 21:55:42]    Found Module: Sequencer.py
+[05/30/2019 21:55:42]    Found Module: SQLiteDataRecorder.py
+[05/30/2019 21:55:42] Finished Searching For Modules!
+[05/30/2019 21:55:42] Loading User Profiles... 
+[05/30/2019 21:55:42] Done!
+[05/30/2019 21:55:42] Loading Component Models... 
+[05/30/2019 21:55:42]    Found Component Script: d:/InstrPlatform/DataStation\Components\Analog_Trigger.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43]    Found Component Script: d:/InstrPlatform/DataStation\Components\Basic_Trigger.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43]    Found Component Script: d:/InstrPlatform/DataStation\Components\Circular_Lens.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43]    Found Component Script: d:/InstrPlatform/DataStation\Components\DC_Electrode.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43]    Found Component Script: d:/InstrPlatform/DataStation\Components\Deflection_Plate.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43]    Found Component Script: d:/InstrPlatform/DataStation\Components\Detection_Plates.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43]    Found Component Script: d:/InstrPlatform/DataStation\Components\Excitation_Plates.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43]    Found Component Script: d:/InstrPlatform/DataStation\Components\Filament.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43]    Found Component Script: d:/InstrPlatform/DataStation\Components\Penning_Trap.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43]    Found Component Script: d:/InstrPlatform/DataStation\Components\Pulse_Valve.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43]    Found Component Script: d:/InstrPlatform/DataStation\Components\Quadrupole.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43]    Found Component Script: d:/InstrPlatform/DataStation\Components\SEM_Detector.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43] Finished Loading Component Models!
+[05/30/2019 21:55:43] Loading User Filters... 
+[05/30/2019 21:55:43]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Signal_Splitter_2Way.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Signal_Splitter_3Way.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Simple_Amplifier.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43] Finished Loading User Filters!
+[05/30/2019 21:55:43] Loading Hardware Drivers... 
+[05/30/2019 21:55:43]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\MIPS.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5105.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5122.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5451.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_6739.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\Test_Driver.py
+[05/30/2019 21:55:43]   (Success!)
+[05/30/2019 21:55:43] Finished Loading Hardware Drivers!
+[05/30/2019 21:55:43] Initializing DataStation Labview Interface... 
+[05/30/2019 21:55:46] Done!
+[05/30/2019 21:55:46] Loading Hardware State Data.. 
+[05/30/2019 21:55:46] Done!
+[05/30/2019 21:55:48] Could not load styleSheet: 
+[05/30/2019 21:55:49] Loading User Instrument (D:/InstrPlatform/DataStation/Instruments\Basic FT-ICR.dsinstrument)... 
+[05/30/2019 21:55:49] Added New Component to Instrument: Circular Lens
+[05/30/2019 21:55:49] Added New Component to Instrument: Circular Lens
+[05/30/2019 21:55:49] Added New Component to Instrument: Penning Trap
+[05/30/2019 21:55:49] Added New Component to Instrument: Excitation Plates
+[05/30/2019 21:55:49] Added New Component to Instrument: Detection Plates
+[05/30/2019 21:55:49] Added New Component to Instrument: Basic Trigger
+[05/30/2019 21:55:49] Added New Component to Instrument: Basic Trigger
+[05/30/2019 21:55:49] Added New Component to Instrument: Filament
+[05/30/2019 21:55:49] Added New Component to Instrument: Pulse Valve
+[05/30/2019 21:55:49] Opening Sequence File (d:/InstrPlatform/DataStation\Sequences\Basic FT-ICR\test)... 
+[05/30/2019 21:55:49] Applying sequence to instrument... 
+[05/30/2019 21:55:49] Sequence applied to instrument!
+[05/30/2019 21:55:49] Loading User Instrument (D:/InstrPlatform/DataStation/Instruments\Background Instrument Test 1.dsinstrument)... 
+[05/30/2019 21:55:49] Added New Component to Instrument: Basic Trigger
+[05/30/2019 21:55:49] Added New Component to Instrument: Basic Trigger
+[05/30/2019 21:55:49] Opening Sequence File (d:/InstrPlatform/DataStation\Sequences\Background Instrument Test 1\Background Instrument Test 1)... 
+[05/30/2019 21:55:49] Applying sequence to instrument... 
+[05/30/2019 21:55:49] Sequence applied to instrument!
+[05/30/2019 21:55:49] Loading User Instrument (d:/InstrPlatform/DataStation\Instruments\FIB SEM Working 3.dsinstrument)... 
+[05/30/2019 21:55:49] Added New Component to Instrument: Deflection Plate
+[05/30/2019 21:55:49] Added New Component to Instrument: Deflection Plate
+[05/30/2019 21:55:49] Added New Component to Instrument: SEM Detector
+[05/30/2019 21:55:50] Added New Component to Instrument: Analog Trigger
+[05/30/2019 21:55:50] Opening Sequence File (d:/InstrPlatform/DataStation\Sequences\FIB SEM Working 3\FIB SEQUENCE)... 
+[05/30/2019 21:55:50] Applying sequence to instrument... 
+[05/30/2019 21:55:50] Sequence data for comp with uuid (5116d984-166d-4511-9dec-17968c8a98a5) cannot be assigned! Possibly from different instrument.
+[05/30/2019 21:55:50] Sequence data for comp with uuid (babc4948-b71b-4470-90e0-04406d0b3257) cannot be assigned! Possibly from different instrument.
+[05/30/2019 21:55:50] Sequence applied to instrument!
+[05/30/2019 21:56:14] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:14] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:14] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:14] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:14] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:14] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:14] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:14] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:14] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:14] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:14] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:14] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:14] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:14] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:14] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:14] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:14] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:15] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:15] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:15] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:15] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:15] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:15] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:15] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:15] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:15] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:15] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:15] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:15] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:15] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:15] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:15] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:15] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:15] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:15] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:16] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:16] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:16] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:16] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:16] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:16] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:16] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:16] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:16] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:16] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:16] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:16] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:16] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:16] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:16] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:16] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:16] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:17] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:17] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:17] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:17] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:17] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:17] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:17] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:17] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:17] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:17] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:17] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:17] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:17] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:17] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:17] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:17] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:17] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:17] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:18] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:19] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:19] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:19] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:19] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:19] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:19] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:19] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:19] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:19] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:19] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:19] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:19] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:19] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:19] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:19] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:19] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:20] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:21] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:21] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:21] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:21] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:21] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:21] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:21] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:21] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:21] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:21] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:21] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:21] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:21] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:21] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:21] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:21] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:21] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:21] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:22] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:23] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:24] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:24] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:25] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:25] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:25] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:25] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:25] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:25] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:25] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:25] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:25] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:26] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:26] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:26] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:26] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:26] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:28] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:28] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:28] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:28] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:28] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:28] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:28] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:28] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:28] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:28] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:29] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:30] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:30] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:30] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:30] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:30] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:30] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:30] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:30] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:30] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:30] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:30] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:30] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:30] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:30] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:30] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:30] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:30] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:30] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:31] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:31] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:31] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:31] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:31] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:31] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:31] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:31] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:31] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:31] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:31] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:31] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:31] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:31] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:31] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:31] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:31] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:31] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:32] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:32] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:32] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:32] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:32] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:32] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:33] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:33] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:33] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:33] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:33] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:33] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:33] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:34] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:34] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:34] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:34] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:34] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:34] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:34] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:34] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:34] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:34] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:34] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:34] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:34] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:34] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:34] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:34] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:34] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:35] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:35] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:35] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:35] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:35] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:35] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:35] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:35] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:35] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:35] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:35] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:35] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:35] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:35] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:35] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:35] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:35] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:36] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:36] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:36] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:36] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:36] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:36] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:36] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:36] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:36] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:36] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:36] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:36] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:36] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:36] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:37] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:38] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:38] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:38] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:38] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:38] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:38] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:38] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:38] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:38] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:38] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:38] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:38] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:38] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:38] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:38] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:38] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:38] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:38] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:39] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:39] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:39] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:39] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:39] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:39] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:39] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:39] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:39] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:39] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:39] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:39] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:39] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:39] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:39] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:39] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:39] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:40] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:40] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:40] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:40] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:40] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:40] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:40] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:40] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:40] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:40] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:40] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:40] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:40] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:40] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:40] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:40] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:40] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:41] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:41] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:41] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:41] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:41] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:41] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:41] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:41] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:41] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:41] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:41] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:41] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:41] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:41] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:41] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:41] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:41] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:42] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:42] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:42] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:42] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:42] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:42] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:42] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:42] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:42] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:42] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:42] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:42] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:42] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:42] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:42] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:42] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:42] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:42] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:43] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:43] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:43] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:43] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:43] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:43] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:43] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:43] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:43] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:43] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:43] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:43] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:43] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:43] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:43] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:43] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:44] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:44] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:44] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:44] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:44] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:44] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:44] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:44] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:44] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:44] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:44] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:44] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:44] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:44] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:44] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:44] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:44] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:45] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:45] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:45] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:45] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:45] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:45] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:45] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:45] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:45] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:45] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:45] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:45] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:45] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:45] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:45] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:45] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:45] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:46] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:46] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:46] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:46] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:46] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:47] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:47] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:47] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:47] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:47] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:47] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:47] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:48] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:48] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:48] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:50] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:50] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:50] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:50] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:50] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:50] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:50] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:50] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:50] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:50] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:50] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:50] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:50] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:51] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:52] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:52] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:52] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:52] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:52] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:52] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:52] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:52] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:52] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:52] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:52] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:52] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:52] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:52] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:52] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:52] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:52] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:52] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:53] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:53] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:53] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:53] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:53] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:53] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:53] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:53] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:53] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:53] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:53] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:53] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:53] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:53] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:53] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:53] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:53] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:53] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:54] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:54] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:54] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:54] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:54] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:54] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:54] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:54] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:54] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:56:54] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:06] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:06] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:06] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:06] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:06] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:07] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:07] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:07] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:07] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:07] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:07] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:07] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:07] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:07] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:07] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:07] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:07] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:07] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:07] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:07] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:07] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:07] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:08] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:08] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:08] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:08] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:08] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:08] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:08] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:08] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:08] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:08] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:08] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:08] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:08] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:08] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:08] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:08] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:09] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:09] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:09] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:09] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:09] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:09] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:09] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:09] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:09] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:09] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:09] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:09] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:09] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:09] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:09] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:09] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:09] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:10] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:10] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:10] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:10] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:10] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:10] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:10] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:10] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:10] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:10] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:10] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:10] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:10] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:10] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:10] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:10] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:11] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:11] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:11] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 
+[05/30/2019 21:57:11] Instrument (FIB SEM Working 3) Run Request Denied - Failed Ready Check 

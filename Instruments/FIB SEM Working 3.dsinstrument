@@ -1,0 +1,145 @@
+{
+    "UUID": "bed6ac18-44f1-4c3f-904a-18d8ff434350",
+    "compList": [
+        {
+            "compIdentifier": "MRB_DefPlate",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": 293.82716049382714,
+                        "y": 1461.6719433137343
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Trigger.png",
+                "name": "X Deflection",
+                "triggerComp": false,
+                "uuid": "6909826f-68fd-454c-b201-7f624e283f76"
+            },
+            "compType": "Deflection Plate",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "66ec2e6f-4809-446a-8d45-f82328311fc9",
+                    "inputSourcePathNo": 1,
+                    "name": "",
+                    "prec": 0.1,
+                    "tag": "[AO]",
+                    "uuid": "a7d3bd35-e6d6-4057-87ae-a5bb78cfd02e",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "MRB_DefPlate",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": 935.8024691358024,
+                        "y": 1502.8237599879392
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Trigger.png",
+                "name": "Y Deflection",
+                "triggerComp": false,
+                "uuid": "b860712f-2b6b-4c47-9c28-3213b3467d10"
+            },
+            "compType": "Deflection Plate",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "6ab22afc-766c-4613-bb2f-a4edcd7de449",
+                    "inputSourcePathNo": 1,
+                    "name": "",
+                    "prec": 0.1,
+                    "tag": "[AO]",
+                    "uuid": "5b9f0ac3-417d-4e48-8b27-c4a0a666bbc1",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "MRB_SEMDETECTOR",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": 635.358024691358,
+                        "y": 1171.0372380521635
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Trigger.png",
+                "name": "Detector",
+                "triggerComp": false,
+                "uuid": "21c0658a-640a-46ed-8128-8ecaf1d88e28"
+            },
+            "compType": "SEM Detector",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "44921c17-4f71-413b-a3db-946f52c8c27d",
+                    "inputSourcePathNo": 1,
+                    "name": "",
+                    "prec": 0.1,
+                    "tag": "[AI]",
+                    "uuid": "34249e1b-9390-47f2-8d37-8fcd29f9e130",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "MRB_AnalogTrigger",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": 607.1111111111111,
+                        "y": 1633.9951756369667
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "granularity": 0.0001,
+                "layoutGraphicSrc": "Trigger.png",
+                "name": "Trigger",
+                "triggerComp": false,
+                "uuid": "bc116a13-644f-4898-ae89-46a140116f2a",
+                "vMax": 10.0,
+                "vMin": 0.0
+            },
+            "compType": "Analog Trigger",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "6984dd7e-06ec-4682-a810-a5cdd349e3a9",
+                    "inputSourcePathNo": 1,
+                    "name": "",
+                    "prec": 0.1,
+                    "tag": "[AO]",
+                    "uuid": "be43da0a-3fb9-47c9-938a-80e128e75333",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        }
+    ],
+    "name": "FIB SEM Working 3"
+}

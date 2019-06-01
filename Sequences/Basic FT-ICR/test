@@ -151,10 +151,10 @@
             "events": [
                 {
                     "params": {
-                        "Duration": 8.0,
-                        "Voltage": -70.0
+                        "Duration": 0.01,
+                        "Voltage": 7.0
                     },
-                    "time": 2.0,
+                    "time": 0.01,
                     "type": "Pulse"
                 }
             ],

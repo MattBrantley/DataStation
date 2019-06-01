@@ -10,6 +10,7 @@ from PyQt5.Qt import *
 from PyQt5.QtGui import *
 import os, random, numpy as np
 from decimal import Decimal
+from scipy import signal
 
 class DC_Electrode(Component):
     componentType = 'DC Electrode'
@@ -34,6 +35,7 @@ class DC_Electrode(Component):
         self.addEventType(pulseEvent)
         self.addEventType(pulseTrainEvent)
         self.addEventType(linearRampEvent)
+        self.addEventType(sawWave)
 
     def onProgram(self):
         self.packet = commandPacket()
@@ -165,5 +167,33 @@ class pulseTrainEvent(eventType):
                 pairs = newEventStep
             else:
                 pairs = np.vstack((pairs, newEventStep))
+
+        print(pairs.shape)
+        command = AnalogSparseCommand(pairs)
+        return command
+
+class sawWave(eventType):
+    name = 'Sawtooth Wave'
+
+    def __init__(self):
+        super().__init__()
+        self.Add_Parameter(eventParameterInt('Count', allowZero=False, allowNegative=False))
+        self.Add_Parameter(eventParameterDouble('Amplitude (V)', allowZero=False, allowNegative=False))
+        self.Add_Parameter(eventParameterDouble('Cycle Length (ms)', allowZero=False, allowNegative=False))
+        self.Add_Parameter(eventParameterInt('Sample Rate', allowZero=False, allowNegative=False))
+        
+    def getLength(self):
+        return (self.eventParams['Count'].v() * self.eventParams['Cycle Length (ms)'].v() / 1000)
+
+    def toCommand(self, v0):
+        f = 1/(self.eventParams['Cycle Length (ms)'].v() / 1000)
+        length = self.getLength()
+        rate = self.eventParams['Sample Rate'].v()
+        
+        t = np.linspace(self.time, self.time + length, rate)
+        s = signal.sawtooth(2 * np.pi * f * t) * self.eventParams['Amplitude (V)'].v()
+
+        pairs = np.transpose(np.vstack((t, s)))
+        # print(pairs.shape)
         command = AnalogSparseCommand(pairs)
         return command

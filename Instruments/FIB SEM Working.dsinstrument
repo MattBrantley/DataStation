@@ -1,0 +1,68 @@
+{
+    "UUID": "0e889e69-f702-40a1-8cf9-8dedbc3a939b",
+    "compList": [
+        {
+            "compIdentifier": "MRB_DefPlate",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": 373.4320987654321,
+                        "y": 1497.6797829036636
+                    }
+                },
+                "layoutGraphicSrc": "Trigger.png",
+                "name": "X Deflection",
+                "triggerComp": false,
+                "uuid": "ded506e2-7dc6-4076-b4e6-697040403a18"
+            },
+            "compType": "Deflection Plate",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": null,
+                    "inputSourcePathNo": null,
+                    "name": "",
+                    "prec": 0.1,
+                    "tag": "[AO]",
+                    "uuid": "4302ea92-5e6a-477e-9469-a9b44d87adfb",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "MRB_DefPlate",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": 892.1481481481482,
+                        "y": 1523.3996683250416
+                    }
+                },
+                "layoutGraphicSrc": "Trigger.png",
+                "name": "Y Deflection",
+                "triggerComp": false,
+                "uuid": "c7484652-5f31-4960-8f15-d5c890d61271"
+            },
+            "compType": "Deflection Plate",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": null,
+                    "inputSourcePathNo": null,
+                    "name": "",
+                    "prec": 0.1,
+                    "tag": "[AO]",
+                    "uuid": "4a9fe6c4-ba28-40df-b691-02afcc6f5b40",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        }
+    ],
+    "name": "FIB SEM Working"
+}

@@ -1,0 +1,74 @@
+{
+    "UUID": "d3c0319a-cac8-481c-ad38-3a0335e8ff51",
+    "compList": [
+        {
+            "compIdentifier": "MRB_DefPlate",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": 442.7654320987654,
+                        "y": 1577.4114277099352
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Trigger.png",
+                "name": "Y Deflect",
+                "triggerComp": false,
+                "uuid": "7e353e17-bdf0-4e48-a78d-f0980cc99058"
+            },
+            "compType": "Deflection Plate",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "66ec2e6f-4809-446a-8d45-f82328311fc9",
+                    "inputSourcePathNo": 1,
+                    "name": "",
+                    "prec": 0.1,
+                    "tag": "[AO]",
+                    "uuid": "96f67363-e49b-430d-a582-55b1dffa2b30",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "MRB_DefPlate",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": 866.469135802469,
+                        "y": 1595.4153475048997
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Trigger.png",
+                "name": "X Deflect",
+                "triggerComp": false,
+                "uuid": "247b479e-5a71-4cee-8352-9eba356a1985"
+            },
+            "compType": "Deflection Plate",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": null,
+                    "inputSourcePathNo": null,
+                    "name": "",
+                    "prec": 0.1,
+                    "tag": "[AO]",
+                    "uuid": "c76611c7-b9f2-4879-bbf7-1a609a187323",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        }
+    ],
+    "name": "FIB SEM"
+}

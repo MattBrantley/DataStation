@@ -21,14 +21,23 @@ class eventType():
     def Add_Parameter(self, param):
         self.eventParams[param.name] = param
 
-############################################################################################
-###################################### OVERRIDE THESE ######################################
+    def Get_Name(self):
+        return self.name
 
     def Get_Length(self):
-        return 0
+        return self.getLength()
 
     def Ready_Check(self):
         return True, ''
+
+############################################################################################
+###################################### OVERRIDE THESE ######################################
+
+    def getLength(self):
+        return 0
+
+    # def readyCheck(self):
+    #     return True, ''
 
 ############################################################################################
 #################################### INTERNAL USER ONLY ####################################
@@ -71,7 +80,10 @@ class eventParameter():
         self.paramSettings['value'] = None
 
     def value(self):
-        return self.paramSettings['value']
+        if self.paramSettings['value'] is None:
+            return self.paramSettings['defaultVal']
+        else:
+            return self.paramSettings['value']
 
     def v(self):
         return self.value()
