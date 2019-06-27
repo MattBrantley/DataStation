@@ -8,8 +8,15 @@ class EventSequence():
     def Save_Sequence(self, filepath):
         self.saveSequence(filepath)
 
+    def Get_Sequence_Serialized(self):
+        savePacket = self.getSequenceSaveData()
+        return json.dumps(savePacket, sort_keys=True, indent=4)
+
     def Load_Sequence_File(self, filePath):
         self.loadSequence(filePath)
+
+    def Load_Sequence_Data(self, data):
+        self.loadSequenceData(data)
 
     def Get_File_Name(self):
         return self.filename
@@ -48,14 +55,25 @@ class EventSequence():
 
     #### Load Sequence ####
     def loadSequence(self, path):
-        data = self.openSequenceFile(path)
+        self.ds.postLog('Loading Sequence data from file: ' + str(path), DSConstants.LOG_PRIORITY_HIGH)
+        try:
+            self.path = path
+            data = self.openSequenceFile(path)
+            return self.parseSequenceData(data)
+        except:
+            self.ds.postLog('Error loading Sequence data from file: ' + str(path), DSConstants.LOG_PRIORITY_HIGH)
+            return False
+
+    def loadSequenceData(self, data):
+        return self.parseSequenceData(json.loads(data))
+
+    def parseSequenceData(self, data):
         self.ds.postLog('Applying sequence to instrument... ', DSConstants.LOG_PRIORITY_HIGH)
 
         if(data is None):
             self.ds.postLog('Sequence data was empty - aborting!', DSConstants.LOG_PRIORITY_HIGH)
             return False
 
-        self.path = path
         self.Clear_All_Events()
 
         for datum in data['eventData']:
@@ -69,7 +87,7 @@ class EventSequence():
         self.instr.sequenceLoaded()
 
         return True
-        
+
     def openSequenceFile(self, filePath):
         self.ds.postLog('Opening Sequence File (' + filePath + ')... ', DSConstants.LOG_PRIORITY_HIGH)
         sequenceData = None

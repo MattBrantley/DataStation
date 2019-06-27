@@ -1,0 +1,80 @@
+[06/26/2019 11:46:36] Searching For Modules... 
+[06/26/2019 11:46:36]    Found Module: FIB_SEM_IMAGER.py
+[06/26/2019 11:46:36]    Found Module: FT_Appearance_Energy.py
+[06/26/2019 11:46:36]    Found Module: System_Pressure.py
+[06/26/2019 11:46:37]    Found Module: codeEditor.py
+[06/26/2019 11:46:37]    Found Module: Console.py
+[06/26/2019 11:46:37]    Found Module: datastationWeb.py
+[06/26/2019 11:46:37]    Found Module: FTStudio.py
+[06/26/2019 11:46:37]    Found Module: hardwareView.py
+[06/26/2019 11:46:37]    Found Module: instrumentEditor.py
+[06/26/2019 11:46:37]    Found Module: loadingScreen.py
+[06/26/2019 11:46:37]    Found Module: logView.py
+[06/26/2019 11:46:37]    Found Module: measurementPreview.py
+[06/26/2019 11:46:37]    Found Module: MultiInstrumentControl.py
+[06/26/2019 11:46:37]    Found Module: processStatus.py
+[06/26/2019 11:46:37]    Found Module: profileSelection.py
+[06/26/2019 11:46:37]    Found Module: Sequencer.py
+[06/26/2019 11:46:37]    Found Module: SQLiteDataRecorder.py
+[06/26/2019 11:46:37] Finished Searching For Modules!
+[06/26/2019 11:46:37] Loading User Profiles... 
+[06/26/2019 11:46:37] Done!
+[06/26/2019 11:46:37] Loading Component Models... 
+[06/26/2019 11:46:37]    Found Component Script: d:/InstrPlatform/DataStation\Components\Analog_Trigger.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Component Script: d:/InstrPlatform/DataStation\Components\Basic_Trigger.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Component Script: d:/InstrPlatform/DataStation\Components\Circular_Lens.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Component Script: d:/InstrPlatform/DataStation\Components\Convectron_Gauge.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Component Script: d:/InstrPlatform/DataStation\Components\DC_Electrode.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Component Script: d:/InstrPlatform/DataStation\Components\Deflection_Plate.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Component Script: d:/InstrPlatform/DataStation\Components\Detection_Plates.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Component Script: d:/InstrPlatform/DataStation\Components\Excitation_Plates.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Component Script: d:/InstrPlatform/DataStation\Components\Filament.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Component Script: d:/InstrPlatform/DataStation\Components\Ion_Gauge.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Component Script: d:/InstrPlatform/DataStation\Components\Penning_Trap.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Component Script: d:/InstrPlatform/DataStation\Components\Pulse_Valve.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Component Script: d:/InstrPlatform/DataStation\Components\Quadrupole.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Component Script: d:/InstrPlatform/DataStation\Components\SEM_Detector.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38] Finished Loading Component Models!
+[06/26/2019 11:46:38] Loading User Filters... 
+[06/26/2019 11:46:38]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Signal_Splitter_2Way.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Signal_Splitter_3Way.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Filter Script: d:/InstrPlatform/DataStation\Filters\Simple_Amplifier.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38] Finished Loading User Filters!
+[06/26/2019 11:46:38] Loading Hardware Drivers... 
+[06/26/2019 11:46:38]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\MIPS.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5105.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5122.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_5451.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_6345.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\PXIe_6739.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38]    Found Hardware Driver: d:/InstrPlatform/DataStation\Hardware Drivers\Test_Driver.py
+[06/26/2019 11:46:38]   (Success!)
+[06/26/2019 11:46:38] Finished Loading Hardware Drivers!
+[06/26/2019 11:46:38] Initializing DataStation Labview Interface... 
+[06/26/2019 11:46:41] Done!
+[06/26/2019 11:46:41] Loading Hardware State Data.. 
+[06/26/2019 11:46:41] Done!
+[06/26/2019 11:46:52] Could not load styleSheet: 

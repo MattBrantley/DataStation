@@ -1,0 +1,96 @@
+{
+    "eventData": [
+        {
+            "compID": "mrb_conv_gauge",
+            "events": [
+                {
+                    "params": {},
+                    "time": 0.0,
+                    "type": "readOnce"
+                }
+            ],
+            "name": "Source Rough 275i",
+            "type": "Convectron Gauge",
+            "uuid": "27863d35-1ed5-4eae-a06c-817b765fabd2"
+        },
+        {
+            "compID": "mrb_conv_gauge",
+            "events": [
+                {
+                    "params": {},
+                    "time": 0.0,
+                    "type": "readOnce"
+                }
+            ],
+            "name": "Mid Rough 275i",
+            "type": "Convectron Gauge",
+            "uuid": "75d46e99-cab6-411b-a4ee-077f4392fb37"
+        },
+        {
+            "compID": "mrb_conv_gauge",
+            "events": [
+                {
+                    "params": {},
+                    "time": 0.0,
+                    "type": "readOnce"
+                }
+            ],
+            "name": "ICR Rough 275i",
+            "type": "Convectron Gauge",
+            "uuid": "8a3bafef-8c2c-40d1-b948-94b7fec510f5"
+        },
+        {
+            "compID": "mrb_conv_gauge",
+            "events": [
+                {
+                    "params": {},
+                    "time": 0.0,
+                    "type": "readOnce"
+                }
+            ],
+            "name": "Pulse Valve",
+            "type": "Convectron Gauge",
+            "uuid": "6ddc7217-5e4b-4690-a461-5b419d9c81d4"
+        },
+        {
+            "compID": "mrb_ion_gauge",
+            "events": [
+                {
+                    "params": {},
+                    "time": 0.0,
+                    "type": "readOnce"
+                }
+            ],
+            "name": "Source 354i",
+            "type": "Ion Gauge",
+            "uuid": "c625303d-4438-4f2b-b61f-f13616daaec5"
+        },
+        {
+            "compID": "mrb_ion_gauge",
+            "events": [
+                {
+                    "params": {},
+                    "time": 0.0,
+                    "type": "readOnce"
+                }
+            ],
+            "name": "Mid 354i",
+            "type": "Ion Gauge",
+            "uuid": "de4ca95f-ad8a-4b49-b73f-539c722258e8"
+        },
+        {
+            "compID": "mrb_ion_gauge",
+            "events": [
+                {
+                    "params": {},
+                    "time": 0.0,
+                    "type": "readOnce"
+                }
+            ],
+            "name": "ICR",
+            "type": "Ion Gauge",
+            "uuid": "8773094d-4f1b-45d3-a64d-e8cff4f20bc4"
+        }
+    ],
+    "instrument": "Readbacks"
+}

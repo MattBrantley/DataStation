@@ -175,7 +175,10 @@ class measurementView(QChartView):
 
     def addData(self, packet, color=None):
         for measurement in packet.Get_Measurements():
-            self.createLine(measurement.xData(zeroOrigin=True), measurement.yData(), color=color)
+            if isinstance(measurement, float):
+                pass
+            else:
+                self.createLine(measurement.xData(zeroOrigin=True), measurement.yData(), color=color)
 
     def createLine(self, xdata, ydata, color=None):
         length = xdata.shape[0]

@@ -187,18 +187,45 @@ class SQLiteDataRecorder_TreeWidget(QTreeWidget):
         self.setHeaderLabels(['Name', 'Instrument', 'Timestamp', 'Sequence', 'User'])
         self.setColumnCount(5)
 
+        self.contextItem = None
+
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.createContextMenu)
+
     def populateIndexes(self):
         self.clear()
         self.module.Remove_All_Resources()
         self.module.Populate_Preview.emit()
+        self.expandAll()
 
     def addIndex(self, runObject):
         indexItem = QTreeWidgetItem(['', runObject.instrumentName, runObject.timeStamp])
+        indexItem.moduleData = runObject
         self.addTopLevelItem(indexItem)
         for measurement in runObject.measurementList:
             childItem = QTreeWidgetItem(['Measurement: ' + str(measurement['rowID'])])
             indexItem.addChild(childItem)
             self.module.Add_Measurement_Packet_Resource('Test', measurementPacket=measurement['packet'])
+
+    def createContextMenu(self, position):
+        index = self.selectedItems()
+        if len(index) > 0:
+            self.contextItem = index[0]
+        else:
+            self.contextItem = None
+
+        if self.contextItem is not None:
+            self.contextMenu = QMenu(self)
+            self.contextMenu.addAction('Load Sequence', self.loadSequence)
+            self.contextMenu.exec_(self.viewport().mapToGlobal(position))
+
+    def loadSequence(self):
+        if self.contextItem is not None:
+            for instrument in self.module.iM.Get_Instruments(uuid=self.contextItem.moduleData.instrumentUUID):
+                instrument.Load_Sequence_Data(self.contextItem.moduleData.sequence)
+                #print('LOADING SEQUENCE')
+                #print(self.contextItem.moduleData.sequence)
+
 
 class SQLiteDataRecorder_SQLComm(QObject):
     Comm_Opened = pyqtSignal(bool)
@@ -222,7 +249,7 @@ class SQLiteDataRecorder_SQLComm(QObject):
     def Init_Tables(self):
         with self.conn:
             try:
-                self.cursor.execute("CREATE TABLE IF NOT EXISTS instrumentRuns(run_ID varchar(36), instrument_name varchar(100), timestamp varchar(100))")
+                self.cursor.execute("CREATE TABLE IF NOT EXISTS instrumentRuns(run_ID varchar(36), instrument_name varchar(100), instrument_uuid varchar(100), timestamp varchar(100), sequence TEXT)")
                 self.cursor.execute("CREATE TABLE IF NOT EXISTS measurementPackets(run_ID varchar(36), measurement_packet BLOB)")
             except Exception as e:
                 self.Error_Message.emit('ERROR Configuring Tables: ' + self.databaseURL, e)
@@ -232,7 +259,7 @@ class SQLiteDataRecorder_SQLComm(QObject):
         timeStamp = time.strftime('%m/%d/%Y %H:%M:%S', time.localtime())
         with self.conn:
             try:
-                self.cursor.execute('INSERT INTO instrumentRuns (run_id, instrument_name, timestamp) VALUES (?, ?, ?)', (instrument.Get_Run_ID(), instrument.Get_Name(), timeStamp))
+                self.cursor.execute('INSERT INTO instrumentRuns (run_id, instrument_name, instrument_uuid, timestamp, sequence) VALUES (?, ?, ?, ?, ?)', (instrument.Get_Run_ID(), instrument.Get_Name(), instrument.Get_UUID(), timeStamp, instrument.Get_Sequence_Serialized()))
             except Exception as e:
                 self.Error_Message.emit('ERROR Writing Instrument Run To: ' + self.databaseURL, e)
         self.Comm_Writing.emit(False)
@@ -251,7 +278,7 @@ class SQLiteDataRecorder_SQLComm(QObject):
         self.Comm_Reading.emit(True)
         with self.conn:
             try:
-                for result in self.cursor.execute('SELECT run_id, instrument_name, timestamp FROM measurementPackets WHERE rowid=?', rowID):
+                for result in self.cursor.execute('SELECT run_id, instrument_name, instrument_uuid, timestamp, squence FROM measurementPackets WHERE rowid=?', rowID):
                     pass
             except Exception as e:
                 self.Error_Message.emit('ERROR Reading Measurement Packet From: ' + self.databaseURL, e)
@@ -264,8 +291,8 @@ class SQLiteDataRecorder_SQLComm(QObject):
         rowCursor = self.conn.cursor()
         with self.conn:
             try:
-                for row in self.cursor.execute('SELECT run_ID, instrument_name, timestamp FROM instrumentRuns'):
-                    record = Database_Run_Record(row[0], row[1], row[2])
+                for row in self.cursor.execute('SELECT run_ID, instrument_name, instrument_uuid, timestamp, sequence FROM instrumentRuns'):
+                    record = Database_Run_Record(row[0], row[1], row[2], row[3], row[4])
                     for row2 in rowCursor.execute('SELECT rowid, run_id, measurement_packet FROM measurementPackets where run_ID=?', (row[0],)):
                         record.Add_Measurement(row[0], row[1], pickle.loads(row2[2]))
                     
@@ -276,10 +303,12 @@ class SQLiteDataRecorder_SQLComm(QObject):
         self.Comm_Reading.emit(False)
 
 class Database_Run_Record():
-    def __init__(self, runID, instrumentName, timeStamp):
+    def __init__(self, runID, instrumentName, instrumentUUID, timeStamp, sequence):
         self.runID = runID
         self.instrumentName = instrumentName
+        self.instrumentUUID = instrumentUUID
         self.timeStamp = timeStamp
+        self.sequence = sequence
 
         self.measurementList = list()
 

@@ -186,7 +186,10 @@ class Sequencer(DSModule):
     def sequenceLoaded(self, instrument): #Update when Sequence has been fixed in iM
         #self.Write_Setting('Sequence_Path', instrument.Get_Sequence().Get_Path())
         seqInfo = instrument.Get_Sequence()
-        self.setWindowTitle('Sequencer (' + seqInfo.Get_Path() + ')')
+        if seqInfo.Get_Path() is not None:
+            self.setWindowTitle('Sequencer (' + seqInfo.Get_Path() + ')')
+        else:
+            self.setWindowTitle('Sequence (None)')
         self.getInstrumentBoxInstrument()
 
     def sequenceUnloaded(self, instrument):

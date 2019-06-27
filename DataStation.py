@@ -29,7 +29,7 @@ from PyQt5.QtGui import *
 
 def warn(*args, **kwargs):
     pass
-import warnings
+import warnings 
 warnings.warn = warn
 
 from src.Constants import DSConstants as DSConstants

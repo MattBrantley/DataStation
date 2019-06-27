@@ -1,0 +1,244 @@
+{
+    "UUID": "0d1f139a-43e4-4fe9-9b81-b877342c9727",
+    "compList": [
+        {
+            "compIdentifier": "mrb_conv_gauge",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": -180.0,
+                        "x": 17.999999999999886,
+                        "y": 899.0000000000003
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Convectron.png",
+                "name": "Source Roughing",
+                "triggerComp": false,
+                "uuid": "27863d35-1ed5-4eae-a06c-817b765fabd2"
+            },
+            "compType": "Convectron Gauge",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "dda7efed-9e5b-4395-a549-a75299155ce8",
+                    "inputSourcePathNo": 1,
+                    "name": "Voltage Input",
+                    "prec": 0.1,
+                    "tag": "[AI]",
+                    "uuid": "7a94351f-da7d-4cc7-9955-e8d493ce17c8",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "mrb_conv_gauge",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": -180.0,
+                        "x": 707.0,
+                        "y": 905.0000000000003
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Convectron.png",
+                "name": "Transfer Roughing",
+                "triggerComp": false,
+                "uuid": "75d46e99-cab6-411b-a4ee-077f4392fb37"
+            },
+            "compType": "Convectron Gauge",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "a6032bc5-f5a2-42ad-a121-3cd27b43619f",
+                    "inputSourcePathNo": 1,
+                    "name": "Voltage Input",
+                    "prec": 0.1,
+                    "tag": "[AI]",
+                    "uuid": "6e7b9d7b-7e3b-456f-afdc-ef4077c7f9d9",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "mrb_conv_gauge",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": -180.0,
+                        "x": 1448.0,
+                        "y": 936.0000000000003
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Convectron.png",
+                "name": "ICR Roughing",
+                "triggerComp": false,
+                "uuid": "8a3bafef-8c2c-40d1-b948-94b7fec510f5"
+            },
+            "compType": "Convectron Gauge",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "42945d27-5951-410f-9477-8ffc8da5580b",
+                    "inputSourcePathNo": 1,
+                    "name": "Voltage Input",
+                    "prec": 0.1,
+                    "tag": "[AI]",
+                    "uuid": "59dc0946-e9ae-48bd-bf14-440463cf9024",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "mrb_conv_gauge",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": -180.0,
+                        "x": 2234.0,
+                        "y": 936.0000000000003
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Convectron.png",
+                "name": "Sample Valve",
+                "triggerComp": false,
+                "uuid": "6ddc7217-5e4b-4690-a461-5b419d9c81d4"
+            },
+            "compType": "Convectron Gauge",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "4660c742-4b36-4c4d-952f-4d88c3f28639",
+                    "inputSourcePathNo": 1,
+                    "name": "Voltage Input",
+                    "prec": 0.1,
+                    "tag": "[AI]",
+                    "uuid": "5148986f-b67b-4aab-b45a-dbccf30ced8c",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "mrb_ion_gauge",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": -180.0,
+                        "x": 50.0,
+                        "y": 1703.0
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Ion_Guage.png",
+                "name": "Source Ion Gauge",
+                "triggerComp": false,
+                "uuid": "c625303d-4438-4f2b-b61f-f13616daaec5"
+            },
+            "compType": "Ion Gauge",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "cdb94dc3-847a-4c3b-8064-4d46cf162348",
+                    "inputSourcePathNo": 1,
+                    "name": "Voltage Input",
+                    "prec": 0.1,
+                    "tag": "[AI]",
+                    "uuid": "8c65aed2-33ef-49e8-beea-a1c91d30ce54",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "mrb_ion_gauge",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": -180.0,
+                        "x": 942.0,
+                        "y": 1699.0
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Ion_Guage.png",
+                "name": "Transfer Ion Gauge",
+                "triggerComp": false,
+                "uuid": "de4ca95f-ad8a-4b49-b73f-539c722258e8"
+            },
+            "compType": "Ion Gauge",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "2a1b4972-ddb1-4d8b-8508-0ee0612e7e9f",
+                    "inputSourcePathNo": 1,
+                    "name": "Voltage Input",
+                    "prec": 0.1,
+                    "tag": "[AI]",
+                    "uuid": "20f346f8-e2d5-4f66-a6d6-1263dd83a425",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        },
+        {
+            "compIdentifier": "mrb_ion_gauge",
+            "compSettings": {
+                "customFields": {
+                    "iViewSettings": {
+                        "r": 0,
+                        "x": 1514.0,
+                        "y": 931.0
+                    },
+                    "sequencerSettings": {
+                        "show": true
+                    }
+                },
+                "layoutGraphicSrc": "Ion_Guage.png",
+                "name": "ICR Ion Gauge",
+                "triggerComp": false,
+                "uuid": "8773094d-4f1b-45d3-a64d-e8cff4f20bc4"
+            },
+            "compType": "Ion Gauge",
+            "sockets": [
+                {
+                    "drivingSocket": true,
+                    "inputSource": "81cc6661-74d2-45a5-ad77-5361f71ec603",
+                    "inputSourcePathNo": 1,
+                    "name": "Voltage Input",
+                    "prec": 0.1,
+                    "tag": "[AI]",
+                    "uuid": "3372d1c2-b1ec-4a49-8768-283e49098151",
+                    "vMax": 10,
+                    "vMin": 0
+                }
+            ],
+            "triggerComp": false
+        }
+    ],
+    "name": "Readbacks"
+}

@@ -119,7 +119,8 @@ class instrumentControlItem(QWidget):
         self.runMultipleButton.setIconSize(QSize(24,24))
         self.runMultipleButton.setToolTip('Rune Multiple')
         self.runMultipleButton.pressed.connect(self.runMultiplePressed)
-        self.runMultipleButton.setEnabled(False)
+        self.runMultipleButton.setEnabled(True)
+        self.runMultipleButton.setCheckable(True)
 
         self.runStopButton = QPushButton()
         self.runStopIcon = QIcon(os.path.join(dir, 'icons5\stop.png'))
@@ -156,9 +157,13 @@ class instrumentControlItem(QWidget):
         self.readyCheckMessages.append(message)
 
     def runMultiplePressed(self):
-        print('run multiple')
+        if self.runMultipleButton.pressed is True:
+            self.runMultipleButton.pressed = False
+        else:
+            self.runMultipleButton.pressed = True
 
     def runStopPressed(self):
+        self.runMultipleButton.pressed = False
         self.targetInstrument.Stop_Instrument()
 
     def runSettingsPressed(self):
@@ -220,7 +225,13 @@ class instrumentControlItem(QWidget):
         if instrument == self.targetInstrument:
             readyCheckList = self.targetInstrument.Ready_Check_List()
             self.updateButtons(readyCheckList)
+            self.runMultiCheck()
             self.statusDisplayWidget.update()
+
+    def runMultiCheck(self):
+        if self.runMultipleButton.pressed is True:
+            if self.targetInstrument.Can_Run():
+                self.targetInstrument.Run_Instrument()
 
     def updateButtons(self, readyCheckList):
         if self.targetInstrument.Can_Run():
@@ -247,6 +258,9 @@ class instrumentControlItem(QWidget):
             self.readyCheckInfoButton.setToInfo()
 
         self.readyCheckInfoButton.setMessageCount(len(readyCheckList))
+
+        if self.runMultipleButton.pressed is True:
+            self.runMultipleButton.setEnabled(True)
 
 class settingsConfigWidget(QWidget):
     def __init__(self, widget, ds):
@@ -324,11 +338,14 @@ class statusDisplayWidget(QLineEdit):
         self.cycleTimer.start(2000)
 
     def getPercentComplete(self):
-        progress = self.controlWidget.targetInstrument.Get_Run_Time() / self.controlWidget.targetInstrument.Get_Sequence().Get_Sequence_Length() * 100
-        if progress > 100:
-            progress = 100
+        if self.controlWidget.targetInstrument.Get_Sequence().Get_Sequence_Length() > 0:
+            progress = self.controlWidget.targetInstrument.Get_Run_Time() / self.controlWidget.targetInstrument.Get_Sequence().Get_Sequence_Length() * 100
+            if progress > 100:
+                progress = 100
 
-        return progress
+            return progress
+        else:
+            return 100
 
     def updateMessage(self):
         messageCount = len(self.messageList)

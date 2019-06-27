@@ -51,8 +51,15 @@ class Instrument(QObject):
         self.Get_Sequence().Load_Sequence_File(path)
         self.readyCheck()
 
+    def Load_Sequence_Data(self, data):
+        self.Get_Sequence().Load_Sequence_Data(data)
+        self.readyCheck()
+
     def Save_Sequence(self, filepath):
         self.Get_Sequence().Save_Sequence(filepath)
+
+    def Get_Sequence_Serialized(self):
+        return self.Get_Sequence().Get_Sequence_Serialized()
 
     def Save_Instrument(self, name=None, path=None):
         if(name is not None):

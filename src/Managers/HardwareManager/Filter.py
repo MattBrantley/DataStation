@@ -24,8 +24,8 @@ class Filter():
     def Get_Source(self):
         return self.getSource()
 
-    def Get_Sockets(self):
-        return self.getSockets()
+    def Get_Socket(self):
+        return self.getSocket()
 
     def Get_UUID(self):
         return self.filterSettings['uuid']
@@ -90,35 +90,38 @@ class Filter():
                 inputObj = self.hM.Get_Sources(uuid=self.filterSettings['inputSource'])
             if not inputObj:
                 return None
-        return inputObj
+        return inputObj[0]
+
+    def getProgrammingPacket(self, programmingPacket):
+        programmingPacket = self.procForwardParent(programmingPacket)
+        self.Get_Source().getProgrammingPacket(programmingPacket)
+
+    def getMeasurementPacket(self, measurementPacket):
+        measurementPacket = self.procReverseParent(measurementPacket)
+        socket = self.Get_Socket()
+        if(socket):
+            socket.getMeasurementPacket(measurementPacket)
 
 ##### Functions Over-Ridden By Factoried Filters #####
 
-    def procForwardParent(self, packetIn):
-        packetType = self.getPacketType(packetIn)
-
-        if(packetType is None):
-            #Incoming packet is an unknown type
-            return None
-
-        packetOut = self.procForward(packetIn, packetType)
+    def procForwardParent(self, programmingPacket):
+        packetOut = self.procForward(programmingPacket)
         if(packetOut is None):
             packetOut = packetIn
         
         return packetOut
 
-    def procForward(self, inputs): ### OVERRIDE ME!! ####
-        return None
-
-    def procReverseParent(self, packetIn):
-        subs = list()
-        packetType = self.getPacketType(packetIn)
-
-        packetOut = self.procReverse(pathNo, packetIn, packetType)
+    def procReverseParent(self, measurementPacket):
+        packetOut = self.procReverse(measurementPacket)
         if(packetOut is None):
             packetOut = packetIn
 
-    def procReverse(self, pathNo, packetIn, packetType): ### OVERRIDE ME!! ####
+        return packetOut
+
+    def procForward(self, programmingPacket): ## OVERRIDE ME!! ##
+        return None
+
+    def procReverse(self, measurementPacket): ### OVERRIDE ME!! ####
         return None
 
     def onCreationParent(self):
@@ -129,16 +132,22 @@ class Filter():
 
 ##### Search Functions ######
 
-    def getSockets(self):
-        if(self.iM.Get_Instrument() is None):
-            return list()
+    def getSocket(self):
         outputFilters = self.hM.Get_Filters(inputUUID = self.filterSettings['uuid'])
-        outputSockets = self.iM.Get_Instrument().Get_Sockets(inputUUID = self.filterSettings['uuid'])
+        if outputFilters:
+            return outputFilters[0]
 
-        for Filter in outputFilters:
-            outputSockets += Filter.Get_Sockets()
+        for instrument in self.iM.Get_Instruments():
+            outputSocket = instrument.Get_Sockets(inputUUID = self.filterSettings['uuid'])
+            if outputSocket:
+                return outputSocket[0]
 
-        return outputSockets
+        return None
+
+        # for Filter in outputFilters:
+        #     outputSockets += Filter.Get_Sockets()
+
+        # return outputSockets
 
     def getSource(self):
         if(self.filterSettings['inputSource'] is None or self.filterSettings['inputSourcePathNo'] is None):
@@ -166,25 +175,26 @@ class Filter():
         for key, value in loadPacket.items():
             self.filterSettings[key] = value
 
-        self.restoreState()
+        #self.restoreState()
 
-    def restoreState(self):
-        if(self.filterSettings['inputSource'] is None):
-            self.filterSettings['inputSourcePathNo'] = None
-            return # Previous filter state was not connected to anything
-        if(self.filterSettings['inputSourcePathNo'] is None):
-            self.filterSettings['inputSource'] = None
-            return # Previous filter state was not connected to anything; even if it was, we don't know to what path.
+    # def restoreState(self):
+    #     if(self.filterSettings['inputSource'] is None):
+    #         self.filterSettings['inputSourcePathNo'] = None
+    #         return # Previous filter state was not connected to anything
+    #     if(self.filterSettings['inputSourcePathNo'] is None):
+    #         self.filterSettings['inputSource'] = None
+    #         return # Previous filter state was not connected to anything; even if it was, we don't know to what path.
 
-        target = self.hM.Get_Sources(uuid=self.filterSettings['inputSource'])
-        if(len(target) == 0):
-            target = self.hM.Get_Filters(uuid=self.filterSettings['inputSource'])
+    #     print(self.filterSettings['inputSource'])
+    #     target = self.hM.Get_Sources(uuid=self.filterSettings['inputSource'])
+    #     if(len(target) == 0):
+    #         target = self.hM.Get_Filters(uuid=self.filterSettings['inputSource'])
 
-        if(len(target) == 0):
-            self.filterSettings['inputSource'] = None
-            self.filterSettings['inputSourcePathNo'] = None
-            self.ds.postLog('FILTER RESTORE ERROR: ' + self.filterSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Filter/Source that does not exist!!!' , DSConstants.LOG_PRIORITY_MED)
-            return # No Filter or Source found at that uuid - clear this filter's reference.
+    #     if(len(target) == 0):
+    #         self.filterSettings['inputSource'] = None
+    #         self.filterSettings['inputSourcePathNo'] = None
+    #         self.ds.postLog('FILTER RESTORE ERROR: ' + self.filterSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Filter/Source that does not exist!!!' , DSConstants.LOG_PRIORITY_MED)
+    #         return # No Filter or Source found at that uuid - clear this filter's reference.
 
     def attachInput(self, uuid, pathNumber):
 
@@ -192,8 +202,8 @@ class Filter():
         filtersAttached = self.hM.Get_Filters(inputUUID = uuid, pathNo=pathNumber)
         for Filter in filtersAttached:
             Filter.Detatch_Input()
-        if(self.iM.Get_Instrument() is not None):
-            socketsAttached = self.iM.Get_Instrument().Get_Sockets(inputUUID = uuid, pathNo=pathNumber)
+        for instrument in self.iM.Get_Instruments():
+            socketsAttached = instrument.Get_Sockets(inputUUID = uuid, pathNo=pathNumber)
             for Socket in socketsAttached:
                 Socket.Detatch_Input()
 
@@ -212,9 +222,10 @@ class Filter():
         outputFilters = self.hM.Get_Filters(inputUUID = self.filterSettings['uuid'])
         for Filter in outputFilters:
             Filter.Remove()
-        outputSockets = self.iM.Get_Instrument().Get_Sockets(inputUUID = self.filterSettings['uuid'])
-        for Socket in outputSockets:
-            Socket.Detatch_Input()
+        for insturment in self.iM.Get_Instruments():
+            outputSockets = insturment.Get_Sockets(inputUUID = self.filterSettings['uuid'])
+            for Socket in outputSockets:
+                Socket.Detatch_Input()
         self.hM.removeFilter(self)
 
 class AnalogFilter(Filter):

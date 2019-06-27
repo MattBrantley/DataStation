@@ -118,7 +118,7 @@
                     "params": {
                         "Width": 0.05
                     },
-                    "time": 12.0,
+                    "time": 8.0,
                     "type": "Pulse High"
                 }
             ],
@@ -138,7 +138,7 @@
                     "params": {
                         "Width": 0.05
                     },
-                    "time": 12.005,
+                    "time": 8.005,
                     "type": "Pulse High"
                 }
             ],
@@ -151,10 +151,10 @@
             "events": [
                 {
                     "params": {
-                        "Duration": 0.01,
-                        "Voltage": 7.0
+                        "Duration": 4.0,
+                        "Voltage": 70.0
                     },
-                    "time": 0.01,
+                    "time": 0.5,
                     "type": "Pulse"
                 }
             ],
@@ -172,11 +172,11 @@
                 },
                 {
                     "params": {
-                        "Count": 5,
+                        "Count": 3,
                         "Off Time": 0.5,
-                        "On Time": 0.001
+                        "On Time": 0.003
                     },
-                    "time": 1.0,
+                    "time": 0.1,
                     "type": "Pulse Train"
                 }
             ],

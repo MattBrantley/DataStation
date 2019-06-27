@@ -37,6 +37,8 @@ class PXIe_5451(HardwareDevice):
         self.initialized.emit()
 
     def configure(self):
+        self.session.terminal_configuration = nifgen.TerminalConfiguration.SINGLE_ENDED
+        self.session.analog_path = nifgen.AnalogPath.DIRECT
         
         self.configured.emit()
 
@@ -65,9 +67,11 @@ class PXIe_5451(HardwareDevice):
 
     def softTrigger(self):
         self.Set_Ready_Status(False)
-        self.session.initiate()
-
-        self.softTriggered.emit()
+        if self.session.is_done():
+            self.session.abort()
+            self.session.initiate()
+            #self.session.output_enabled = False
+            self.softTriggered.emit()
 
     def shutdown(self):
         if(self.session is not None):
@@ -84,7 +88,8 @@ class PXIe_5451(HardwareDevice):
                     else:
                         if(self.Ready_Status() is False):
                             self.Send_Status_Message('Triggered!')
-                            self.Set_Ready_Status(True)
+                            #self.session.output_enabled = False
+                            self.Set_Ready_Status(True) 
                 except:
                     pass
         

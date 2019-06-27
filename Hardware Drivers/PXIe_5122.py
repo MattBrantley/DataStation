@@ -82,6 +82,7 @@ class PXIe_5122(HardwareDevice):
 
     def softTrigger(self):
         self.Set_Ready_Status(False)
+        self.session.abort()
         self.session.initiate()
         
         self.softTriggered.emit()
@@ -96,10 +97,10 @@ class PXIe_5122(HardwareDevice):
                 try:
                     if(self.session.acquisition_status() == niscope.AcquisitionStatus.COMPLETE):
                         if(self.Ready_Status() is False):
-                            self.Send_Status_Message('Triggered!')
-                            self.Set_Ready_Status(True)
                             wfmInfo = self.session.channels[0].fetch_into(self.readArray)
                             self.writeToPacket(self.readArray, wfmInfo[0])
+                            self.Send_Status_Message('Triggered!')
+                            self.Set_Ready_Status(True)
 
                     else:
                         if(ms() - self.reportTime >= 500):

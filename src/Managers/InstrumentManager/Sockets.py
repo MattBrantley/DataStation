@@ -136,23 +136,24 @@ class Socket():
 
         #self.restoreState()
 
-    def restoreState(self):
-        if(self.socketSettings['inputSource'] is None):
-            self.socketSettings['inputSourcePathNo'] = None
-            return # Previous socket state was not connected to anything
-        if(self.socketSettings['inputSourcePathNo'] is None):
-            self.socketSettings['inputSource'] = None
-            return # Previous socket state was not connected to anything; even if it was, we don't know to what path.
+    # def restoreState(self):
+    #     print('IS THIS CALLED?')
+    #     if(self.socketSettings['inputSource'] is None):
+    #         self.socketSettings['inputSourcePathNo'] = None
+    #         return # Previous socket state was not connected to anything
+    #     if(self.socketSettings['inputSourcePathNo'] is None):
+    #         self.socketSettings['inputSource'] = None
+    #         return # Previous socket state was not connected to anything; even if it was, we don't know to what path.
 
-        target = self.hM.Get_Sources(uuid=self.socketSettings['inputSource'])
-        if(len(target) == 0):
-            target = self.hM.Get_Filters(uuid=self.socketSettings['inputSource'])
+    #     target = self.hM.Get_Sources(uuid=self.socketSettings['inputSource'])
+    #     if(len(target) == 0):
+    #         target = self.hM.Get_Filters(uuid=self.socketSettings['inputSource'])
 
-        if(len(target) == 0):
-            self.socketSettings['inputSource'] = None
-            self.socketSettings['inputSourcePathNo'] = None
-            self.ds.postLog('SOCKET RESTORE ERROR: ' + self.socketSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Filter/Source that does not exist!!!' , DSConstants.LOG_PRIORITY_MED)
-            return # No Filter or Source found at that uuid - clear this socket's reference.
+    #     if(len(target) == 0):
+    #         self.socketSettings['inputSource'] = None
+    #         self.socketSettings['inputSourcePathNo'] = None
+    #         self.ds.postLog('SOCKET RESTORE ERROR: ' + self.socketSettings['name'] + ' (' + type(self).__name__ + ') Trying To Attach To Filter/Source that does not exist!!!' , DSConstants.LOG_PRIORITY_MED)
+    #         return # No Filter or Source found at that uuid - clear this socket's reference.
         
     def detatch(self):
         self.socketSettings['inputSource'] = None

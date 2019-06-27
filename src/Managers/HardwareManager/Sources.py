@@ -15,8 +15,8 @@ class Source():
     def Get_Connector_ID(self):
         return self.sourceSettings['physConID']
 
-    def Get_Sockets(self):
-        return self.getSockets()
+    def Get_Socket(self):
+        return self.getSocket()
 
     def Get_Source(self):
         return self
@@ -69,12 +69,12 @@ class Source():
         trace.append(self)
 
         socketInstrumentUUIDList = list()
-        for socket in self.getSockets():
-            if socket.socketSettings['drivingSocket'] == True:
-                socketInstrumentUUIDList.append(socket.Get_Component().Get_Instrument().Get_UUID())
-        if len(socketInstrumentUUIDList) != len(set(socketInstrumentUUIDList)):
-            trace[0].Fail_Ready_Check(trace, 'Source Has More Than One Driving Socket From An Instrument!')
-            return False
+        # if self.getSocket() is not None:
+        #     if self.getSocket().socketSettings['drivingSocket'] == True:
+        #          socketInstrumentUUIDList.append(self.getSocket().Get_Component().Get_Instrument().Get_UUID())
+        # if len(socketInstrumentUUIDList) != len(set(socketInstrumentUUIDList)):
+        #     trace[0].Fail_Ready_Check(trace, 'Source Has More Than One Driving Socket From An Instrument!')
+        #     return False
 
         #drivingSocketCount = 0
         #for socket in self.getSockets():
@@ -108,15 +108,15 @@ class Source():
         self.hWare.programDataReceived(self)
 
     def isConnected(self):
-        if(self.getSockets()):
+        if(self.getSocket()):
             return True
         else:
             return False
 
     def pushMeasurementPacket(self, measurementPacket):
-        sockets = self.Get_Sockets()
-        if(sockets):
-            sockets[0].getMeasurementPacket(measurementPacket)
+        socket = self.Get_Socket()
+        if(socket):
+            socket.getMeasurementPacket(measurementPacket)
 
     def getProgrammingInstrument(self):
         if self.programmingPacket is not None:
@@ -125,16 +125,17 @@ class Source():
             return None
 
 ##### Search Functions #####
-    def getSockets(self):
-        outputSockets = list()
+    def getSocket(self):
         outputFilters = self.hM.Get_Filters(inputUUID = self.sourceSettings['uuid'])
+        if outputFilters:
+            return outputFilters[0]
+
         for instrument in self.iM.Get_Instruments():
-            outputSockets += instrument.Get_Sockets(inputUUID = self.sourceSettings['uuid'])
+            outputSocket = instrument.Get_Sockets(inputUUID = self.sourceSettings['uuid'])
+            if outputSocket:
+                return outputSocket[0]
 
-        for Filter in outputFilters:
-            outputSockets += Filter.Get_Sockets()
-
-        return outputSockets
+        return None
 
 ##### Functions Over-Ridden By Factoried Sources #####
     def procReverseParent(self, packetIn):

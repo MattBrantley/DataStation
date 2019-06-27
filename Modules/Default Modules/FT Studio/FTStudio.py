@@ -64,6 +64,8 @@ class FTStudio(DSModule):
                     resourceItem.packetResource = resource
                     moduleItem.addChild(resourceItem)
 
+        self.TreeWidget.expandAll()
+
     def initFTContainer(self):
         self.FTContainer.setOrientation(Qt.Vertical)
 
@@ -159,7 +161,9 @@ class spectrumView(QChartView):
     ##### MATHS #####
     def doFFT(self, data, dT):
         yData = np.fft.rfft(data)
-        yData = np.abs(yData)**2
+        #yData = np.abs(yData)**2
+        # yData = yData*np.blackman(yData.size)
+        yData = np.abs(yData)
         xData = np.fft.rfftfreq(data.shape[0], d=dT)
         vfunc = np.vectorize(self.ftomz)
         xData = vfunc(xData[1:], 9.34)
